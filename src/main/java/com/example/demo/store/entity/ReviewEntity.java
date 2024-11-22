@@ -46,7 +46,7 @@ public class ReviewEntity { // 리뷰
     // dto => entity 변환
 
     // 리뷰 작성
-    public static ReviewEntity toSaveReviewDTO(ReviewDTO dto, UserEntity userEntity, ProductEntity productEntity) {
+    public static ReviewEntity toSaveReviewEntity(ReviewDTO dto, UserEntity userEntity, ProductEntity productEntity) {
         ReviewEntity entity = new ReviewEntity();
         entity.setUserEntity(userEntity);
         entity.setProductEntity(productEntity);
@@ -56,17 +56,4 @@ public class ReviewEntity { // 리뷰
         return entity;
     }
 
-    // 리뷰 출력
-    public static ReviewDTO toGetReviewDTO(ReviewEntity entity) {
-        ReviewDTO dto = new ReviewDTO();
-        dto.setId(entity.getId());
-        dto.setUserId(entity.getUserEntity().getId());
-        dto.setUserName(entity.getUserEntity().getName());
-        dto.setProductId(entity.getProductEntity().getId());
-        dto.setRating(entity.getRating());
-        dto.setContent(entity.getContent());
-        dto.setReviewDate(entity.getReviewDate());
-
-        return dto;
-    }
 }

@@ -29,7 +29,7 @@ public class ProductEntity { // 상품
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 200)
+    @Column(length = 200)
     private String img; // 첫 번째 상품 이미지
 
     @Column(length = 2000)

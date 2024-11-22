@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.payment.service.PaymentService;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api/user/payment")
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;

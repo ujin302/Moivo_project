@@ -8,7 +8,7 @@ function user_signup() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    id: "",
+    userId: "",
     pwd: "",
     confirmPwd: "",
     name: "",
@@ -93,8 +93,8 @@ function user_signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/api/auth/signup", {
-        id: formData.id,
+      await axios.post("/api/user/join", {
+        userId: formData.userId,
         pwd: formData.pwd,
         name: formData.name,
         email: formData.email,
@@ -118,8 +118,8 @@ function user_signup() {
         <form className={styles.signupForm} onSubmit={handleSubmit}>
           <div className={styles.formRow}>
             <span>ID</span>
-            <input type="text" name="id" value={formData.id} onChange={handleChange} />
-            <div className={styles.exception}>{errors.id}</div>
+            <input type="text" name="userId" value={formData.userId} onChange={handleChange} />
+            <div className={styles.exception}>{errors.userId}</div>
           </div>
           <hr className={styles.signupline} />
 

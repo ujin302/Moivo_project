@@ -38,10 +38,8 @@ public class UserEntity { // 사용자 & 관리자
     @Column(name = "userid", nullable = false, unique = true)
     private String userId;
 
-    @Column(nullable = false, length = 30)
+    @Column(length = 30)
     private String name;
-
-    @Column(nullable = false)
     private String pwd;
 
     @Column(length = 50)
@@ -71,7 +69,6 @@ public class UserEntity { // 사용자 & 관리자
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Grade grade = Grade.LV1;
-
     private double height;
     private double weight;
 

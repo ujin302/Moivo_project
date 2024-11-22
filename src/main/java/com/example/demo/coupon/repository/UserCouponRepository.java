@@ -11,5 +11,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserCouponRepository extends JpaRepository<UserCouponEntity, Long> {
-    List<UserCouponEntity> findByUserEntityId(int userid); // 특정 사용자에 해당하는 쿠폰 조회
+  List<UserCouponEntity> findByUserEntity_Id(int userId);
+
 }

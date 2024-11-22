@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
-@RequestMapping("/api/mypage")
+@RequestMapping("/api/user/mypage")
 public class MypageController {
 
     @Autowired

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.qna.service.QuestionService;
 
 @RestController
-@RequestMapping("/api/qna/question")
+@RequestMapping("/api/user/question")
 public class QuestionController {
     @Autowired
     private QuestionService questionsService;

@@ -1,6 +1,7 @@
 package com.example.demo.jwt.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +11,7 @@ import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.UserRepository;
 
 @Service
+@Primary
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired

@@ -90,10 +90,10 @@ public class UserServiceImpl implements UserService {
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1시간 유효
                 .compact();
 
-        System.out.println("userseq = " + userEntity.getUserId());
+        System.out.println("id = " + userEntity.getId());
         Map<String, Object> result = new HashMap<>();
         result.put("jwt", jwt);
-        result.put("userseq", userEntity.getUserId());
+        result.put("id", userEntity.getId());
         result.put("wishId", wishId);
         result.put("paymentId", paymentId);
 
