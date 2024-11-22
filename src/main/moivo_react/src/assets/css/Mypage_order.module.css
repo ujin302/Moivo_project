@@ -1,0 +1,256 @@
+@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
+
+.memberFrame {
+    margin: 0 auto;
+    padding: 130px; /* 내부 여백 추가 */
+    background: #f6f2ee;
+}
+
+.order {
+    font-family: 'Italiana', serif;
+    font-size: 40px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: 40px;
+}
+
+.logoutCartSearch {
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: right;
+    color: #2f2e2c;
+    margin-bottom: 20px;
+}
+
+.navLinks {
+    font-family: 'GmarketSans', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: 20px;
+}
+
+.instructions {
+    font-family: 'GmarketSans', serif;
+    font-size: 15px;
+    font-weight: 570;
+    line-height: 24px;
+    letter-spacing: 0.03em;
+    color: #988c73;
+    margin-bottom: 10px;
+}
+
+.table {
+    width: 100%; /* 테이블 전체 크기 조정 */
+    border: 1px solid #988c73;
+    border-collapse: collapse; /* 경계선이 깔끔하게 보이도록 설정 */
+}
+
+.row {
+    display: flex;
+    align-items: center; /* 행의 모든 요소를 수직 중앙 정렬 */
+    padding: 15px;
+    border-bottom: 1px dashed #988c73;
+    text-align: center;
+}
+
+.row:last-child {
+    border-bottom: none; /* 마지막 행의 경계선 제거 */
+}
+
+.column .additionalCount {
+    font-size: 12px;
+    color: #988c73;
+}
+
+
+/* 상품정보 텍스트 왼쪽 정렬 */
+.column .product-info {
+    text-align: left; /* 왼쪽 정렬 */
+    margin-bottom: 0; /* 아래 여백 제거 */
+    display: flex;
+    flex-direction: column; /* 세로로 정렬 */
+    justify-content: flex-start; /* 상단 정렬 */
+}
+
+/* 상품정보 하위 내용들인 옵션도 왼쪽 정렬 */
+.column .product-info span {
+    display: block; /* 줄 바꿈을 위한 블록 요소로 설정 */
+    margin-bottom: 5px; /* 옵션과 내용 사이의 간격 */
+}
+
+.header {
+    font-family: 'GmarketSans', serif;
+    font-size: 14px;
+    color: #988c73;
+    flex: 1;
+    text-align: center;
+}
+
+/* 상품금액 및 상태와 다른 컬럼들의 정렬 유지 */
+/* 구매확정 + 리뷰 버튼 스타일 */
+.column {
+    font-family: 'GmarketSans', serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    color: #2F2E2C;
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1; /* 기본 비율 */
+}
+
+.column .reviewButton {
+    margin-top: 10px; /* 버튼과 텍스트 사이 간격 */
+}
+
+
+.column .orderDate {
+    font-size: 14px; /* 주문일자 스타일 */
+    margin-bottom: 5px; /* 아래 여백 추가 */
+}
+
+/* Link 컴포넌트 스타일 */
+.orderLink {
+    text-decoration: underline; /* 밑줄 추가 */
+    color: inherit; /* 부모 요소의 색상 그대로 사용 */
+}
+
+
+.column .orderNumber {
+    font-size: 14px; /* 주문번호 스타일 */
+    margin-top: 5px; /* 위 여백 추가 */
+    text-decoration: underline; /* 밑줄 추가 */
+}
+
+.column2 {
+    font-family: 'Italiana', serif;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 20px;
+    color: #988c73;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+
+.column .product-info {
+    text-align: left; /* 상품정보만 왼쪽 정렬 */
+    margin-bottom: 5px; /* 상품정보와 내용 사이에 약간의 간격 추가 */
+}
+
+.column .product-details {
+    text-align: center; /* 상품 내용은 기존대로 가운데 정렬 */
+}
+
+
+.column:nth-child(2) {
+    flex: 0 0 80px; /* 이미지 열의 크기를 고정 */
+}
+
+
+.column2 .product-info {
+    text-align: left; /* 상품정보만 왼쪽 정렬 */
+    margin-bottom: 5px; /* 상품정보와 내용 사이에 약간의 간격 추가 */
+}
+
+.column2 .product-details {
+    text-align: center; /* 상품 내용은 기존대로 가운데 정렬 */
+}
+
+
+.column2:nth-child(2) {
+    flex: 0 0 80px; /* 이미지 열의 크기를 고정 */
+}
+
+
+
+.image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    padding-right: 10px;
+    background-color: #988c7325; /* 원하는 배경색 */
+    position: relative; /* 가상 요소가 제대로 배치되도록 상대 위치 지정 */
+}
+
+.image img {
+    max-width: 90px;
+    max-height: 1100px;
+    object-fit: contain; /* 이미지 비율 유지 */
+}
+
+/* Link 컴포넌트 스타일 */
+.orderLink {
+    text-decoration: underline; /* 밑줄 추가 */
+    color: inherit; /* 부모 요소의 색상 그대로 사용 */
+}
+
+.reviewColumn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reviewButton {
+    font-family: 'Italiana', serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 15px;
+    background-color: #988c736f;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.reviewButton:hover {
+    background-color: #988C73;
+    transform: scale(1.05);
+}
+
+
+@media (max-width: 768px) {
+    .moivo {
+        font-size: 36px;
+    }
+
+    .order {
+        font-size: 28px;
+    }
+
+    .instructions {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    .column {
+        font-size: 12px;
+    }
+
+    .column:first-child {
+        flex: 2; /* 작은 화면에서 첫 번째 열 더 넓게 */
+    }
+
+    .row {
+        flex-direction: column; /* 세로 정렬 */
+    }
+    
+    .image {
+        flex: 0 0 80px;
+        height: 80px;
+        padding-right: 5px;
+    }
+
+    .image img {
+        max-width: 60px;
+        max-height: 80px;
+    }
+}

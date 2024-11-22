@@ -1,0 +1,145 @@
+.qnalistMainDiv {
+    height: 100vh;
+    background-color: #fff;
+  }
+  
+  .qnalistheader {
+    height: 130px;
+  }
+  
+  /* 제목 영역 */
+  .qnalistTitle {
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-weight: bold;
+    position: relative;
+  }
+  
+  .qnalistTitle::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1300px;
+    height: 2px;
+    background-color: #000;
+    margin-bottom: 15px;
+  }
+  
+  /* 네비게이션 버튼 스타일 */
+  .qnalistNavi {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  
+  .qnalistNaviBtn {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .qnalistNaviBtn:hover {
+    background-color: #333;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .qnalistNaviBtn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .qnalist{
+    height: 562px;
+  }
+  /* QnA 리스트 컨테이너 */
+  .qnalistContainer {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 4px;
+    position: relative;
+  }
+  
+  /* QnA 항목 스타일 */
+  .qnalistItem {
+    padding: 15px 0px;
+    border-bottom: 1.5px solid #555;
+  }
+  
+  .qnalistHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #FAFAFA;
+    border-bottom: 1px solid #E1E1E1;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .qnalistHeader span{
+    margin-bottom: 10px;
+  }
+  
+  .qnalistHeader:hover {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .qnalistQuestionType {
+    font-weight: bold;
+    color: black;
+  }
+  
+  .qnalistQuestionTitle {
+    flex-grow: 1;
+    margin-left: 10px;
+    color: #222;
+  }
+  
+  .qnalistSecretLabel {
+    font-size: 14px;
+    color: red;
+    font-weight: bold;
+  }
+  
+  .qnalistDetails {
+    padding: 0px 20px;
+    background-color: #fff;
+    
+  }
+  
+  .qnalistUserInfo {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .qnalistUserQuestion, .qnalistUserAnswer {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+  
+  .qnalistDivider {
+    height: 1px;
+    background-color: #ddd;
+    margin: 15px 0;
+  }
+  

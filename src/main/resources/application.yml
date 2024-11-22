@@ -1,0 +1,42 @@
+spring:
+  config:
+    import: "classpath:external-config.properties"
+
+  datasource:
+    # Oracle 설정
+    # url: jdbc:oracle:thin:@localhost:1521:XE
+    # username: c##java
+    # password: 1234
+    # driver-class-name: oracle.jdbc.driver.OracleDriver
+
+    # MySQL 설정
+  #  url: jdbc:mysql://localhost:3306/moivotest?useSSL=false&serverTimezone=Asia/Seoul
+  #  username: root
+  #  password: 1234
+  #  driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # MySQL - NAVER Cloud 설정
+      url: jdbc:mysql://db-2vrk3j-kr.vpc-pub-cdb.ntruss.com:3306/moivodb?serverTimezone=Asia/Seoul
+      username: moivo
+      password: bitcamp123!@#
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+
+  servlet:
+    multipart:
+      max-file-size: -1 # 파일당 최대 크기 (-1은 무제한)
+      max-request-size: -1 # 요청 전체 최대 크기 (-1은 무제한)
+
+ncp:
+  storage:
+    access-key: 6A890BBDD2150DF9BDC5
+    secret-key: E59E91B8E8475F97570C5CC1B44F87162DCDBF24
+    region: kr-standard
+    endpoint: http://kr.object.ncloudstorage.com

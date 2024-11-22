@@ -1,0 +1,446 @@
+@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
+
+/* 전체 컨테이너 */
+.memberFrame {
+    width: 100%;
+    margin: 0 auto;
+    background: #F6F2EE;
+    padding: 130px 0;
+}
+
+/* 타이틀 */
+.title {
+    font-family: 'Italiana', sans-serif;
+    font-size: 36px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+/* 멤버십 박스 */
+.membershipBox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 98%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #F6F2EE;
+    border: 1px solid #988C73;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.membershipImage {
+    width: 50px;
+    height: 50px;
+    background: #F6F2EE;
+    margin-right: 50px;
+    margin-left: 20px;
+}
+
+.membershipImage img {
+    width: 50px;
+    height: 40px;
+    background: #F6F2EE;
+    margin-right: 50px;
+}
+
+.membershipInfo {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 14px;
+    text-align: left;
+    color: #2f2e2c;
+    margin-bottom: 5px;
+}
+
+.pointCoupon {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 16px;
+    text-align: left;
+    color: #2f2e2c;
+}
+
+/* 아이콘 영역 (우측 상단으로 위치) */
+.tooltipIcon {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.tooltipIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 툴팁 박스 */
+.tooltip {
+    font-family: 'GmarketSans', sans-serif;
+    position: absolute;
+    top: 90%;
+    left: -270px;
+    transform: translateY(-50%);
+    background-color: #988c7358;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+
+.couponSection {
+    display: flex; /* 가로로 배치 */
+    align-items: center; /* 수직 정렬 */
+    gap: 20px; /* POINT와 COUPON 간 간격 */
+    font-family: 'Italiana', serif;
+    font-size: 14px;
+}
+  
+  .pointCouponSection {
+    display: flex;
+    align-items: center; /* 수직 가운데 정렬 */
+    gap: 20px; /* POINT와 COUPON 간 간격 */
+  }
+  
+  .point {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 14px;
+}
+
+.coupon {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 14px;
+    position: relative; /* 툴팁 위치를 조정하기 위한 기준 */
+}
+  
+  .couponTooltip {
+    position: absolute;
+    top: 100%; /* COUPON 아래에 표시 */
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+    width: 300px;
+  }
+  
+  .couponItem {
+    margin-bottom: 5px;
+  }
+  
+  .couponItem:last-child {
+    margin-bottom: 0; /* 마지막 항목 간격 제거 */
+  }
+  
+
+
+/* 좌우 배치 영역 */
+.contentWrapper {
+    display: flex; /* 가로 배치 */
+    justify-content: space-between; /* 좌우 배치 */
+    align-items: stretch; /* 자식 요소 높이 동일 */
+    width: 98%;
+    margin: 20px auto;
+    gap: 20px; /* 두 박스 간 간격 */
+    box-sizing: border-box;
+}
+
+/* ONLY FOR YOU */
+.onlyForYouBox {
+    position: relative;
+    padding: 20px;
+    border: 1px solid #988C73;
+    background: #F6F2EE;
+    width: 100%; /* 멤버십 박스와 동일한 너비 */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.onlyForYou {
+    font-family: 'Italiana', serif;
+    font-size: 18px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: 10px;
+}
+
+/* 제품 리스트 사이 간격 줄이기 */
+.productList {
+    display: flex;
+    transition: transform 0.5s ease-in-out; /* 부드러운 전환 효과 추가 */
+    gap: 2px; 
+    overflow: hidden;
+    justify-content: center;
+  }
+  
+  .product {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 150px;
+    flex: 0 0 25%; /* 3개의 항목이 한 줄에 나오도록 설정 */
+  }
+.productImage {
+    width: 140px;
+    height: 200px;
+    background: #F6F2EE;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.productImage img{
+    width: 140px;
+    height: 200px;
+    background: #F6F2EE;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.productText {
+    font-family: 'Italiana', serif;
+    font-size: 14px;
+    color: #2f2e2c;
+}
+
+.productText .price {
+    font-family: 'GmarketSans', serif;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* 통합 메뉴 */
+.menuWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    position: relative;
+    width: 97%; /* 멤버십 박스와 동일한 너비 */
+    max-width: 1200px; /* 최대 너비를 1200px로 제한 */
+    padding: 20px;
+    border: 1px solid #988C73;
+    background: #F6F2EE;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    justify-items: center;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* 메뉴 아이템 */
+.menuItem {
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #2f2e2c; /* 기본 색상 */
+    padding: 15px;
+    background: #F6F2EE;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* 밑줄 제거 */
+    transition: color 0.3s ease; /* 색상 변경 효과 */
+}
+
+.menuItem img {
+    width: 65px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.menuItem {
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #2f2e2c; /* 기본 색상 */
+    padding: 15px;
+    background: #F6F2EE;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* 밑줄 제거 */
+    transition: color 0.3s ease; /* 색상 변경 효과 */
+}
+
+.menuItem img {
+    width: 65px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+/* 마우스 오버 시 색상 변경 */
+.menuItem:hover {
+    color: #988C73; /* 마우스 오버 시 색상 변경 */
+    text-decoration: none; 
+}
+
+/* 십자가 점선 */
+.crossLine {
+    position: absolute;
+    top: 50%; /* 컨테이너의 중앙 */
+    left: 50%; /* 컨테이너의 중앙 */
+    transform: translate(-50%, -50%); /* 정확히 중앙으로 이동 */
+    width: 100%; /* 부모 컨테이너 너비 기준 */
+    height: 100%; /* 부모 컨테이너 높이 기준 */
+    pointer-events: none; /* 클릭 방지 */
+}
+
+.crossLine .horizontal {
+    position: absolute;
+    top: 50%; /* 세로 중앙 */
+    left: 5%; /* 좌우 여백 조정 */
+    width: 90%; /* 점선 길이를 90%로 확대 */
+    border-top: 1px dashed #988C73; /* 가로 점선 */
+}
+
+.crossLine .vertical {
+    position: absolute;
+    left: 50%; /* 가로 중앙 */
+    top: 5%; /* 상하 여백 조정 */
+    height: 90%; /* 점선 길이를 90%로 확대 */
+    border-left: 1px dashed #988C73; /* 세로 점선 */
+}
+/* 화살표 버튼 위치 조정 및 반전 스타일 추가 */
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px; /* 기본 이미지 크기 */
+    height: 30px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    z-index: 10; /* 다른 요소보다 위에 표시되도록 설정 */
+}
+
+
+.arrowLeft {
+    left: 0px; /* 좌측 위치 조정 */
+}
+
+.arrowRight {
+    right: 0; /* 우측 위치 조정 */
+}
+
+.arrow img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 왼쪽 화살표 이미지 뒤집기 */
+.arrowLeft img {
+    transform: scaleX(-1); /* 이미지 좌우 반전 */
+}
+
+/* 하단 바 */
+.bottomBar {
+    width: 70%; /* 원하는 너비로 설정 */
+    height: 0.9px;
+    background-color: #988C73;
+    margin-top: 20px;
+    margin-left: auto; /* 왼쪽 여백 자동 */
+    margin-right: auto; /* 오른쪽 여백 자동 */
+    cursor: pointer; /* 클릭 가능하도록 포인터 추가 */
+    transition: background-color 0.3s ease;
+}
+
+.bottomBar:hover {
+    background-color: #2f2e2c; /* 마우스 오버 시 색상 변경 */
+}
+ 
+/* 반응형 레이아웃 */
+@media screen and (max-width: 768px) {
+    .contentWrapper {
+        flex-direction: column; /* 세로 배치 */
+        align-items: stretch; /* 높이를 동일하게 */
+    }
+
+    .onlyForYouBox, .menuWrapper {
+        width: 100%; /* 박스를 가득 채움 */
+        max-width: 800px;
+    }
+}
+/* 반응형 레이아웃 (화살표 크기와 위치 변경) */
+@media screen and (max-width: 768px) {
+    .arrow {
+        width: 25px; /* 모바일에서 화살표 크기 감소 */
+        height: 25px;
+    }
+
+    .arrowLeft {
+        left: 40px; /* 모바일에서 좌측 위치 이동 */
+    }
+
+    .arrowRight {
+        right: 40px; /* 모바일에서 우측 위치 이동 */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .arrow {
+        width: 20px; /* 더 작은 화면에서 화살표 크기 추가로 감소 */
+        height: 20px;
+    }
+
+    .arrowLeft {
+        left: 20px; /* 화면 크기에 맞게 좌측 위치 더 이동 */
+    }
+
+    .arrowRight {
+        right: 20px; /* 화면 크기에 맞게 우측 위치 더 이동 */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .title {
+      font-size: 28px; /* 제목 크기 축소 */
+    }
+  
+    .membershipBox {
+      flex-direction: column; /* 세로 배치 */
+      text-align: center;
+    }
+  
+    .tooltip {
+      left: 10px; /* 툴팁 위치 조정 */
+      top: auto; /* 상단에서 이동 */
+      bottom: -50px; /* 툴팁이 아래쪽으로 */
+    }
+  
+    .productImage {
+      width: 100px; /* 이미지 크기 감소 */
+      height: 150px;
+    }
+  
+    .menuItem {
+      width: 80px; /* 메뉴 아이템 크기 축소 */
+      height: 80px;
+      font-size: 12px; /* 텍스트 크기 감소 */
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .couponSection {
+      flex-direction: column; /* 세로 배치 */
+      align-items: flex-start; /* 왼쪽 정렬 */
+    }
+  }
+  

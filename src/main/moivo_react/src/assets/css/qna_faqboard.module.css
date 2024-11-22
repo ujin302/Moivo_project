@@ -1,0 +1,131 @@
+.faqmainDiv {
+  height: calc(100vh);
+  background-color: #fff;
+}
+
+.faqheader {
+  height: 130px;
+}
+
+/* QnA 설명 영역 */
+.faqcoment {
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: bold;
+  position: relative;
+}
+
+/* QnA 설명 텍스트 아래 밑줄 */
+.faqcoment::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1300px;
+  height: 2px;
+  background-color: #000;
+  margin-bottom: 15px;
+}
+
+/* 고객센터 버튼 스타일 */
+.faqNavi{
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+/* FAQ 네비게이션 버튼 */
+.faqNaviBtn {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.faqNaviBtn:hover {
+  background-color: #333;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.faqNaviBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* FAQ 전체 컨테이너 */
+.faq {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 4px;
+  position: relative;
+}
+
+.faqDiv {
+  margin-bottom: 100px;
+}
+
+.faqItem {
+  padding: 10px 0;
+  border-bottom: 1.5px solid #555;
+}
+
+/* FAQ 항목 영역 스타일 */
+.faqItem label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #E1E1E1;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.faqItem label:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.faqItem input[type="checkbox"] {
+  display: none; 
+}
+
+.faqArrow {
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid rgba(0, 0, 0, 0.700);
+  border-right: 2px solid rgba(0, 0, 0, 0.700);
+  transform: rotate(45deg);
+  transition: transform 0.3s ease-in-out;
+}
+
+.faqItem input[type="checkbox"]:checked + label .faqArrow {
+  transform: rotate(135deg);
+}
+
+.faqText {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 20px;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+.faqItem input[type="checkbox"]:checked + label + .faqText {
+  max-height: 500px;
+  padding: 10px 20px;
+}

@@ -1,0 +1,133 @@
+/* 전체 컨테이너 */
+.wishlistPage {
+    width: 100%;
+    margin: 0 auto;
+    background: #f6f2ee;
+    padding: 130px 0;
+  }
+  
+  .container {
+    width: 98%;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f6f2ee;
+    border: 1px solid #988c73;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 타이틀 */
+  .title {
+    font-family: 'Italiana', serif;
+    font-size: 36px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+  }
+  
+  /* 상품 리스트 컨테이너 */
+  .wishlistContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  /* 상품 카드 */
+  .wishlistItem {
+    width: 220px;
+    background: #f6f2ee;
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .itemImage img {
+    width: 200px;
+    height: 250px;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .itemInfo {
+    font-family: 'Italiana', serif;
+  }
+
+  .itemInfo .itemPrice{
+    font-family: 'GmarketSans', serif;
+    font-weight: bold;
+  }
+  
+  .itemName {
+    font-size: 16px;
+    color: #2f2e2c;
+    margin-bottom: 5px;
+  }
+  
+  .itemPrice {
+    font-size: 14px;
+    color: #988c73;
+    margin-bottom: 10px;
+  }
+  
+  /* 버튼 */
+  .removeButton {
+    font-size: 14px;
+    padding: 5px 10px;
+    background-color: #988c73;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .removeButton:hover {
+    background-color: #2f2e2c;
+  }
+  
+  /* 하단 바 */
+  .bottomBar {
+    width: 70%;
+    height: 0.9px;
+    background-color: #988c73;
+    margin: 20px auto;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .bottomBar:hover {
+    background-color: #2f2e2c;
+  }
+  
+  /* 뒤로 가기 링크 */
+  .backLink {
+    display: block;
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #988c73;
+    text-decoration: none;
+    margin-top: 20px;
+    transition: color 0.3s ease;
+  }
+  
+  .backLink:hover {
+    color: #2f2e2c;
+  }
+  
+  /* 반응형 */
+  @media screen and (max-width: 768px) {
+    .wishlistContainer {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .wishlistItem {
+      width: 90%;
+    }
+  }
+  

@@ -1,0 +1,370 @@
+@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
+
+.membershipBox,
+.profileForm {
+    width: 98%; /* 동일한 너비 설정 */
+    margin: 20px auto; /* 가운데 정렬 */
+}
+
+.membershipBox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 98%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #F6F2EE;
+    border: 1px solid #988C73;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative; 
+    margin-top: 50px; /* 삭제 버튼과 더 가까워지도록 위쪽 마진을 조정 */
+}
+
+/* 기존 .postalCodeContainer 스타일 수정 */
+.postalCodeContainer {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 버튼과 입력란 간격을 좁게 */
+}
+
+/* 우편번호 입력란 */
+.addressContainer input[name="postalCode"] {
+    width: 100px; /* 적절한 너비로 설정 */
+    padding: 8px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+}
+
+/* 우편번호 찾기 버튼 */
+.postalCodeButton {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px; /* 버튼 크기를 조정 */
+    font-size: 12px; /* 버튼 글자 크기를 줄이기 */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 38px; /* 입력창과 높이를 맞추기 */
+}
+
+.postalCodeButton:hover {
+    background-color: #e0e0e0;
+}
+
+
+
+.membershipImage {
+    width: 50px;
+    height: 50px;
+    background: #F6F2EE;
+    margin-right: 50px;
+    margin-left: 20px;
+}
+
+.membershipImage img{
+    width: 50px;
+    height: 40px;
+    background: #F6F2EE;
+    margin-right: 50px;
+}
+
+.membershipInfo {
+    font-family: 'GmarketSans', serif;
+    font-size: 14px;
+    text-align: left;
+    color: #2f2e2c;
+    margin-bottom: 5px;
+}
+
+.pointCoupon {
+    font-family: 'GmarketSans', serif;
+    font-size: 14px;
+    text-align: left;
+    color: #2f2e2c;
+}
+.profileContainer {
+    width: 100%;
+    margin: 0 auto;
+    background-color: #f6f2ee;
+    padding: 20px;
+    font-family: "Italiana", sans-serif;
+    padding-bottom: 100px;
+  }
+  
+  .pageName {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+
+    margin-bottom: 20px;
+    padding-top: 130px;
+  }
+  
+  .memberStatus {
+    background-color: #f6f2ee;
+    border: 1px solid #988C73;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  
+  .vipAmount {
+    color: #333;
+  }
+  
+  .profileForm {
+    background-color: #f6f2ee;
+    padding: 20px;
+    border: 1px solid #988C73;
+  }
+  
+  .formRow {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    margin-bottom: 15px;
+}
+
+.formRow label {
+    font-weight: bold;
+    color: #333;
+    width: 150px; /* 레이블의 너비 고정 */
+    margin-bottom: 0; /* 하단 마진 제거 */
+    padding-right: 20px; /* 입력창과의 간격 조정 */
+}
+
+/* 공통 input 스타일 */
+input {
+    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 적용 */
+    color: #2f2e2c; /* 텍스트 색상 */
+    background-color: transparent; /* 배경 투명 */
+    padding: 10px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    width: 100%; /* 입력칸 기본 너비 */
+}
+
+/* 폼의 개별 입력 필드 */
+.profileForm input[type="text"],
+.profileForm input[type="email"],
+.profileForm input[type="password"] {
+    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 */
+}
+
+/* 전화번호, 우편번호 같은 입력칸 */
+.phoneRow input,
+.addressContainer input {
+    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 */
+}
+
+/* 버튼 및 기타 텍스트에 영향 주지 않도록 제한 */
+button, label {
+    font-family: inherit; /* 기본 상속 */
+}
+
+
+.formRow input {
+    padding: 10px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    background-color: transparent;
+    width: 70%; /* 입력창 너비를 70%로 설정 */
+}
+/* 주소 입력란을 세로로 배치하면서, 상하 정렬을 맞추는 방법 */
+.addressContainer {
+    display: flex;
+    flex-direction: column; /* 세로로 배치 */
+    gap: 10px;
+    width: 100%; /* 전체 너비 사용 */
+    align-items: stretch; /* 모든 입력창의 너비를 동일하게 맞추기 */
+}
+.addressContainer input {
+    padding: 8px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    background-color: transparent;
+    margin-left: 10px;
+}
+
+
+/* 기본 주소와 상세 주소가 화면 너비에 맞게 차지하도록 설정 */
+.addressContainer input[name="address"],
+.addressContainer input[name="detailedAddress"] {
+    flex-grow: 1; /* 입력창들이 여유 공간을 차지하도록 설정 */
+    width: 78%; /* 100% 너비 차지 */
+}
+
+/* 우편번호 입력란은 좁게 설정 */
+.addressContainer input[name="postalCode"] {
+    width: 80px; /* 우편번호 입력란의 너비 좁게 설정 */
+}
+
+.phoneRow {
+    display: flex;
+    gap: 5px;
+}
+
+.phoneRow input {
+    text-align: center;
+}
+
+.genderContainer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.genderContainer label {
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: center; /* 버튼 중앙 정렬 */
+    gap: 10px; /* 버튼 간격 설정 */
+    margin-top: 20px;
+}
+
+.submitButton,
+.cancelButton {
+    padding: 10px 20px;
+    background-color: #988c7328;
+    color: #2F2E2C;
+    border: none;
+    cursor: pointer;
+}
+
+.submitButton:hover,
+.cancelButton:hover {
+    background-color: #B4A59B;
+}
+
+
+.deleteButton {
+    position: absolute;
+    top: 200px; /* 삭제 버튼을 멤버십 박스 바로 위에 배치 */
+    right: 20px; 
+    padding: 8px 18px;
+    background-color: #E6E3E2; 
+    color: black;
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+    margin-right: 13px;
+    font-size: 13px;
+}
+
+.deleteButton:hover {
+    background-color: #beb9b8; /* 마우스 오버 시 색상 변경 */
+}
+
+/* Footer */
+.mainFooter {
+    background: #2F2E2C;
+    font-family: 'Italiana', sans-serif;
+    position: relative;
+    width: 100%;
+    padding: 2rem 0;
+    margin-top: 50px;
+    min-height: 200px;  /* 푸터의 최소 높이 설정 */
+    margin-top: auto;    /* 푸터를 화면 하단에 고정 */
+    color: #F6F2EE;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* 내용 세로 중앙 정렬 */
+}
+
+.footerGridContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 1.5rem;
+}
+
+.footerGridContainer div {
+    padding: 1rem;
+}
+
+.mainFooter .nav-logo {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.mainFooter ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.mainFooter ul li {
+    padding: 0.3rem 0;
+}
+
+.mainFooter ul li a {
+    text-decoration: none;
+    color: #F6F2EE;
+}
+
+.mainFooter input[type="email"] {
+    width: 90%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.mainFooter .btn {
+    background-color: #333;
+    color: #F6F2EE;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+}
+
+/* 미디어 쿼리: 화면 크기가 768px 이하일 때 적용 */
+@media (max-width: 768px) {
+    .membershipBox {
+        flex-direction: column; /* 세로로 배치하여 공간을 더 효율적으로 사용 */
+        align-items: center; /* 멤버십 박스 중앙 정렬 */
+    }
+
+    .membershipImage {
+        margin: 0 auto 20px auto; /* 이미지 가운데 정렬 */
+    }
+
+    .formRow {
+        flex-direction: column; /* 수직으로 배치 */
+        align-items: flex-start; /* 왼쪽 정렬 */
+    }
+
+    .formRow input {
+        width: 100%; /* 입력창 너비를 100%로 설정하여 화면에 맞게 */
+        padding: 12px; /* 입력창 여백 늘리기 */
+    }
+
+    .addressContainer {
+        flex-direction: column; /* 주소 항목 세로로 정렬 */
+    }
+
+    .buttonRow {
+        flex-direction: column; /* 버튼들을 세로로 배치 */
+        gap: 15px; /* 버튼 간격 늘리기 */
+    }
+
+    .submitButton,
+    .cancelButton {
+        width: 100%; /* 버튼 너비를 100%로 설정 */
+        padding: 12px; /* 버튼 여백 늘리기 */
+    }
+}
+
+/* 미디어 쿼리: 화면 크기가 480px 이하일 때 추가 조정 */
+@media (max-width: 480px) {
+    .pageName {
+        font-size: 28px; /* 제목 크기 축소 */
+    }
+
+    .membershipInfo,
+    .pointCoupon {
+        font-size: 14px; /* 멤버십 정보 폰트 크기 축소 */
+    }
+}
+

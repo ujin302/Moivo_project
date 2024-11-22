@@ -1,0 +1,105 @@
+/* footer.module.css */
+
+.mainFooter {
+     background: #1C1B1A;
+     font-family: 'Italiana', serif;
+     color: #EDEDED;
+     width: 100%;
+     padding: 3rem 0;
+     position: relative;
+     text-align: center;
+     border-top: 3px solid #333;
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+     min-height: 300px;
+}
+
+.footerGridContainer {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+     gap: 2rem;
+     max-width: 1200px;
+     margin: 0 auto;
+     padding: 0 1rem;
+}
+
+.footerSection {
+     padding: 1rem;
+     text-align: left;
+}
+
+.navLogo {
+     font-size: 2.5rem;
+     font-weight: bold;
+     color: #F6F2EE;
+     margin-bottom: 1.5rem;
+     letter-spacing: 1.5px;
+}
+
+.linkList {
+     list-style-type: none;
+     padding: 0;
+}
+
+.linkItem {
+     font-size: 1rem;
+     padding: 0.5rem 0;
+}
+
+.linkAnchor {
+     text-decoration: none;
+     color: #EDEDED;
+     transition: color 0.3s ease;
+}
+
+.linkAnchor:hover {
+     color: #C59D5F;
+}
+
+.emailInput {
+     width: 90%;
+     padding: 0.8rem;
+     margin-bottom: 1rem;
+     border: 1px solid #555;
+     background: #2F2E2C;
+     color: #EDEDED;
+     font-size: 1rem;
+}
+
+.emailInput::placeholder {
+     color: #999;
+}
+
+.submitBtn {
+     background-color: #333;
+     color: #F6F2EE;
+     padding: 0.8rem 1.5rem;
+     border: none;
+     border-radius: 5px;
+     cursor: pointer;
+     font-size: 1rem;
+     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.submitBtn:hover {
+     background-color: #C59D5F;
+     color: #1C1B1A;
+}
+
+@media screen and (max-width: 768px) {
+     .footerGridContainer {
+         grid-template-columns: 1fr 1fr;
+     }
+}
+
+@media screen and (max-width: 480px) {
+     .footerGridContainer {
+         grid-template-columns: 1fr;
+     }
+     .mainFooter {
+         text-align: center;
+         padding: 2rem 1rem;
+     }
+}
+ 

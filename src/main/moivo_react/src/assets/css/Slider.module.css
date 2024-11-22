@@ -1,0 +1,108 @@
+/* Slider.module.css */
+
+.carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carouselInner {
+  display: flex;
+  transition: transform 0.8s ease;
+}
+
+.carouselItem {
+  flex: 0 0 100%;
+  position: relative;
+}
+
+.carouselImage {
+  width: 100%;
+  height: 600px;
+  object-fit: cover;
+  animation: zoomEffect 5s ease infinite;
+}
+
+@keyframes zoomEffect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.carouselCaption {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.captionTitle {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.captionText {
+  font-size: 1.2rem;
+}
+
+.carouselNav {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+}
+
+.carouselNavItem {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.carouselNavItem.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+.carouselControlBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  font-size: 2rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  opacity: 0;
+}
+
+.carousel:hover .carouselControlBtn {
+  opacity: 1;
+}
+
+.carouselControlBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.carouselControlPrev {
+  composes: carouselControlBtn;
+  left: 1rem;
+}
+
+.carouselControlNext {
+  composes: carouselControlBtn;
+  right: 1rem;
+} 

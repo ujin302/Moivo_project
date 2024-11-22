@@ -1,0 +1,224 @@
+/* banner.module.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Italiana&family=Montserrat:wght@300;400;500;700&display=swap');
+
+
+/* 배너 */
+.banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 100px;
+  background: transparent;
+  backdrop-filter: blur(10px);
+  transition: background 0.5s ease, box-shadow 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.banner:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 로고 */
+.logo {
+  font-size: 36px;
+  font-weight: 400;
+  font-family: 'Italiana', serif;
+  cursor: pointer;
+  text-align: left;
+}
+
+.logoLink {
+  text-decoration: none;
+  color: #2F2E2C;
+  transition: color 0.3s ease;
+}
+
+.logoLink:hover {
+  color: #8B7355;
+}
+
+/* 네비게이션 */
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navList {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  font-size: 18px;
+  font-weight: 500;
+  color: #2F2E2C;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.navItem:hover .navLink {
+  color: #8B7355;
+  background: none;
+}
+
+/* 드롭다운 메뉴 */
+.subMenu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s ease;
+  text-align: center;
+}
+
+.navItem:hover .subMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.subLink {
+  display: block;
+  font-size: 16px;
+  color: #2F2E2C;
+  text-decoration: none;
+  padding: 10px;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+.subLink:hover {
+  color: #8B7355;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* 유틸리티 링크 */
+.utility {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.utilityLink {
+  text-decoration: none;
+  color: #2F2E2C;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+
+.utilityLink:hover {
+  color: #8B7355;
+}
+
+/* 로그아웃 버튼 */
+.logoutButton {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #2F2E2C;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.logoutButton:hover {
+  color: #8B7355;
+}
+
+/* 애니메이션 */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 로그인 상태 */
+.loginStatus {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #2F2E2C;
+  margin-left: auto;
+  padding-left: 20px;
+}
+
+.loginStatus span {
+  margin-right: 10px;
+}
+
+.loginStatus .status {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.loginStatus .status.on {
+  background-color: #4CAF50;
+  box-shadow: 0 0 5px #4CAF50;
+}
+
+.loginStatus .status.off {
+  background-color: #F44336;
+  box-shadow: 0 0 5px #F44336;
+}
+
+.loginStatus .expiration {
+  font-weight: bold;
+  color: #8B7355;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.loginStatus .expirationLabel {
+  font-style: italic;
+  color: #888;
+}

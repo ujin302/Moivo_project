@@ -1,0 +1,410 @@
+@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
+
+.orderDetailsContainer {
+    font-family: 'Italiana', serif;
+    background: #f6f2ee;
+    padding: 20px;
+    color: #2f2e2c;
+    line-height: 1.6;
+    position: relative;
+}
+
+/* 헤더 */
+.header {
+    padding-top: 130px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 헤더 */
+.header h1 {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2f2e2c;
+}
+
+/* 주문 및 배송 정보 */
+.infoSection {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.orderInfo, .shippingInfo {
+    font-family: 'GmarketSans', serif;
+    width: 50%;
+    background: #f6f2ee;
+    padding: 20px;
+    border: 1px solid #988c73;
+}
+
+.orderInfo h2, .shippingInfo h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #2f2e2c; /* 제목 색상 */
+}
+
+.orderInfo p, .shippingInfo p {
+    color: #988c73;
+    font-size: 14px;
+    margin: 5px 0;
+    display: flex; /* Flexbox를 사용해 정렬 */
+    align-items: center;
+    gap: 10px;
+}
+
+.rowInfo {
+    display: flex;
+    justify-content: left; /* 왼쪽 정렬 */
+    align-items: center;
+    margin: 5px 0;
+}
+
+.label {
+    width: 120px; /* 라벨 고정 너비 */
+    color: #988c73; /* 라벨 색상 */
+    font-weight: bold;
+}
+
+.label2 {
+    width: 120px; /* 라벨 고정 너비 */
+    color: #2F2E2C; /* 라벨 색상 수정 */
+    font-weight: bold;
+}
+
+.value {
+    color: #2f2e2c; /* 값 색상 */
+    font-weight: bold;
+}
+
+/* 구분선 */
+.dottedLine {
+    border: none;
+    border-top: 1px dashed #988c73;
+    margin: 10px 0;
+}
+
+.solidLine {
+    border: none;
+    border-top: 1px solid #988c73;
+    margin: 20px 0;
+}
+
+.orderInfo span, .shippingInfo span {
+    color: #2F2E2C; /* 강조된 텍스트 색상 */
+    font-weight: bold;
+}
+
+
+.orderInfo p:first-child span, 
+.orderInfo p:nth-child(3) span, 
+.shippingInfo p:first-child span, 
+.shippingInfo p:nth-child(3) span {
+    color: #988C73; /* 라벨 색상 */
+    font-weight: normal;
+}
+
+/* 주문 테이블 */
+.tableSection {
+    background: #f6f2ee;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.row {
+
+    display: flex;
+    align-items: center; /* 행의 모든 요소를 수직 중앙 정렬 */
+    padding: 15px;
+    border-bottom: 1px dashed #988c73;
+    text-align: center;
+}
+
+.row:last-child {
+    border-bottom: none; /* 마지막 행의 경계선 제거 */
+}
+
+/* 상품금액 및 상태와 다른 컬럼들의 정렬 유지 */
+/* 구매확정 + 리뷰 버튼 스타일 */
+.column {
+    font-family: 'GmarketSans', serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    color: #2F2E2C;
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1; /* 기본 비율 */
+}
+
+.column .reviewButton {
+    margin-top: 10px; /* 버튼과 텍스트 사이 간격 */
+}
+
+
+.column .orderDate {
+    font-size: 14px; /* 주문일자 스타일 */
+    margin-bottom: 5px; /* 아래 여백 추가 */
+}
+
+.column2:nth-child(4) {
+    flex: 0 0 80px; /* 수량 열 크기 고정 */
+}
+
+/* Link 컴포넌트 스타일 */
+.orderLink {
+    text-decoration: underline; /* 밑줄 추가 */
+    color: inherit; /* 부모 요소의 색상 그대로 사용 */
+}
+
+
+.column .orderNumber {
+    font-size: 14px; /* 주문번호 스타일 */
+    margin-top: 5px; /* 위 여백 추가 */
+    text-decoration: underline; /* 밑줄 추가 */
+}
+
+.column2 {
+    font-family: 'GmarketSans', serif;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 20px;
+    color: #988c73;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+
+.column .product-info {
+    text-align: left; /* 상품정보만 왼쪽 정렬 */
+    margin-bottom: 5px; /* 상품정보와 내용 사이에 약간의 간격 추가 */
+}
+
+.column .product-details {
+    text-align: center; /* 상품 내용은 기존대로 가운데 정렬 */
+}
+
+
+.column:nth-child(2) {
+    flex: 0 0 80px; /* 이미지 열의 크기를 고정 */
+}
+
+
+.column2 .product-info {
+    text-align: left; /* 상품정보만 왼쪽 정렬 */
+    margin-bottom: 5px; /* 상품정보와 내용 사이에 약간의 간격 추가 */
+}
+
+.column2 .product-details {
+    text-align: center; /* 상품 내용은 기존대로 가운데 정렬 */
+}
+
+
+.column2:nth-child(2) {
+    flex: 0 0 80px; /* 이미지 열의 크기를 고정 */
+}
+
+
+
+.image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    padding-right: 10px;
+    background-color: #988c7325; /* 원하는 배경색 */
+    position: relative; /* 가상 요소가 제대로 배치되도록 상대 위치 지정 */
+}
+
+.image img {
+    max-width: 90px;
+    max-height: 1100px;
+    object-fit: contain; /* 이미지 비율 유지 */
+}
+
+.reviewColumn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 리뷰 버튼 */
+.reviewButton {
+    font-family: 'Italiana', serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 15px;
+    background-color: #988c736f;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.reviewButton:hover {
+    background-color: #988C73;
+    transform: scale(1.05);
+}
+
+/* 링크 스타일 */
+.orderLink {
+    text-decoration: underline;
+    color: inherit;
+}
+
+/* 결제 정보 */
+.paymentSummary {
+    font-family: 'GmarketSans', serif;
+    text-align: right;
+    background: #f6f2ee;
+    padding: 20px;
+    border: 1px solid #988c73;
+}
+.paymentDetails {
+    text-align: right;
+    line-height: 1.2; /* 줄 간격 조정 */
+}
+
+.paymentDetails p {
+    margin: 3px 0; /* 위아래 간격 좁히기 */
+}
+
+.paymentDetails span {
+    margin-left: 3px; /* 숫자와 텍스트 사이 간격 */
+}
+
+.totalPrice {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #2f2e2c;
+}
+
+.paymentSummary button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #2f2e2c;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.backToOrders {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #2f2e2cbe;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: block;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-bottom: 100px;
+}
+
+.backToOrders:hover {
+    background-color: #2f2e2c;
+    transform: scale(1.05);
+}
+
+
+/* Footer */
+.mainFooter {
+    background: #2F2E2C;
+    font-family: 'Italiana', sans-serif;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    padding: 2rem 0;
+    margin-top: 50px;
+}
+
+.footerGridContainer {
+    color: #F6F2EE;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 1.5rem;
+}
+
+.footerGridContainer div {
+    padding: 1rem;
+}
+
+.mainFooter .nav-logo {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.mainFooter ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.mainFooter ul li {
+    padding: 0.3rem 0;
+}
+
+.mainFooter ul li a {
+    text-decoration: none;
+    color: #F6F2EE;
+}
+
+.mainFooter input[type="email"] {
+    width: 90%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.mainFooter .btn {
+    background-color: #333;
+    color: #F6F2EE;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 28px;
+    }
+
+    .infoSection {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .orderInfo, .shippingInfo {
+        width: 100%;
+    }
+
+    .row {
+        flex-direction: column; /* 열을 세로로 배치 */
+        gap: 10px; /* 간격 축소 */
+    }
+
+    .image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .image img {
+        max-width: 60px;
+        max-height: 60px;
+    }
+}
