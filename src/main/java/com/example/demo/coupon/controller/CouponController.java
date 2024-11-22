@@ -16,8 +16,8 @@ public class CouponController {
     private CouponService couponService;
 
     // 특정 사용자의 쿠폰 조회
-    @GetMapping("/user/{userid}")
-    public List<UserCouponDTO> getUserCoupons(@PathVariable int userid) {
-        return couponService.getUserCoupons(userid);
+    @GetMapping("/user/{id}")
+    public List<UserCouponDTO> getUserCoupons(@PathVariable int id) {
+        return couponService.getUserCoupons(id);
     }
 }

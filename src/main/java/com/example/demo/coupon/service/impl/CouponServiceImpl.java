@@ -26,8 +26,8 @@ public class CouponServiceImpl implements CouponService {
         private UserCouponRepository userCouponRepository;
 
         @Override
-        public List<UserCouponDTO> getUserCoupons(int userId) {
-                List<UserCouponEntity> userCoupons = userCouponRepository.findByUserEntity_Id(userId);
+        public List<UserCouponDTO> getUserCoupons(int id) {
+                List<UserCouponEntity> userCoupons = userCouponRepository.findByUserEntity_Id(id);
 
                 return userCoupons.stream().map(userCoupon -> {
                         CouponEntity coupon = userCoupon.getCouponEntity(); // 쿠폰 엔티티 가져오기

@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserCouponRepository extends JpaRepository<UserCouponEntity, Long> {
-  List<UserCouponEntity> findByUserEntity_Id(int userId);
+  List<UserCouponEntity> findByUserEntity_Id(int id);
 
 }
