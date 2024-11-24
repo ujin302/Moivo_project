@@ -15,4 +15,6 @@ public interface ProductService {
     public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid);
 
     public Map<String, Object> getProductSearchList(Pageable pageable, String sortby, String keyword);
+
+    public List<ProductCategoryDTO> getCategory();
 }

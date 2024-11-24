@@ -161,7 +161,7 @@ public class ProductServiceImpl implements ProductService {
         //findAll.size()는 SELECT FROM product; 후 Java의 List.size()를 호출하는 방식
         //count() 자료형이 long 이라서 int 로 강제 형변환
         int productCount = categoryid == 0 ? (int) productRepository.count() :
-                productRepository.countcategoryid(categoryid);
+                productRepository.countByCategoryEntity_id(categoryid);
 
         // 페이징 설정
         productPaging.setTotalA(productCount);
@@ -216,6 +216,7 @@ public class ProductServiceImpl implements ProductService {
         return map;
     }
 
+    //상품 검색
     @Override
     public Map<String, Object> getProductSearchList(Pageable pageable, String sortby, String keyword) {
         /*1 검색한 결과 JPA 쿼리문 생성
@@ -226,9 +227,10 @@ public class ProductServiceImpl implements ProductService {
           6 entity -> dto 변환
           7 map에 저장
          */
+
         Map<String, Object> map = new HashMap<>();
         //키워드 검색결과 개수 추출
-        int productSearchCount = productRepository.countproductContaining(keyword);
+        int productSearchCount = productRepository.countByNameContaining(keyword);
 
         //페이징 설정
         productPaging.setTotalA(productSearchCount);
@@ -251,7 +253,7 @@ public class ProductServiceImpl implements ProductService {
         //검색 결과대로 상품 목록 가져오기
         Page<ProductEntity> pageProductList;
 
-        pageProductList = productRepository.findByProductContainingIgnoreCase(keyword, pageable);
+        pageProductList = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
 
         //Java8이상 사용시 Entity => DTO 변환하는 방법
         List<ProductDTO> dtoList = pageProductList.getContent()
@@ -267,6 +269,20 @@ public class ProductServiceImpl implements ProductService {
         map.put("next", productPaging.isNext());
         System.out.println("getProductSearchList : " + dtoList);
         return map;
+    }
+
+    @Override
+    public List<ProductCategoryDTO> getCategory() {
+        List<ProductCategoryDTO> list = new ArrayList<>();
+        Iterable<ProductCategoryEntity> categoryEntityList = categoryRepository.findAll();
+
+        for (ProductCategoryEntity categoryEntity : categoryEntityList) {
+            ProductCategoryDTO categoryDTO = ProductCategoryDTO.getCategoryDTO(categoryEntity);
+            System.out.println(categoryDTO);
+            list.add(categoryDTO);
+        }
+
+        return list;
     }
 
 }

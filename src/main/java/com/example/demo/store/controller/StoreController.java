@@ -60,9 +60,14 @@ public class StoreController {
             @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false, defaultValue = "newest") String sortby,
             @PathVariable String keyword) {
+        //키워드 검증 추가
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("검색 키워드를 입력해주세요.");
+        }
+
         Map<String, Object> map = productService.getProductSearchList(pageable, sortby, keyword);
         //값 존재 X
-        if(map == null)
+        if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
 
         //값 존재 O
