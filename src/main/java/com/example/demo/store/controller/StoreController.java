@@ -42,9 +42,10 @@ public class StoreController {
     @GetMapping("")
     public ResponseEntity<?> getProductAll(
             @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(required = false, defaultValue = "newest") String sortby) {
+            @RequestParam(required = false, defaultValue = "newest") String sortby,
+            @RequestParam(defaultValue = "0") int categoryid) {
 
-        Map<String, Object> map = productService.getProductList(pageable, sortby);
+        Map<String, Object> map = productService.getProductList(pageable, sortby, categoryid);
         // 값 존재 X
         if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
@@ -53,4 +54,18 @@ public class StoreController {
         return ResponseEntity.ok(map);
     }
 
+    //검색 매핑주소 확인필요
+    @GetMapping("/{keyword}")
+    public ResponseEntity<?> getProductSearchList(
+            @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "newest") String sortby,
+            @PathVariable String keyword) {
+        Map<String, Object> map = productService.getProductSearchList(pageable, sortby, keyword);
+        //값 존재 X
+        if(map == null)
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+
+        //값 존재 O
+        return ResponseEntity.ok(map);
+    }
 }

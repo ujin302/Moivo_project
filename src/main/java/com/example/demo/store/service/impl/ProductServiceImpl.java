@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.demo.store.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 3. 재고 저장
         // 사이즈 S, M, L
-        for (String size : new String[] { "S", "M", "L" }) {
+        for (String size : new String[]{"S", "M", "L"}) {
             ProductStockDTO stockDTO = new ProductStockDTO();
             stockDTO.setSize(size);
             stockDTO.setCount(Integer.parseInt(map.get(size).toString()));
@@ -149,11 +150,18 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 전체 리스트 뿌리기
     @Override
-    public Map<String, Object> getProductList(Pageable pageable, String sortby) {
+    public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid) {
         Map<String, Object> map = new HashMap<>();
 
-        // 1 DB 전체 상품 개수 추출
-        int productCount = productRepository.findAll().size();
+        //DB 상품 개수 추출
+        //삼항연산자 사용 categoryid가 0 = 전체 상품, 1 = 아우터, 2 = 상의, 3 = 하의로 상품개수 추출
+        //현재 테이블엔 0일땐 없는상태!! 이런방식이 좋을지? 다른 방식으로 짜야할지?
+        //productRepository.count(); = productRepository.findAll().size(); 와 같음
+        //count는 SELECT COUNT(*) FROM product;
+        //findAll.size()는 SELECT FROM product; 후 Java의 List.size()를 호출하는 방식
+        //count() 자료형이 long 이라서 int 로 강제 형변환
+        int productCount = categoryid == 0 ? (int) productRepository.count() :
+                productRepository.countcategoryid(categoryid);
 
         // 페이징 설정
         productPaging.setTotalA(productCount);
@@ -162,8 +170,7 @@ public class ProductServiceImpl implements ProductService {
         productPaging.setPageBlock(3);
         productPaging.makePaging();
 
-        // 정렬
-        // 최신순
+        // 기본 최신순 정렬
         Sort sort = pageable.getSort();
         if (sortby.equals("priceHigh")) {
             // 가격 높은 순
@@ -173,17 +180,32 @@ public class ProductServiceImpl implements ProductService {
             sort = Sort.by(Sort.Direction.ASC, "price");
         }
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        // 페이징처리한 상품 들고오기 컨트롤러에서 설정한 개수 9개
-        Page<ProductEntity> pageProductList = productRepository.findAll(pageable);
 
+        // 상품 목록 가져오기( 컨트롤러에서 설정한 기본 개수는 9개)
+        Page<ProductEntity> pageProductList;
+        if (categoryid == 0) {
+            //전체 상품
+            pageProductList = productRepository.findAll(pageable);
+        } else {
+            //카테고리id 별 상품
+            pageProductList = productRepository.findBycategoryid(categoryid, pageable);
+        }
+
+        /*
         List<ProductDTO> dtoList = new ArrayList<>();
-
         for (ProductEntity productEntity : pageProductList) {
             ProductDTO productDTO = ProductDTO.toGetProductDTO(productEntity);
             dtoList.add(productDTO);
         }
+         */
 
-        // 결과를 map에 저장 맵애 4개 또 찾아야지~
+        //Java8 이상 사용시 Entity -> DTO 변환하는 방법
+        List<ProductDTO> dtoList = pageProductList.getContent()
+                .stream()
+                .map(ProductDTO::toGetProductDTO)
+                .collect(Collectors.toList());
+
+        // 결과를 map에 저장
         map.put("productList", dtoList);
         map.put("startNum", productPaging.getStartNum());
         map.put("endNum", productPaging.getEndNum());
@@ -195,17 +217,56 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductCategoryDTO> getCategory() {
-        List<ProductCategoryDTO> list = new ArrayList<>();
-        Iterable<ProductCategoryEntity> categoryEntityList = categoryRepository.findAll();
+    public Map<String, Object> getProductSearchList(Pageable pageable, String sortby, String keyword) {
+        /*1 검색한 결과 JPA 쿼리문 생성
+          2 검색결과 개수 추출
+          3 페이징 설정
+          4 기본은 최신순 정렬
+          5 검색상품 목록 가져오기
+          6 entity -> dto 변환
+          7 map에 저장
+         */
+        Map<String, Object> map = new HashMap<>();
+        //키워드 검색결과 개수 추출
+        int productSearchCount = productRepository.countproductContaining(keyword);
 
-        for (ProductCategoryEntity categoryEntity : categoryEntityList) {
-            ProductCategoryDTO categoryDTO = ProductCategoryDTO.getCategoryDTO(categoryEntity);
-            System.out.println(categoryDTO);
-            list.add(categoryDTO);
+        //페이징 설정
+        productPaging.setTotalA(productSearchCount);
+        productPaging.setCurrentPage(pageable.getPageNumber() + 1);
+        productPaging.setPageSize(pageable.getPageSize());
+        productPaging.setPageBlock(3);
+        productPaging.makePaging();
+
+        //기본은 최신순 정렬
+        Sort sort = pageable.getSort();
+        if(sortby.equals("priceHigh")){
+            //가격 높은 순
+            sort = Sort.by(Sort.Direction.DESC, "price");
+        } else if (sortby.equals("priceLow")) {
+            //가격 낮은 순
+            sort = Sort.by(Sort.Direction.ASC, "price");
         }
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
-        return list;
+        //검색 결과대로 상품 목록 가져오기
+        Page<ProductEntity> pageProductList;
+
+        pageProductList = productRepository.findByProductContainingIgnoreCase(keyword, pageable);
+
+        //Java8이상 사용시 Entity => DTO 변환하는 방법
+        List<ProductDTO> dtoList = pageProductList.getContent()
+                .stream()
+                .map(ProductDTO::toGetProductDTO)
+                .collect(Collectors.toList());
+
+        //결과를 map에 저장
+        map.put("productList", dtoList);
+        map.put("startNum", productPaging.getStartNum());
+        map.put("endNum", productPaging.getEndNum());
+        map.put("pre", productPaging.isPre());
+        map.put("next", productPaging.isNext());
+        System.out.println("getProductSearchList : " + dtoList);
+        return map;
     }
 
 }
