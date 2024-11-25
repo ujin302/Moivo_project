@@ -2,10 +2,7 @@ package com.example.demo.user.entity;
 
 import java.util.List;
 
-import com.example.demo.store.entity.ProductEntity;
-
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

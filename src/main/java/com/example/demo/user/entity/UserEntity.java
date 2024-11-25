@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.example.demo.user.dto.UserDTO;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +33,13 @@ public class UserEntity { // 사용자 & 관리자
         LV1, LV2, LV3, LV4, LV5
         // 0, 10, 30, 50, 70
     }
+
+    //양방량 매핑시킴
+    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WishEntity wishEntity; // Wish와 연결
+
+    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CartEntity cartEntity; // Cart와 연결
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,6 +81,7 @@ public class UserEntity { // 사용자 & 관리자
     private Grade grade = Grade.LV1;
     private double height;
     private double weight;
+
 
     // DTO -> Entity
 

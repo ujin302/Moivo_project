@@ -12,7 +12,7 @@ public interface ProductService {
 
     public void saveProduct(Map<String, Object> map);
 
-    public Map<String, Object> getProductList(Pageable pageable, String sortby);
+    public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword);
 
     public List<ProductCategoryDTO> getCategory();
 
