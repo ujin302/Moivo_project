@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { AuthContext } from "../../contexts/AuthContext";
 import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -8,6 +9,7 @@ import products from "../../assets/dummydata/productDTO";
 import Modal from "../../components/Modal/Modal";
 
 const ProductList = () => {
+  const { isLoggedIn } = useContext(AuthContext);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,46 +22,6 @@ const ProductList = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   // const [products, setProducts] = useState([]);
-
-   // 더미데이터 대신 api 상품 데이터 가져오기
-  //  useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const response = await axios.get('변수명/api/store');
-  //       setProducts(response.data);
-  //     } catch (error) {
-  //       console.error('상품 데이터를 불러오는데 실패했습니다:', error);
-  //     }
-  //   };
-    
-  //   fetchProducts();
-  // }, []);
-
-// API 연동 코드 (주석 처리)
-  /*
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [productsData, categoriesData] = await Promise.all([
-          storeAPI.getProducts(currentPage, sortBy),
-          storeAPI.getCategories()
-        ]);
-        
-        setProducts(productsData.content);
-        setCategories(categoriesData.map(cat => cat.name));
-        setTotalPages(productsData.totalPages);
-      } catch (error) {
-        console.error('데이터 로딩 실패:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [currentPage, sortBy]);
-  */
-
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
@@ -136,7 +98,7 @@ const ProductList = () => {
   const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
 
   const goToDetail = (id) => {
-    navigate(`/product-detail/${id}`);
+      navigate(`/product-detail/${id}`);
   };
 
   return (
@@ -331,6 +293,8 @@ const ProductList = () => {
           items={cartItems}
           onRemove={removeFromCart}
           onQuantityChange={updateCartQuantity}
+          isLoggedIn={isLoggedIn}
+          navigate={navigate}
         />
         <Modal
           isOpen={isWishModalOpen}
@@ -338,6 +302,8 @@ const ProductList = () => {
           title="위시리스트"
           items={wishItems}
           onRemove={removeFromWish}
+          isLoggedIn={isLoggedIn}
+          navigate={navigate}
         />
       </div>
       <Footer />

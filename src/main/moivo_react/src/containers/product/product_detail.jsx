@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "../../assets/css/product_detail.module.css";
+import { motion } from "framer-motion";
+import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import { AuthContext } from "../../contexts/AuthContext";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import products from "../../assets/dummydata/productDTO";
-import { motion } from "framer-motion";
-import { FaHeart, FaShoppingCart } from "react-icons/fa";
 
 const ProductDetail = () => {
-  /* ===== STATE MANAGEMENT ===== */
+  const { isLoggedIn } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
@@ -117,15 +118,20 @@ const ProductDetail = () => {
 
   // 위시리스트 핸들러 추가
   const handleWishlist = () => {
-    // 로그인 체크 로직이 필요할 수 있습니다
-    navigate(`/mypage/wish?productId=${id}`);
+    if (!isLoggedIn) {
+      navigate('/user');
+    } else {
+      navigate(`/mypage/wish?productId=${id}`);
+    }
   };
 
   // 구매 핸들러 추가
   const handlePurchase = () => {
-    // 임시로 이동을 막아둡니다
-    // navigate(`/api/payment?productId=${id}`);
-    console.log('구매 기능 준비 중');
+    if (!isLoggedIn) {
+      navigate('/user');
+    } else {
+      console.log('구매 기능 준비 중');
+    }
   };
 
   /* ===== TAB CONTENT RENDERER ===== */
@@ -246,7 +252,7 @@ const ProductDetail = () => {
               <div className={styles.thumbnailWrapper}>
                 {product?.productimg.slice(currentSlide, currentSlide + slidesPerView).map((img) => (
                   <div 
-                    key={img.id} 
+                    key={img.id || img.fileurl}
                     className={`${styles.thumbnailItem} ${mainImg === img.fileurl ? styles.activeThumbnail : ''}`}
                     onClick={() => setMainImg(img.fileurl)}
                   >

@@ -1,8 +1,10 @@
-/* 상품 리스트 스타일 */
+/* product_list.jsx 의 module.css */
 
+/* =========================================
+   1. 기본 레이아웃
+========================================= */
 @import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
 
-/* 기본 폰트 설정 */
 .container {
   width: 100%;
   min-height: 100vh;
@@ -16,613 +18,6 @@
   padding: 2rem;
 }
 
-/* =========================================
-   2. 헤더 스타일
-========================================= */
-.header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
-  color: #718096;
-}
-
-/* =========================================
-   3. 필터 및 정렬
-========================================= */
-.filters {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: #f7fafc;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.categories {
-  display: flex;
-  gap: 1rem;
-}
-
-.categoryBtn {
-  padding: 0.6rem 1.2rem;
-  border: none;
-  background: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.categoryBtn.active {
-  background: #4a90e2;
-  color: white;
-}
-
-.sortSelect {
-  padding: 0.6rem 1.2rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 5px;
-  background: white;
-  cursor: pointer;
-}
-
-/* =========================================
-   4. 상품 그리드 및 카드
-========================================= */
-.productGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(300px, 1fr));
-  gap: 2.5rem;
-  margin: 2rem auto;
-}
-
-.productCard {
-  position: relative;
-  background: #fff;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  aspect-ratio: 3/4;
-}
-
-.productCard:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.productImageContainer {
-  position: relative;
-  width: 100%;
-  padding-top: 133.33%;
-  overflow: hidden;
-}
-
-.productImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s ease;
-}
-
-.productCard:hover .productImage {
-  transform: scale(1.1);
-}
-
-.productOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: all 0.4s ease;
-}
-
-.productCard:hover .productOverlay {
-  opacity: 1;
-}
-
-.productActions {
-  display: flex;
-  gap: 1rem;
-  transform: translateY(20px);
-  opacity: 0;
-  transition: all 0.4s ease 0.1s;
-}
-
-.productCard:hover .productActions {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.actionButton {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #2d3748;
-}
-
-.actionButton:hover {
-  background: #4a90e2;
-  color: white;
-  transform: scale(1.1);
-}
-
-/* =========================================
-   5. 페이징 스타일
-========================================= */
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-}
-
-.pageBtn {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.pageBtn.active {
-  background: #4a90e2;
-  color: white;
-  border-color: #4a90e2;
-}
-
-.pageBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* =========================================
-   6. 플로팅 버튼
-========================================= */
-.floatingButtons {
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  z-index: 100;
-}
-
-.cart,
-.wish {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #2d3748;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.cart::before,
-.wish::before {
-  content: attr(data-totalitems);
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #e63946;
-  color: white;
-  border-radius: 50%;
-  padding: 5px 8px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.cart.shake,
-.wish.shake {
-  animation: shakeCart 0.4s ease-in-out;
-}
-
-/* =========================================
-   7. 애니메이션
-========================================= */
-@keyframes shakeCart {
-  0%, 100% {
-    transform: translate(1px, 1px) rotate(0deg);
-  }
-  25% {
-    transform: translate(-1px, -2px) rotate(-1deg);
-  }
-  50% {
-    transform: translate(-3px, 0px) rotate(1deg);
-  }
-  75% {
-    transform: translate(3px, 2px) rotate(0deg);
-  }
-}
-
-/* =========================================
-   7. 필터 섹션
-========================================= */
-.filterSection {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
-}
-
-/* =========================================
-   8. 모달 스타일
-========================================= */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modalContent {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.modalContent h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.modalContent ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.modalContent li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
-}
-
-.modalContent button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-/* 헤더 섹션 */
-.headerSection {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.headerTitle {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-}
-
-/* 필터 섹션 */
-.filterContainer {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
-}
-
-.categoryContainer {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.categoryButton {
-  padding: 0.8rem 1.5rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 25px;
-  background: transparent;
-  color: #2d3748;
-  font-weight: 500;
-  transition: all 0.4s ease;
-  cursor: pointer;
-}
-
-.categoryButton:hover {
-  background: #f7fafc;
-  border-color: #4a90e2;
-}
-
-.categoryButton.active {
-  background: #4a90e2;
-  color: white;
-  border-color: #4a90e2;
-}
-
-.sortSelect {
-  padding: 0.8rem 1.5rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 25px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  outline: none;
-  color: #2d3748;
-}
-
-.sortSelect:hover {
-  border-color: #4a90e2;
-}
-
-/* 상품 그리드 */
-.productGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.productCard {
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.productImageContainer {
-  position: relative;
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-}
-
-.productImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.productActions {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: space-around;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.productCard:hover .productActions {
-  opacity: 1;
-}
-
-.actionButton {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  background: white;
-  color: #2d3748;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.actionButton:hover {
-  background: #4a90e2;
-  color: white;
-}
-
-/* 상품 정보 섹션 */
-.productInfo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1.5rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-  color: white;
-  transform: translateY(100%);
-  transition: all 0.3s ease;
-}
-
-.productTitle {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.productPrice {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #4dffff;
-  margin-bottom: 0.5rem;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.productStock {
-  font-size: 1rem;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-/* 페이지네이션 */
-.paginationContainer {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-}
-
-.pageButton {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.pageButton.active {
-  background: #4a90e2;
-  color: white;
-  border-color: #4a90e2;
-}
-
-.pageButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* 플로팅 버튼 */
-.floatingButtonContainer {
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  z-index: 100;
-}
-
-.floatingButton {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #2d3748;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-  transition: transform 0.3s ease;
-}
-
-.floatingButton:hover {
-  transform: scale(1.1);
-}
-
-.floatingButton::before {
-  content: attr(data-totalitems);
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #e63946;
-  color: white;
-  border-radius: 50%;
-  padding: 5px 8px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-/* 모달 스타일 */
-.modalContainer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modalContent {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 500px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.modalTitle {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #2d3748;
-}
-
-.modalList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.modalItem {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modalCloseButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #2d3748;
-}
-
 .productListWrapper {
   max-width: 1400px;
   margin: 120px auto 0;
@@ -630,6 +25,9 @@
   width: 100%;
 }
 
+/* =========================================
+   2. 검색 및 필터 영역
+========================================= */
 .filterSection {
   display: flex;
   justify-content: space-between;
@@ -638,179 +36,6 @@
   padding: 1rem 0;
 }
 
-.categoryList {
-  display: flex;
-  gap: 1rem;
-}
-
-.categoryItem {
-  padding: 0.8rem 1.5rem;
-  border-radius: 30px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.categoryItem.active {
-  background: #2d3748;
-  color: white;
-  border-color: #2d3748;
-}
-
-.sortDropdown {
-  padding: 0.8rem 1.5rem;
-  border-radius: 30px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  cursor: pointer;
-}
-
-.productGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(300px, 1fr));
-  gap: 2.5rem;
-  margin: 2rem auto;
-}
-
-.productCard {
-  position: relative;
-  background: #fff;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  aspect-ratio: 3/4;
-}
-
-.productImageWrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 133.33%;
-  overflow: hidden;
-}
-
-.productImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.productOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.productInfo {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1.5rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-  color: white;
-  transform: translateY(100%);
-  transition: all 0.3s ease;
-}
-
-.productTitle {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.productPrice {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #4dffff;
-  margin-bottom: 0.5rem;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.productStock {
-  font-size: 1rem;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.actionButtons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.actionButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.actionButton:hover {
-  background: #4a90e2;
-  color: white;
-}
-
-/* 호버 효과 */
-.productCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-.productCard:hover .productImage {
-  transform: scale(1.1);
-}
-
-.productCard:hover .productOverlay {
-  opacity: 1;
-}
-
-.productCard:hover .productInfo {
-  transform: translateY(0);
-}
-
-/* 반응형 디자인 */
-@media screen and (max-width: 1200px) {
-  .productGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .productGrid {
-    grid-template-columns: repeat(1, 1fr);
-    gap: 1.5rem;
-  }
-  
-  .productListWrapper {
-    padding: 0 1rem;
-  }
-}
-
-/* 검색 컨테이너 스타일 */
 .searchAndCategories {
   display: flex;
   align-items: center;
@@ -853,13 +78,45 @@
   background: transparent;
 }
 
-/* 상품 그리드 애니메이션 개선 */
+/* =========================================
+   3. 카테고리 및 정렬
+========================================= */
+.categoryList {
+  display: flex;
+  gap: 1rem;
+}
+
+.categoryItem {
+  padding: 0.8rem 1.5rem;
+  border-radius: 30px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.categoryItem.active {
+  background: #2d3748;
+  color: white;
+  border-color: #2d3748;
+}
+
+.sortDropdown {
+  padding: 0.8rem 1.5rem;
+  border-radius: 30px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* =========================================
+   4. 상품 그리드 및 카드
+========================================= */
 .productGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 2.5rem;
   margin: 2rem auto;
-  will-change: transform;
 }
 
 .productCard {
@@ -870,17 +127,230 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   aspect-ratio: 3/4;
-  will-change: transform;
 }
 
-/* 반응형 스타일 수정 */
+.productImageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 133.33%;
+  overflow: hidden;
+}
+
+.productImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+/* =========================================
+   5. 상품 오버레이 및 정보
+========================================= */
+.productOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.productInfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  color: white;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
+}
+
+.productTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.productPrice {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #4dffff;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.productStock {
+  font-size: 1rem;
+  color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* =========================================
+   6. 액션 버튼
+========================================= */
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.actionButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.actionButton:hover {
+  background: #4a90e2;
+  color: white;
+}
+
+/* =========================================
+   7. 페이지네이션
+========================================= */
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pageButton.active {
+  background: #4a90e2;
+  color: white;
+  border-color: #4a90e2;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   8. 플로팅 버튼
+========================================= */
+.floatingButtonContainer {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.floatingButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #2d3748;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.floatingButton:not(.scrollTopButton)::before {
+  content: attr(data-totalitems);
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #e63946;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.scrollTopButton {
+  background-color: #333;
+  color: white;
+  z-index: 1000;
+}
+
+/* =========================================
+   9. 호버 효과
+========================================= */
+.productCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.productCard:hover .productImage {
+  transform: scale(1.1);
+}
+
+.productCard:hover .productOverlay {
+  opacity: 1;
+}
+
+.productCard:hover .productInfo {
+  transform: translateY(0);
+}
+
+.floatingButton:hover {
+  transform: scale(1.1);
+}
+
+/* =========================================
+   10. 반응형 디자인
+========================================= */
 @media screen and (max-width: 1200px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  
   .searchContainer.open {
     width: 250px;
   }
 }
 
 @media screen and (max-width: 768px) {
+  .productGrid {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .productListWrapper {
+    padding: 0 1rem;
+  }
+  
   .searchAndCategories {
     flex-direction: column;
     align-items: flex-start;
@@ -890,3 +360,4 @@
     width: 100%;
   }
 }
+
