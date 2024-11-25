@@ -11,16 +11,18 @@ import com.example.demo.store.entity.ProductEntity;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Integer> {
+
+    //카테고리id로 검색
     @Query("SELECT p FROM ProductEntity p WHERE p.categoryEntity.id =:categoryid")
     Page<ProductEntity> findBycategoryid(@Param("categoryid") int categoryid, Pageable pageable);
-    int countByCategoryEntity_id(int categoryid);
 
-    //상품 검색 (키워드)
+    //상품 검색 (keyword)
     //Containing = 부분검색, IgnoreCase = 대소문자 무시
     Page<ProductEntity> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
     int countByNameContaining(String keyword);
 
-    //카테고리 검색
-    //Page<ProductEntity> findByCategoryContainingIgnoreCase(String category, Pageable pageable);
-//    Object countByNameContainingIgnoreCase(String keyword);
+    //상품 검색 (keyword + categoryid)
+    Page<ProductEntity> findByNameContainingIgnoreCaseAndCategoryEntity_id(String name, int categoryid, Pageable pageable);
+    int countByNameContainingIgnoreCaseAndCategoryEntity_id(String keyword, int categoryid);
+
 }
