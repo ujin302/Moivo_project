@@ -7,33 +7,35 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [tokenExpiration, setTokenExpiration] = useState(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
-    if (token) {
+    const storedToken = sessionStorage.getItem('token');
+    if (storedToken) {
       setIsLoggedIn(true);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setToken(storedToken);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
 
       // 토큰 만료 시간 계산
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const decodedToken = JSON.parse(atob(storedToken.split('.')[1]));
       const expirationTime = new Date(decodedToken.exp * 1000);
       setTokenExpiration(expirationTime);
     } else {
       setIsLoggedIn(false);
       setUser(null);
-
     }
   }, []);
 
   const login = async () => {
     try {
-      const token = sessionStorage.getItem('token');
-      if (token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const storedToken = sessionStorage.getItem('token');
+      if (storedToken) {
+        setToken(storedToken);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
         setIsLoggedIn(true);
 
         // 토큰 만료 시간 계산
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const decodedToken = JSON.parse(atob(storedToken.split('.')[1]));
         const expirationTime = new Date(decodedToken.exp * 1000);
         setTokenExpiration(expirationTime);
       }
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
     setIsLoggedIn(false);
     setUser(null);
+    setToken(null);
   };
 
   return (
@@ -54,6 +57,7 @@ export const AuthProvider = ({ children }) => {
       isLoggedIn,
       user,
       tokenExpiration,
+      token,
       login,
       logout
     }}>

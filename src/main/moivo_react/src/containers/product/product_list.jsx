@@ -1,15 +1,16 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext";
 import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import products from "../../assets/dummydata/productDTO";
-import Modal from "../../components/Modal/Modal";
+import Modal from "../../components/Modal/modal";
 
 const ProductList = () => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, token } = useContext(AuthContext);
+  const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,29 +22,40 @@ const ProductList = () => {
   const [isWishModalOpen, setIsWishModalOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  // const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // 비동기 함수 fetchProducts 정의
+    const fetchProducts = async () => {
+      try {
+        // axios를 사용하여 GET 요청을 보냄
+        const response = await axios.get("/api/user/store", {
+          headers: {
+            // Authorization 헤더에 Bearer 토큰 추가
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            // 정렬 기준, 카테고리 ID, 검색어, 페이지, 페이지 크기 설정
+            sortby: sortBy,
+            categoryid: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
+            keyword: searchTerm,
+            page: currentPage,
+            size: itemsPerPage,
+          },
+        });
+        // 응답 데이터에서 productList를 상태로 설정
+        setProducts(response.data.productList);
+      } catch (error) {
+        // 오류 발생 시 콘솔에 출력
+        console.error("Error fetching products:", error);
+      }
+    };
+  
+    // fetchProducts 함수 호출
+    fetchProducts();
+  }, [activeCategory, sortBy, currentPage, searchTerm, token]); 
+      // 의존성 배열: activeCategory, sortBy, currentPage, searchTerm, token이 변경될 때마다 실행
 
   const categories = ["All", "Outer", "Top", "Bottom"];
-
-  const filteredAndSearchedProducts = products.filter((product) => {
-    const matchesCategory = activeCategory === "All" ? true : product.categoryid === categories.indexOf(activeCategory);
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
-  const sortProducts = () => {
-    let sorted = [...filteredAndSearchedProducts];
-    switch (sortBy) {
-      case "priceHigh":
-        return sorted.sort((a, b) => b.price - a.price);
-      case "priceLow":
-        return sorted.sort((a, b) => a.price - b.price);
-      default:
-        return sorted.sort((a, b) => b.id - a.id);
-    }
-  };
-
-  const sortedProducts = sortProducts();
 
   const handleAddToCart = (product) => {
     const cartProduct = {
@@ -51,9 +63,9 @@ const ProductList = () => {
       name: product.name,
       price: product.price,
       productimg: product.productimg,
-      quantity: 1
+      quantity: 1,
     };
-    setCartItems(prev => [...prev, cartProduct]);
+    setCartItems((prev) => [...prev, cartProduct]);
     setIsCartModalOpen(true);
   };
 
@@ -62,29 +74,27 @@ const ProductList = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      productimg: product.productimg
+      productimg: product.productimg,
     };
-    setWishItems(prev => [...prev, wishProduct]);
+    setWishItems((prev) => [...prev, wishProduct]);
     setIsWishModalOpen(true);
   };
 
   const removeFromCart = (id) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const updateCartQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, quantity: newQuantity }
-          : item
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
   };
 
   const removeFromWish = (id) => {
-    setWishItems(prev => prev.filter(item => item.id !== id));
+    setWishItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const openCartModal = () => setIsCartModalOpen(true);
@@ -94,11 +104,11 @@ const ProductList = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const goToDetail = (id) => {
-      navigate(`/product-detail/${id}`);
+    navigate(`/product-detail/${id}`);
   };
 
   return (
@@ -107,7 +117,7 @@ const ProductList = () => {
       <div className={styles.productListWrapper}>
         <div className={styles.filterSection}>
           <div className={styles.searchAndCategories}>
-            <motion.div 
+            <motion.div
               className={`${styles.searchContainer} ${searchOpen ? styles.open : ''}`}
               animate={{ width: searchOpen ? "300px" : "40px" }}
               transition={{ duration: 0.3 }}
@@ -157,12 +167,12 @@ const ProductList = () => {
           </select>
         </div>
 
-        <motion.div 
+        <motion.div
           className={styles.productGrid}
           layout
           transition={{
             layout: { duration: 0.3 },
-            opacity: { duration: 0.2 }
+            opacity: { duration: 0.2 },
           }}
         >
           <AnimatePresence mode="popLayout">
