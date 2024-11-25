@@ -1,5 +1,5 @@
 .faqmainDiv {
-  height: calc(100vh);
+  height: 100%;
   background-color: #fff;
 }
 
@@ -75,8 +75,8 @@
   position: relative;
 }
 
-.faqDiv {
-  margin-bottom: 100px;
+.faqss{
+  height: 700px;
 }
 
 .faqItem {

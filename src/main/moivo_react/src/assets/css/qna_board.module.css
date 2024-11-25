@@ -1,69 +1,143 @@
-.qnalistContainer {
-    width: 100%;
-    max-width: 1300px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 4px;
-    position: relative;
-    padding: 30px;
-  }
-  
-  .qnalistItem {
-    padding: 20px 0;
-    border-bottom: 1.5px solid #555;
-  }
-  
-  .qnalistHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #FAFAFA;
-    border-bottom: 1px solid #E1E1E1;
-  }
-  
-  .qnalistQuestionType {
-    font-weight: bold;
-    color: #555;
-  }
-  
-  .qnalistInput, .qnalistTextarea, .qnalistSelect {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    margin-top: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  
-  .qnalistTextarea {
-    height: 150px;
-  }
-  
-  .qnalistSubmit {
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .qnalistSubmitBtn {
-    background-color: black;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .qnalistSubmitBtn:hover {
-    background-color: #333;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-  
-  .qnalistSubmitBtn:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
+.qnaboardMainDiv {
+  height: 100%;
+  background-color: #fff;
+}
+
+.qnaboardheader {
+  height: 130px;
+}
+
+.qnaboardTitle {
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: bold;
+  position: relative;
+}
+
+.qnaboardTitle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1300px;
+  height: 2px;
+  background-color: #000;
+  margin-bottom: 15px;
+}
+
+.qnaboardNavi {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.qnaboardNaviBtn {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qnaboardNaviBtn:hover {
+  background-color: #333;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.qnaboardNaviBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.qnaboardContainer {
+  height: 700px;
+}
+
+.qnaboard {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 4px;
+  position: relative;
+  padding: 30px;
+}
+
+.qnaboardItem {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+.qnaboardQuestionType{
+  font-weight: bold;
+}
+/* 입력 필드 */
+.qnaboardInput,
+.qnaboardTextarea,
+.qnaboardSelect {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.qnaboardTextarea {
+  height: 200px; 
+}
+
+.qnaboardInput:focus,
+.qnaboardTextarea:focus,
+.qnaboardSelect:focus {
+  border-color: #000;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.qnaboardHeader label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  cursor: pointer;
+}
+
+.qnaboardHeader input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.qnaboardSubmit{
+  display: flex;
+  justify-content: center;
+}
+
+.qnaboardSubmitBtn {
+  background-color: black;
+  color: white;
+  padding: 14px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.qnaboardSubmitBtn:hover {
+  background-color: #333;
+}
+
+.qnaboardSubmitBtn:active {
+  transform: scale(0.98);
+}

@@ -32,12 +32,12 @@ const user_login = () => {
             console.log(formData);
             const response = await axios.post("http://localhost:8080/api/user/login", formData);
 
-            const {jwt, id, wishId, paymentId} = response.data;
+            const {jwt, id, wishId, cartid} = response.data;
 
             sessionStorage.setItem("token", jwt);
             sessionStorage.setItem("id", id);
             sessionStorage.setItem("wishId", wishId);
-            sessionStorage.setItem("paymentId", paymentId);
+            sessionStorage.setItem("cartid", cartid);
             
             login();
             alert("로그인 성공!");
