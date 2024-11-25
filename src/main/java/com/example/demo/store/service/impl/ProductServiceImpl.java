@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.example.demo.ncp.service.NCPObjectStorageService;
 import com.example.demo.store.entity.ProductCategoryEntity;
 import com.example.demo.store.entity.ProductEntity;
@@ -174,7 +175,14 @@ public class ProductServiceImpl implements ProductService {
         }
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         // 페이징처리한 상품 들고오기 컨트롤러에서 설정한 개수 9개
-        Page<ProductEntity> pageProductList = productRepository.findAll(pageable);
+        Page<ProductEntity> pageProductList = null;
+
+        int id = 0;
+        if (id == 0) {
+            pageProductList = productRepository.findAll(pageable);
+        } else {
+            categoryRepository.findById(id).orElseThrow().getProductList();
+        }
 
         List<ProductDTO> dtoList = new ArrayList<>();
 
@@ -206,6 +214,59 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return list;
+    }
+
+    // 상품 수정 - 24.11.25 - uj
+    @Override
+    @SuppressWarnings("unchecked")
+    public void putProduct(Map<String, Object> map) {
+        // 1. 상품 조회
+        // 사용자 입력 데이터
+        ProductDTO productDTO = (ProductDTO) map.get("ProductDTO");
+        ProductEntity productEntity = ProductEntity.toGetProductEntity(productDTO);
+
+        // 2. 카테고리 Entity 추출
+        ProductCategoryEntity categoryEntity = categoryRepository
+                .findById(Integer.parseInt(map.get("CategorySeq").toString()))
+                .orElseThrow(
+                        () -> new NotFoundException("해당 카테고리(" + map.get("CategorySeq").toString() + ")가 조회되지 않습니다."));
+        productEntity.setCategoryEntity(categoryEntity);
+
+        // 3. 이미지(NCP) 수정
+        // 3-1. 이미지 삭제
+        List<ProductImgEntity> imgEntityList = productRepository.findById(productEntity.getId()).orElseThrow()
+                .getImgList();
+        for (ProductImgEntity imgEntity : imgEntityList) {
+            ncpObjectStorageService.deleteFile("moivo", "products/", imgEntity.getFileName());
+        }
+        imgRepository.deleteByProductEntity(productEntity);
+
+        // 3-2. 이미지 업로드
+        for (int i = 1; i < 4; i++) {
+            List<MultipartFile> files = (List<MultipartFile>) map.get("layer" + i);
+            saveImgFiles(files, productEntity, i);
+        }
+
+        // 4. 재고 수정
+        List<ProductStockEntity> stockEntityList = stockRepository.findByProductEntity(productEntity);
+        for (ProductStockEntity stockEntity : stockEntityList) {
+            switch (stockEntity.getSize()) {
+                case S:
+                    stockEntity.setCount(Integer.parseInt(map.get("S").toString()));
+                    break;
+                case M:
+                    stockEntity.setCount(Integer.parseInt(map.get("M").toString()));
+                    break;
+                case L:
+                    stockEntity.setCount(Integer.parseInt(map.get("L").toString()));
+                    break;
+                default:
+                    break;
+            }
+            stockRepository.save(stockEntity);
+        }
+
+        productRepository.save(productEntity);
     }
 
 }

@@ -25,4 +25,5 @@ public class WishController {
         return ResponseEntity.ok(null);
     }
 
+    //
 }

@@ -16,4 +16,7 @@ public interface ProductService {
 
     public List<ProductCategoryDTO> getCategory();
 
+    // 상품 수정 - 24.11.25 - 이유진
+    public void putProduct(Map<String, Object> map);
+
 }
