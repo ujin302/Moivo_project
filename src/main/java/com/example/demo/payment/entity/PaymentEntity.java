@@ -3,7 +3,6 @@ package com.example.demo.payment.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.entity.UserEntity;
 
 import jakarta.persistence.CascadeType;

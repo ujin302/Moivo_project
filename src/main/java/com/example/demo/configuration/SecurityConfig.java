@@ -30,8 +30,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/user/join", "/api/user/login").permitAll()
-                        .anyRequest().authenticated())
+                        //.requestMatchers("/api/user/join", "/api/user/login").permitAll()  //api/user/coupons, store 이걸 넣어도 되도럭
+                        .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 권한 명시
+                        .anyRequest().authenticated()) //나머지 경로는 인증 필요
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProps, customUserDetailsService),
