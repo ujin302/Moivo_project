@@ -103,27 +103,38 @@ const Upload = () => {
     Object.entries(stock).forEach(([size, count]) => {
       formData.append(`stock[${size}]`, count);
     });
-  
-    // 파일 추가
-    formData.append("files", files.layer1);
-    formData.append("layer", 1);
-  
-    files.layer2.forEach((file) => {
-      formData.append("files", file);
-      formData.append("layer", 2);
-    });
-  
-    files.layer3.forEach((file) => {
-      formData.append("files", file);
-      formData.append("layer", 3);
-    });
-  
-    formData.append("files", files.layer4);
-    formData.append("layer", 4);
-  
+
+    // Layer 1: 메인 이미지 (단일 파일)
+    if (files.layer1) {
+      formData.append("files", files.layer1);
+      formData.append("layer", 1);
+    }
+
+    // Layer 2: 섬네일 이미지 (단일 또는 다중 파일)
+    if (files.layer2.length > 0) {
+      files.layer2.forEach(file => {
+        formData.append("files", file);
+        formData.append("layer", 2);
+      });
+    }
+
+    // Layer 3: 상품 상세 이미지들 (다중 파일)
+    if (files.layer3.length > 0) {
+      files.layer3.forEach(file => {
+        formData.append("files", file);
+        formData.append("layer", 3);
+      });
+    }
+
+    // Layer 4: 배송 이미지 (단일 파일)
+    if (files.layer4) {
+      formData.append("files", files.layer4);
+      formData.append("layer", 4);
+    }
+
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/admin/store/product",
+        "http://localhost:8080/api/store/product",
         formData,
         {
           headers: {
@@ -137,13 +148,14 @@ const Upload = () => {
           },
         }
       );
-  
+
       if (response.status === 200) {
         alert("상품이 성공적으로 등록되었습니다.");
-        // 성공 후 처리 (예: 페이지 이동)
+        resetForm();
       }
     } catch (error) {
       console.error("업로드 실패:", error);
+      alert("상품 등록에 실패했습니다. 다시 시도해주세요.");
     }
   };
 

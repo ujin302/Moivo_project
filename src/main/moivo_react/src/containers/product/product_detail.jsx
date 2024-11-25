@@ -46,7 +46,7 @@ const ProductDetail = () => {
 
   // 섬네일 캐러셀을 위한 상태
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slidesPerView = 4;
+  const slidesPerView = 3;
 
   // 현재 활성화된 탭을 관리하는 state 추가
   const [activeTab, setActiveTab] = useState('상품정보');
@@ -125,7 +125,7 @@ const ProductDetail = () => {
   const handlePurchase = () => {
     // 임시로 이동을 막아둡니다
     // navigate(`/api/payment?productId=${id}`);
-    console.log('구매 기능 준비 중입니다.');
+    console.log('구매 기능 준비 중');
   };
 
   /* ===== TAB CONTENT RENDERER ===== */
@@ -343,7 +343,7 @@ const ProductDetail = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                구매하기
+                <FaShoppingCart /> 구매하기
               </motion.button>
               <motion.button 
                 className={`${styles.actionBtn} ${styles.wishlistButton}`}

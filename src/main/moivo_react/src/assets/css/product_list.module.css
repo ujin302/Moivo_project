@@ -809,3 +809,84 @@
     padding: 0 1rem;
   }
 }
+
+/* 검색 컨테이너 스타일 */
+.searchAndCategories {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.searchContainer {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  color: #2d3748;
+}
+
+.searchInput {
+  width: 100%;
+  height: 100%;
+  padding: 0 40px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background: transparent;
+}
+
+/* 상품 그리드 애니메이션 개선 */
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 2.5rem;
+  margin: 2rem auto;
+  will-change: transform;
+}
+
+.productCard {
+  position: relative;
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  aspect-ratio: 3/4;
+  will-change: transform;
+}
+
+/* 반응형 스타일 수정 */
+@media screen and (max-width: 1200px) {
+  .searchContainer.open {
+    width: 250px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .searchAndCategories {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchContainer.open {
+    width: 100%;
+  }
+}

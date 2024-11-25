@@ -8,7 +8,7 @@ import products from "../../assets/dummydata/productDTO";
 import Modal from "../../components/Modal/Modal";
 
 const ProductList = () => {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
@@ -17,13 +17,15 @@ const ProductList = () => {
   const [wishItems, setWishItems] = useState([]);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isWishModalOpen, setIsWishModalOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   // const [products, setProducts] = useState([]);
 
    // 더미데이터 대신 api 상품 데이터 가져오기
   //  useEffect(() => {
   //   const fetchProducts = async () => {
   //     try {
-  //       const response = await axios.get('http://localhost:8080/api/store');
+  //       const response = await axios.get('변수명/api/store');
   //       setProducts(response.data);
   //     } catch (error) {
   //       console.error('상품 데이터를 불러오는데 실패했습니다:', error);
@@ -59,16 +61,16 @@ const ProductList = () => {
   */
 
 
-  const categories = ["all", "Outerwear", "Pants", "Jeans"];
+  const categories = ["All", "Outer", "Top", "Bottom"];
 
-  const filteredProducts = products.filter((product) =>
-    activeCategory === "all"
-      ? true
-      : product.categoryid === categories.indexOf(activeCategory)
-  );
+  const filteredAndSearchedProducts = products.filter((product) => {
+    const matchesCategory = activeCategory === "All" ? true : product.categoryid === categories.indexOf(activeCategory);
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const sortProducts = () => {
-    let sorted = [...filteredProducts];
+    let sorted = [...filteredAndSearchedProducts];
     switch (sortBy) {
       case "priceHigh":
         return sorted.sort((a, b) => b.price - a.price);
@@ -137,47 +139,50 @@ const ProductList = () => {
     navigate(`/product-detail/${id}`);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
   return (
     <div className={styles.container}>
       <Banner />
       <div className={styles.productListWrapper}>
         <div className={styles.filterSection}>
-          <div className={styles.categoryList}>
-            {categories.map((category) => (
+          <div className={styles.searchAndCategories}>
+            <motion.div 
+              className={`${styles.searchContainer} ${searchOpen ? styles.open : ''}`}
+              animate={{ width: searchOpen ? "300px" : "40px" }}
+              transition={{ duration: 0.3 }}
+            >
               <motion.button
-                key={category}
-                className={`${styles.categoryItem} ${
-                  activeCategory === category ? styles.active : ''
-                }`}
-                onClick={() => setActiveCategory(category)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className={styles.searchIcon}
+                onClick={() => setSearchOpen(!searchOpen)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
-                {category}
+                <i className="fas fa-search" />
               </motion.button>
-            ))}
+              <motion.input
+                type="text"
+                placeholder="상품 검색..."
+                className={styles.searchInput}
+                animate={{ opacity: searchOpen ? 1 : 0 }}
+                transition={{ duration: 0.2 }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </motion.div>
+            <div className={styles.categoryList}>
+              {categories.map((category) => (
+                <motion.button
+                  key={category}
+                  className={`${styles.categoryItem} ${
+                    activeCategory === category ? styles.active : ''
+                  }`}
+                  onClick={() => setActiveCategory(category)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.85 }}
+                >
+                  {category}
+                </motion.button>
+              ))}
+            </div>
           </div>
           <select
             className={styles.sortDropdown}
@@ -193,62 +198,69 @@ const ProductList = () => {
         <motion.div 
           className={styles.productGrid}
           layout
+          transition={{
+            layout: { duration: 0.3 },
+            opacity: { duration: 0.2 }
+          }}
         >
-          {currentItems.map((product) => (
-            <motion.div
-              key={product.id}
-              className={styles.productCard}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div className={styles.productImageWrapper}>
-                <img
-                  src={product.productimg[0].fileurl}
-                  alt={product.name}
-                  className={styles.productImage}
-                />
-                <div className={styles.productOverlay}>
-                  <div className={styles.actionButtons}>
-                    <motion.button
-                      className={styles.actionButton}
-                      onClick={() => handleAddToCart(product)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <i className="fas fa-shopping-cart" />
-                    </motion.button>
-                    <motion.button
-                      className={styles.actionButton}
-                      onClick={() => handleAddToWish(product)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <i className="fas fa-heart" />
-                    </motion.button>
-                    <motion.button
-                      className={styles.actionButton}
-                      onClick={() => goToDetail(product.id)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <i className="fas fa-eye" />
-                    </motion.button>
+          <AnimatePresence mode="popLayout">
+            {currentItems.map((product) => (
+              <motion.div
+                key={product.id}
+                className={styles.productCard}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className={styles.productImageWrapper}>
+                  <img
+                    src={product.productimg[0].fileurl}
+                    alt={product.name}
+                    className={styles.productImage}
+                  />
+                  <div className={styles.productOverlay}>
+                    <div className={styles.actionButtons}>
+                      <motion.button
+                        className={styles.actionButton}
+                        onClick={() => handleAddToCart(product)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <i className="fas fa-shopping-cart" />
+                      </motion.button>
+                      <motion.button
+                        className={styles.actionButton}
+                        onClick={() => handleAddToWish(product)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <i className="fas fa-heart" />
+                      </motion.button>
+                      <motion.button
+                        className={styles.actionButton}
+                        onClick={() => goToDetail(product.id)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <i className="fas fa-eye" />
+                      </motion.button>
+                    </div>
+                  </div>
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productTitle}>{product.name}</h3>
+                    <p className={styles.productPrice}>
+                      ₩{product.price?.toLocaleString()}
+                    </p>
+                    <p className={styles.productStock}>
+                      재고: {product.stock}개
+                    </p>
                   </div>
                 </div>
-                <div className={styles.productInfo}>
-                  <h3 className={styles.productTitle}>{product.name}</h3>
-                  <p className={styles.productPrice}>
-                    ₩{product.price?.toLocaleString()}
-                  </p>
-                  <p className={styles.productStock}>
-                    재고: {product.stock}개
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </motion.div>
 
         <motion.div className={styles.paginationContainer}>
