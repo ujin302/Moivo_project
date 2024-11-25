@@ -58,7 +58,7 @@ public class WishServiceImpl implements WishService {
         // WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
         // ProductEntity productEntity = productRepository.findById(productid).orElseThrow(() -> new RuntimeException("해당 상품이 없습니다."));
 
-        // // 해당 ProductEntity와 연결된 UserWishEntity 삭제
+        // // 해당 ProductEntity와 연결된 UserWishEntity 삭제하는거임
         // UserWishEntity userWishEntity =  userWishRepository.findByWishEntityAndProductEntity(wishEntity, productEntity)
         //    .orElseThrow(() -> new RuntimeException("찜 목록에서 해당 상품을 찾을 수 없습니다."));
 
