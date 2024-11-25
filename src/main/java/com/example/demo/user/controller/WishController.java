@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.user.service.WishService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class WishController {
         return ResponseEntity.ok(null);
     }
 
-    //찜한거 출력
+    // 찜한거 출력 - 24.11.25 - yjy
     @GetMapping("")
     public ResponseEntity<?> printWish(@RequestParam(name = "userid") int userId) {
         List<ProductEntity> productList = wishService.printWish(userId);
@@ -39,11 +38,12 @@ public class WishController {
 
     }
 
-    //찜한거 삭제
+    // 찜한거 삭제 - 24.11.25 - yjy & uj
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable(name="productId") int productId, @RequestParam(name = "userid") int userId) {
+    public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") int productId,
+            @RequestParam(name = "userid") int userId) {
         wishService.deleteProduct(productId, userId);
-        
+
         return ResponseEntity.ok("찜 목록에서 삭제되었습니다.");
     }
 
