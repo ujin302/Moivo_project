@@ -361,3 +361,20 @@
   }
 }
 
+/* =========================================
+   11. 재고 출력
+========================================= */
+.soldOut {
+  font-size: 1rem;
+  color: #e63946; /* 빨간색 */
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}

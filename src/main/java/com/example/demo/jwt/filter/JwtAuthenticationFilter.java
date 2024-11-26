@@ -46,8 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .build()
                         .parseClaimsJws(jwt);
 
-                String userseq = parsedToken.getBody().get("uid", String.class);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userseq);
+                String userId = parsedToken.getBody().get("uid", String.class);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

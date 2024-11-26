@@ -52,7 +52,7 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody UserDTO userDTO) {
         System.out.println("=== 로그인 시도 ===");
-        System.out.println("받은 ID: " + userDTO.getId());
+        System.out.println("받은 ID: " + userDTO.getUserId());
         System.out.println("받은 비밀번호 길이: " + (userDTO.getPwd() != null ? userDTO.getPwd().length() : "null"));
 
         try {
