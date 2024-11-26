@@ -6,50 +6,21 @@ import { FaHeart, FaShoppingCart } from "react-icons/fa";
 import { AuthContext } from "../../contexts/AuthContext";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import products from "../../assets/dummydata/productDTO";
+import axios from "axios";
 
 const ProductDetail = () => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, token } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [mainImg, setMainImg] = useState("");
   const [selectedSize, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-
-  /* ===== DUMMY DATA ===== */
-  // 리뷰 더미 데이터
-  const [reviews] = useState([
-    {
-      id: 1,
-      username: "user1",
-      rating: 5,
-      content: "정말 좋은 상품이에요!",
-      date: "2024-03-20"
-    },
-    {
-      id: 2,
-      username: "user2",
-      rating: 4,
-      content: "배송이 빨라요",
-      date: "2024-03-19"
-    }
-  ]);
-
-  // 재고 더미 데이터
-  const [stockData] = useState([
-    { id: 7, size: 'S', count: 2, productId: 13 },
-    { id: 8, size: 'M', count: 11, productId: 13 },
-    { id: 9, size: 'L', count: 5, productId: 13 }
-  ]);
-  
+  const [reviews, setReviews] = useState([]);
+  const [stockData, setStockData] = useState([]);
   const [selectedStock, setSelectedStock] = useState(null);
-
-  // 섬네일 캐러셀을 위한 상태
   const [currentSlide, setCurrentSlide] = useState(0);
   const slidesPerView = 3;
-
-  // 현재 활성화된 탭을 관리하는 state 추가
   const [activeTab, setActiveTab] = useState('상품정보');
 
   const nextSlide = () => {
@@ -65,35 +36,47 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    const selectedProduct = products.find((product) => product.id === parseInt(id));
-    if (selectedProduct) {
-      setProduct(selectedProduct);
-      setMainImg(selectedProduct.productimg[0].fileurl);
-    } else {
-      setProduct(null);
-    }
-  }, [id]);
-
-  // API 연동 시 사용할 데이터 fetch 함수 (현재는 주석처리)
-  /*
-  useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchProductData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/stock/${id}`);
-        setStockData(response.data);
+        const response = await axios.get(`/api/user/store/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const selectedProduct = response.data;
+        
+        if (selectedProduct) {
+          setProduct(selectedProduct);
+          setMainImg(selectedProduct.productimg.find(img => img.layer === 1)?.filename);
+        } else {
+          setProduct(null);
+        }
       } catch (error) {
-        console.error('재고 정보를 불러오는데 실패했습니다:', error);
+        console.error('상품 정보를 불러오는데 실패했습니다:', error);
       }
     };
-    fetchStockData();
-  }, [id]);
-  */
 
-  // const prevSlide = () => {
-  //   if (currentSlide > 0) {
-  //     setCurrentSlide(prev => prev - 1);
-  //   }
-  // };
+    fetchProductData();
+  }, [id, token]);
+
+  // 리뷰 및 재고 데이터 가져오기
+  useEffect(() => {
+    const fetchAdditionalData = async () => {
+      try {
+        const reviewsResponse = await axios.get(`/api/reviews/${id}`);
+        const stockResponse = await axios.get(`/api/stock/${id}`);
+        
+        setReviews(reviewsResponse.data);
+        setStockData(stockResponse.data);
+      } catch (error) {
+        console.error('리뷰 또는 재고 정보를 불러오는데 실패했습니다:', error);
+      }
+    };
+
+    if (product) {
+      fetchAdditionalData();
+    }
+  }, [product]);
 
   // 사이즈 선택 핸들러
   const handleSizeChange = (e) => {

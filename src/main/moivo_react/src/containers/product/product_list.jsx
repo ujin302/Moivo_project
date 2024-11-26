@@ -24,6 +24,10 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      alert('로그인이 필요합니다.');
+      navigate('/user');
+    }
     const fetchProducts = async () => {
       try {
         const headers = isLoggedIn ? { Authorization: `Bearer ${token}` } : {};
@@ -52,7 +56,7 @@ const ProductList = () => {
     };
   
     fetchProducts();
-  }, [activeCategory, sortBy, currentPage, searchTerm, isLoggedIn, token]);
+  }, [activeCategory, sortBy, currentPage, searchTerm, isLoggedIn, token, navigate]);
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
