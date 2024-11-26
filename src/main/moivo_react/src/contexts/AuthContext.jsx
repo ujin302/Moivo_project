@@ -5,62 +5,52 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(sessionStorage.getItem('token'));
   const [user, setUser] = useState(null);
-  const [tokenExpiration, setTokenExpiration] = useState(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
-    if (token) {
+    // 컴포넌트 마운트 시 세션스토리지 확인
+    const storedToken = sessionStorage.getItem('token');
+    const storedUser = sessionStorage.getItem('user');
+    
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      // 토큰 만료 시간 계산
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const expirationTime = new Date(decodedToken.exp * 10000);
-      setTokenExpiration(expirationTime);
-    } else {
-      setIsLoggedIn(false);
-      setUser(null);
-
+      // axios 기본 헤더 설정
+      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
   }, []);
 
-  const login = async () => {
-    try {
-      const token = sessionStorage.getItem('token');
-      if (token) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        setIsLoggedIn(true);
-
-        // 토큰 만료 시간 계산
-        const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        const expirationTime = new Date(decodedToken.exp * 10000);
-        setTokenExpiration(expirationTime);
-      }
-    } catch (error) {
-      console.error('로그인 상태 업데이트 실패:', error);
-    }
+  const login = (userData, authToken) => {
+    console.log('로그인 시도:', { userData, authToken });
+    sessionStorage.setItem('token', authToken);
+    sessionStorage.setItem('user', JSON.stringify(userData));
+    setToken(authToken);
+    setUser(userData);
+    setIsLoggedIn(true);
+    // axios 기본 헤더 설정
+    axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+    console.log('로그인 완료:', { token: authToken, user: userData });
   };
 
   const logout = () => {
     sessionStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setIsLoggedIn(false);
+    sessionStorage.removeItem('user');
+    setToken(null);
     setUser(null);
-  };
-
-  const getAuthToken = () => {
-    return sessionStorage.getItem('token');
+    setIsLoggedIn(false);
+    // axios 헤더 제거
+    delete axios.defaults.headers.common['Authorization'];
   };
 
   return (
-    <AuthContext.Provider value={{
-      isLoggedIn,
+    <AuthContext.Provider value={{ 
+      isLoggedIn, 
+      token, 
       user,
-      tokenExpiration,
-      login,
-      logout,
-      getAuthToken
+      login, 
+      logout 
     }}>
       {children}
     </AuthContext.Provider>

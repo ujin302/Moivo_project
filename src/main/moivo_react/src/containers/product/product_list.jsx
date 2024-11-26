@@ -7,6 +7,7 @@ import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import Modal from "../../components/Modal/modal";
+import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
@@ -22,6 +23,7 @@ const ProductList = () => {
   const [isWishModalOpen, setIsWishModalOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -30,6 +32,7 @@ const ProductList = () => {
       return;
     }
     const fetchProducts = async () => {
+      setIsLoading(true);
       try {
         const headers = {
           'Authorization': `Bearer ${token}`,
@@ -60,6 +63,8 @@ const ProductList = () => {
           navigate('/user');
         }
         console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
   
@@ -328,6 +333,8 @@ const ProductList = () => {
           isLoggedIn={isLoggedIn}
           navigate={navigate}
         />
+
+        <LoadingModal isOpen={isLoading} />
       </div>
       <Footer />
     </div>

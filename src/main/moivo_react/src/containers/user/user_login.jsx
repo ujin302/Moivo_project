@@ -29,20 +29,18 @@ const user_login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:8080/api/user/login", {
-                userId: formData.userId,
-                pwd: formData.pwd
-            });
+            console.log(formData);
+            const response = await axios.post("http://localhost:8080/api/user/login", formData);
 
-            const { jwt, userId, wishId, paymentId } = response.data;
+            const {jwt, id, wishId, paymentId} = response.data;
 
             sessionStorage.setItem("token", jwt);
-            sessionStorage.setItem("userId", userId);
+            sessionStorage.setItem("id", id);
             sessionStorage.setItem("wishId", wishId);
             sessionStorage.setItem("paymentId", paymentId);
-
-            await fetchUserData(); // 사용자 정보 요청
-            login(); // 로그인 상태 업데이트
+            
+            login({ id, wishId, paymentId }, jwt);
+            
             alert("로그인 성공!");
             navigate("/");
         } catch (error) {
@@ -92,7 +90,7 @@ const user_login = () => {
             <input
               type="text"
               name="userId"
-              value={formData.userId}
+              value={formData.id}
               onChange={handleChange}
               placeholder="ID"
               required

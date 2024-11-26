@@ -46,10 +46,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .build()
                         .parseClaimsJws(jwt);
 
-                String userId = parsedToken.getBody().get("userId", String.class);
-                logger.info("JWT로 파싱된 userId: " + userId);
+                        String userId = parsedToken.getBody().get("userId", String.class);
+                        logger.info("JWT로 파싱된 userId: " + userId);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
                 System.out.println("중간 성공");
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
