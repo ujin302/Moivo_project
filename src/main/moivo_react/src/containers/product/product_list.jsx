@@ -24,36 +24,35 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // 비동기 함수 fetchProducts 정의
     const fetchProducts = async () => {
       try {
-        // axios를 사용하여 GET 요청을 보냄
+        const headers = isLoggedIn ? { Authorization: `Bearer ${token}` } : {};
+        
         const response = await axios.get("/api/user/store", {
-          headers: {
-            // Authorization 헤더에 Bearer 토큰 추가
-            Authorization: `Bearer ${token}`,
-          },
+          headers: headers,
           params: {
-            // 정렬 기준, 카테고리 ID, 검색어, 페이지, 페이지 크기 설정
             sortby: sortBy,
             categoryid: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
             keyword: searchTerm,
-            page: currentPage,
+            page: currentPage - 1,
             size: itemsPerPage,
           },
         });
-        // 응답 데이터에서 productList를 상태로 설정
-        setProducts(response.data.productList);
+
+        console.log('서버 응답:', response.data);
+        
+        if (response.data) {
+          const productList = response.data.productList || [];
+          console.log('상품 목록:', productList);
+          setProducts(productList);
+        }
       } catch (error) {
-        // 오류 발생 시 콘솔에 출력
-        console.error("Error fetching products:", error);
+        console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
       }
     };
   
-    // fetchProducts 함수 호출
     fetchProducts();
-  }, [activeCategory, sortBy, currentPage, searchTerm, token]); 
-      // 의존성 배열: activeCategory, sortBy, currentPage, searchTerm, token이 변경될 때마다 실행
+  }, [activeCategory, sortBy, currentPage, searchTerm, isLoggedIn, token]);
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
@@ -62,7 +61,7 @@ const ProductList = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      productimg: product.productimg,
+      imgList: product.imgList ? product.imgList : [],
       quantity: 1,
     };
     setCartItems((prev) => [...prev, cartProduct]);
@@ -74,27 +73,26 @@ const ProductList = () => {
       id: product.id,
       name: product.name,
       price: product.price,
-      productimg: product.productimg,
+      imgList: product.imgList ? product.imgList : [],
     };
     setWishItems((prev) => [...prev, wishProduct]);
     setIsWishModalOpen(true);
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (productId) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
-  const updateCartQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
+  const updateCartQuantity = (productId, quantity) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
+        item.id === productId ? { ...item, quantity } : item
       )
     );
   };
 
-  const removeFromWish = (id) => {
-    setWishItems((prev) => prev.filter((item) => item.id !== id));
+  const removeFromWish = (productId) => {
+    setWishItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
   const openCartModal = () => setIsCartModalOpen(true);
@@ -167,6 +165,7 @@ const ProductList = () => {
           </select>
         </div>
 
+        {/* 상품 목록 */}
         <motion.div
           className={styles.productGrid}
           layout
@@ -188,7 +187,7 @@ const ProductList = () => {
               >
                 <div className={styles.productImageWrapper}>
                   <img
-                    src={product.productimg[0].fileurl}
+                    src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
                     alt={product.name}
                     className={styles.productImage}
                   />
@@ -227,6 +226,7 @@ const ProductList = () => {
                     </p>
                     <p className={styles.productStock}>
                       재고: {product.stock}개
+                      {/* 재고: {product.stockList && product.stockList.length > 0 ? product.stockList[0].stock : 0}개 */}
                     </p>
                   </div>
                 </div>
@@ -296,6 +296,7 @@ const ProductList = () => {
           </motion.div>
         </div>
 
+        {/* 모달 (장바구니, 위시리스트) */}
         <Modal
           isOpen={isCartModalOpen}
           onClose={closeCartModal}
