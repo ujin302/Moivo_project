@@ -123,4 +123,28 @@ public class UserEntity { // 사용자 & 관리자
 
         return entity;
     }
+
+    // Entity -> DTO 변환
+    public static UserDTO toGetUserDTO(UserEntity userEntity) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(userEntity.getId());
+        userDTO.setUserId(userEntity.getUserId());
+        userDTO.setName(userEntity.getName());
+        userDTO.setPwd(userEntity.getPwd());
+        userDTO.setEmail(userEntity.getEmail());
+        userDTO.setTel(userEntity.getTel());
+        userDTO.setBirth(userEntity.getBirth());
+        userDTO.setAddr1(userEntity.getAddr1());
+        userDTO.setAddr2(userEntity.getAddr2());
+        userDTO.setZipcode(userEntity.getZipcode());
+        userDTO.setGender(userEntity.getGender());
+        userDTO.setLoginType(userEntity.getLoginType());
+        userDTO.setAdmin(userEntity.isAdmin());
+        userDTO.setGrade(userEntity.getGrade()); 
+        userDTO.setHeight(userEntity.getHeight());
+        userDTO.setWeight(userEntity.getWeight());
+
+        return userDTO;
+    }
+
 }
