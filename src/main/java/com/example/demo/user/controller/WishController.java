@@ -38,7 +38,7 @@ public class WishController {
 
     }
 
-    // 찜한거 삭제 - 24.11.25 - yjy & uj
+    // 찜한거 삭제 - 24.11.25 - yj
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") int productId,
             @RequestParam(name = "userid") int userId) {
