@@ -13,6 +13,7 @@ import Qna_board from './containers/qna/qna_board';
 import Qna_boardlist from './containers/qna/qna_bardlist';
 import MainProvider from './contexts/MainContext';
 import Upload from './containers/test/upload';
+import Update from './containers/test/update';
 import MypageMain from './containers/mypage/mypage_main';
 import MypageWish from './containers/mypage/mypage_wish';
 import MypageBoard from './containers/mypage/mypage_board';
@@ -30,6 +31,7 @@ const routeConfig = [
   { path: "/product-search", element: <ProductSearch /> },
   { path: "/product-detail/:id", element: <ProductDetail /> },
   { path: "/upload", element: <Upload /> },
+  { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },
   { path: "/mypage/profile", element: <MypageProfile /> },
   { path: "/mypage/wish", element: <MypageWish /> },

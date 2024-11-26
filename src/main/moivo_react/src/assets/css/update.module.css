@@ -1,0 +1,216 @@
+/* upload.module.css */
+
+.uploadContainer {
+  width: 100%;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.uploadWrapper {
+  max-width: 1200px;
+  margin: 120px auto 0;
+  padding: 3rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.uploadTitle {
+  font-size: 2.5rem;
+  color: #2d3748;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.form {
+  display: grid;
+  gap: 2rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 1rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.input {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.textarea {
+  composes: input;
+  min-height: 150px;
+  resize: vertical;
+}
+
+.select {
+  composes: input;
+  appearance: none;
+  background: url("data:image/svg+xml,...") no-repeat right 1rem center;
+}
+
+.stockSection {
+  background: #f8fafc;
+  padding: 2rem;
+  border-radius: 15px;
+  margin: 2rem 0;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.stockGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stockItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fileSection {
+  background: #f8fafc;
+  padding: 2rem;
+  border-radius: 15px;
+  margin: 2rem 0;
+}
+
+.dropzone {
+  border: 2px dashed #cbd5e0;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 1rem 0;
+}
+
+.dropzone:hover {
+  border-color: #4a90e2;
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.dropzoneText {
+  color: #718096;
+  margin: 1rem 0;
+}
+
+.fileInput {
+  margin: 1rem 0;
+}
+
+.uploadButton {
+  background: #4a90e2;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.uploadButton:hover {
+  background: #357abd;
+  transform: translateY(-2px);
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #4a90e2;
+  transition: width 0.3s ease;
+}
+
+/* .cancelBtn {
+  background-color: #357abd;
+  color: aliceblue;
+}
+
+.productImgDiv {
+  width: 120px;
+  height: 120px;
+  display: flex;
+}
+
+.productImgDiv > .productImg {
+  width: 100px;
+  height: 100px;
+  display: flex;
+} */
+
+.parentContainer {
+  display: flex; /* 자식 요소를 가로로 정렬 */
+  flex-wrap: wrap; /* 자식 요소가 부모 너비를 초과하면 줄바꿈 */
+  gap: 15px; /* 각 요소 간 간격 */
+  justify-content: start; /* 왼쪽 정렬 (필요 시 변경 가능) */
+  align-items: flex-start; /* 상단 정렬 */
+  width: 100%; /* 부모 크기 설정 */
+}
+
+.productImgDiv {
+  position: relative; /* 자식 요소(button)을 절대적으로 배치하기 위해 */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.productImg {
+  width: 120px; /* 이미지 크기 */
+  height: 200px;
+  object-fit: cover; /* 비율 유지 */
+  border-radius: 8px; /* 선택사항: 둥근 모서리 */
+}
+
+.cancelBtn {
+  position: absolute; /* 절대 위치 */
+  top: 5px; /* 상단 5px 여백 */
+  left: 5px; /* 왼쪽 5px 여백 */
+  background-color: transparent;
+  color: rgb(0, 0, 0);
+  font-size: 1.7rem;
+  border: none;
+  border-radius: 50%; /* 원형 버튼 */
+  padding: 0.5rem;
+  cursor: pointer;
+  z-index: 1; /* 버튼이 이미지 위에 오도록 설정 */
+}
+
+.cancelBtn:hover {
+  color: #424242;
+}

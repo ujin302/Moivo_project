@@ -10,6 +10,7 @@ import com.example.demo.store.dto.ProductCategoryDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.service.ProductService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,10 +71,11 @@ public class AdminStoreController {
         return ResponseEntity.ok(list);
     }
 
-    // 상품 수정 - 24.11.25 - 이유진
+    // 상품 수정 - 24.11.25, 26, 27 - 이유진
     @PutMapping("/product")
     public ResponseEntity<String> putProduct(
             @ModelAttribute ProductDTO productDTO,
+            @RequestParam(name = "deleteImgList", required = false) String deleteImgList,
             @RequestPart(name = "layer1", required = false) List<MultipartFile> layer1Files,
             @RequestPart(name = "layer2", required = false) List<MultipartFile> layer2Files,
             @RequestPart(name = "layer3", required = false) List<MultipartFile> layer3Files,
@@ -82,9 +84,10 @@ public class AdminStoreController {
             @RequestParam(name = "L", defaultValue = "0", required = false) int LCount,
             @RequestParam(name = "CategorySeq", defaultValue = "1", required = false) int categorySeq) {
         Map<String, Object> map = new HashMap<>();
-
+        String[] deleteImgId = deleteImgList.replace("[", "").replace("]", "").split(",");
         System.out.println("putProduct" + productDTO);
         map.put("ProductDTO", productDTO);
+        map.put("deleteImgId", deleteImgId);
         map.put("layer1", layer1Files);
         map.put("layer2", layer2Files);
         map.put("layer3", layer3Files);

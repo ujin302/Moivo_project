@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import styles from "../../assets/css/upload.module.css";
+import styles from "../../assets/css/update.module.css";
 import axios from "axios";
 import { PATH } from "../../../scripts/path";
 import Banner from "../../components/Banner/banner";
 
 const Upload = () => {
   const [product, setProduct] = useState({
+    id: 0,
     name: "",
     price: "",
     content: "",
-    categoryId: "",
+    categoryId : 0
   });
 
   const [categories, setCategories] = useState([]);
@@ -20,11 +21,18 @@ const Upload = () => {
     L: 0,
   });
 
+  const [serverFiles, setServerFiles] = useState({
+    layer1: [],
+    layer2: [],
+    layer3: [],
+    layer4: []
+  });
+  
   const [files, setFiles] = useState({
     layer1: null,
     layer2: [],
     layer3: [],
-    layer4: null,
+    layer4: null
   });
 
   const [progress, setProgress] = useState(0);
@@ -34,10 +42,69 @@ const Upload = () => {
     axios.get(`${PATH.SERVER}/api/admin/store/category`).then((res) => {
       if (Array.isArray(res.data)) {
         setCategories(res.data);
+        console.log(res.data);
+        
       } else {
         console.error("카테고리 데이터는 배열이 아닙니다 ? :", res.data);
       }
     });
+
+    axios.get(`${PATH.SERVER}/api/user/store/13`).then((res) => {
+      console.log(res.data)
+      // 상품 정보 설정
+      setProduct({
+        ...product, 
+        'id' : res.data.Product.id,
+        'name' : res.data.Product.name,
+        'price' : res.data.Product.price,
+        'content' : res.data.Product.content,
+        'categoryId' : res.data.Product.categoryId
+      });
+
+      // 이미지 설정
+      var l1 = [];
+      var l2 = [];
+      var l3 = [];
+      var l4 = [];
+
+      for (let i = 0; i < res.data.ImgList.length; i++) {
+        switch (res.data.ImgList[i].layer) {
+          case 1:
+            l1.push(res.data.ImgList[i])
+            break;
+          case 2:
+            l2.push(res.data.ImgList[i])
+          break;
+          case 3:
+            l3.push(res.data.ImgList[i])
+          break;
+          case 4:
+            l4.push(res.data.ImgList[i])
+          break;
+          default:
+            break;
+        }
+      }
+      
+      setServerFiles({
+        ...serverFiles,
+        'layer1' : l1,
+        'layer2' : l2,
+        'layer3' : l3,
+        'layer4' : l4
+      });
+      console.log(l1);
+      
+      // 재고 설정
+      setStock({
+        ...stock,
+        'S' : res.data.Stock.S,
+        'M' : res.data.Stock.M,
+        'L' : res.data.Stock.L
+      });
+      
+    });
+
   }, []);
 
   // 상품 정보 입력 핸들러
@@ -61,6 +128,24 @@ const Upload = () => {
     setFiles((prev) => ({ ...prev, [layer]: Array.from(e.target.files) }));
   };
 
+  // 화면에서 이미지 삭제
+  const cancelImg = (e, layer, img) => {
+    e.preventDefault(); // 기본 동작 방지 (옵션)
+  
+    // 레이어에 해당하는 이미지를 찾아 삭제
+    setServerFiles(prevFiles => {
+      // 각 레이어별로 해당 이미지 제거
+      const updatedLayer = prevFiles[layer].filter(item => item.fileName !== img.fileName);
+  
+      return {
+        ...prevFiles,
+        [layer]: updatedLayer, // 해당 레이어만 업데이트
+      };
+    });
+
+    console.log(files)
+  };
+  
   // 드래그 앤 드롭 핸들러
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -73,22 +158,13 @@ const Upload = () => {
 
   // 업로드 핸들러
   const handleUpload = async () => {
-    if (
-      !product.name ||
-      !product.price ||
-      !product.content ||
-      !product.categoryId
-    ) {
+    if (!product.name || !product.price || !product.content || !product.categoryId) {
       alert("모든 상품 정보를 입력해주세요.");
       return;
     }
 
-    if (!files.layer1 || !files.layer4 || files.layer2.length === 0 || files.layer3.length === 0) {
-      alert("모든 레이어의 이미지를 업로드해주세요.");
-      return;
-    }
-
     const formData = new FormData();
+    formData.append("id", product.id);
     formData.append("name", product.name);
     formData.append("price", product.price);
     formData.append("content", product.content);
@@ -98,8 +174,33 @@ const Upload = () => {
     Object.entries(stock).forEach(([size, count]) => {
       formData.append(`stock[${size}]`, count);
     });
+    
+    // 서버 파일 삭제할 id
+    var deleteImgList = []
+    serverFiles.layer1.forEach((file) => {
+      console.log(file.id);
+      deleteImgList.push(file.id);
+    });
 
-    // 파일 추가 (layer 정보와 함께)
+    serverFiles.layer2.forEach((file) => {
+      console.log(file.id);
+      deleteImgList.push(file.id);
+    });
+
+    serverFiles.layer3.forEach((file) => {
+      console.log(file.id);
+      deleteImgList.push(file.id);
+    });
+
+    serverFiles.layer4.forEach((file) => {
+      console.log(file.id);
+      deleteImgList.push(file.id);
+    });
+
+    // 배열을 JSON 문자열로 변환하여 추가
+    formData.append("deleteImgList", JSON.stringify(deleteImgList));
+
+    // 사용자 파일 추가 (layer 정보와 함께)
     formData.append("files", files.layer1);
     formData.append("layers", 1);
 
@@ -116,8 +217,9 @@ const Upload = () => {
     formData.append("files", files.layer4);
     formData.append("layers", 4);
 
+    console.log(formData);
     try {
-      const response = await axios.post(
+      const response = await axios.put(
         `${PATH.SERVER}/api/admin/store/product`,
         formData,
         {
@@ -139,24 +241,11 @@ const Upload = () => {
     }
   };
 
-  // 폼 초기화
-  const resetForm = () => {
-    setProduct({ name: "", price: "", content: "", categoryId: "" });
-    setStock({ S: 0, M: 0, L: 0 });
-    setFiles({
-      layer1: null,
-      layer2: [],
-      layer3: [],
-      layer4: null,
-    });
-    setProgress(0);
-  };
-
   return (
     <div className={styles.uploadContainer}>
       <Banner />
       <div className={styles.uploadWrapper}>
-        <h1 className={styles.uploadTitle}>상품 업로드</h1>
+        <h1 className={styles.uploadTitle}>상품 수정</h1>
         <div className={styles.form}>
           <div className={styles.inputGroup}>
             <label className={styles.label}>상품명</label>
@@ -166,7 +255,7 @@ const Upload = () => {
               name="name"
               value={product.name}
               onChange={handleInputChange}
-              placeholder="상품명을 입력하세요"
+              placeholder="상품명을 입력하세요."
             />
           </div>
 
@@ -178,7 +267,7 @@ const Upload = () => {
               name="price"
               value={product.price}
               onChange={handleInputChange}
-              placeholder="가격을 입력하세요"
+              placeholder="가격을 입력하세요."
             />
           </div>
 
@@ -189,7 +278,7 @@ const Upload = () => {
               name="content"
               value={product.content}
               onChange={handleInputChange}
-              placeholder="상품 설명을 입력하세요"
+              placeholder="상품 설명을 입력하세요."
             />
           </div>
 
@@ -232,6 +321,18 @@ const Upload = () => {
             
             <div className={styles.inputGroup}>
               <label className={styles.label}>Layer 1 (대표 이미지)</label>
+              <div className={styles.parentContainer}>
+                {
+                  serverFiles.layer1.map((img, index) => (
+                    <>
+                      <div className={styles.productImgDiv}>
+                        <img className={styles.productImg} key={index} src={img.fileName} alt={img.fileName} />
+                        <button className={styles.cancelBtn} onClick={(e) => cancelImg(e, "layer1", img)}>X</button>
+                      </div>
+                    </>
+                  ))
+                }
+              </div>
               <input
                 className={styles.fileInput}
                 type="file"
@@ -241,6 +342,18 @@ const Upload = () => {
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Layer 2 (상세 이미지)</label>
+              <div className={styles.parentContainer}>
+                {
+                  serverFiles.layer2.map((img, index) => (
+                    <>
+                      <div className={styles.productImgDiv}>
+                        <img className={styles.productImg} key={index} src={img.fileName} alt={img.fileName} />
+                        <button className={styles.cancelBtn} onClick={(e) => cancelImg(e, "layer2", img)}>X</button>
+                      </div>
+                    </>
+                  ))
+                }
+              </div>
               <div
                 className={styles.dropzone}
                 onDragOver={handleDragOver}
@@ -259,6 +372,18 @@ const Upload = () => {
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Layer 3 (추가 상세 이미지)</label>
+              <div className={styles.parentContainer}>
+                {
+                  serverFiles.layer3.map((img, index) => (
+                    <>
+                      <div className={styles.productImgDiv}>
+                        <img className={styles.productImg} key={index} src={img.fileName} alt={img.fileName} />
+                        <button className={styles.cancelBtn} onClick={(e) => cancelImg(e, "layer3", img)}>X</button>
+                      </div>
+                    </>
+                  ))
+                }
+              </div>
               <div
                 className={styles.dropzone}
                 onDragOver={handleDragOver}
@@ -277,6 +402,20 @@ const Upload = () => {
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Layer 4 (상품 정보 이미지)</label>
+              <div className={styles.parentContainer}>
+              <div className={styles.parentContainer}>
+                {
+                  serverFiles.layer4.map((img, index) => (
+                    <>
+                      <div className={styles.productImgDiv}>
+                        <img className={styles.productImg} key={index} src={img.fileName} alt={img.fileName} />
+                        <button className={styles.cancelBtn} onClick={(e) => cancelImg(e, "layer4", img)}>X</button>
+                      </div>
+                    </>
+                  ))
+                }
+              </div>
+              </div>
               <input
                 className={styles.fileInput}
                 type="file"
@@ -286,7 +425,7 @@ const Upload = () => {
           </div>
 
           <button className={styles.uploadButton} onClick={handleUpload}>
-            상품 등록하기
+            상품 수정하기
           </button>
 
           {progress > 0 && (

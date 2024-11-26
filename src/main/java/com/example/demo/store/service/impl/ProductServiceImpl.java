@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.ncp.service.NCPObjectStorageService;
 import com.example.demo.store.entity.ProductCategoryEntity;
 import com.example.demo.store.entity.ProductEntity;
@@ -48,19 +49,25 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductPaging productPaging;
 
+    @Autowired
+    private NCPObjectStorageDTO ncpDTO;
+
     @Override
     public Map<String, Object> getProduct(int productId) {
         Map<String, Object> map = new HashMap<>();
 
         // 1. 상품 정보 추출
         ProductEntity productEntity = productRepository.findById(productId).orElseThrow(null);
+        productEntity.setImg(ncpDTO.getURL() + productEntity.getImg());
         map.put("Product", ProductDTO.toGetProductDTO(productEntity));
 
         // 2. 이미지 추출
         List<ProductImgDTO> imgList = new ArrayList<>();
         for (ProductImgEntity imgEntity : productEntity.getImgList()) {
+            imgEntity.setFileName(ncpDTO.getURL() + imgEntity.getFileName());
             ProductImgDTO imgDTO = ProductImgDTO.toGetProductImgDTO(imgEntity);
             imgList.add(imgDTO);
+
             System.out.println(imgDTO);
         }
         map.put("ImgList", imgList);
@@ -123,7 +130,8 @@ public class ProductServiceImpl implements ProductService {
         for (MultipartFile file : files) {
             try {
                 // NCP Object Storage 업로드
-                String fileName = ncpObjectStorageService.uploadFile("moivo", "products/", file);
+                String fileName = ncpObjectStorageService.uploadFile(
+                        ncpDTO.getBUCKETNAME(), ncpDTO.getPRODUCTDIRECTORY(), file);
 
                 // ProductEntity에 메인 이미지 저장
                 if (layer == 1) {
@@ -227,7 +235,10 @@ public class ProductServiceImpl implements ProductService {
         // Java8 이상 사용시 Entity -> DTO 변환하는 방법
         List<ProductDTO> dtoList = pageProductList.getContent()
                 .stream()
-                .map(ProductDTO::toGetProductDTO)
+                .map(productEntity -> {
+                    productEntity.setImg(ncpDTO.getURL() + productEntity.getImg()); // 이미지 URL 수정
+                    return ProductDTO.toGetProductDTO(productEntity); // DTO로 변환
+                })
                 .collect(Collectors.toList());
 
         // 결과를 map에 저장
@@ -255,14 +266,19 @@ public class ProductServiceImpl implements ProductService {
         return list;
     }
 
-    // 상품 수정 - 24.11.25 - uj
+    // 상품 수정 - 24.11.25, 26, 27 - uj
     @Override
     @SuppressWarnings("unchecked")
     public void putProduct(Map<String, Object> map) {
-        // 1. 상품 조회
-        // 사용자 입력 데이터
+        // 1. DB에서 상품 조회
         ProductDTO productDTO = (ProductDTO) map.get("ProductDTO");
-        ProductEntity productEntity = ProductEntity.toGetProductEntity(productDTO);
+        ProductEntity productEntity = productRepository.findById(productDTO.getId()).orElseThrow(
+                () -> new NotFoundException("해당 상품(" + productDTO.getId() + ")이 조회되지 않습니다."));
+
+        // 1-1. 사용자 입력 데이터
+        productEntity.setName(productDTO.getName());
+        productEntity.setContent(productDTO.getContent());
+        productEntity.setPrice(productDTO.getPrice());
 
         // 2. 카테고리 Entity 추출
         ProductCategoryEntity categoryEntity = categoryRepository
@@ -272,15 +288,24 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setCategoryEntity(categoryEntity);
 
         // 3. 이미지(NCP) 수정
-        // 3-1. 이미지 삭제
-        List<ProductImgEntity> imgEntityList = productRepository.findById(productEntity.getId()).orElseThrow()
-                .getImgList();
-        for (ProductImgEntity imgEntity : imgEntityList) {
-            ncpObjectStorageService.deleteFile("moivo", "products/", imgEntity.getFileName());
-        }
-        imgRepository.deleteByProductEntity(productEntity);
+        List<ProductImgEntity> imgEntityList = productEntity.getImgList();
 
-        // 3-2. 이미지 업로드
+        // int imgCount = imgEntityList.size();
+        // for (int i = 0; i < imgCount; i++) {
+        // ProductImgEntity imgEntity = imgEntityList.get(i);
+        // System.out.println(imgEntity.getFileName());
+
+        // // NCP 삭제
+        // ncpObjectStorageService.deleteFile(
+        // ncpDTO.getBUCKETNAME(),
+        // ncpDTO.getPRODUCTDIRECTORY(),
+        // imgEntity.getFileName());
+        // }
+
+        // DB 에서 삭제
+        productEntity.getImgList().clear();
+
+        // 3-2. 이미지 업로드 (NCP & DB)
         for (int i = 1; i < 4; i++) {
             List<MultipartFile> files = (List<MultipartFile>) map.get("layer" + i);
             saveImgFiles(files, productEntity, i);

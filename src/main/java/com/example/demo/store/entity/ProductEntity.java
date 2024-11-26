@@ -44,7 +44,7 @@ public class ProductEntity { // 상품
     private ProductCategoryEntity categoryEntity;
 
     // 상품 1개 : 이미지 n개
-    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImgEntity> imgList;
 
     // 상품 1개 : 사이즈 3개
@@ -52,7 +52,7 @@ public class ProductEntity { // 상품
     private List<ProductStockEntity> stockList;
 
     // 상품 1개 : 리뷰 n개
-    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ReviewEntity> reviewList;
 
     // dto => entity
