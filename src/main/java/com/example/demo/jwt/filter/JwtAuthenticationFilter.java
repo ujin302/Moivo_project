@@ -46,17 +46,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .build()
                         .parseClaimsJws(jwt);
 
-                String userId = parsedToken.getBody().get("uid", String.class);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                String userId = parsedToken.getBody().get("userId", String.class);
+                logger.info("JWT로 파싱된 userId: " + userId);
 
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                System.out.println("중간 성공");
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("성공");
             } catch (Exception e) {
                 logger.error("토큰 발급 안됨", e);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰 발급 안됨");
+
+                return; //필터 체인 종료
             }
         }
 
