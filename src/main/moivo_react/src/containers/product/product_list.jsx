@@ -9,35 +9,35 @@ import Footer from "../../components/Footer/Footer";
 import Modal from "../../components/Modal/modal";
 
 const ProductList = () => {
-  const { isLoggedIn, getAuthToken } = useContext(AuthContext); // Context에서 데이터 가져오기
-  const navigate = useNavigate();
+  const { isLoggedIn, token } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [wishItems, setWishItems] = useState([]);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isWishModalOpen, setIsWishModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const itemsPerPage = 15;
-  const categories = ["All", "Outer", "Top", "Bottom"];
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      alert("유효하지 않은 토큰입니다. 다시 로그인 해주세요.");
-      navigate("/user");
+    if (!isLoggedIn) {
+      alert('로그인이 필요합니다.');
+      navigate('/user');
       return;
     }
-
     const fetchProducts = async () => {
       try {
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+        
         const response = await axios.get("/api/user/store", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: headers,
           params: {
             sortby: sortBy,
             categoryid: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
@@ -46,20 +46,29 @@ const ProductList = () => {
             size: itemsPerPage,
           },
         });
-        setProducts(response.data.productList || []);
+
+        console.log('서버 응답:', response.data);
+        
+        if (response.data) {
+          const productList = response.data.productList || [];
+          console.log('상품 목록:', productList);
+          setProducts(productList);
+        }
       } catch (error) {
+        if (error.response?.status === 401) {
+          alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+          navigate('/user');
+        }
         console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
       }
     };
-
+  
     fetchProducts();
-  }, [getAuthToken, activeCategory, sortBy, currentPage, searchTerm, navigate]);
+  }, [activeCategory, sortBy, currentPage, searchTerm, isLoggedIn, token, navigate]);
+
+  const categories = ["All", "Outer", "Top", "Bottom"];
 
   const handleAddToCart = (product) => {
-    if (!isLoggedIn) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
     const cartProduct = {
       id: product.id,
       name: product.name,
@@ -72,10 +81,6 @@ const ProductList = () => {
   };
 
   const handleAddToWish = (product) => {
-    if (!isLoggedIn) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
     const wishProduct = {
       id: product.id,
       name: product.name,
@@ -182,74 +187,63 @@ const ProductList = () => {
           }}
         >
           <AnimatePresence mode="popLayout">
-            {currentItems.map((product) => {
-              const productImage = product.imgList.find(img => img.productid === product.id)?.filename || "";
-
-              return (
-                <motion.div
-                  key={product.id}
-                  className={styles.productCard}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className={styles.productImageWrapper}>
-                    <img
-                      src={productImage}
-                      alt={product.name}
-                      className={styles.productImage}
-                    />
-                    <div className={styles.productOverlay}>
-                      <div className={styles.actionButtons}>
-                        {isLoggedIn && (
-                          <>
-                            <motion.button
-                              className={styles.actionButton}
-                              onClick={() => handleAddToCart(product)}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                            >
-                              <i className="fas fa-shopping-cart" />
-                            </motion.button>
-                            <motion.button
-                              className={styles.actionButton}
-                              onClick={() => handleAddToWish(product)}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                            >
-                              <i className="fas fa-heart" />
-                            </motion.button>
-                          </>
-                        )}
-                        <motion.button
-                          className={styles.actionButton}
-                          onClick={() => goToDetail(product.id)}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <i className="fas fa-eye" />
-                        </motion.button>
-                      </div>
-                    </div>
-                    <div className={styles.productInfo}>
-                      <h3 className={styles.productTitle}>{product.name}</h3>
-                      <p className={styles.productPrice}>
-                        ₩{product.price?.toLocaleString()}
-                      </p>
-                      {product.stock > 0 ? (
-                        <p className={styles.productStock}>
-                          재고: {product.stock}개
-                        </p>
-                      ) : (
-                        <p className={styles.soldOut}>Sold Out</p>
-                      )}
+            {currentItems.map((product) => (
+              <motion.div
+                key={product.id}
+                className={styles.productCard}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className={styles.productImageWrapper}>
+                  <img
+                    src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    alt={product.name}
+                    className={styles.productImage}
+                  />
+                  <div className={styles.productOverlay}>
+                    <div className={styles.actionButtons}>
+                      <motion.button
+                        className={styles.actionButton}
+                        onClick={() => handleAddToCart(product)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <i className="fas fa-shopping-cart" />
+                      </motion.button>
+                      <motion.button
+                        className={styles.actionButton}
+                        onClick={() => handleAddToWish(product)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <i className="fas fa-heart" />
+                      </motion.button>
+                      <motion.button
+                        className={styles.actionButton}
+                        onClick={() => goToDetail(product.id)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <i className="fas fa-eye" />
+                      </motion.button>
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productTitle}>{product.name}</h3>
+                    <p className={styles.productPrice}>
+                      ₩{product.price?.toLocaleString()}
+                    </p>
+                    <p className={styles.productStock}>
+                      재고: {product.stock}개
+                      {/* 재고: {product.stockList && product.stockList.length > 0 ? product.stockList[0].stock : 0}개 */}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </AnimatePresence>
         </motion.div>
 
