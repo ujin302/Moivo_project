@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.WishService;
 
 import java.util.List;
@@ -30,16 +31,15 @@ public class WishController {
     }
 
     // 찜한거 출력 - 24.11.25 - yjy
-    @GetMapping("")
+    @GetMapping("/list")
     public ResponseEntity<?> printWish(@RequestParam(name = "userid") int userId) {
-        List<ProductEntity> productList = wishService.printWish(userId);
-        
-        return ResponseEntity.ok(productList);
+        List<WishDTO> wishList = wishService.printWish(userId);
+        return ResponseEntity.ok(wishList);
 
     }
 
-    // 찜한거 삭제 - 24.11.25 - yj
-    @DeleteMapping("/{productId}")
+    // 찜한거 삭제 - 24.11.25 - yjy
+    @DeleteMapping("/delete/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") int productId,
             @RequestParam(name = "userid") int userId) {
         wishService.deleteProduct(productId, userId);

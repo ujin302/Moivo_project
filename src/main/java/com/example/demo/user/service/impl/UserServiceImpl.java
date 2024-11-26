@@ -100,6 +100,7 @@ public class UserServiceImpl implements UserService {
         byte[] signingKey = jwtProps.getSecretKey().getBytes();
         String jwt = Jwts.builder()
                 .setSubject(String.valueOf(userEntity.getUserId())) // 사용자 식별자
+                .claim("userId", String.valueOf(userEntity.getUserId()))  //userid 클래임 추가함.
                 .claim("roles", userEntity.isAdmin() ? "ROLE_ADMIN" : "ROLE_USER") // 역할 정보
                 .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512) // 서명
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1시간 유효

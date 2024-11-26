@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.repository.ProductRepository;
+import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.entity.UserWishEntity;
 import com.example.demo.user.entity.WishEntity;
 import com.example.demo.user.repository.UserWishRepository;
@@ -40,14 +41,15 @@ public class WishServiceImpl implements WishService {
         userWishRepository.save(userWishEntity);
     }
 
-    // 찜한거 출력 매개변수 유저 아이디 하나만 필요
+    // 찜한거 출력 - 24.11.25 yjy
     @Override
-    public List<ProductEntity> printWish(int userId) {
+    public List<WishDTO> printWish(int userId) {
         // 사용자의 WishEntity 가져오기
         WishEntity wishEntity = wishRepository.findById(userId).orElse(null);
 
         return wishEntity.getUserWishList().stream()
-                .map(UserWishEntity::getProductEntity) // UserWishEntity에서 ProductEntity 가져오기
+                .map(UserWishEntity::getWishEntity)
+                .map(WishDTO::toGetWishDTO)
                 .toList();
     }
 
