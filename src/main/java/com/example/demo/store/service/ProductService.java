@@ -14,7 +14,9 @@ public interface ProductService {
 
     public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword);
 
-    //public Map<String, Object> getProductSearchList(Pageable pageable, String sortby, String keyword);
-
     public List<ProductCategoryDTO> getCategory();
+
+    // 상품 수정 - 24.11.25 - 이유진
+    public void putProduct(Map<String, Object> map);
+
 }

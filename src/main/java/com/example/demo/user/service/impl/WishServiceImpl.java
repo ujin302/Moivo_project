@@ -28,7 +28,7 @@ public class WishServiceImpl implements WishService {
     @Autowired
     private ProductRepository productRepository;
 
-    //찜한거 담는거
+    // 찜한거 담는거
     @Override
     public void addProduct(int productId, int userId) {
         WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
@@ -40,32 +40,37 @@ public class WishServiceImpl implements WishService {
         userWishRepository.save(userWishEntity);
     }
 
-    //찜한거 출력  매개변수 유저 아이디 하나만 필요
+    // 찜한거 출력 매개변수 유저 아이디 하나만 필요
     @Override
     public List<ProductEntity> printWish(int userId) {
-       //사용자의 WishEntity 가져오기 
-        WishEntity wishEntity  = wishRepository.findById(userId).orElse(null);
-        
+        // 사용자의 WishEntity 가져오기
+        WishEntity wishEntity = wishRepository.findById(userId).orElse(null);
+
         return wishEntity.getUserWishList().stream()
-            .map(UserWishEntity::getProductEntity) // UserWishEntity에서 ProductEntity 가져오기
-            .toList();
+                .map(UserWishEntity::getProductEntity) // UserWishEntity에서 ProductEntity 가져오기
+                .toList();
     }
 
-    //찜한거 삭제
+    // 찜한거 삭제 - 24.11.26 - uj
     @Override
+    @Transactional
     public void deleteProduct(int productid, int userId) {
         // 사용자의 WishEntity 가져오기
-        // WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
-        // ProductEntity productEntity = productRepository.findById(productid).orElseThrow(() -> new RuntimeException("해당 상품이 없습니다."));
+        WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
+        ProductEntity productEntity = productRepository.findById(productid)
+                .orElseThrow(() -> new RuntimeException("해당 상품이 없습니다."));
+        List<UserWishEntity> userWishEntityList = wishEntity.getUserWishList();
 
-        // // 해당 ProductEntity와 연결된 UserWishEntity 삭제하는거임
-        // UserWishEntity userWishEntity =  userWishRepository.findByWishEntityAndProductEntity(wishEntity, productEntity)
-        //    .orElseThrow(() -> new RuntimeException("찜 목록에서 해당 상품을 찾을 수 없습니다."));
+        // 연관 관계 끊기 & DB에서 삭제
+        for (UserWishEntity userWishEntity : userWishEntityList) {
+            if (userWishEntity.getProductEntity() == productEntity) {
+                userWishEntityList.remove(userWishEntity);
+                wishRepository.save(wishEntity);
+                break;
+            }
+        }
 
-        
-        // userWishRepository.delete(userWishEntity);
-        // System.out.println("삭제가 요청되었습니다.");
-        // userWishRepository.flush();
+        System.out.println("삭제가 요청되었습니다.");
     }
 
 }
