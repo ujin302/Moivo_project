@@ -1,35 +1,108 @@
+/* LoadingModal.module.css */
 
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  min-width: 300px;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loadingCircles {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #6366f1, #8b5cf6);
+  animation: bounce 0.8s infinite;
+}
+
+.circle:nth-child(2) {
+  animation-delay: 0.2s;
+  background: linear-gradient(45deg, #8b5cf6, #d946ef);
+}
+
+.circle:nth-child(3) {
+  animation-delay: 0.4s;
+  background: linear-gradient(45deg, #d946ef, #ec4899);
+}
+
+.progressBar {
+  width: 200px;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #ec4899);
+  animation: progress 2s ease-in-out infinite;
+  transform-origin: left;
+}
+
+.loadingText {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  min-height: 1.5em;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
   }
-  
-  .modal {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    text-align: center;
+  50% {
+    transform: translateY(-10px);
   }
-  
-  .loadingSpinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
+}
+
+@keyframes progress {
+  0% {
+    transform: scaleX(0);
   }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  50% {
+    transform: scaleX(1);
   }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circle {
+    animation: none;
+  }
+  .progress {
+    animation: none;
+  }
+}
