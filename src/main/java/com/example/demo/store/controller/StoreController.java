@@ -46,12 +46,23 @@ public class StoreController {
             @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid,
             @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword) {
 
+        //400 Bad Request: 잘못된 요청
+        if (categoryid < 0 || sortby.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("400 Bad Request");
+        }
+
+        //401 Unauthorized: 인증되지 않은 사용자
+        //추후 토큰 사용시 사용예정
+//        if (token == null || !isValidToken(token)) {
+//            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("401 Unauthorized");
+//        }
+
         Map<String, Object> map = productService.getProductList(pageable, sortby, categoryid, keyword);
-        // 값 존재 X
+        //404 값 존재 X
         if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
 
-        // 값 존재 O
+        //200 값 존재 O
         return ResponseEntity.ok(map);
     }
 

@@ -153,7 +153,6 @@ public class ProductServiceImpl implements ProductService {
     public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword) {
         Map<String, Object> map = new HashMap<>();
         //DB 상품 개수 추출
-        //삼항연산자 사용 categoryid가 0 = 전체 상품, 1 = 아우터, 2 = 상의, 3 = 하의로 상품개수 추출
         //productRepository.count(); = productRepository.findAll().size(); 와 같음
         //count는 SELECT COUNT(*) FROM product;
         //findAll.size()는 SELECT FROM product; 후 Java의 List.size()를 호출하는 방식
