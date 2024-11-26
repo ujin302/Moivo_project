@@ -33,7 +33,7 @@ public class WishController {
     @GetMapping("")
     public ResponseEntity<?> printWish(@RequestParam(name = "userid") int userId) {
         List<ProductEntity> productList = wishService.printWish(userId);
-
+        
         return ResponseEntity.ok(productList);
 
     }

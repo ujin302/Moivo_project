@@ -30,7 +30,7 @@ const Upload = () => {
 
   useEffect(() => {
     // 카테고리 정보 가져오기
-    axios.get("/api/categories").then((res) => {
+    axios.get("http://localhost:8080/api/admin/store/category").then((res) => {
       if (Array.isArray(res.data)) {
         setCategories(res.data);
       } else {
@@ -117,7 +117,7 @@ const Upload = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/store/upload",
+        "http://localhost:8080/api/admin/store/product",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

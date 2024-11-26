@@ -1,40 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import styles from "../../assets/css/Mypage_wish.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 
-const mypage_wish = () => {
-  const wishlistItems = [
-    { image: "../image/wish1.jpg", name: "Basic logo off top", price: "KRW 71,000" },
-    { image: "../image/wish2.png", name: "Isabella fur coat", price: "KRW 283,000" },
-    { image: "../image/wish3.jpg", name: "Shawl Collar Down Vest_Black", price: "KRW 345,000" },
-    { image: "../image/wish4.jpg", name: "Mohair Round Neck Cardigan_Red", price: "KRW 138,000" },
-    { image: "../image/wish1.jpg", name: "Basic logo off top", price: "KRW 71,000" },
-    { image: "../image/wish2.png", name: "Isabella fur coat", price: "KRW 283,000" },
-    { image: "../image/wish3.jpg", name: "Shawl Collar Down Vest_Black", price: "KRW 345,000" },
-    { image: "../image/wish4.jpg", name: "Mohair Round Neck Cardigan_Red", price: "KRW 138,000" },
-    { image: "../image/wish1.jpg", name: "Basic logo off top", price: "KRW 71,000" },
-    { image: "../image/wish2.png", name: "Isabella fur coat", price: "KRW 283,000" },
-    { image: "../image/wish3.jpg", name: "Shawl Collar Down Vest_Black", price: "KRW 345,000" },
-    { image: "../image/wish4.jpg", name: "Mohair Round Neck Cardigan_Red", price: "KRW 138,000" },
-  ]; 
+const MypageWish = () => {
+  const [wishlistItems, setWishlistItems] = useState([]); // 상태로 찜 목록 관리
+  const userId = 1; // 임시 userId
+
+  // 찜 목록 가져오기
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const response = await axios.get(`/api/user/wish`, {
+          params: { userid: userId },
+        });
+        setWishlistItems(response.data); 
+      } catch (error) {
+        console.error("Failed to fetch wishlist:", error);
+      }
+    };
+    fetchWishlist();
+  }, []);
+
+  // 찜 목록에서 삭제
+  const handleRemove = async (productId) => {
+    try {
+      await axios.delete(`/api/user/wish/${productId}`, {
+        params: { userid: userId },
+      });
+      setWishlistItems((prevItems) =>
+        prevItems.filter((item) => item.id !== productId)
+      );
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    }
+  };
 
   return (
     <div className={styles.wishlistPage}>
       <Banner />
       <div className={styles.title}>WISHLIST</div>
-        <div className={styles.container}>
+      <div className={styles.container}>
         <div className={styles.wishlistContainer}>
-          {wishlistItems.map((item, index) => (
-            <div key={index} className={styles.wishlistItem}>
+          {wishlistItems.map((item) => (
+            <div key={item.id} className={styles.wishlistItem}>
               <div className={styles.itemImage}>
                 <img src={item.image} alt={item.name} />
               </div>
               <div className={styles.itemInfo}>
                 <div className={styles.itemName}>{item.name}</div>
                 <div className={styles.itemPrice}>{item.price}</div>
-                <button className={styles.removeButton}>Remove</button>
+                <button
+                  className={styles.removeButton}
+                  onClick={() => handleRemove(item.id)}
+                >
+                  Remove
+                </button>
               </div>
             </div>
           ))}
@@ -49,4 +72,4 @@ const mypage_wish = () => {
   );
 };
 
-export default mypage_wish;
+export default MypageWish;
