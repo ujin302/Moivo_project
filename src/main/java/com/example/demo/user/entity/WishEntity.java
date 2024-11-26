@@ -16,10 +16,11 @@ public class WishEntity {
     private Integer id; // 찜 고유 키
 
     @ManyToOne
-    @JoinColumn(name = "userid", nullable = false)
+    @JoinColumn(name = "userid", nullable = false, unique = true)
     private UserEntity userEntity; // 고객 고유 키
 
     // 찜 상품 리스트
-    @OneToMany(mappedBy = "wishEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "wishEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UserWishEntity> userWishList;
 }
+//유저 한명이 찜을 여러개 할 수 있다.

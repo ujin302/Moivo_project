@@ -2,6 +2,7 @@ package com.example.demo.user.entity;
 
 import com.example.demo.store.entity.ProductEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

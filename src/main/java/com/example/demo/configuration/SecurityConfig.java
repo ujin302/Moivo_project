@@ -26,13 +26,16 @@ public class SecurityConfig {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtProps jwtProps, @Qualifier("customUserDetailsService") UserDetailsService userDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtProps jwtProps,
+            @Qualifier("customUserDetailsService") UserDetailsService userDetailsService) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                //.requestMatchers("/api/user/join", "/api/user/login").permitAll()
+                        // .requestMatchers("/api/user/join", "/api/user/login").permitAll()
+                        // //api/user/coupons, store 이걸 넣어도 되도록
                         .requestMatchers("/api/user/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 권한 명시
+                        .anyRequest().authenticated()) // 나머지 경로는 인증 필요
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProps, customUserDetailsService),
@@ -40,7 +43,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-    
 
     @Bean
     public PasswordEncoder passwordEncoder() {
