@@ -43,10 +43,13 @@ export const AuthProvider = ({ children }) => {
               setToken(newToken);
               axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
               originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+              
+              // 토큰 갱신 성공 시 원래 요청 재시도
               return axios(originalRequest);
             }
           } catch (refreshError) {
             console.error('토큰 갱신 실패:', refreshError);
+            // 토큰 갱신 실패 시에만 로그아웃
             logout();
             return Promise.reject(refreshError);
           }

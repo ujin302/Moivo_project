@@ -27,12 +27,6 @@ const ProductList = () => {
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
-      if (!isLoggedIn || !token) {
-        alert('토큰이 사라져서 다시 로그인 해라 ㅠㅠ');
-        navigate('/user');
-        return;
-      }
-      
       setIsLoading(true);
       try {
         const response = await axios.get("/api/user/store", {
@@ -53,18 +47,16 @@ const ProductList = () => {
           setProducts(response.data.productList || []);
         }
       } catch (error) {
-        if (error.response?.status === 401) {
-          alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-          navigate('/user');
-        }
         console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuthAndFetch();
-  }, [activeCategory, sortBy, currentPage, searchTerm, token, navigate]);
+    if (token) {
+      checkAuthAndFetch();
+    }
+  }, [activeCategory, sortBy, currentPage, searchTerm, token]);
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
