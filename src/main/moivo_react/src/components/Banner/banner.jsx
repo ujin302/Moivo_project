@@ -36,6 +36,10 @@ const Banner = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('id');
+    sessionStorage.removeItem('paymentId');
+    sessionStorage.removeItem('wishId');
+
     logout();
     alert('로그아웃되었습니다.');
     navigate('/');

@@ -14,4 +14,8 @@ public class CartServiceImpl implements CartService {
 
     // @Autowired
     private CartRepository cartRepository; // 장바구니
+
+
+    //찜한거 출력  (위시랑 비슷함)
+    
 }

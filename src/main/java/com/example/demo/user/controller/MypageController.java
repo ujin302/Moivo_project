@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.demo.user.dto.CartDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.MypageService;

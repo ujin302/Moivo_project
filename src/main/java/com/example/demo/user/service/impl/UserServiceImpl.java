@@ -17,8 +17,10 @@ import com.example.demo.jwt.prop.JwtProps;
 import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.user.dto.UserDTO;
+import com.example.demo.user.entity.CartEntity;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.entity.WishEntity;
+import com.example.demo.user.repository.CartRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.repository.WishRepository;
 import com.example.demo.user.service.UserService;
@@ -31,6 +33,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Transactional
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,8 +43,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private WishRepository wishRepository;
     @Autowired
+    private CartRepository cartRepository;
+    @Autowired
     private PaymentRepository paymentRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -74,19 +78,23 @@ public class UserServiceImpl implements UserService {
         System.out.println("저장된 암호화 비밀번호: " + userEntity.getPwd());
         System.out.println("비밀번호 매칭 결과: " + passwordEncoder.matches(pwd, userEntity.getPwd()));
 
-        // Wish ID 조회
-        Integer wishId = null;
-        List<WishEntity> wishEntities = wishRepository.findByUserEntity_Id(userEntity.getId());
-        if (!wishEntities.isEmpty()) {
-            wishId = wishEntities.get(0).getId(); // 첫 번째 Wish ID 가져오기
-        }
+        // Wish 생성 확인 및 자동 생성
+        WishEntity wishEntity = wishRepository.findByUserEntity_Id(userEntity.getId())
+            .stream()
+            .findFirst()
+            .orElseGet(() -> {
+                WishEntity newWish = new WishEntity();
+                newWish.setUserEntity(userEntity);
+                return wishRepository.save(newWish); // 새로운 Wish 생성 및 저장
+            });
 
-        // Payment ID 조회
-        Integer paymentId = null;
-        List<PaymentEntity> paymentEntities = paymentRepository.findByUserEntity_Id(userEntity.getId());
-        if (!paymentEntities.isEmpty()) {
-            paymentId = paymentEntities.get(0).getId(); // 첫 번째 Payment ID 가져오기
-        }
+        // cart 생성 확인 및 자동 생성
+        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId())
+            .orElseGet(() -> {
+                CartEntity newCart = new CartEntity();
+                newCart.setUserEntity(userEntity);
+                return cartRepository.save(newCart); // 새로운 Cart 생성 및 저장
+            });
 
         // JWT 생성
         byte[] signingKey = jwtProps.getSecretKey().getBytes();
@@ -101,8 +109,8 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> result = new HashMap<>();
         result.put("jwt", jwt);
         result.put("id", userEntity.getId());
-        result.put("wishId", wishId);
-        result.put("paymentId", paymentId);
+        result.put("wishId", wishEntity.getId());
+        result.put("cartId", cartEntity.getId());
 
         return result;
     }

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/user/store")
-
 public class StoreController {
 
     @Autowired
@@ -39,12 +38,15 @@ public class StoreController {
         return ResponseEntity.ok(map);
     }
 
+    // 상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang
     @GetMapping("")
     public ResponseEntity<?> getProductAll(
-            @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(required = false, defaultValue = "newest") String sortby) {
+            @PageableDefault(page = 0, size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "sortby", required = false, defaultValue = "newest") String sortby,
+            @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid,
+            @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword) {
 
-        Map<String, Object> map = productService.getProductList(pageable, sortby);
+        Map<String, Object> map = productService.getProductList(pageable, sortby, categoryid, keyword);
         // 값 존재 X
         if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
