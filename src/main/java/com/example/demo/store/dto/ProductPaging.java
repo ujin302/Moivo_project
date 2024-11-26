@@ -34,6 +34,7 @@ public class ProductPaging {
             next = true;
         }
     }
+    
 
 //    public void makePagingHTML() {
 //        pagingHTML = new StringBuffer();

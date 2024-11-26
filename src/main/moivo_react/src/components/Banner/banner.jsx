@@ -96,8 +96,6 @@ const Banner = () => {
             </>
           )}
 
-          <a href='/product-search' className={styles.utilityLink}>Search</a>
-
           <div className={styles.loginStatus}>
             <span>
               <span className={`${styles.status} ${isLoggedIn ? styles.on : styles.off}`}></span>
@@ -105,7 +103,7 @@ const Banner = () => {
             </span>
             {isLoggedIn && (
               <>
-                <span className={styles.expirationLabel}>로그인 만료</span>
+                <span className={styles.expirationLabel}>로그인 만료 시간</span>
                 <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span>
               </>
             )}

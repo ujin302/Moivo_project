@@ -6,7 +6,6 @@ import User_login from './containers/user/user_login';
 import User_signup from './containers/user/user_signup';
 import ProductBoard from './containers/product/product_board'; 
 import ProductList from './containers/product/product_list';
-import ProductSearch from './containers/product/product_search';
 import ProductDetail from './containers/product/product_detail';
 import Qna_faqboard from './containers/qna/qna_faqboard';
 import Qna_board from './containers/qna/qna_board';
@@ -27,7 +26,6 @@ const routeConfig = [
   { path: "/user_signup", element: <User_signup /> },
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
-  { path: "/product-search", element: <ProductSearch /> },
   { path: "/product-detail/:id", element: <ProductDetail /> },
   { path: "/upload", element: <Upload /> },
   { path: "/mypage", element: <MypageMain /> },
@@ -51,8 +49,8 @@ const App = () => {
             {routeConfig.map(({ path, element }, index) => (
               <Route key={index} path={path} element={element} />
             ))}
-          </Routes>
-        </Router>
+            </Routes>
+          </Router>
       </MainProvider>
     </AuthProvider>
   );
