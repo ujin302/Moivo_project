@@ -26,21 +26,20 @@ const ProductList = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      alert('로그인이 필요합니다.');
-      navigate('/user');
-      return;
-    }
-    const fetchProducts = async () => {
+    const checkAuthAndFetch = async () => {
+      if (!isLoggedIn || !token) {
+        alert('토큰이 사라져서 다시 로그인 해라 ㅠㅠ');
+        navigate('/user');
+        return;
+      }
+      
       setIsLoading(true);
       try {
-        const headers = {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        };
-        
         const response = await axios.get("/api/user/store", {
-          headers: headers,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
           params: {
             sortby: sortBy,
             categoryid: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
@@ -49,13 +48,9 @@ const ProductList = () => {
             size: itemsPerPage,
           },
         });
-
-        console.log('서버 응답:', response.data);
         
         if (response.data) {
-          const productList = response.data.productList || [];
-          console.log('상품 목록:', productList);
-          setProducts(productList);
+          setProducts(response.data.productList || []);
         }
       } catch (error) {
         if (error.response?.status === 401) {
@@ -67,9 +62,9 @@ const ProductList = () => {
         setIsLoading(false);
       }
     };
-  
-    fetchProducts();
-  }, [activeCategory, sortBy, currentPage, searchTerm, isLoggedIn, token, navigate]);
+
+    checkAuthAndFetch();
+  }, [activeCategory, sortBy, currentPage, searchTerm, token, navigate]);
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
@@ -122,8 +117,29 @@ const ProductList = () => {
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  const goToDetail = (id) => {
-    navigate(`/product-detail/${id}`);
+  const goToDetail = async (productId) => {
+    try {
+      const response = await axios.get(`/api/user/store/${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data) {
+        navigate(`/product-detail/${productId}`, {
+          state: {
+            productData: response.data
+          }
+        });
+      }
+    } catch (error) {
+      console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
+      if (error.response?.status === 401) {
+        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+        navigate('/user');
+      }
+    }
   };
 
   return (
@@ -240,10 +256,6 @@ const ProductList = () => {
                     <h3 className={styles.productTitle}>{product.name}</h3>
                     <p className={styles.productPrice}>
                       ₩{product.price?.toLocaleString()}
-                    </p>
-                    <p className={styles.productStock}>
-                      재고: {product.stock}개
-                      {/* 재고: {product.stockList && product.stockList.length > 0 ? product.stockList[0].stock : 0}개 */}
                     </p>
                   </div>
                 </div>

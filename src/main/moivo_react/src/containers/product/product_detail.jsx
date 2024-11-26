@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styles from "../../assets/css/product_detail.module.css";
 import { motion } from "framer-motion";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
@@ -12,7 +12,8 @@ const ProductDetail = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
+  const location = useLocation();
+  const [product, setProduct] = useState(location.state?.productData || null);
   const [mainImg, setMainImg] = useState("");
   const [selectedSize, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -36,28 +37,32 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const response = await axios.get(`/api/user/store/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
+    if (!product) {
+      const fetchProductData = async () => {
+        try {
+          const response = await axios.get(`/api/user/store/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          
+          if (response.data) {
+            setProduct(response.data);
+            setMainImg(response.data.productimg.find(img => img.layer === 1)?.filename);
           }
-        });
-        const selectedProduct = response.data;
-        
-        if (selectedProduct) {
-          setProduct(selectedProduct);
-          setMainImg(selectedProduct.productimg.find(img => img.layer === 1)?.filename);
-        } else {
-          setProduct(null);
+        } catch (error) {
+          console.error('상품 정보를 불러오는데 실패했습니다:', error);
+          if (error.response?.status === 401) {
+            alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+            navigate('/user');
+          }
         }
-      } catch (error) {
-        console.error('상품 정보를 불러오는데 실패했습니다:', error);
-      }
-    };
-
-    fetchProductData();
-  }, [id, token]);
+      };
+      fetchProductData();
+    } else {
+      setMainImg(product.productimg.find(img => img.layer === 1)?.filename);
+    }
+  }, [id, token, product]);
 
   // 리뷰 및 재고 데이터 가져오기
   useEffect(() => {

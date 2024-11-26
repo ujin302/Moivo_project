@@ -196,4 +196,20 @@ public class UserServiceImpl implements UserService {
         // Entity -> DTO 변환하여 반환
         return UserEntity.toGetUserDTO(userEntity);
     }
+
+    // 토큰 검사 _241126_sc
+    @Override
+    public boolean validateToken(String token) {
+        try {
+            // JWT 토큰 검증
+            Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(jwtProps.getSecretKey().getBytes()))
+                .build()
+                .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            System.out.println("토큰 검증 실패: " + e.getMessage());
+            return false;
+        }
+    }
 }
