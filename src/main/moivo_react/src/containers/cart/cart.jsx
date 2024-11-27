@@ -24,9 +24,11 @@ const Cart = () => {
         const mappedItems = fetchedItems.map((item) => ({
           ...item,
           ...item.productDTO, // productDTO 데이터 병합
+
         }));
+        console.log("fetchedItems = " + fetchedItems);
+        console.log("mappedItems = " + mappedItems);
         setCartItems(mappedItems);
-        console.log(response.data);
       } catch (error) {
         console.error("Error fetching cart items:", error);
       } finally {
@@ -36,6 +38,7 @@ const Cart = () => {
     fetchCartItems();
   }, [userid]);
 
+  console.log(cartItems);
   const handleQuantityChange = async (id, action) => {
     const currentItem = cartItems.find((item) => item.cartid === id);
     const newQuantity = currentItem.count + (action === "increase" ? 1 : -1);
@@ -75,16 +78,17 @@ const Cart = () => {
   const handleRemoveItem = async (id) => {
     const token = sessionStorage.getItem("token");
     console.log("token = " + token);
-
-    console.log(id);
+  
+    console.log("Removing item with id:", id);
     try {
       await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,  // 토큰이 제대로 전달되는지 확인
+          Authorization: `Bearer ${token}`, // 토큰이 제대로 전달되는지 확인
         },
         params: { userid },
       });
-      setCartItems((prevItems) => prevItems.filter((item) => item.cartid !== id));
+      // 상태 업데이트에서 id를 사용
+      setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
       console.log(`Item with id ${id} removed successfully`);
     } catch (error) {
       console.error("Error removing item:", error);
@@ -148,7 +152,10 @@ const Cart = () => {
                     <span>{item.count}</span>
                     <button onClick={() => handleQuantityChange(item.cartid, "increase")}>+</button>
                   </div>
-                  <button className={styles.removeButton} onClick={() => handleRemoveItem(item.id)}>
+                  <button
+                    className={styles.removeButton}
+                    onClick={() => handleRemoveItem(item.id)} // `cartid`를 전달
+                  >
                     REMOVE
                   </button>
                 </div>

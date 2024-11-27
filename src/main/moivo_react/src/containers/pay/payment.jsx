@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // 페이지 이동을 위한 Hook
 import styles from "../../assets/css/Payment.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -6,6 +7,9 @@ import Footer from "../../components/Footer/Footer";
 const payment = () => {
   const [orderStatus, setOrderStatus] = useState(null); // 결제 상태
   const [selectedCoupon, setSelectedCoupon] = useState(null); // 선택한 쿠폰
+  const [deliveryAddress, setDeliveryAddress] = useState(""); // 배송지
+  const navigate = useNavigate();
+
   const [cartItems] = useState([
     { id: 1, name: "Angel wing tee", price: 62000, quantity: 1, image: "../image/only1.jpg" },
     { id: 2, name: "Ruffle baggy jeans", price: 129000, quantity: 2, image: "../image/only2.jpg" },
@@ -16,11 +20,15 @@ const payment = () => {
     { id: 2, name: "10,000원 할인", discount: 10000 },
   ];
 
+  // 임의의 배송지 데이터 불러오기
+  useEffect(() => {
+    // 실제로는 API 호출로 불러올 수 있음
+    setDeliveryAddress("서울특별시 강남구 테헤란로 123");
+  }, []);
+
   const handlePayment = () => {
-    // 결제 API 호출 시 결제 성공한 것처럼 처리
-    setTimeout(() => {
-      setOrderStatus("success");
-    }, 1000);
+    // 결제 페이지로 리다이렉트
+    navigate("/payment-method");
   };
 
   const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -77,7 +85,6 @@ const payment = () => {
                 </span>
               </div>
             </div>
-
             {/* 쿠폰 선택 */}
             <div className={styles.couponContainer}>
               <label>사용 가능한 쿠폰:</label>
@@ -96,12 +103,13 @@ const payment = () => {
               </select>
             </div>
 
-            {/* 배송지 입력 */}
+            {/* 배송지 */}
             <div className={styles.deliveryAddress}>
               <label>배송지:</label>
               <input
                 type="text"
-                placeholder="배송지를 입력하세요."
+                value={deliveryAddress}
+                readOnly
                 className={styles.inputField}
               />
             </div>

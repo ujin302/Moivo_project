@@ -19,7 +19,7 @@ const MypageWish = () => {
         const wishlist = response.data.wishlist || []; //서버에서 받은 데이터 저장
         
         // wishlist 안에서 product 정보를 추출하여 상태에 저장
-        const formattedWishlist = wishlist.map(item => item.product);
+        const formattedWishlist = wishlist.map(item => item.productDTO); // productDTO로 변경
         setWishlistItems(formattedWishlist);
       } catch (error) {
         console.error("Failed to fetch wishlist:", error);
@@ -28,7 +28,6 @@ const MypageWish = () => {
     fetchWishlist();
   }, [userid]); //userid가 변경될 때마다 함수 호출
   console.log(wishlistItems);
-
 
   // 찜 목록에서 삭제
   const handleRemove = async (productId) => {
@@ -39,9 +38,9 @@ const MypageWish = () => {
       await axios.delete(`http://localhost:8080/api/user/wish/delete/${productId}`, {
         params: { userid }, //userid는 쿼리 파라미터로 전달
       });
-      //삭제 성공 시 상태 업데이트하기
+      // 삭제 성공 시 상태 업데이트하기
       setWishlistItems((prevItems) =>
-        //filter 메서드 이용해서 productId가 일치하는 항목 제거하기
+        // filter 메서드 이용해서 productId가 일치하는 항목 제거하기
         prevItems.filter((item) => item.id !== productId)
       );
     } catch (error) {
@@ -54,7 +53,7 @@ const MypageWish = () => {
       <Banner />
       <div className={styles.title}>WISHLIST</div>
       <div className={styles.container}>
-      {wishlistItems.length > 0 ? (
+        {wishlistItems.length > 0 ? (
           <div className={styles.wishlistContainer}>
             {wishlistItems.map((item) => (
               <div key={item.id} className={styles.wishlistItem}>
@@ -66,7 +65,7 @@ const MypageWish = () => {
                   <div className={styles.itemPrice}>{item.price}원</div>
                   <button
                     className={styles.removeButton}
-                    onClick={() => handleRemove(item.id)}
+                    onClick={() => handleRemove(item.id)} // productDTO의 id 사용
                   >
                     Remove
                   </button>
@@ -78,10 +77,10 @@ const MypageWish = () => {
           <div className={styles.emptyMessage}>Your wishlist is empty.</div>
         )}
         <div className={styles.bottomBar}></div>
-          <Link to="/mypage" className={styles.backLink}>
-            Go Back to MyPage
-          </Link>
-        </div>
+        <Link to="/mypage" className={styles.backLink}>
+          Go Back to MyPage
+        </Link>
+      </div>
       <Footer />
     </div>
   );
