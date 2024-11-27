@@ -38,13 +38,6 @@ const Upload = () => {
         console.error("카테고리 데이터는 배열이 아닙니다 ? :", res.data);
       }
     });
-    // 하드코딩된 카테고리 데이터 사용
-    // const hardcodedCategories = [
-    //   { id: 1, name: "아우터" },
-    //   { id: 2, name: "상의" },
-    //   { id: 3, name: "하의" }
-    // ];
-    // setCategories(hardcodedCategories);
   }, []);
 
   // 상품 정보 입력 핸들러

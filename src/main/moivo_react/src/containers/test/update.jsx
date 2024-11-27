@@ -208,22 +208,6 @@ const Upload = () => {
     files.layer2.forEach((file) => formData.append("layer2", file)); // 다중 파일
     files.layer3.forEach((file) => formData.append("layer3", file)); // 다중 파일
     formData.append("layer4", files.layer4); // 단일 파일
-    
-    // formData.append("files", files.layer1);
-    // formData.append("layers", 1);
-
-    // files.layer2.forEach((file) => {
-    //   formData.append("files", file);
-    //   formData.append("layers", 2);
-    // });
-
-    // files.layer3.forEach((file) => {
-    //   formData.append("files", file);
-    //   formData.append("layers", 3);
-    // });
-
-    // formData.append("files", files.layer4);
-    // formData.append("layers", 4);
 
     console.log(formData);
     try {
