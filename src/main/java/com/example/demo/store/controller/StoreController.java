@@ -17,28 +17,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/api/user/store")
+@RequestMapping("/api/store")
 public class StoreController {
 
     @Autowired
     private ProductService productService;
-
-    // 상품 페이징 처리
-    // 상품 검색
-    // 상품 상세 화면 (리뷰 포함)
-    // 상품 상세 화면 조회 로직 수정_241126-sc
-    @GetMapping("/{id}") // id를 사용하여 상품 상세 정보 요청
-    public ResponseEntity<?> getProductDetail(@PathVariable int id) {
-        Map<String, Object> map = productService.getProduct(id); // 서비스에서 상품 정보 가져오기
-        // 값 존재 X
-        if (map == null) {
-            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
-        }
-
-        // 값 존재 O
-        return ResponseEntity.ok(map);
-    }
-
+    
     // 상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang
     @GetMapping("")
     public ResponseEntity<?> getProductAll(
@@ -54,6 +38,20 @@ public class StoreController {
 
         // 값 존재 O
         return ResponseEntity.ok(map);
+    }
+
+    //  개별 상품 상세 정보 요청_241127-sc
+    @GetMapping("/product-detail/{productId}")
+    public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
+        try {
+            Map<String, Object> productData = productService.getProduct(productId);
+            if (productData == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(productData);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 }
