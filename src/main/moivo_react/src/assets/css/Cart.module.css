@@ -155,3 +155,39 @@
     color: #988c73;
   }
   
+  .cartItem input[type="checkbox"] {
+    display: none;
+  }
+  
+  .cartItem input[type="checkbox"] + label {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #988c73;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-right: 20px;
+  }
+  
+  .cartItem input[type="checkbox"]:checked + label {
+    background-color: #988c73;
+    border-color: #988c73;
+  }
+  
+  .cartItem input[type="checkbox"]:checked + label::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .cartItem input[type="checkbox"] + label:hover {
+    border-color: #2f2e2c;
+  }

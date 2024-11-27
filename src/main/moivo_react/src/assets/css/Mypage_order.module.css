@@ -216,7 +216,23 @@
     transform: scale(1.05);
 }
 
-
+  /* 뒤로 가기 링크 */
+  .backLink {
+    display: block;
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #988c73;
+    text-decoration: none;
+    margin-top: 20px;
+    margin-bottom: 100px;
+    transition: color 0.3s ease;
+  }
+  
+  .backLink:hover {
+    color: #2f2e2c;
+  }
+  
 @media (max-width: 768px) {
     .moivo {
         font-size: 36px;

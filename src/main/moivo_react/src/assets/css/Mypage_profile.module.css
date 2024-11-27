@@ -68,7 +68,7 @@
 }
 
 .membershipInfo {
-    font-family: 'GmarketSans', serif;
+    font-family: 'GmarketSans', sans-serif;
     font-size: 14px;
     text-align: left;
     color: #2f2e2c;
@@ -76,11 +76,12 @@
 }
 
 .pointCoupon {
-    font-family: 'GmarketSans', serif;
-    font-size: 14px;
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 16px;
     text-align: left;
     color: #2f2e2c;
 }
+
 .profileContainer {
     width: 100%;
     margin: 0 auto;
@@ -132,8 +133,8 @@
     padding-right: 20px; /* 입력창과의 간격 조정 */
 }
 
-/* 공통 input 스타일 */
-input {
+
+.inputtext {
     font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 적용 */
     color: #2f2e2c; /* 텍스트 색상 */
     background-color: transparent; /* 배경 투명 */
@@ -319,6 +320,36 @@ button, label {
     cursor: pointer;
 }
 
+/* 하단 바 */
+.bottomBar {
+    width: 70%;
+    height: 0.9px;
+    background-color: #988c73;
+    margin: 20px auto;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .bottomBar:hover {
+    background-color: #2f2e2c;
+  }
+  
+  /* 뒤로 가기 링크 */
+  .backLink {
+    display: block;
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #988c73;
+    text-decoration: none;
+    margin-top: 20px;
+    transition: color 0.3s ease;
+  }
+  
+  .backLink:hover {
+    color: #2f2e2c;
+  }
+  
 /* 미디어 쿼리: 화면 크기가 768px 이하일 때 적용 */
 @media (max-width: 768px) {
     .membershipBox {
