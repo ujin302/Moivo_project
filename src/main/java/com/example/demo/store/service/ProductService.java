@@ -19,4 +19,6 @@ public interface ProductService {
     // 상품 수정 - 24.11.25 - 이유진
     public void putProduct(Map<String, Object> map);
 
+    public void deleteProduct(int productId);
+
 }

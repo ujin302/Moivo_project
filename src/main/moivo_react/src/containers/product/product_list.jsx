@@ -12,11 +12,19 @@ import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // 상품 List
+  const [pageInfo, setPageInfo] = useState({ // 페이징 정보
+    "isFirst" : false,  // 1 페이지 여부
+    "isLast" : false, // 마지막 페이지 여부
+    "hasPrevious" : false, // 이전 페이지 여부
+    "hasNext" : false, // 다음 페이지 여부
+    "totalPages" : 0 // 페이지 개수
+  });
+  const pageBlock = 3;
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [wishItems, setWishItems] = useState([]);
@@ -48,6 +56,19 @@ const ProductList = () => {
         
         if (response.data) {
           setProducts(response.data.productList || []);
+          setPageInfo({
+            isFirst: response.data.isFirst,
+            isLast: response.data.isLast,
+            hasPrevious: response.data.hasPrevious,
+            hasNext: response.data.hasNext,
+            totalPages: response.data.totalPages
+          });
+          // setCurrentPage(response.data.currentPage);
+          setCurrentPage(0);
+          console.log(response.data);
+          console.log(products);
+          console.log(pageInfo);
+          console.log(currentPage);
         }
       } catch (error) {
         if (error.response?.status === 401) {
@@ -61,7 +82,59 @@ const ProductList = () => {
     };
 
     fetchProducts();
-  }, [activeCategory, sortBy, currentPage, searchTerm, token]);
+  }, []);
+
+  // 페이지 넘어가기 
+  const onClickPage () => {
+    useEffect(() => {
+      const fetchProducts = async () => {
+        setIsLoading(true);
+        try {
+          const headers = {};
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+  
+          const response = await axios.get(`${PATH.SERVER}/api/store`, {
+            headers,
+            params: {
+              page: currentPage - 1,
+              size: itemsPerPage,
+              sortBy: sortBy,
+              categoryId: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
+              keyword: searchTerm,
+            }
+          });
+          
+          if (response.data) {
+            setProducts(response.data.productList || []);
+            setPageInfo({
+              isFirst: response.data.isFirst,
+              isLast: response.data.isLast,
+              hasPrevious: response.data.hasPrevious,
+              hasNext: response.data.hasNext,
+              totalPages: response.data.totalPages
+            });
+            // setCurrentPage(response.data.currentPage);
+            setCurrentPage(0);
+            console.log(response.data);
+            console.log(products);
+            console.log(pageInfo);
+            console.log(currentPage);
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            console.error("인증 오류:", error);
+          } else {
+            console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      fetchProducts();
+  }
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
@@ -125,7 +198,9 @@ const ProductList = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  // const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  // const totalPages = Math.ceil(products.length / itemsPerPage);
+  // const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const handleProductClick = (productId) => {
@@ -198,7 +273,7 @@ const ProductList = () => {
           }}
         >
           <AnimatePresence mode="popLayout">
-            {currentItems.map((product) => (
+            {products.map((product) => (
               <motion.div
                 key={product.id}
                 className={styles.productCard}
@@ -258,19 +333,19 @@ const ProductList = () => {
         <motion.div className={styles.paginationContainer}>
           <button
             className={styles.pageButton}
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(0)}
+            disabled={pageInfo.isFirst}
           >
             &laquo;
           </button>
           <button
             className={styles.pageButton}
             onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
+            disabled={!pageInfo.hasPrevious}
           >
             &lt;
           </button>
-          {Array.from({ length: totalPages }, (_, index) => (
+          {Array.from({ length: pageBlock }, (_, index) => (
             <button
               key={index}
               className={`${styles.pageButton} ${currentPage === index + 1 ? styles.active : ""}`}
@@ -282,14 +357,14 @@ const ProductList = () => {
           <button
             className={styles.pageButton}
             onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={!pageInfo.hasNext}
           >
             &gt;
           </button>
           <button
             className={styles.pageButton}
             onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
+            disabled={pageInfo.isLast}
           >
             &raquo;
           </button>
