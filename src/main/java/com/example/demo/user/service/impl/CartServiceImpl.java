@@ -3,6 +3,7 @@ package com.example.demo.user.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.repository.ProductRepository;
 import com.example.demo.user.dto.UserCartDTO;
@@ -15,10 +16,10 @@ import com.example.demo.user.entity.Size;
 
 import jakarta.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -66,23 +67,31 @@ public class CartServiceImpl implements CartService {
                 CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                                 .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
 
-                // userCartList 직접 가져오기
+                // userCartList 가져오기
                 List<UserCartEntity> userCartEntities = userCartRepository.findByCartEntity_Id(cartEntity.getId());
 
-                // DTO로 변환
-                List<UserCartDTO> cartList = userCartEntities.stream()
-                                .map(userCart -> new UserCartDTO(
-                                                userCart.getId(),
-                                                cartEntity.getId(),
-                                                userCart.getProductEntity().getId(),
-                                                userCart.getSize().name(), // Enum -> String 변환
-                                                userCart.getCount()))
-                                .collect(Collectors.toList());
+                // UserCartDTO 리스트 생성
+                List<UserCartDTO> cartList = new ArrayList<>();
+                for (UserCartEntity userCart : userCartEntities) {
+                        // ProductEntity -> ProductDTO 변환
+                        ProductDTO productDTO = ProductDTO.toGetProductDTO(userCart.getProductEntity());
+
+                        // UserCartDTO 생성
+                        UserCartDTO userCartDTO = new UserCartDTO(
+                                        userCart.getId(),
+                                        cartEntity.getId(),
+                                        productDTO, // ProductDTO 객체 추가
+                                        userCart.getSize().name(), // Enum -> String 변환
+                                        userCart.getCount());
+
+                        // 리스트에 추가
+                        cartList.add(userCartDTO);
+                }
 
                 // Map으로 데이터 반환
                 Map<String, Object> cartMap = new HashMap<>();
-                cartMap.put("cartItems", cartList);
-                cartMap.put("totalItems", cartList.size());
+                cartMap.put("cartItems", cartList); // 장바구니 아이템 리스트
+                cartMap.put("totalItems", cartList.size()); // 장바구니 총 상품 개수
 
                 return cartMap;
         }

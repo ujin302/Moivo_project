@@ -7,6 +7,9 @@ import User_signup from './containers/user/user_signup';
 import ProductBoard from './containers/product/product_board'; 
 import ProductList from './containers/product/product_list';
 import ProductDetail from './containers/product/product_detail';
+import ProductOrder from './containers/product/product_order';
+import SuccessPage from './containers/product/product_order_success';
+import FailPage from './containers/product/product_order_fail';
 import Qna_faqboard from './containers/qna/qna_faqboard';
 import Qna_board from './containers/qna/qna_board';
 import Qna_boardlist from './containers/qna/qna_bardlist';
@@ -28,6 +31,9 @@ const routeConfig = [
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
   { path: "/product-detail/:id", element: <ProductDetail /> },
+  { path: "/product-order", element: <ProductOrder /> },
+  { path: "/product-order-success", element: <SuccessPage /> },
+  { path: "/product-order-fail", element: <FailPage /> },
   { path: "/upload", element: <Upload /> },
   { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },
