@@ -102,12 +102,7 @@ const Banner = () => {
               <span className={`${styles.status} ${isLoggedIn ? styles.on : styles.off}`}></span>
               {isLoggedIn ? 'ON' : 'OFF'}
             </span>
-            {isLoggedIn && (
-              <>
-                <span className={styles.expirationLabel}>로그인 만료 시간</span>
-                <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span>
-              </>
-            )}
+            {isLoggedIn && ( <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span> )}
           </div>
 
         </div>
