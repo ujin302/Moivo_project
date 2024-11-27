@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Italiana&display=swap');
 
 .signupContainer {
-  height: calc(100vh);
   background-color: #F6F2EE;
   font-family: "Italiana", sans-serif;
   font-style: normal;
@@ -9,13 +8,13 @@
 
 .pageName {
   display: flex;
-  justify-content: center;  /* 가로 방향 중앙 정렬 */
-  align-items: center;      /* 세로 방향 중앙 정렬 */
-  font-size: 36px;          /* 글씨 크기 크게 설정 */
+  justify-content: center;
+  align-items: center;
+  font-size: 36px;
   font-weight: bold;
   color: #333;
-  margin-top: 100px;
-  height: 10%;
+  margin-bottom: 20px;
+  padding-top: 130px;
 }
 
 .signupline {
@@ -24,7 +23,7 @@
 }
 
 .signupDiv {
-  margin: 20px;
+  margin: 30px;
   border: 1px solid #988C73;
   padding: 10px;
   margin-bottom: 100px;
@@ -34,7 +33,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  
 }
 
 .formRow span {
@@ -57,14 +55,14 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 80%;
+  width: 50%;
 }
 
 .addressContainer .postalRow {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
-  width: 30%;
+  width: 300px;
 }
 
 .addressContainer .postalRow input {
@@ -73,9 +71,9 @@
 }
 
 .addressContainer .postalRow button {
-  flex: 1;
-  padding: 10px;
+  width: 150px;
   height: 40px;
+  padding: 10px;
   background-color: #aaa6a2;
   color: #2F2E2C;
   border: none;
@@ -88,41 +86,25 @@
   background-color: #B4A59B;
 }
 
-.addressContainer .formRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.detailedAddress input{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #988C73;
+  font-size: 14px;
+  outline: none;
+  background-color: transparent;
 }
 
-.addressContainer .formRow input {
-    width: 62%;
-    padding: 10px;
-    border: 1px solid #988C73;
-    font-size: 14px;
-    outline: none;
-    background-color: transparent;
-  }
+.radioContainer {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  height: 40px;
+}
 
-  .radioContainer {
-    display: flex;
-    gap: 20px;  /* 라디오 버튼 간 간격 조정 */
-    align-items: center;  /* 라디오 버튼과 텍스트 세로 정렬 */
-    height: 40px;
-  }
-  
-  .radioContainer input[type="radio"] {
-    margin-right: 5px;  /* 라디오 버튼과 텍스트 사이에 간격 추가 */
-  }
-
-  .formRow .emaildetail{
-    width: 910px;
-    padding: 10px;
-    border: 1px solid #988C73;
-    font-size: 14px;
-    outline: none;
-    background-color: transparent;
-    border-radius: 0;
-  }
+.radioContainer input[type="radio"] {
+  margin-right: 5px;
+}
 
 .exception {
   color: red;
@@ -133,8 +115,8 @@
 
 .phoneRow {
   display: flex;
-  width: 895px;
-  height: 40px; 
+  height: 40px;
+  width: 50%;
 }
 
 .phoneRow p {
@@ -145,11 +127,11 @@
   color: black;
   display: flex;
   justify-content: center;
-  align-items: center;  
+  align-items: center;
 }
 
 .phoneRow input {
-  width: 10%;
+  width: 20%;
   padding: 10px;
   border: 1px solid #988C73;
   font-size: 14px;
@@ -178,4 +160,126 @@
 
 .submitButton:hover {
   background-color: #B4A59B;
+}
+
+/* --- 반응형 미디어 쿼리 --- */
+
+@media (max-width: 700px) {
+  .pageName {
+    font-size: 28px;
+    padding-top: 80px;
+  }
+
+  .signupDiv {
+    margin: 15px;
+    padding: 15px;
+  }
+
+  .formRow {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+  }
+
+  .formRow span {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .formRow input {
+    width: 100%;
+  }
+
+  .addressContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .addressContainer .postalRow {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .addressContainer .postalRow input {
+    flex: 1;
+    max-width: 70%;
+  }
+
+  .addressContainer .postalRow button {
+    width: 25%;
+    min-width: 100px;
+    height: 40px;
+    padding: 10px;
+    background-color: #aaa6a2;
+    color: #2F2E2C;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .addressContainer .postalRow button:hover {
+    background-color: #B4A59B;
+  }
+
+  .detailedAddress input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    outline: none;
+    background-color: transparent;
+  }
+
+  .phoneRow {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 5px;
+  }
+
+  .phoneRow input {
+    flex: 1;
+    max-width: 90px;
+    min-width: 50px; 
+    padding: 8px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    text-align: center;
+    height: 40px;
+    margin: 0;
+  }
+
+  .phoneRow p {
+    font-size: 28px;
+    margin: 0 2px;
+    font-weight: bold;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .emaildetail {
+    width: 100%;
+  }
+
+  .submitButton {
+    width: 100px;
+    font-size: 12px;
+    padding: 8px 20px;
+  }
+
+  .signupbtn {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
 }

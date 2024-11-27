@@ -86,30 +86,20 @@ const user_login = () => {
             </div>
             <span>If you don't want to sign up,<br/>or use your account instead.</span>
             {error && <div className={styles.error}>{error}</div>}
-            <input
-              type="text"
-              name="userId"
-              value={formData.id}
-              onChange={handleChange}
-              placeholder="ID"
-              required
-            />
-            <input
-              type="password"
-              name="pwd"
-              value={formData.pwd}
-              onChange={handleChange}
-              placeholder="Password"
-              required
-            />
+            <input type="text" name="userId" value={formData.id} onChange={handleChange} placeholder="ID" required/>
+            <input type="password" name="pwd" value={formData.pwd} onChange={handleChange} placeholder="Password" required/>
             <a href="#">Forgot your password?</a>
             <button type="submit">Sign In</button>
+            <Link to="/user_signup">
+                <button type="submit" className={styles.singupbtn}>Sign Up</button>
+            </Link>
           </form>
         </div>
+
         <div className={styles['overlay-container']}>
           <div className={styles.overlay}>
             <div className={`${styles['overlay-panel']} ${styles['overlay-right']}`}>
-              <h1>Hello, Style Icon!</h1>
+              <h2>Hello, Style Icon!</h2>
               <p>Enter your personal details and start journey with us</p>
               <Link to="/user_signup">
                 <button className={styles.ghost} id="signUp">Sign Up</button>

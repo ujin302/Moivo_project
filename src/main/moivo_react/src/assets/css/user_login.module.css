@@ -13,16 +13,22 @@
 	font-family: "Italiana", sans-serif;
 	font-style: normal;
 	height: 100vh;
-	margin: -20px 0 50px;
 }
 
 .loginMain h1 {
 	font-weight: bold;
 	margin: 0;
+	font-size: 70px;
+}
+
+.loginMain h2 {
+	font-weight: bold;
+	margin: 0;
+	font-size: 40px;
 }
 
 .overlay-container p {
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: 100;
 	line-height: 20px;
 	letter-spacing: 0.5px;
@@ -30,12 +36,12 @@
 }
 
 .loginMain span {
-	font-size: 12px;
+	font-size: 15px;
 }
 
 .loginMain a {
 	color: #333;
-	font-size: 14px;
+	font-size: 15px;
 	text-decoration: none;
 	margin: 15px 0;
 }
@@ -66,6 +72,10 @@ button.ghost {
 	border-color: #FFFFFF;
 }
 
+.singupbtn{
+	display: none;
+}
+
 .loginMain form {
 	background-color: #FFFFFF;
 	display: flex;
@@ -89,12 +99,13 @@ button.ghost {
 	background-color: #fff;
 	border-radius: 10px;
   	box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
-			0 10px 10px rgba(0,0,0,0.22);
+				0 10px 10px rgba(0,0,0,0.22);
 	position: relative;
 	overflow: hidden;
 	width: 768px;
 	max-width: 100%;
-	min-height: 480px;
+	width: 1000px;
+	height: 700px;
 }
 
 .form-container {
@@ -171,3 +182,22 @@ button.ghost {
 	height: 40px;
 	width: 40px;
 }
+
+/* --- 반응형 미디어 쿼리 --- */
+@media (max-width: 700px) {
+	.container {
+		width: 100%; /* 전체 화면의 100% 차지 */
+		padding: 20px 10px; /* 내부 간격 추가 */
+		box-shadow: none; /* 작은 화면에서는 그림자 제거 */
+		height: 100%;
+	}
+	.form-container{
+		width: 100%;
+	}
+	.overlay-container {
+		display: none;
+	  }
+	.singupbtn{
+		display: block;
+	}
+  }

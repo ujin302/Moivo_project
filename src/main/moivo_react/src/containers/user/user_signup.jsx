@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from '../../assets/css/user_sigup.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
+import Banner from '../../components/Banner/banner';
 import axios from "axios";
 
 function user_signup() {
@@ -113,6 +114,7 @@ function user_signup() {
 
   return (
     <div className={styles.signupContainer}>
+      <div><Banner /></div>
       <div className={styles.pageName}>Sign Up</div>
       <div className={styles.signupDiv}>
         <form className={styles.signupForm} onSubmit={handleSubmit}>
@@ -139,7 +141,7 @@ function user_signup() {
 
           <div className={styles.formRow}>
             <span>NAME</span>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} />
+            <input type="text" name="name" value={formData.name} onChange={handleChange}/>
             <div className={styles.exception}>{errors.name}</div>
           </div>
           <hr className={styles.signupline} />
@@ -162,10 +164,10 @@ function user_signup() {
                 <button type="button" onClick={handleFindPostalCode}>우편번호 찾기</button>
               </div>
               
-              <div className={`${styles.formRow} ${styles.detailedAddress}`}>
+              <div className={styles.detailedAddress}>
                 <input type="text" name="address" placeholder="기본 주소" value={formData.address} onChange={handleChange} />
               </div>
-              <div className={`${styles.formRow} ${styles.detailedAddress}`}>
+              <div className={styles.detailedAddress}>
                 <input type="text" name="detailedAddress" placeholder="상세 주소" value={formData.detailedAddress} onChange={handleChange} />
                 <div className={styles.exception}>{errors.address}</div>
               </div>
@@ -201,7 +203,7 @@ function user_signup() {
           </div>
         </form>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 }
