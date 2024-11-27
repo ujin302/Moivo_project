@@ -8,7 +8,7 @@ import com.example.demo.store.dto.ProductCategoryDTO;
 
 public interface ProductService {
 
-    public Map<String, Object> getProduct(int productSeq);
+    public Map<String, Object> getProduct(int productId);
 
     public void saveProduct(Map<String, Object> map);
 
