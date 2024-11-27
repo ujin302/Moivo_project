@@ -63,6 +63,39 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
         }
     }
 
+    // 토큰 갱신 _241126_sc
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Map<String, Object>> refreshToken(@RequestBody Map<String, String> payload) {
+        try {
+            String userId = payload.get("userId");
+            String pwd = payload.get("pwd");
+            
+            // 기존 login 메서드를 재사용하여 새 토큰 발급
+            Map<String, Object> result = userService.login(userId, pwd);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of("error", "토큰 갱신 실패: " + e.getMessage()));
+        }
+    }
+    // 토큰 유효성 검사 _241126_sc
+    @GetMapping("/validate-token")
+    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String token) {
+        try {
+            // 토큰 유효성 검사 로직
+            if (token != null && token.startsWith("Bearer ")) {
+                String jwt = token.substring(7);
+                // JWT 유효성 검증
+                if (userService.validateToken(jwt)) {
+                    return ResponseEntity.ok().build();
+                }
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
@@ -71,5 +104,6 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
     }
 
     // 소셜 로그인
+
 
 }

@@ -18,4 +18,7 @@ public interface UserService {
     public void updateUserGradeBasedOnPurchase(int userId);
 
     public UserDTO findUserById(Integer userId);
+
+    public boolean validateToken(String token); // 토큰 검사 _241126_sc
+
 }
