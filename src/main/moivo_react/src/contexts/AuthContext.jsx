@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { PATH } from "../../scripts/path";
 
 export const AuthContext = createContext();
 
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
           
           try {
             // 토큰 갱신 요청 시 현재 토큰 정보도 함께 전송
-            const refreshResponse = await axios.post('/api/user/refresh-token', {}, {
+            const refreshResponse = await axios.post(`${PATH.SERVER}/api/user/refresh-token`, {}, {
               headers: {
                 'Authorization': `Bearer ${authToken}`
               }
@@ -96,7 +97,9 @@ export const AuthProvider = ({ children }) => {
     setToken(authToken);
     setUser(userData);
     setIsLoggedIn(true);
-    setupAxiosInterceptors(authToken, userData);
+    
+    // axios 기본 설정에 토큰 추가
+    axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
   };
 
   const logout = () => {
@@ -108,6 +111,8 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setIsLoggedIn(false);
+    
+    // axios 기본 설정에서 토큰 제거
     delete axios.defaults.headers.common['Authorization'];
   };
 

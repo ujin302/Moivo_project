@@ -8,6 +8,7 @@ import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import LoadingModal from "./LoadingModal";
 import axios from "axios";
+import { PATH } from "../../../scripts/path";
 
 const ProductDetail = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
@@ -16,7 +17,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   
   // 필요한 상태들 선언
-  const [productData, setProductData] = useState(location.state?.productData || null);
+  const [productData, setProductData] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -65,72 +66,36 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!productData) {
-      const fetchProductData = async () => {
-        setIsLoading(true);
-        try {
-          const headers = {
-            'Content-Type': 'application/json'
-          };
-          
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-          }
+    const fetchProductDetail = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${PATH.SERVER}/api/store/product-detail/${id}`);
+        setProductDetail(response.data);
+      } catch (error) {
+        console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-          const response = await axios.get(`/api/user/store/${id}`, {
-            headers: headers
-          });
+    fetchProductDetail();
+  }, [id]);
 
-          if (response.data) {
-            // 상품 기본 정보 설정
-            setProduct(response.data.Product);
-            setCategory(response.data.Category);
-            
-            // 이미지 정보 설정
-            const sortedImages = response.data.ImgList.sort((a, b) => a.layer - b.layer);
-            setProductImages(sortedImages);
-            const mainImg = sortedImages.find(img => img.layer === 1);
-            if (mainImg) {
-              setMainImage(mainImg.fileName);
-            }
-            
-            // 재고 정보 설정
-            const stockInfo = response.data.Stock;
-            const sizes = Object.keys(stockInfo).filter(size => stockInfo[size] > 0);
-            setAvailableSizes(sizes);
-            if (sizes.length > 0) {
-              setSelectedSize(sizes[0]);
-            }
-            
-            // 리뷰 정보 설정
-            const reviewList = response.data.ReviewList;
-            setReviews(reviewList);
-            const totalRating = reviewList.reduce((sum, review) => sum + review.rating, 0);
-            setAverageRating(reviewList.length > 0 ? totalRating / reviewList.length : 0);
-            setReviewCount(reviewList.length);
-
-            // 전체 데이터 저장
-            setProductData(response.data);
-          }
-        } catch (error) {
-          console.error("상품 데이터를 가져오는데 실패했습니다:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      fetchProductData();
-    } else {
-      // 이미 데이터가 있는 경우 초기 설정
+  useEffect(() => {
+    if (productData) {
+      // 상품 기본 정보 설정
       setProduct(productData.Product);
       setCategory(productData.Category);
-      setProductImages(productData.ImgList.sort((a, b) => a.layer - b.layer));
-      const mainImg = productData.ImgList.find(img => img.layer === 1);
+      
+      // 이미지 정보 설정
+      const sortedImages = productData.ImgList.sort((a, b) => a.layer - b.layer);
+      setProductImages(sortedImages);
+      const mainImg = sortedImages.find(img => img.layer === 1);
       if (mainImg) {
         setMainImage(mainImg.fileName);
       }
-      setReviews(productData.ReviewList);
       
+      // 재고 정보 설정
       const stockInfo = productData.Stock;
       const sizes = Object.keys(stockInfo).filter(size => stockInfo[size] > 0);
       setAvailableSizes(sizes);
@@ -138,62 +103,14 @@ const ProductDetail = () => {
         setSelectedSize(sizes[0]);
       }
       
-      setIsLoading(false);
+      // 리뷰 정보 설정
+      const reviewList = productData.ReviewList;
+      setReviews(reviewList);
+      const totalRating = reviewList.reduce((sum, review) => sum + review.rating, 0);
+      setAverageRating(reviewList.length > 0 ? totalRating / reviewList.length : 0);
+      setReviewCount(reviewList.length);
     }
-  }, [id, token, productData]);
-
-  useEffect(() => {
-    const fetchProductDetail = async () => {
-      if (!productData || !productData.fromList) { // 리스트에서 오지 않았거나 데이터가 없는 경우에만 새로 요청
-        setIsLoading(true);
-        try {
-          const headers = {
-            'Content-Type': 'application/json'
-          };
-          
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-          }
-
-          const response = await axios.get(`/api/user/store/${id}`, {
-            headers: headers
-          });
-
-          if (response.data) {
-            setProductDetail(response.data);
-            // 이미지 처리
-            const images = response.data.ImgList.sort((a, b) => a.layer - b.layer);
-            setThumbnailImages(images);
-            
-            // 재고 처리
-            const stockData = response.data.Stock;
-            setAvailableSizes(Object.keys(stockData).filter(size => stockData[size] > 0));
-            
-            // 리뷰 처리
-            const reviews = response.data.ReviewList;
-            const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-            setAverageRating(reviews.length > 0 ? totalRating / reviews.length : 0);
-            setReviewCount(reviews.length);
-          }
-        } catch (error) {
-          console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
-          if (error.response?.status === 401) {
-            // 401 에러 발생 시 로그인 페이지로 리다이렉트
-            navigate('/user');
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        // 리스트에서 전달받은 데이터 사용
-        setProductDetail(productData);
-        // ... 나머지 데이터 처리 ...
-        setIsLoading(false);
-      }
-    };
-
-    fetchProductDetail();
-  }, [id, token, productData, navigate]);
+  }, [productData]);
 
   // 구매 핸들러 추가
   const handlePurchase = () => {

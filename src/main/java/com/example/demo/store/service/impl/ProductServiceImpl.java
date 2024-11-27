@@ -238,7 +238,16 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> dtoList = pageProductList.getContent()
                 .stream()
                 .map(productEntity -> {
-                    productEntity.setImg(ncpDTO.getURL() + productEntity.getImg()); // 이미지 URL 수정
+                    System.out.println("Product ID: " + productEntity.getId());
+                    System.out.println("Original Image: " + productEntity.getImg());
+                    System.out.println("NCP URL: " + ncpDTO.getURL());
+                    
+                    if (productEntity.getImg() != null && !productEntity.getImg().isEmpty()) {
+                        // 이미 전체 URL이 있는 경우는 그대로 사용, 파일명만 있는 경우 URL 추가
+                        if (!productEntity.getImg().startsWith("http")) {
+                            productEntity.setImg(ncpDTO.getURL() + productEntity.getImg());
+                        }
+                    }
                     return ProductDTO.toGetProductDTO(productEntity); // DTO로 변환
                 })
                 .collect(Collectors.toList());
