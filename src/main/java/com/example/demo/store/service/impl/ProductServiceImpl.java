@@ -95,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void saveProduct(Map<String, Object> map) { // 재고 관련 매개 변수 필요
+    public void saveProduct(Map<String, Object> map) {
 
         // 1. 상품 DTO => Entity
         ProductEntity productEntity = ProductEntity.toSaveProductEntity((ProductDTO) map.get("ProductDTO"));
@@ -159,10 +159,19 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    // 상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang
+    // 상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang & 11/27 - 검색어 예외 처리 - uj
     @Override
     public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword) {
         Map<String, Object> map = new HashMap<>();
+        
+        // 검색어 null 체크 및 trim - sc
+        if (keyword != null) {
+            keyword = keyword.trim();
+            if (keyword.isEmpty()) {
+                keyword = null;
+            }
+        }
+        
         // DB 상품 개수 추출
         // 삼항연산자 사용 categoryid가 0 = 전체 상품, 1 = 아우터, 2 = 상의, 3 = 하의로 상품개수 추출
         // productRepository.count(); = productRepository.findAll().size(); 와 같음
@@ -177,6 +186,11 @@ public class ProductServiceImpl implements ProductService {
         // 3. 카테고리 + 키워드
         int pCase = 0;
         int productCount = 0;
+        // 검색어 예외 처리
+        keyword.trim();
+        if (keyword.equals("")) {
+            keyword = null;
+        }
 
         if (categoryid == 0 & keyword == null) {
             // categoryid는 all, keyword는 받지 않았을 때, 전체 DB 개수 추출
@@ -199,7 +213,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 페이징 설정
         productPaging.setTotalA(productCount);
-        productPaging.setCurrentPage(pageable.getPageNumber());
+        productPaging.setCurrentPage(pageable.getPageNumber() - 1);
         productPaging.setPageSize(pageable.getPageSize());
         productPaging.setPageBlock(3);
         productPaging.makePaging();
@@ -238,7 +252,16 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> dtoList = pageProductList.getContent()
                 .stream()
                 .map(productEntity -> {
-                    productEntity.setImg(ncpDTO.getURL() + productEntity.getImg()); // 이미지 URL 수정
+                    System.out.println("Product ID: " + productEntity.getId());
+                    System.out.println("Original Image: " + productEntity.getImg());
+                    System.out.println("NCP URL: " + ncpDTO.getURL());
+                    
+                    if (productEntity.getImg() != null && !productEntity.getImg().isEmpty()) {
+                        // 이미 전체 URL이 있는 경우는 그대로 사용, 파일명만 있는 경우 URL 추가
+                        if (!productEntity.getImg().startsWith("http")) {
+                            productEntity.setImg(ncpDTO.getURL() + productEntity.getImg());
+                        }
+                    }
                     return ProductDTO.toGetProductDTO(productEntity); // DTO로 변환
                 })
                 .collect(Collectors.toList());

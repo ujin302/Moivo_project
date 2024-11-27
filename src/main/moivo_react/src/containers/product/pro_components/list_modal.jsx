@@ -54,6 +54,8 @@ const ListModal = ({ isOpen, onClose, title, items, onRemove, onQuantityChange }
     }
   };
 
+  if (!isOpen) return null;
+
   return (
     <motion.div 
       className={styles.modalOverlay} 
@@ -100,7 +102,7 @@ const ListModal = ({ isOpen, onClose, title, items, onRemove, onQuantityChange }
                   />
                 </div>
                 <div className={styles.itemImageWrap}>
-                  <img src={item.productimg[0].fileurl} alt={item.name} className={styles.itemImage} />
+                  <img src={item.img} alt={item.name} className={styles.itemImage} />
                 </div>
                 <div className={styles.itemInfo}>
                   <h3 className={styles.itemName}>{item.name}</h3>
@@ -139,11 +141,11 @@ const ListModal = ({ isOpen, onClose, title, items, onRemove, onQuantityChange }
             )}
             {title === "위시리스트" && (
               <button 
-                className={styles.addToMyWishlistButton}
-                onClick={handleAddSelectedToMyWishlist}
-              >
-                나의 위시리스트로 보내기 <FaHeart />
-              </button>
+              className={styles.addToMyWishlistBtn}
+              onClick={handleAddSelectedToMyWishlist}
+            >
+              My Wishlist <FaHeart />
+            </button>
             )}
           </div>
         ) : (
