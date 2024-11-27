@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from '../../assets/css/LoadingModal.module.css';
 
 const LoadingModal = ({ isOpen }) => {
-  const loadingTexts = ['Loading', 'Please wait', 'Almost there', 'Just a moment'];
+  const loadingTexts = ['로딩중...', '상품을 가져오고 있어요...', '거의 다 됐어요...', '창고를 뒤적이고 있어요...'];
   const [currentText, setCurrentText] = React.useState(0);
 
   React.useEffect(() => {
     if (isOpen) {
       const interval = setInterval(() => {
         setCurrentText((prev) => (prev + 1) % loadingTexts.length);
-      }, 2000);
+      }, 1500);
       return () => clearInterval(interval);
     }
   }, [isOpen]);
@@ -32,11 +32,6 @@ const LoadingModal = ({ isOpen }) => {
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
             <div className={styles.loadingContainer}>
-              <div className={styles.loadingCircles}>
-                <div className={styles.circle}></div>
-                <div className={styles.circle}></div>
-                <div className={styles.circle}></div>
-              </div>
               <div className={styles.progressBar}>
                 <div className={styles.progress}></div>
               </div>

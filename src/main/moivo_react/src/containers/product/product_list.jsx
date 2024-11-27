@@ -240,7 +240,8 @@ const ProductList = () => {
               >
                 <div className={styles.productImageWrapper}>
                   <img
-                    src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    // src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    src={product.img}
                     alt={product.name}
                     className={styles.productImage}
                   />
