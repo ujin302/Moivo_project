@@ -26,14 +26,19 @@ const ProductList = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const checkAuthAndFetch = async () => {
+    const fetchProducts = async () => {
       setIsLoading(true);
       try {
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        // 유저 정보 조회 후 상품 목록 조회(로그인 상태에서의 렌더링)
         const response = await axios.get("/api/user/store", {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
+          headers: headers,
           params: {
             sortby: sortBy,
             categoryid: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
@@ -53,9 +58,7 @@ const ProductList = () => {
       }
     };
 
-    if (token) {
-      checkAuthAndFetch();
-    }
+    fetchProducts();
   }, [activeCategory, sortBy, currentPage, searchTerm, token]);
 
   const categories = ["All", "Outer", "Top", "Bottom"];
@@ -109,28 +112,53 @@ const ProductList = () => {
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  const goToDetail = async (productId) => {
+  const handleProductClick = async (productId) => {
     try {
-      const response = await axios.get(`/api/user/store/${productId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      setIsLoading(true);
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // 상품 상세 정보를 가져옴기 전에 토큰 유효성 검사
+      if (token) {
+        try {
+          await axios.get('/api/user/validate-token', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        } catch (error) {
+          // 토큰이 유효하지 않은 경우 AuthContext의 토큰 갱신 로직이 동작
+          console.log('토큰 검증 실패, 갱신 시도');
         }
+      }
+
+      // 상품 상세 정보 요청
+      const response = await axios.get(`/api/user/store/${productId}`, {
+        headers: headers
       });
 
       if (response.data) {
+        // 상세 페이지로 이동하면서 데이터를 함께 전달
         navigate(`/product-detail/${productId}`, {
-          state: {
-            productData: response.data
+          state: { 
+            productData: response.data,
+            fromList: true
           }
         });
       }
     } catch (error) {
       console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
       if (error.response?.status === 401) {
-        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+        // 401 에러가 발생하면 로그인 페이지로 리다이렉트
+        alert('401 에러 발생, 로그인 페이지로 리다이렉트');
+        console.log('401 에러 발생, 로그인 페이지로 리다이렉트');
         navigate('/user');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -212,7 +240,8 @@ const ProductList = () => {
               >
                 <div className={styles.productImageWrapper}>
                   <img
-                    src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    // src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    src={product.img}
                     alt={product.name}
                     className={styles.productImage}
                   />
@@ -236,7 +265,7 @@ const ProductList = () => {
                       </motion.button>
                       <motion.button
                         className={styles.actionButton}
-                        onClick={() => goToDetail(product.id)}
+                        onClick={() => handleProductClick(product.id)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >

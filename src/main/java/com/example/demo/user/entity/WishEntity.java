@@ -23,4 +23,4 @@ public class WishEntity {
     @OneToMany(mappedBy = "wishEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UserWishEntity> userWishList;
 }
-//유저 한명이 찜을 여러개 할 수 있다.
+// 유저 한명이 찜을 여러개 할 수 있다.
