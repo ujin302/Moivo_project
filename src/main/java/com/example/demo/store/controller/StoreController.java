@@ -29,7 +29,7 @@ public class StoreController {
             @PageableDefault(page = 0, size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "sortby", required = false, defaultValue = "newest") String sortby,
             @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid,
-            @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword) {
+            @RequestParam(name = "keyword", required = false) String keyword) {
 
         Map<String, Object> map = productService.getProductList(pageable, sortby, categoryid, keyword);
         // 값 존재 X
