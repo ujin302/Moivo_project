@@ -5,6 +5,42 @@ import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 
 const MypageMain = () => {
+  const [userInfo, setUserInfo] = useState(null); // 사용자 정보 저장
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    //const userSeq = sessionStorage.getItem("userSeq");
+    console.log(token);
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      navigate("/user");
+      return;
+    }
+
+    const id = 1; // 사용자 ID예시
+
+    // API 호출
+    fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // 인증 토큰 전달
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("사용자 정보를 가져오지 못했습니다.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setUserInfo(data); // 사용자 정보 상태에 저장
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching user info:", error);
+        alert("사용자 정보를 가져오는 중 오류가 발생했습니다.");
+      });
+  }, [navigate]);
 
   const [startIndex, setStartIndex] = useState(0);
 
@@ -33,6 +69,7 @@ const MypageMain = () => {
   const handleCouponMouseLeave = () => {
     setShowCouponTooltip(false);
   };
+
 
   const productList = [
     { image: "../image/only1.jpg", name: "Angel wing tee", price: "KRW 62,000" },
@@ -92,28 +129,31 @@ const MypageMain = () => {
           </div>
           <div>
             <div className={styles.membershipInfo}>
-              전수민님의 멤버십 등급은 [ LV.4 ]입니다.<br />
-              LV.5 까지 남은 구매금액은 KRW 100,000원입니다.<br/><br/>
-              <strong>키:</strong> 170cm &nbsp;
-              <strong>몸무게:</strong> 60kg
-            </div>
+                {userInfo ? (
+                  <>
+                    {userInfo.name}님의 멤버십 등급은 [ {userInfo.grade} ]입니다.
+                    <br />
+                    LV.5 까지 남은 구매금액은 KRW 100,000원입니다.
+                    <br />
+                    <br />
+                    키: <strong>{userInfo.height}cm &nbsp;</strong>
+                    몸무게: <strong>{userInfo.weight}kg</strong>
+                  </>
+                ) : (
+                  "사용자 정보를 불러오는 중입니다..."
+                )}
+              </div>
             <div className={styles.couponSection}>
-            <div className={styles.point}>POINT: 5000</div>
-              <div
-                className={styles.coupon} 
-                onMouseEnter={handleCouponMouseEnter}
-                onMouseLeave={handleCouponMouseLeave}
-              >
-              COUPON: {coupons.length}
-              {showCouponTooltip && (
-                <div className={styles.couponTooltip}>
-                  {coupons.map((coupon, index) => (
-                    <div key={index} className={styles.couponItem}>
-                      <strong>{coupon.name}</strong>: {coupon.description}
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className={styles.point}>POINT: <strong>5000</strong></div>
+            <div className={styles.coupon}>
+                COUPON: &nbsp;
+                {userInfo && userInfo.coupons ? (
+                  userInfo.coupons.map((coupon, index) => (
+                    <strong key={index}>{coupon.name}</strong>
+                  ))
+                ) : (
+                  "쿠폰 정보를 불러오는 중입니다..."
+                )}
             </div>
           </div>
           </div>

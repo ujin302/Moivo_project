@@ -16,7 +16,7 @@ public class CouponController {
     @Autowired
     private CouponService couponService;
 
-    // 특정 사용자의 쿠폰 조회
+    // 특정 사용자의 쿠폰 조회 2024.11.25 sumin
     @GetMapping("/{id}")
     public ResponseEntity<List<CouponDTO>> getUserCoupons(@PathVariable("id") int id) {
         System.out.println(id);
