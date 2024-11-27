@@ -163,6 +163,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword) {
         Map<String, Object> map = new HashMap<>();
+        
+        // 검색어 null 체크 및 trim - sc
+        if (keyword != null) {
+            keyword = keyword.trim();
+            if (keyword.isEmpty()) {
+                keyword = null;
+            }
+        }
+        
         // DB 상품 개수 추출
         // 삼항연산자 사용 categoryid가 0 = 전체 상품, 1 = 아우터, 2 = 상의, 3 = 하의로 상품개수 추출
         // productRepository.count(); = productRepository.findAll().size(); 와 같음

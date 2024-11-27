@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
         const validateAndSetup = async () => {
           try {
             // 토큰 검증 먼저 수행
-            await axios.get('/api/user/validate-token', {
+            await axios.get(`${PATH.SERVER}/api/user/validate-token`, {
               headers: {
                 'Authorization': `Bearer ${storedToken}`
               }
