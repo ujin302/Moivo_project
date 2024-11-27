@@ -1,0 +1,135 @@
+/* LoadingModal.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-width: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background: linear-gradient(45deg, #007bff, #00bfff);
+  z-index: -1;
+  animation: gradientBG 5s ease infinite;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.progressBar {
+  width: 100%;
+  height: 10px;
+  background: #f1f1f1;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(45deg, #007bff, #00bfff);
+  animation: progress 2s ease-in-out infinite;
+}
+
+.loadingText {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  min-height: 1.5em;
+  position: relative;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.loadingText::before,
+.loadingText::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 2px;
+  background: #333;
+  animation: textLine 1s ease-in-out infinite;
+}
+
+.loadingText::before {
+  left: -30px;
+}
+
+.loadingText::after {
+  right: -30px;
+}
+
+@keyframes gradientBG {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 100%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes textLine {
+  0%, 100% {
+    width: 0;
+  }
+  50% {
+    width: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress {
+    animation: none;
+  }
+  .modal::before {
+    animation: none;
+  }
+  .loadingText::before,
+  .loadingText::after {
+    animation: none;
+  }
+}

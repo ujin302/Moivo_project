@@ -63,6 +63,46 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
         }
     }
 
+    // 토큰 갱신 _241127_sc
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Map<String, Object>> refreshToken(@RequestHeader("Authorization") String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                String jwt = token.substring(7);
+                // 토큰에서 userId 추출
+                Map<String, Object> userData = userService.getUserDataFromToken(jwt);
+                String userId = (String) userData.get("userId");
+                
+                // 새 토큰 발급
+                Map<String, Object> result = userService.refreshUserToken(userId);
+                return ResponseEntity.ok(result);
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of("error", "유효하지 않은 토큰 형식"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Map.of("error", "토큰 갱신 실패: " + e.getMessage()));
+        }
+    }
+
+    // 토큰 유효성 검사 _241126_sc
+    @GetMapping("/validate-token")
+    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String token) {
+        try {
+            // 토큰 유효성 검사 로직
+            if (token != null && token.startsWith("Bearer ")) {
+                String jwt = token.substring(7);
+                // JWT 유효성 검증
+                if (userService.validateToken(jwt)) {
+                    return ResponseEntity.ok().build();
+                }
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
@@ -71,5 +111,6 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
     }
 
     // 소셜 로그인
+
 
 }

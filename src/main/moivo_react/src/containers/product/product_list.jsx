@@ -7,6 +7,7 @@ import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import Modal from "../../components/Modal/modal";
+import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
@@ -22,16 +23,20 @@ const ProductList = () => {
   const [isWishModalOpen, setIsWishModalOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      alert('로그인이 필요합니다.');
-      navigate('/user');
-    }
     const fetchProducts = async () => {
+      setIsLoading(true);
       try {
-        const headers = isLoggedIn ? { Authorization: `Bearer ${token}` } : {};
+        const headers = {
+          'Content-Type': 'application/json'
+        };
         
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        // 유저 정보 조회 후 상품 목록 조회(로그인 상태에서의 렌더링)
         const response = await axios.get("/api/user/store", {
           headers: headers,
           params: {
@@ -42,21 +47,19 @@ const ProductList = () => {
             size: itemsPerPage,
           },
         });
-
-        console.log('서버 응답:', response.data);
         
         if (response.data) {
-          const productList = response.data.productList || [];
-          console.log('상품 목록:', productList);
-          setProducts(productList);
+          setProducts(response.data.productList || []);
         }
       } catch (error) {
         console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-  
+
     fetchProducts();
-  }, [activeCategory, sortBy, currentPage, searchTerm, isLoggedIn, token, navigate]);
+  }, [activeCategory, sortBy, currentPage, searchTerm, token]);
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
@@ -109,8 +112,54 @@ const ProductList = () => {
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  const goToDetail = (id) => {
-    navigate(`/product-detail/${id}`);
+  const handleProductClick = async (productId) => {
+    try {
+      setIsLoading(true);
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // 상품 상세 정보를 가져옴기 전에 토큰 유효성 검사
+      if (token) {
+        try {
+          await axios.get('/api/user/validate-token', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        } catch (error) {
+          // 토큰이 유효하지 않은 경우 AuthContext의 토큰 갱신 로직이 동작
+          console.log('토큰 검증 실패, 갱신 시도');
+        }
+      }
+
+      // 상품 상세 정보 요청
+      const response = await axios.get(`/api/user/store/${productId}`, {
+        headers: headers
+      });
+
+      if (response.data) {
+        // 상세 페이지로 이동하면서 데이터를 함께 전달
+        navigate(`/product-detail/${productId}`, {
+          state: { 
+            productData: response.data,
+            fromList: true
+          }
+        });
+      }
+    } catch (error) {
+      console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
+      if (error.response?.status === 401) {
+        // 401 에러가 발생하면 로그인 페이지로 리다이렉트
+        alert('401 에러 발생, 로그인 페이지로 리다이렉트');
+        console.log('401 에러 발생, 로그인 페이지로 리다이렉트');
+        navigate('/user');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -191,7 +240,8 @@ const ProductList = () => {
               >
                 <div className={styles.productImageWrapper}>
                   <img
-                    src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    // src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
+                    src={product.img}
                     alt={product.name}
                     className={styles.productImage}
                   />
@@ -215,7 +265,7 @@ const ProductList = () => {
                       </motion.button>
                       <motion.button
                         className={styles.actionButton}
-                        onClick={() => goToDetail(product.id)}
+                        onClick={() => handleProductClick(product.id)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -227,10 +277,6 @@ const ProductList = () => {
                     <h3 className={styles.productTitle}>{product.name}</h3>
                     <p className={styles.productPrice}>
                       ₩{product.price?.toLocaleString()}
-                    </p>
-                    <p className={styles.productStock}>
-                      재고: {product.stock}개
-                      {/* 재고: {product.stockList && product.stockList.length > 0 ? product.stockList[0].stock : 0}개 */}
                     </p>
                   </div>
                 </div>
@@ -320,6 +366,8 @@ const ProductList = () => {
           isLoggedIn={isLoggedIn}
           navigate={navigate}
         />
+
+        <LoadingModal isOpen={isLoading} />
       </div>
       <Footer />
     </div>

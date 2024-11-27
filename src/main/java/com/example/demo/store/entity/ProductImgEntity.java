@@ -2,6 +2,7 @@ package com.example.demo.store.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +20,7 @@ public class ProductImgEntity {
     private Integer id;
 
     // 이미지 n개 : 상품 1개
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productid", nullable = false)
     private ProductEntity productEntity; // 상품
 
