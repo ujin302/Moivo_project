@@ -74,6 +74,7 @@ public class UserServiceImpl implements UserService {
         }
 
         System.out.println("=== 로그인 디버깅 ===");
+        System.out.println("입력된 로그인 아이디 : " + userId); // 로그인 확인 디버깅 _241126_sc
         System.out.println("입력된 비밀번호: " + pwd);
         System.out.println("저장된 암호화 비밀번호: " + userEntity.getPwd());
         System.out.println("비밀번호 매칭 결과: " + passwordEncoder.matches(pwd, userEntity.getPwd()));
@@ -194,5 +195,21 @@ public class UserServiceImpl implements UserService {
 
         // Entity -> DTO 변환하여 반환
         return UserEntity.toGetUserDTO(userEntity);
+    }
+
+    // 토큰 검사 _241126_sc
+    @Override
+    public boolean validateToken(String token) {
+        try {
+            // JWT 토큰 검증
+            Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(jwtProps.getSecretKey().getBytes()))
+                .build()
+                .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            System.out.println("토큰 검증 실패: " + e.getMessage());
+            return false;
+        }
     }
 }

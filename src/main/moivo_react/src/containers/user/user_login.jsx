@@ -39,7 +39,8 @@ const user_login = () => {
             sessionStorage.setItem("wishId", wishId);
             sessionStorage.setItem("paymentId", paymentId);
             
-            login();
+            login({ id, wishId, paymentId }, jwt);
+            
             alert("로그인 성공!");
             navigate("/");
         } catch (error) {
