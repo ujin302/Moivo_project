@@ -1,0 +1,54 @@
+package com.example.demo.configuration;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.Map;
+
+@Configuration
+@Service
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        // 부모 클래스(DefaultOAuth2UserService)에서 사용자 정보 가져오기
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+
+        // 클라이언트 등록 ID (예: kakao, naver, google)
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
+        // 사용자 고유 ID가 매핑된 키 (예: sub, id 등)
+        String userNameAttributeName = userRequest.getClientRegistration()
+                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+
+        // 사용자 정보 속성
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        // 사용자 정보를 저장 또는 업데이트
+        saveOrUpdate(attributes, registrationId);
+
+        // OAuth2 사용자 객체 반환
+        return new DefaultOAuth2User(
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
+                attributes,
+                userNameAttributeName);
+    }
+
+    private void saveOrUpdate(Map<String, Object> attributes, String registrationId) {
+        // 사용자 정보를 저장하거나 업데이트
+        // 예: DB에 저장, 기존 사용자 업데이트 등
+        System.out.println("Social Login Info - Provider: " + registrationId);
+        System.out.println("User Attributes: " + attributes);
+
+        // 실제로는 JPA 또는 MyBatis를 통해 DB 연동
+        // 예:
+        // userRepository.saveOrUpdate(attributes);
+    }
+}

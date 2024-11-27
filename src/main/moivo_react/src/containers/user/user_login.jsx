@@ -80,9 +80,10 @@ const user_login = () => {
               <h1>Moivo</h1>
             </Link>
             <div className={styles['social-container']}>
-              <a href="#" className={styles.social}><i className="fab fa-facebook-f"></i></a>
-              <a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>
-              <a href="#" className={styles.social}><i className="fab fa-linkedin-in"></i></a>
+              {/*<a href="#" className={styles.social}><i className="fab fa-facebook-f"></i></a>*/}
+              {/*<a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>*/}
+              {/*<a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=714a575754949434c7f9e10bb527da9a&redirect_uri=http://localhost:8080/api/user/oauth2/callback/kakao" className={styles.social}><i className="fab fa-linkedin-in"></i></a>*/}
+              <a href="https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code" className={styles.social}><i className="fab fa-kakao"></i></a>
             </div>
             <span>If you don't want to sign up,<br/>or use your account instead.</span>
             {error && <div className={styles.error}>{error}</div>}

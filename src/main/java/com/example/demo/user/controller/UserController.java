@@ -3,8 +3,10 @@ package com.example.demo.user.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.user.dto.UserDTO;
@@ -17,7 +19,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    
+    @Value("${kakao.client_id}")
+    private String client_id;
+
+    @Value("${kakao.client_secret")
+    private String client_secret;
+
+    @Value("${kakao.redirect_uri}")
+    private String redirect_uri;
+
     //회원가입
     @PostMapping("/join")
     public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
@@ -47,6 +57,26 @@ public class UserController {
         return ResponseEntity.ok("로그아웃 성공");
     }
 
-    // 소셜 로그인
+//    // 소셜 로그인(카카오)
+    @GetMapping("/oauth2/callback/kakao")
+    public String loginPage(Model model) {
+        String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri="+redirect_uri;
+        System.out.println(location);
+        model.addAttribute("location", location);
+
+        return "login";
+    }
+
+////    소셜 로그인(카카오)
+//    @GetMapping(value = "/oauth2/callback/kakao")
+//    public String kakaologin(){
+//        StringBuffer url = new StringBuffer();
+//        url.append("https://kauth.kakao.com/oauth2/authorize?");
+//        url.append("client_id=" + client_id);
+//        url.append("&redirect_uri=" + redirect_uri);
+//        url.append("&response_type=code");
+//        return "redirect : " + url.toString();
+//    }
+
 
 }
