@@ -1,20 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Cart.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import axios from "axios";
 
 const Cart = () => {
   const navigate = useNavigate();
-
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Angel wing tee", price: 62000, quantity: 1, image: "../image/only1.jpg" },
-    { id: 2, name: "Ruffle baggy jeans", price: 129000, quantity: 2, image: "../image/only2.jpg" },
-    { id: 3, name: "Basic logo off top", price: 71000, quantity: 1, image: "../image/wish1.jpg" },
-    { id: 4, name: "Isabella fur coat", price: 283000, quantity: 3, image: "../image/wish2.png" },
-  ]);
-
+  const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
+  const userId = 3; // 임의의 userId
+
+  useEffect(() => {
+    // 서버에서 장바구니 데이터 가져오기
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/user/cart/list`, {
+          params: { userid: userId },
+        });
+        setCartItems(response.data.cartItems || []);
+        console.log(cartItems);
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      } finally {
+        setLoading(false); // 로딩 상태 해제
+      }
+    };
+
+    fetchCartItems();
+  }, [userId]);
+
+  // 사이즈 변경 핸들러
+  const handleSizeChange = (id, size) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, size } : item
+      )
+    );
+  };
 
   // 항목 선택 토글
   const toggleSelectItem = (id) => {
@@ -40,29 +64,41 @@ const Cart = () => {
   };
 
   // 장바구니에서 삭제
-  const handleRemoveItem = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    setSelectedItems((prevSelected) => prevSelected.filter((itemId) => itemId !== id));
+  const handleRemoveItem = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
+        params: { userid: userId },
+      });
+      setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      setSelectedItems((prevSelected) =>
+        prevSelected.filter((itemId) => itemId !== id)
+      );
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
   };
 
   // 선택된 항목만 결제 페이지로 이동
   const handleBuyNow = () => {
-    console.log("Selected items before buy now:", selectedItems); // 디버그용
     if (selectedItems.length === 0) {
       alert("선택한 항목이 없습니다. 항목을 선택해주세요.");
-      return; // 선택한 항목이 없으면 함수 종료
+      return;
     }
-  
-    const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item.id));
-    console.log("Selected items to buy:", selectedCartItems); // 디버그용
+    const selectedCartItems = cartItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
     navigate("/payment", { state: { items: selectedCartItems } });
   };
 
   const totalPrice = cartItems
     .filter((item) => selectedItems.includes(item.id))
     .reduce((total, item) => total + item.price * item.quantity, 0);
+   
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  return (
+    return (
     <div>
       <Banner />
       <div className={styles.cartFrame}>
@@ -73,21 +109,43 @@ const Cart = () => {
               <div key={item.id} className={styles.cartItem}>
                 <input
                   type="checkbox"
-                  id={`checkbox-${item.id}`} // 고유 id 설정
+                  id={`checkbox-${item.id}`}
                   checked={selectedItems.includes(item.id)}
                   onChange={() => toggleSelectItem(item.id)}
                 />
-                <label htmlFor={`checkbox-${item.id}`}></label> 
+                <label htmlFor={`checkbox-${item.id}`}></label>
                 <div className={styles.productImage}>
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.image || "../image/default.jpg"} alt={item.name} />
                 </div>
                 <div className={styles.productDetails}>
                   <div className={styles.productName}>{item.name}</div>
-                  <div className={styles.productPrice}>KRW {item.price.toLocaleString()}</div>
+                  <div className={styles.productPrice}>
+                    KRW {item.price.toLocaleString()}
+                  </div>
+                  <div className={styles.sizeSelector}>
+                    <label htmlFor={`size-${item.id}`}>Size:</label>
+                    <select
+                      id={`size-${item.id}`}
+                      value={item.size}
+                      onChange={(e) => handleSizeChange(item.id, e.target.value)}
+                    >
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                    </select>
+                  </div>
                   <div className={styles.quantityControls}>
-                    <button onClick={() => handleQuantityChange(item.id, "decrease")}>-</button>
+                    <button
+                      onClick={() => handleQuantityChange(item.id, "decrease")}
+                    >
+                      -
+                    </button>
                     <span>{item.quantity}</span>
-                    <button onClick={() => handleQuantityChange(item.id, "increase")}>+</button>
+                    <button
+                      onClick={() => handleQuantityChange(item.id, "increase")}
+                    >
+                      +
+                    </button>
                   </div>
                   <button
                     className={styles.removeButton}
@@ -102,10 +160,7 @@ const Cart = () => {
               <div className={styles.totalText}>
                 Selected Total: KRW {totalPrice.toLocaleString()}
               </div>
-              <button
-                className={styles.checkoutButton}
-                onClick={handleBuyNow} // 버튼은 항상 활성화
-              >
+              <button className={styles.checkoutButton} onClick={handleBuyNow}>
                 BUY NOW
               </button>
             </div>

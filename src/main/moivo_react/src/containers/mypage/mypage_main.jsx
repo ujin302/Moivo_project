@@ -136,30 +136,22 @@ const MypageMain = () => {
                     LV.5 까지 남은 구매금액은 KRW 100,000원입니다.
                     <br />
                     <br />
-                    <strong>키:</strong> {userInfo.height}cm &nbsp;
-                    <strong>몸무게:</strong> {userInfo.weight}kg
+                    키: <strong>{userInfo.height}cm &nbsp;</strong>
+                    몸무게: <strong>{userInfo.weight}kg</strong>
                   </>
                 ) : (
                   "사용자 정보를 불러오는 중입니다..."
                 )}
               </div>
             <div className={styles.couponSection}>
-            <div className={styles.point}>POINT: 5000</div>
-              <div
-                className={styles.coupon} 
-                onMouseEnter={handleCouponMouseEnter}
-                onMouseLeave={handleCouponMouseLeave}
-              >
-              COUPON: {coupons.length}
-              {showCouponTooltip && (
-                <div className={styles.couponTooltip}>
-                  {coupons.map((coupon, index) => (
-                    <div key={index} className={styles.couponItem}>
-                      <strong>{coupon.name}</strong>: {coupon.description}
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className={styles.point}>POINT: <strong>5000</strong></div>
+            <div className={styles.coupon}>
+                COUPON: &nbsp;
+                    {userInfo.coupons.map((coupon, index) => (
+
+                        <strong>{coupon.name}</strong>
+
+                    ))}
             </div>
           </div>
           </div>

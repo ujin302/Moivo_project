@@ -19,6 +19,8 @@ const MypageProfile = () => {
         phone2: "",
         phone3: "",
         email: "",
+        height: "",
+        weight: "",
     });
     const navigate = useNavigate();
 
@@ -61,6 +63,8 @@ const MypageProfile = () => {
                     phone2: data.phone2,
                     phone3: data.phone3,
                     email: data.email,
+                    height: data.height,
+                    weight: data.weight,
                 });
             })
             .catch((error) => {
@@ -100,6 +104,8 @@ const MypageProfile = () => {
             phone2: userInfo?.phone2 || "",
             phone3: userInfo?.phone3 || "",
             email: userInfo?.email || "",
+            height: data.height || "", 
+            weight: data.weight || "", 
         });
         alert("수정이 취소되었습니다.");
     };
@@ -271,6 +277,25 @@ const MypageProfile = () => {
                                 style={{ color: "#2f2e2c" }}
                             />
                         </div>
+                            <div className={styles.heightWeightRow}>
+                                <label htmlFor="height">HEIGHT (cm):</label>
+                                <input
+                                    className={styles.height}
+                                    type="number"
+                                    id="height"
+                                    name="height"
+                                    placeholder="예: 170"
+                                />
+                                <br/>
+                                <label htmlFor="weight">WEIGHT (kg):</label>
+                                <input
+                                    className={styles.weight}
+                                    type="number"
+                                    id="weight"
+                                    name="weight"
+                                    placeholder="예: 100"
+                                />
+                            </div>            
                         <div className={styles.buttonRow}>
                             <button type="submit" className={styles.submitButton}>
                                 회원정보 수정
