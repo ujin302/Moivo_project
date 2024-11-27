@@ -25,6 +25,7 @@ import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.repository.WishRepository;
 import com.example.demo.user.service.UserService;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -212,4 +213,59 @@ public class UserServiceImpl implements UserService {
             return false;
         }
     }
+
+    // 토큰에서 사용자 데이터 추출 _241127_sc
+    @Override
+    public Map<String, Object> getUserDataFromToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(jwtProps.getSecretKey().getBytes()))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+            
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("userId", claims.get("userId"));
+            userData.put("roles", claims.get("roles"));
+            return userData;
+        } catch (Exception e) {
+            throw new RuntimeException("토큰에서 사용자 정보를 추출할 수 없습니다.");
+        }
+    }
+    
+    // 사용자 토큰 갱신 _241127_sc
+    @Override
+    public Map<String, Object> refreshUserToken(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        
+        // Wish와 Cart 정보 가져오기
+        WishEntity wishEntity = wishRepository.findByUserEntity_Id(userEntity.getId())
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Wish 정보를 찾을 수 없습니다."));
+        
+        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId())
+            .orElseThrow(() -> new RuntimeException("Cart 정보를 찾을 수 없습니다."));
+
+        // 새 토큰 생성
+        byte[] signingKey = jwtProps.getSecretKey().getBytes();
+        String jwt = Jwts.builder()
+            .setSubject(String.valueOf(userEntity.getId()))
+            .claim("userId", userEntity.getUserId())
+            .claim("roles", userEntity.isAdmin() ? "ROLE_ADMIN" : "ROLE_USER")
+            .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
+            .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+            .compact();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("jwt", jwt);
+        result.put("id", userEntity.getId());
+        result.put("wishId", wishEntity.getId());
+        result.put("cartId", cartEntity.getId());
+
+        return result;
+    }
+
+
 }

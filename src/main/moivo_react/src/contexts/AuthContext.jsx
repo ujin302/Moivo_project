@@ -9,39 +9,33 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   // axios 인터셉터 설정 함수
-  const setupAxiosInterceptors = (storedToken, userData) => {
-    // 기본 헤더 설정
-    axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-
-    // 응답 인터셉터
+  const setupAxiosInterceptors = (authToken) => {
     const interceptor = axios.interceptors.response.use(
-      response => response,
-      async error => {
-        if (error.response?.status === 401) {
-          const originalRequest = error.config;
-          
-          // 재시도 방지
-          if (originalRequest._retry) {
-            logout();
-            return Promise.reject(error);
-          }
-          
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        
+        // 토큰 만료로 인한 401 에러이고, 재시도하지 않은 요청인 경우
+        if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-
+          
           try {
-            // 토큰 갱신 요청
-            const refreshResponse = await axios.post('/api/user/refresh-token', {
-              userId: userData.userId,
-              pwd: userData.pwd
-            }, {
-              headers: { 'Authorization': null } // 기존 토큰 제거
+            // 토큰 갱신 요청 시 현재 토큰 정보도 함께 전송
+            const refreshResponse = await axios.post('/api/user/refresh-token', {}, {
+              headers: {
+                'Authorization': `Bearer ${authToken}`
+              }
             });
 
-            const newToken = refreshResponse.data.jwt;
-            if (newToken) {
-              sessionStorage.setItem('token', newToken);
+            if (refreshResponse.data && refreshResponse.data.jwt) {
+              const newToken = refreshResponse.data.jwt;
               setToken(newToken);
+              sessionStorage.setItem('token', newToken);
+              
+              // 모든 후속 요청에 새 토큰 적용
               axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+              
+              // 원래 요청 재시도
               originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
               
               // 토큰 갱신 성공 시 원래 요청 재시도

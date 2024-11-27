@@ -158,4 +158,8 @@ public class UserEntity { // 사용자 & 관리자
         return userDTO;
     }
 
+    // 토큰 갱신 관련 _241127_sc
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
 }

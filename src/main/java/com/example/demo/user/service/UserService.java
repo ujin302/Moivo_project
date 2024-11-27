@@ -20,5 +20,7 @@ public interface UserService {
     public UserDTO findUserById(Integer userId);
 
     public boolean validateToken(String token); // 토큰 검사 _241126_sc
+    public Map<String, Object> getUserDataFromToken(String token); // 토큰에서 사용자 데이터 추출 _241127_sc
+    public Map<String, Object> refreshUserToken(String userId); // 사용자 토큰 갱신 _241127_sc
 
 }
