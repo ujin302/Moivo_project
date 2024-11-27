@@ -7,20 +7,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 
 @Service
 public class NCPObjectStorageService {
@@ -52,10 +40,11 @@ public class NCPObjectStorageService {
             amazonS3.putObject(putObjectRequest);
 
             // 로그 추가: 업로드 완료
-            String fileUrl = "https://" + bucketName + ".kr.object.ncloudstorage.com/" + directoryPath + fileName;
-            System.out.println("File uploaded successfully: " + fileUrl);
+            // String fileUrl = "https://" + bucketName + ".kr.object.ncloudstorage.com/" +
+            // directoryPath + fileName;
+            // System.out.println("File uploaded successfully: " + fileUrl);
 
-            return fileUrl;
+            return fileName;
 
         } catch (IOException e) {
             System.err.println("File upload failed: " + e.getMessage());
