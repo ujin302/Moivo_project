@@ -22,9 +22,9 @@ public class MypageController {
 
     // 회원 정보 (포스트맨 테스트 성공)
     @GetMapping("/info/{id}")
-    public ResponseEntity<UserDTO> getUserInfo(@PathVariable int id) {
+    public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) {
         UserDTO userInfo = mypageService.getUserInfo(id);
-
+        System.out.println(userInfo);
         return ResponseEntity.ok(userInfo);
     }
 

@@ -88,6 +88,7 @@ const Banner = () => {
           {isLoggedIn ? (
             <>
               <a href="/mypage" className={styles.utilityLink}>My Page</a>
+              <a href="/cart" className={styles.utilityLink}>Cart</a>
               <button onClick={handleLogout} className={styles.logoutButton}>Logout</button>
             </>
           ) : (

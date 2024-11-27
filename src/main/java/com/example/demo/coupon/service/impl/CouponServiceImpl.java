@@ -1,14 +1,11 @@
 package com.example.demo.coupon.service.impl;
 
 import com.example.demo.coupon.dto.CouponDTO;
-import com.example.demo.coupon.dto.UserCouponDTO;
 import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.entity.UserCouponEntity;
 import com.example.demo.coupon.repository.CouponRepository;
 import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.coupon.service.CouponService;
-import com.example.demo.user.dto.UserDTO;
-import com.example.demo.user.entity.UserEntity;
 
 import jakarta.transaction.Transactional;
 

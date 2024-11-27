@@ -9,6 +9,7 @@ import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.WishService;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,9 @@ public class WishController {
     // 찜한거 출력 - 24.11.25 - yjy
     @GetMapping("/list")
     public ResponseEntity<?> printWish(@RequestParam(name = "userid") int userId) {
-        List<WishDTO> wishList = wishService.printWish(userId);
-        return ResponseEntity.ok(wishList);
+        Map<String, Object> map = wishService.printWish(userId);
+        
+        return ResponseEntity.ok(map);
 
     }
 
@@ -42,6 +44,7 @@ public class WishController {
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") int productId,
             @RequestParam(name = "userid") int userId) {
+                System.out.println("삭제할 productId: " + productId + ", userId: " + userId);
         wishService.deleteProduct(productId, userId);
 
         return ResponseEntity.ok("찜 목록에서 삭제되었습니다.");

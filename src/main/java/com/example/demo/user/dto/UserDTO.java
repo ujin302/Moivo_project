@@ -1,7 +1,9 @@
 package com.example.demo.user.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.example.demo.coupon.dto.CouponDTO;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.entity.UserEntity.Grade;
 import com.example.demo.user.entity.UserEntity.LoginType;
@@ -30,7 +32,8 @@ public class UserDTO { // 사용자 & 관리자
     private Grade grade = Grade.LV1;
     private double height;
     private double weight;
-
+    private List<CouponDTO> coupons;
+    
     // Entity -> DTO
 
     // 사용자 데이터 출력

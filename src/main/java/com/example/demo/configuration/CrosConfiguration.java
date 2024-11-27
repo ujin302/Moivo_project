@@ -14,8 +14,10 @@ public class CrosConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173") // React 앱 URL
-                .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE") // 허용 HTTP 메서드
-                .allowCredentials(true); // 인증 정보 포함 허용
+        .allowedOrigins("http://localhost:5173")
+        .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE")
+        .allowedHeaders("Authorization", "Content-Type", "X-Requested-With")
+        .allowCredentials(true);
+
     }
 }
