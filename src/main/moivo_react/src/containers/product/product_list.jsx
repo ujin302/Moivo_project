@@ -3,10 +3,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext";
+import { PATH } from "../../../scripts/path";
 import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import Modal from "../../components/Modal/modal";
+import ListModal from "./pro_components/list_modal";
 import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
@@ -29,30 +30,31 @@ const ProductList = () => {
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-        
+        const headers = {};
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
-        // 유저 정보 조회 후 상품 목록 조회(로그인 상태에서의 렌더링)
-        const response = await axios.get("/api/user/store", {
-          headers: headers,
+
+        const response = await axios.get(`${PATH.SERVER}/api/store`, {
+          headers,
           params: {
-            sortby: sortBy,
-            categoryid: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
-            keyword: searchTerm,
             page: currentPage - 1,
             size: itemsPerPage,
-          },
+            sortBy: sortBy,
+            categoryId: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
+            keyword: searchTerm,
+          }
         });
         
         if (response.data) {
           setProducts(response.data.productList || []);
         }
       } catch (error) {
-        console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+        if (error.response?.status === 401) {
+          console.error("인증 오류:", error);
+        } else {
+          console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -64,26 +66,40 @@ const ProductList = () => {
   const categories = ["All", "Outer", "Top", "Bottom"];
 
   const handleAddToCart = (product) => {
-    const cartProduct = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      imgList: product.imgList ? product.imgList : [],
-      quantity: 1,
-    };
-    setCartItems((prev) => [...prev, cartProduct]);
+    const existingItem = cartItems.find((item) => item.id === product.id);
+  
+    if (existingItem) {
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      );
+    } else {
+      const cartProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        img: product.img || '',
+        quantity: 1,
+      };
+      setCartItems((prev) => [...prev, cartProduct]);
+    }
     setIsCartModalOpen(true);
   };
-
+  
   const handleAddToWish = (product) => {
-    const wishProduct = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      imgList: product.imgList ? product.imgList : [],
-    };
-    setWishItems((prev) => [...prev, wishProduct]);
-    setIsWishModalOpen(true);
+    const existingItem = wishItems.find((item) => item.id === product.id);
+  
+    if (!existingItem) {
+      const wishProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        img: product.img || '',
+      };
+      setWishItems((prev) => [...prev, wishProduct]);
+      setIsWishModalOpen(true);
+    }
   };
 
   const removeFromCart = (productId) => {
@@ -112,54 +128,8 @@ const ProductList = () => {
   const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  const handleProductClick = async (productId) => {
-    try {
-      setIsLoading(true);
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      // 상품 상세 정보를 가져옴기 전에 토큰 유효성 검사
-      if (token) {
-        try {
-          await axios.get('/api/user/validate-token', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-        } catch (error) {
-          // 토큰이 유효하지 않은 경우 AuthContext의 토큰 갱신 로직이 동작
-          console.log('토큰 검증 실패, 갱신 시도');
-        }
-      }
-
-      // 상품 상세 정보 요청
-      const response = await axios.get(`/api/user/store/${productId}`, {
-        headers: headers
-      });
-
-      if (response.data) {
-        // 상세 페이지로 이동하면서 데이터를 함께 전달
-        navigate(`/product-detail/${productId}`, {
-          state: { 
-            productData: response.data,
-            fromList: true
-          }
-        });
-      }
-    } catch (error) {
-      console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
-      if (error.response?.status === 401) {
-        // 401 에러가 발생하면 로그인 페이지로 리다이렉트
-        alert('401 에러 발생, 로그인 페이지로 리다이렉트');
-        console.log('401 에러 발생, 로그인 페이지로 리다이렉트');
-        navigate('/user');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  const handleProductClick = (productId) => {
+    navigate(`/product-detail/${productId}`);
   };
 
   return (
@@ -347,25 +317,25 @@ const ProductList = () => {
         </div>
 
         {/* 모달 (장바구니, 위시리스트) */}
-        <Modal
-          isOpen={isCartModalOpen}
-          onClose={closeCartModal}
-          title="장바구니"
-          items={cartItems}
-          onRemove={removeFromCart}
-          onQuantityChange={updateCartQuantity}
-          isLoggedIn={isLoggedIn}
-          navigate={navigate}
-        />
-        <Modal
-          isOpen={isWishModalOpen}
-          onClose={closeWishModal}
-          title="위시리스트"
-          items={wishItems}
-          onRemove={removeFromWish}
-          isLoggedIn={isLoggedIn}
-          navigate={navigate}
-        />
+        <ListModal
+        isOpen={isCartModalOpen}
+        onClose={closeCartModal}
+        title="장바구니"
+        items={cartItems}
+        onRemove={removeFromCart}
+        onQuantityChange={updateCartQuantity}
+        isLoggedIn={isLoggedIn}
+        navigate={navigate}
+      />
+      <ListModal
+        isOpen={isWishModalOpen}
+        onClose={closeWishModal}
+        title="위시리스트"
+        items={wishItems}
+        onRemove={removeFromWish}
+        isLoggedIn={isLoggedIn}
+        navigate={navigate}
+      />
 
         <LoadingModal isOpen={isLoading} />
       </div>
