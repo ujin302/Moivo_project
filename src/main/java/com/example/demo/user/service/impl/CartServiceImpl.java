@@ -116,7 +116,7 @@ public class CartServiceImpl implements CartService {
         for (UserCartEntity userCart : userCartEntities) {
                 // ProductEntity -> ProductDTO 변환
                 ProductDTO productDTO = ProductDTO.toGetProductDTO(userCart.getProductEntity());
-
+                
                 // UserCartDTO 생성
                 UserCartDTO userCartDTO = new UserCartDTO(
                         userCart.getId(),
@@ -144,6 +144,8 @@ public class CartServiceImpl implements CartService {
     // 장바구니에서 상품 삭제 
     @Override
     public void deleteProduct(int productId, int userId) {
+        System.out.println("userid = " + userId);
+        System.out.println("productId = " + productId);
         CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                 .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
 

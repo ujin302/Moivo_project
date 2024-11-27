@@ -9,96 +9,100 @@ const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
-  const userId = 3; // 임의의 userId
+  const [loading, setLoading] = useState(true);
+  const userid = 3;
 
   useEffect(() => {
-    // 서버에서 장바구니 데이터 가져오기
+
     const fetchCartItems = async () => {
       try {
         const response = await axios.get(`http://localhost:8080/api/user/cart/list`, {
-          params: { userid: userId },
+          params: { userid },
         });
-        setCartItems(response.data.cartItems || []);
-        console.log(cartItems);
+        const fetchedItems = response.data.cartItems || [];
+        // productDTO 데이터를 포함하여 필요한 구조로 변환
+        const mappedItems = fetchedItems.map((item) => ({
+          ...item,
+          ...item.productDTO, // productDTO 데이터 병합
+        }));
+        setCartItems(mappedItems);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching cart items:", error);
       } finally {
-        setLoading(false); // 로딩 상태 해제
+        setLoading(false);
       }
     };
-
     fetchCartItems();
-  }, [userId]);
+  }, [userid]);
 
-  // 사이즈 변경 핸들러
-  const handleSizeChange = (id, size) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, size } : item
-      )
-    );
-  };
+  const handleQuantityChange = async (id, action) => {
+    const currentItem = cartItems.find((item) => item.cartid === id);
+    const newQuantity = currentItem.count + (action === "increase" ? 1 : -1);
+    if (newQuantity < 1) return;
 
-  // 항목 선택 토글
-  const toggleSelectItem = (id) => {
-    setSelectedItems((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((itemId) => itemId !== id)
-        : [...prevSelected, id]
-    );
-  };
-
-  // 수량 변경
-  const handleQuantityChange = (id, action) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantity: action === "increase" ? item.quantity + 1 : Math.max(1, item.quantity - 1),
-            }
-          : item
-      )
-    );
-  };
-
-  // 장바구니에서 삭제
-  const handleRemoveItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
-        params: { userid: userId },
+      await axios.put(`http://localhost:8080/api/user/cart/update/${id}`, {
+        userid: userid,
+        quantity: newQuantity,
       });
-      setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-      setSelectedItems((prevSelected) =>
-        prevSelected.filter((itemId) => itemId !== id)
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.cartid === id ? { ...item, count: newQuantity } : item
+        )
       );
     } catch (error) {
-      console.error("Error removing item:", error);
+      console.error("Error updating quantity:", error);
     }
   };
 
-  // 선택된 항목만 결제 페이지로 이동
-  const handleBuyNow = () => {
-    if (selectedItems.length === 0) {
-      alert("선택한 항목이 없습니다. 항목을 선택해주세요.");
-      return;
+  const handleSizeChange = async (id, newSize) => {
+    try {
+      await axios.put(`http://localhost:8080/api/user/cart/update/${id}`, {
+        userid: userid,
+        size: newSize,
+      });
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.cartid === id ? { ...item, size: newSize } : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating size:", error);
     }
-    const selectedCartItems = cartItems.filter((item) =>
-      selectedItems.includes(item.id)
-    );
-    navigate("/payment", { state: { items: selectedCartItems } });
+  };
+
+  const handleRemoveItem = async (id) => {
+    const token = sessionStorage.getItem("token");
+    console.log("token = " + token);
+
+    console.log(id);
+    try {
+      await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,  // 토큰이 제대로 전달되는지 확인
+        },
+        params: { userid },
+      });
+      setCartItems((prevItems) => prevItems.filter((item) => item.cartid !== id));
+      console.log(`Item with id ${id} removed successfully`);
+    } catch (error) {
+      console.error("Error removing item:", error);
+      if (error.response?.status === 401) {
+        alert("인증이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.");
+      } else {
+        alert("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    }
   };
 
   const totalPrice = cartItems
-    .filter((item) => selectedItems.includes(item.id))
-    .reduce((total, item) => total + item.price * item.quantity, 0);
-   
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    .filter((item) => selectedItems.includes(item.cartid))
+    .reduce((total, item) => total + item.price * item.count, 0);
 
-    return (
+  if (loading) return <div>Loading...</div>;
+
+   return (
     <div>
       <Banner />
       <div className={styles.cartFrame}>
@@ -106,51 +110,45 @@ const Cart = () => {
         {cartItems.length > 0 ? (
           <div className={styles.cartContainer}>
             {cartItems.map((item) => (
-              <div key={item.id} className={styles.cartItem}>
+              <div key={item.cartid} className={styles.cartItem}>
                 <input
                   type="checkbox"
-                  id={`checkbox-${item.id}`}
-                  checked={selectedItems.includes(item.id)}
-                  onChange={() => toggleSelectItem(item.id)}
+                  id={`checkbox-${item.cartid}`}
+                  checked={selectedItems.includes(item.cartid)}
+                  onChange={() =>
+                    setSelectedItems((prev) =>
+                      prev.includes(item.cartid)
+                        ? prev.filter((id) => id !== item.cartid)
+                        : [...prev, item.cartid]
+                    )
+                  }
                 />
-                <label htmlFor={`checkbox-${item.id}`}></label>
+                <label htmlFor={`checkbox-${item.cartid}`}></label>
                 <div className={styles.productImage}>
-                  <img src={item.image || "../image/default.jpg"} alt={item.name} />
+                  <img src={item.img || "../image/default.jpg"} alt={item.name} />
                 </div>
                 <div className={styles.productDetails}>
                   <div className={styles.productName}>{item.name}</div>
-                  <div className={styles.productPrice}>
-                    KRW {item.price.toLocaleString()}
-                  </div>
+                  <div className={styles.productContent}>{item.content}</div>
+                  <div className={styles.productPrice}>KRW {item.price.toLocaleString()}</div>
                   <div className={styles.sizeSelector}>
-                    <label htmlFor={`size-${item.id}`}>Size:</label>
+                    <label htmlFor={`size-select-${item.cartid}`}>Size: </label>
                     <select
-                      id={`size-${item.id}`}
+                      id={`size-select-${item.cartid}`}
                       value={item.size}
-                      onChange={(e) => handleSizeChange(item.id, e.target.value)}
+                      onChange={(e) => handleSizeChange(item.cartid, e.target.value)}
                     >
-                      <option value="S">S</option>
+                      <option value="S">S</option>   
                       <option value="M">M</option>
                       <option value="L">L</option>
                     </select>
                   </div>
                   <div className={styles.quantityControls}>
-                    <button
-                      onClick={() => handleQuantityChange(item.id, "decrease")}
-                    >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      onClick={() => handleQuantityChange(item.id, "increase")}
-                    >
-                      +
-                    </button>
+                    <button onClick={() => handleQuantityChange(item.cartid, "decrease")}>-</button>
+                    <span>{item.count}</span>
+                    <button onClick={() => handleQuantityChange(item.cartid, "increase")}>+</button>
                   </div>
-                  <button
-                    className={styles.removeButton}
-                    onClick={() => handleRemoveItem(item.id)}
-                  >
+                  <button className={styles.removeButton} onClick={() => handleRemoveItem(item.id)}>
                     REMOVE
                   </button>
                 </div>
@@ -160,7 +158,14 @@ const Cart = () => {
               <div className={styles.totalText}>
                 Selected Total: KRW {totalPrice.toLocaleString()}
               </div>
-              <button className={styles.checkoutButton} onClick={handleBuyNow}>
+              <button
+                className={styles.checkoutButton}
+                onClick={() =>
+                  navigate("/payment", {
+                    state: { items: cartItems.filter((item) => selectedItems.includes(item.cartid)) },
+                  })
+                }
+              >
                 BUY NOW
               </button>
             </div>

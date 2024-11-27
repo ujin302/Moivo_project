@@ -147,11 +147,13 @@ const MypageMain = () => {
             <div className={styles.point}>POINT: <strong>5000</strong></div>
             <div className={styles.coupon}>
                 COUPON: &nbsp;
-                    {userInfo.coupons.map((coupon, index) => (
-
-                        <strong>{coupon.name}</strong>
-
-                    ))}
+                {userInfo && userInfo.coupons ? (
+                  userInfo.coupons.map((coupon, index) => (
+                    <strong key={index}>{coupon.name}</strong>
+                  ))
+                ) : (
+                  "쿠폰 정보를 불러오는 중입니다..."
+                )}
             </div>
           </div>
           </div>
