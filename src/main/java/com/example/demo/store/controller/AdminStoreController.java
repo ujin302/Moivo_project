@@ -10,7 +10,6 @@ import com.example.demo.store.dto.ProductCategoryDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.service.ProductService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +38,11 @@ public class AdminStoreController {
             @RequestPart(name = "layer1") List<MultipartFile> layer1Files,
             @RequestPart(name = "layer2") List<MultipartFile> layer2Files,
             @RequestPart(name = "layer3") List<MultipartFile> layer3Files,
+            @RequestPart(name = "layer4") List<MultipartFile> layer4Files,
             @RequestParam(name = "S", defaultValue = "0") int SCount,
             @RequestParam(name = "M", defaultValue = "0") int MCount,
             @RequestParam(name = "L", defaultValue = "0") int LCount,
-            @RequestParam(name = "CategorySeq", defaultValue = "1") int categorySeq) {
+            @RequestParam(name = "categoryId", defaultValue = "1") int categoryId) {
 
         // 받을 값
         // 1. ProductDTO 객체 (Category 설정)
@@ -55,10 +55,11 @@ public class AdminStoreController {
         map.put("layer1", layer1Files);
         map.put("layer2", layer2Files);
         map.put("layer3", layer3Files);
+        map.put("layer4", layer4Files);
         map.put("S", SCount);
         map.put("M", MCount);
         map.put("L", LCount);
-        map.put("CategorySeq", categorySeq);
+        map.put("categoryId", categoryId);
 
         productService.saveProduct(map);
         return ResponseEntity.ok(null);
@@ -75,30 +76,33 @@ public class AdminStoreController {
     @PutMapping("/product")
     public ResponseEntity<String> putProduct(
             @ModelAttribute ProductDTO productDTO,
-            @RequestParam(name = "deleteImgList", required = false) String deleteImgList,
+            @RequestParam(name = "selectImgList", required = false) String selectImgList,
             @RequestPart(name = "layer1", required = false) List<MultipartFile> layer1Files,
             @RequestPart(name = "layer2", required = false) List<MultipartFile> layer2Files,
             @RequestPart(name = "layer3", required = false) List<MultipartFile> layer3Files,
+            @RequestPart(name = "layer4", required = false) List<MultipartFile> layer4Files,
             @RequestParam(name = "S", defaultValue = "0", required = false) int SCount,
             @RequestParam(name = "M", defaultValue = "0", required = false) int MCount,
             @RequestParam(name = "L", defaultValue = "0", required = false) int LCount,
-            @RequestParam(name = "CategorySeq", defaultValue = "1", required = false) int categorySeq) {
+            @RequestParam(name = "categoryId", defaultValue = "1", required = false) int categoryId) {
         Map<String, Object> map = new HashMap<>();
-        String[] deleteImgId = deleteImgList.replace("[", "").replace("]", "").split(",");
+        String[] selectImgId = selectImgList.replace("[", "").replace("]", "").split(",");
         System.out.println("putProduct" + productDTO);
         map.put("ProductDTO", productDTO);
-        map.put("deleteImgId", deleteImgId);
+        map.put("selectImgId", selectImgId);
         map.put("layer1", layer1Files);
         map.put("layer2", layer2Files);
         map.put("layer3", layer3Files);
+        map.put("layer4", layer4Files);
         map.put("S", SCount);
         map.put("M", MCount);
         map.put("L", LCount);
-        map.put("CategorySeq", categorySeq);
+        map.put("categoryId", categoryId);
 
         try {
             productService.putProduct(map);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
         }
 

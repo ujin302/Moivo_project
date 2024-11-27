@@ -29,6 +29,8 @@ import com.example.demo.store.repository.ProductRepository;
 import com.example.demo.store.repository.ProductStockRepository;
 import com.example.demo.store.service.ProductService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ProductServiceImpl implements ProductService {
     @Autowired
@@ -99,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity productEntity = ProductEntity.toSaveProductEntity((ProductDTO) map.get("ProductDTO"));
         // 1-1. 카테고리 Entity 가져와서 저장
         ProductCategoryEntity categoryEntity = categoryRepository
-                .findById(Integer.parseInt(map.get("CategorySeq").toString())).orElse(null);
+                .findById(Integer.parseInt(map.get("categoryId").toString())).orElse(null);
         productEntity.setCategoryEntity(categoryEntity);
 
         // 1-2. 상품 테이블에 저장
@@ -125,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    // NCP 업로드 & 이미지 테이블에 Data 저장
+    // NCP 업로드 & 이미지 테이블에 Data 저장 (메인 Img ProductEntity에 설정)
     private void saveImgFiles(List<MultipartFile> files, ProductEntity product, int layer) {
         for (MultipartFile file : files) {
             try {
@@ -268,6 +270,7 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 수정 - 24.11.25, 26, 27 - uj
     @Override
+    @Transactional
     @SuppressWarnings("unchecked")
     public void putProduct(Map<String, Object> map) {
         // 1. DB에서 상품 조회
@@ -282,38 +285,56 @@ public class ProductServiceImpl implements ProductService {
 
         // 2. 카테고리 Entity 추출
         ProductCategoryEntity categoryEntity = categoryRepository
-                .findById(Integer.parseInt(map.get("CategorySeq").toString()))
+                .findById(Integer.parseInt(map.get("categoryId").toString()))
                 .orElseThrow(
-                        () -> new NotFoundException("해당 카테고리(" + map.get("CategorySeq").toString() + ")가 조회되지 않습니다."));
+                        () -> new NotFoundException("해당 카테고리(" + map.get("categoryId").toString() + ")가 조회되지 않습니다."));
         productEntity.setCategoryEntity(categoryEntity);
 
         // 3. 이미지(NCP) 수정
-        List<ProductImgEntity> imgEntityList = productEntity.getImgList();
+        // 이미지 Id
+        String[] selectImgId = (String[]) map.get("selectImgId"); // 존재할 상품 이미지 Id
+        List<ProductImgEntity> imgEntityList = productEntity.getImgList(); // 상품 이미지 Entity
+        List<ProductImgEntity> selectimgEntityList = new ArrayList<>(); // DB에 저장할 Img Entity
 
-        // int imgCount = imgEntityList.size();
-        // for (int i = 0; i < imgCount; i++) {
-        // ProductImgEntity imgEntity = imgEntityList.get(i);
-        // System.out.println(imgEntity.getFileName());
+        // 3-1. 이미지 삭제 (NCP & DB)
+        for (ProductImgEntity imgEntity : imgEntityList) {
+            boolean isDelete = true;
 
-        // // NCP 삭제
-        // ncpObjectStorageService.deleteFile(
-        // ncpDTO.getBUCKETNAME(),
-        // ncpDTO.getPRODUCTDIRECTORY(),
-        // imgEntity.getFileName());
-        // }
+            for (String imgIdStr : selectImgId) {
+                int imgId = Integer.parseInt(imgIdStr);
+                // DB에 남길 Img Entity
+                if (imgId == imgEntity.getId()) {
+                    selectimgEntityList.add(imgEntity);
+                    isDelete = false;
+                    break;
+                }
+            }
+
+            // NCP에서 삭제
+            if (isDelete) {
+                ncpObjectStorageService.deleteFile(
+                        ncpDTO.getBUCKETNAME(),
+                        ncpDTO.getPRODUCTDIRECTORY(),
+                        imgEntity.getFileName());
+
+                System.out.println("삭제 Img Entity Id: " + imgEntity.getId());
+            }
+        }
 
         // DB 에서 삭제
-        productEntity.getImgList().clear();
+        productEntity.getImgList().clear(); // 기존 컬렉션 초기화
+        productEntity.getImgList().addAll(selectimgEntityList); // 새 값 추가
 
         // 3-2. 이미지 업로드 (NCP & DB)
-        for (int i = 1; i < 4; i++) {
-            List<MultipartFile> files = (List<MultipartFile>) map.get("layer" + i);
-            saveImgFiles(files, productEntity, i);
+        for (int i = 1; i < 5; i++) {
+            if (map.get("layer" + i) != null) {
+                List<MultipartFile> files = (List<MultipartFile>) map.get("layer" + i);
+                saveImgFiles(files, productEntity, i);
+            }
         }
 
         // 4. 재고 수정
-        List<ProductStockEntity> stockEntityList = stockRepository.findByProductEntity(productEntity);
-        for (ProductStockEntity stockEntity : stockEntityList) {
+        for (ProductStockEntity stockEntity : productEntity.getStockList()) {
             switch (stockEntity.getSize()) {
                 case S:
                     stockEntity.setCount(Integer.parseInt(map.get("S").toString()));
@@ -327,7 +348,6 @@ public class ProductServiceImpl implements ProductService {
                 default:
                     break;
             }
-            stockRepository.save(stockEntity);
         }
 
         productRepository.save(productEntity);

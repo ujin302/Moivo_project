@@ -40,10 +40,11 @@ public class NCPObjectStorageService {
             amazonS3.putObject(putObjectRequest);
 
             // 로그 추가: 업로드 완료
-            String fileUrl = "https://" + bucketName + ".kr.object.ncloudstorage.com/" + directoryPath + fileName;
-            System.out.println("File uploaded successfully: " + fileUrl);
+            // String fileUrl = "https://" + bucketName + ".kr.object.ncloudstorage.com/" +
+            // directoryPath + fileName;
+            // System.out.println("File uploaded successfully: " + fileUrl);
 
-            return fileUrl;
+            return fileName;
 
         } catch (IOException e) {
             System.err.println("File upload failed: " + e.getMessage());

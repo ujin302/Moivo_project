@@ -169,53 +169,61 @@ const Upload = () => {
     formData.append("price", product.price);
     formData.append("content", product.content);
     formData.append("categoryId", product.categoryId);
+    console.log(product.categoryId);
+    console.log("------------");
+    
 
     // 재고 데이터 추가
     Object.entries(stock).forEach(([size, count]) => {
-      formData.append(`stock[${size}]`, count);
-    });
+      formData.append(size, count); // "S", "M", "L"라는 키로 전송
+    });    
     
-    // 서버 파일 삭제할 id
-    var deleteImgList = []
+    // 서버 파일 삭제하지 않을 id
+    var selectImgList = []
     serverFiles.layer1.forEach((file) => {
       console.log(file.id);
-      deleteImgList.push(file.id);
+      selectImgList.push(file.id);
     });
 
     serverFiles.layer2.forEach((file) => {
       console.log(file.id);
-      deleteImgList.push(file.id);
+      selectImgList.push(file.id);
     });
 
     serverFiles.layer3.forEach((file) => {
       console.log(file.id);
-      deleteImgList.push(file.id);
+      selectImgList.push(file.id);
     });
 
     serverFiles.layer4.forEach((file) => {
       console.log(file.id);
-      deleteImgList.push(file.id);
+      selectImgList.push(file.id);
     });
 
     // 배열을 JSON 문자열로 변환하여 추가
-    formData.append("deleteImgList", JSON.stringify(deleteImgList));
+    formData.append("selectImgList", JSON.stringify(selectImgList));
 
     // 사용자 파일 추가 (layer 정보와 함께)
-    formData.append("files", files.layer1);
-    formData.append("layers", 1);
+    formData.append("layer1", files.layer1); // 단일 파일
+    files.layer2.forEach((file) => formData.append("layer2", file)); // 다중 파일
+    files.layer3.forEach((file) => formData.append("layer3", file)); // 다중 파일
+    formData.append("layer4", files.layer4); // 단일 파일
+    
+    // formData.append("files", files.layer1);
+    // formData.append("layers", 1);
 
-    files.layer2.forEach((file) => {
-      formData.append("files", file);
-      formData.append("layers", 2);
-    });
+    // files.layer2.forEach((file) => {
+    //   formData.append("files", file);
+    //   formData.append("layers", 2);
+    // });
 
-    files.layer3.forEach((file) => {
-      formData.append("files", file);
-      formData.append("layers", 3);
-    });
+    // files.layer3.forEach((file) => {
+    //   formData.append("files", file);
+    //   formData.append("layers", 3);
+    // });
 
-    formData.append("files", files.layer4);
-    formData.append("layers", 4);
+    // formData.append("files", files.layer4);
+    // formData.append("layers", 4);
 
     console.log(formData);
     try {
