@@ -30,8 +30,8 @@ public class MypageServiceImpl implements MypageService {
     //private AttendanceRepository attendanceRepository; // 출석
 
     @Override
-    public UserDTO getUserInfo(int userseq) {
-        UserEntity userEntity = userRepository.findById(userseq)
+    public UserDTO getUserInfo(int id) {
+        UserEntity userEntity = userRepository.findById(id)
                                               .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
         
         return UserDTO.toGetUserDTO(userEntity);
@@ -50,8 +50,8 @@ public class MypageServiceImpl implements MypageService {
     // }
 
     @Override
-    public List<WishDTO> getWishlist(int userseq) {
-        List<WishEntity> wishEntities = wishRepository.findByUserEntity_Id(userseq);
+    public List<WishDTO> getWishlist(int id) {
+        List<WishEntity> wishEntities = wishRepository.findByUserEntity_Id(id);
         if (wishEntities.isEmpty()) {
             throw new RuntimeException("No wishlist items found for the user.");
         }

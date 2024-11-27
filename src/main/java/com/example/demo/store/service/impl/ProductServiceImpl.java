@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.demo.store.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.example.demo.ncp.service.NCPObjectStorageService;
 import com.example.demo.store.entity.ProductCategoryEntity;
 import com.example.demo.store.entity.ProductEntity;
@@ -147,23 +149,52 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    // 상품 전체 리스트 뿌리기
+    // 상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang
     @Override
-    public Map<String, Object> getProductList(Pageable pageable, String sortby) {
+    public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword) {
         Map<String, Object> map = new HashMap<>();
+        // DB 상품 개수 추출
+        // 삼항연산자 사용 categoryid가 0 = 전체 상품, 1 = 아우터, 2 = 상의, 3 = 하의로 상품개수 추출
+        // productRepository.count(); = productRepository.findAll().size(); 와 같음
+        // count는 SELECT COUNT(*) FROM product;
+        // findAll.size()는 SELECT FROM product; 후 Java의 List.size()를 호출하는 방식
+        // count() 자료형이 long 이라서 int 로 강제 형변환
 
-        // 1 DB 전체 상품 개수 추출
-        int productCount = productRepository.findAll().size();
+        // 조건 별 총 개수
+        // 0. 전체
+        // 1. 카테고리
+        // 2. 키워드
+        // 3. 카테고리 + 키워드
+        int pCase = 0;
+        int productCount = 0;
+
+        if (categoryid == 0 & keyword == null) {
+            // categoryid는 all, keyword는 받지 않았을 때, 전체 DB 개수 추출
+            pCase = 0;
+            productCount = (int) productRepository.count();
+        } else if (categoryid != 0 && keyword == null) {
+            pCase = 1;
+            // categoryid로 검색한 DB 개수 추출
+            productCount = categoryRepository.findById(categoryid).orElseThrow().getProductList().size();
+        } else if (categoryid == 0 && keyword != null) {
+            pCase = 2;
+            // keyword로 검색한 DB 개수 추출
+            productCount = productRepository.countByNameContaining(keyword);
+        } else if (categoryid != 0 && keyword != null) {
+            pCase = 3;
+            // categoryid + keyword로 검색한 DB 개수 추출
+            productCount = productRepository.countByNameContainingIgnoreCaseAndCategoryEntity_id(keyword, categoryid);
+
+        }
 
         // 페이징 설정
         productPaging.setTotalA(productCount);
-        productPaging.setCurrentPage(pageable.getPageNumber() + 1); // 0이면 1페이지
+        productPaging.setCurrentPage(pageable.getPageNumber());
         productPaging.setPageSize(pageable.getPageSize());
         productPaging.setPageBlock(3);
         productPaging.makePaging();
 
-        // 정렬
-        // 최신순
+        // 기본 최신순 정렬
         Sort sort = pageable.getSort();
         if (sortby.equals("priceHigh")) {
             // 가격 높은 순
@@ -173,23 +204,39 @@ public class ProductServiceImpl implements ProductService {
             sort = Sort.by(Sort.Direction.ASC, "price");
         }
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        // 페이징처리한 상품 들고오기 컨트롤러에서 설정한 개수 9개
-        Page<ProductEntity> pageProductList = productRepository.findAll(pageable);
 
-        List<ProductDTO> dtoList = new ArrayList<>();
+        // 상품 목록 가져오기( 컨트롤러에서 설정한 기본 개수는 15개)
+        Page<ProductEntity> pageProductList = null;
 
-        for (ProductEntity productEntity : pageProductList) {
-            ProductDTO productDTO = ProductDTO.toGetProductDTO(productEntity);
-            dtoList.add(productDTO);
+        if (pCase == 0) {
+            // categoryid는 all, keyword는 받지 않았을 때, 전체 DB 개수 추출
+            pageProductList = productRepository.findAll(pageable);
+        } else if (pCase == 1) {
+            // categoryid로 검색한 DB 개수 추출
+            pageProductList = productRepository.findBycategoryid(categoryid, pageable);
+        } else if (pCase == 2) {
+
+            // keyword로 검색한 DB 개수 추출
+            pageProductList = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        } else {
+            // categoryid + keyword로 검색한 DB 개수 추출
+            pageProductList = productRepository.findByNameContainingIgnoreCaseAndCategoryEntity_id(keyword, categoryid,
+                    pageable);
         }
 
-        // 결과를 map에 저장 맵애 4개 또 찾아야지~
+        // Java8 이상 사용시 Entity -> DTO 변환하는 방법
+        List<ProductDTO> dtoList = pageProductList.getContent()
+                .stream()
+                .map(ProductDTO::toGetProductDTO)
+                .collect(Collectors.toList());
+
+        // 결과를 map에 저장
         map.put("productList", dtoList);
         map.put("startNum", productPaging.getStartNum());
         map.put("endNum", productPaging.getEndNum());
         map.put("pre", productPaging.isPre());
         map.put("next", productPaging.isNext());
-
+        map.put("category", getCategory());
         System.out.println("getProductList: " + dtoList);
         return map;
     }
@@ -206,6 +253,59 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return list;
+    }
+
+    // 상품 수정 - 24.11.25 - uj
+    @Override
+    @SuppressWarnings("unchecked")
+    public void putProduct(Map<String, Object> map) {
+        // 1. 상품 조회
+        // 사용자 입력 데이터
+        ProductDTO productDTO = (ProductDTO) map.get("ProductDTO");
+        ProductEntity productEntity = ProductEntity.toGetProductEntity(productDTO);
+
+        // 2. 카테고리 Entity 추출
+        ProductCategoryEntity categoryEntity = categoryRepository
+                .findById(Integer.parseInt(map.get("CategorySeq").toString()))
+                .orElseThrow(
+                        () -> new NotFoundException("해당 카테고리(" + map.get("CategorySeq").toString() + ")가 조회되지 않습니다."));
+        productEntity.setCategoryEntity(categoryEntity);
+
+        // 3. 이미지(NCP) 수정
+        // 3-1. 이미지 삭제
+        List<ProductImgEntity> imgEntityList = productRepository.findById(productEntity.getId()).orElseThrow()
+                .getImgList();
+        for (ProductImgEntity imgEntity : imgEntityList) {
+            ncpObjectStorageService.deleteFile("moivo", "products/", imgEntity.getFileName());
+        }
+        imgRepository.deleteByProductEntity(productEntity);
+
+        // 3-2. 이미지 업로드
+        for (int i = 1; i < 4; i++) {
+            List<MultipartFile> files = (List<MultipartFile>) map.get("layer" + i);
+            saveImgFiles(files, productEntity, i);
+        }
+
+        // 4. 재고 수정
+        List<ProductStockEntity> stockEntityList = stockRepository.findByProductEntity(productEntity);
+        for (ProductStockEntity stockEntity : stockEntityList) {
+            switch (stockEntity.getSize()) {
+                case S:
+                    stockEntity.setCount(Integer.parseInt(map.get("S").toString()));
+                    break;
+                case M:
+                    stockEntity.setCount(Integer.parseInt(map.get("M").toString()));
+                    break;
+                case L:
+                    stockEntity.setCount(Integer.parseInt(map.get("L").toString()));
+                    break;
+                default:
+                    break;
+            }
+            stockRepository.save(stockEntity);
+        }
+
+        productRepository.save(productEntity);
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.demo.user.entity;
 
 import com.example.demo.store.entity.ProductEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,12 +25,12 @@ public class UserWishEntity {
 
     // 찜 참조
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wishid", nullable = false)
+    @JoinColumn(name = "wishid")
     private WishEntity wishEntity;
 
     // 상품 참조
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productid", nullable = false)
+    @JoinColumn(name = "productid")
     private ProductEntity productEntity;
 
 }

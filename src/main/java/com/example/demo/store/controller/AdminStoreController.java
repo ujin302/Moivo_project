@@ -14,11 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/admin/store")
@@ -33,9 +35,9 @@ public class AdminStoreController {
             // 1. 카테고리 관련 매개변수 필요 >> int형
             // 2. 재고 관련 매개 변수 필요 >>
             @ModelAttribute ProductDTO productDTO,
-            @RequestPart("layer1") List<MultipartFile> layer1Files,
-            @RequestPart("layer2") List<MultipartFile> layer2Files,
-            @RequestPart("layer3") List<MultipartFile> layer3Files,
+            @RequestPart(name = "layer1") List<MultipartFile> layer1Files,
+            @RequestPart(name = "layer2") List<MultipartFile> layer2Files,
+            @RequestPart(name = "layer3") List<MultipartFile> layer3Files,
             @RequestParam(name = "S", defaultValue = "0") int SCount,
             @RequestParam(name = "M", defaultValue = "0") int MCount,
             @RequestParam(name = "L", defaultValue = "0") int LCount,
@@ -61,10 +63,42 @@ public class AdminStoreController {
         return ResponseEntity.ok(null);
     }
 
-    // 카테고리 출력
+    // 상품 등록 화면 카테고리 출력
     @GetMapping("/category")
     public ResponseEntity<List<ProductCategoryDTO>> getCategory() {
         List<ProductCategoryDTO> list = productService.getCategory();
         return ResponseEntity.ok(list);
+    }
+
+    // 상품 수정 - 24.11.25 - 이유진
+    @PutMapping("/product")
+    public ResponseEntity<String> putProduct(
+            @ModelAttribute ProductDTO productDTO,
+            @RequestPart(name = "layer1", required = false) List<MultipartFile> layer1Files,
+            @RequestPart(name = "layer2", required = false) List<MultipartFile> layer2Files,
+            @RequestPart(name = "layer3", required = false) List<MultipartFile> layer3Files,
+            @RequestParam(name = "S", defaultValue = "0", required = false) int SCount,
+            @RequestParam(name = "M", defaultValue = "0", required = false) int MCount,
+            @RequestParam(name = "L", defaultValue = "0", required = false) int LCount,
+            @RequestParam(name = "CategorySeq", defaultValue = "1", required = false) int categorySeq) {
+        Map<String, Object> map = new HashMap<>();
+
+        System.out.println("putProduct" + productDTO);
+        map.put("ProductDTO", productDTO);
+        map.put("layer1", layer1Files);
+        map.put("layer2", layer2Files);
+        map.put("layer3", layer3Files);
+        map.put("S", SCount);
+        map.put("M", MCount);
+        map.put("L", LCount);
+        map.put("CategorySeq", categorySeq);
+
+        try {
+            productService.putProduct(map);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(null);
     }
 }
