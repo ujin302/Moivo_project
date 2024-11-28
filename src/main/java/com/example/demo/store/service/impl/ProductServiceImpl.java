@@ -163,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Map<String, Object> getProductList(Pageable pageable, String sortby, int categoryid, String keyword) {
         Map<String, Object> map = new HashMap<>();
-        
+
         // 검색어 null 체크 및 trim - sc
         if (keyword != null) {
             keyword = keyword.trim();
@@ -171,7 +171,7 @@ public class ProductServiceImpl implements ProductService {
                 keyword = null;
             }
         }
-        
+
         // DB 상품 개수 추출
         // 삼항연산자 사용 categoryid가 0 = 전체 상품, 1 = 아우터, 2 = 상의, 3 = 하의로 상품개수 추출
         // productRepository.count(); = productRepository.findAll().size(); 와 같음
@@ -187,10 +187,11 @@ public class ProductServiceImpl implements ProductService {
         int pCase = 0;
         int productCount = 0;
         // 검색어 예외 처리
-        keyword.trim();
-        if (keyword.equals("")) {
+
+        if (keyword == null || keyword.equals(""))
             keyword = null;
-        }
+        else if (keyword != null)
+            keyword.trim();
 
         if (categoryid == 0 & keyword == null) {
             // categoryid는 all, keyword는 받지 않았을 때, 전체 DB 개수 추출
@@ -207,16 +208,9 @@ public class ProductServiceImpl implements ProductService {
         } else if (categoryid != 0 && keyword != null) {
             pCase = 3;
             // categoryid + keyword로 검색한 DB 개수 추출
-            productCount = productRepository.countByNameContainingIgnoreCaseAndCategoryEntity_id(keyword, categoryid);
-
+            productCount = productRepository.countByNameContainingIgnoreCaseAndCategoryEntity_id(keyword,
+                    categoryid);
         }
-
-        // 페이징 설정
-        productPaging.setTotalA(productCount);
-        productPaging.setCurrentPage(pageable.getPageNumber() - 1);
-        productPaging.setPageSize(pageable.getPageSize());
-        productPaging.setPageBlock(3);
-        productPaging.makePaging();
 
         // 기본 최신순 정렬
         Sort sort = pageable.getSort();
@@ -239,7 +233,6 @@ public class ProductServiceImpl implements ProductService {
             // categoryid로 검색한 DB 개수 추출
             pageProductList = productRepository.findBycategoryid(categoryid, pageable);
         } else if (pCase == 2) {
-
             // keyword로 검색한 DB 개수 추출
             pageProductList = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
         } else {
@@ -255,7 +248,7 @@ public class ProductServiceImpl implements ProductService {
                     System.out.println("Product ID: " + productEntity.getId());
                     System.out.println("Original Image: " + productEntity.getImg());
                     System.out.println("NCP URL: " + ncpDTO.getURL());
-                    
+
                     if (productEntity.getImg() != null && !productEntity.getImg().isEmpty()) {
                         // 이미 전체 URL이 있는 경우는 그대로 사용, 파일명만 있는 경우 URL 추가
                         if (!productEntity.getImg().startsWith("http")) {
@@ -266,12 +259,20 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
 
+        // 페이징 정보
+        map.put("isFirst", pageProductList.isFirst()); // 1 페이지 여부
+        map.put("isLast", pageProductList.isLast()); // 마지막 페이지 여부
+        map.put("hasPrevious", pageProductList.hasPrevious()); // 이전 페이지 여부
+        map.put("hasNext", pageProductList.hasNext()); // 다음 페이지 여부
+        map.put("totalPages", pageProductList.getTotalPages()); // 페이지 개수
+        map.put("currentPage", pageProductList.getNumber()); // 페이지 개수
+
         // 결과를 map에 저장
         map.put("productList", dtoList);
-        map.put("startNum", productPaging.getStartNum());
-        map.put("endNum", productPaging.getEndNum());
-        map.put("pre", productPaging.isPre());
-        map.put("next", productPaging.isNext());
+        // map.put("startNum", productPaging.getStartNum());
+        // map.put("endNum", productPaging.getEndNum());
+        // map.put("pre", productPaging.isPre());
+        // map.put("next", productPaging.isNext());
         map.put("category", getCategory());
         System.out.println("getProductList: " + dtoList);
         return map;
@@ -374,6 +375,22 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.save(productEntity);
+    }
+
+    // 24.11.27 - 상품 삭제 - uj
+    @Override
+    public void deleteProduct(int productId) {
+        // 1. 상품 정보 삭제
+
+        // 2. 상품 이미지 삭제
+
+        // 3. 상품 재고 삭제
+
+        // 4. 상품 리뷰 삭제
+
+        // 5. 장바구니에서 상품 삭제
+
+        // 6.
     }
 
 }
