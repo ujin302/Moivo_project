@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from '../../assets/css/user_sigup.module.css';
+import singup from '../../assets/css/user_sigup.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
@@ -113,92 +113,93 @@ function user_signup() {
   };
 
   return (
-    <div className={styles.signupContainer}>
-      <div><Banner /></div>
-      <div className={styles.pageName}>Sign Up</div>
-      <div className={styles.signupDiv}>
-        <form className={styles.signupForm} onSubmit={handleSubmit}>
-          <div className={styles.formRow}>
+    <div className={singup.signupContainer}>
+      <div className={singup.signbanner}><Banner /></div>
+      <div className={singup.signheader}></div>
+      <div className={singup.pageName}>Sign Up</div>
+      <div className={singup.signupDiv}>
+        <form className={singup.signupForm} onSubmit={handleSubmit}>
+          <div className={singup.formRow}>
             <span>ID</span>
             <input type="text" name="userId" value={formData.userId} onChange={handleChange} />
-            <div className={styles.exception}>{errors.userId}</div>
+            <div className={singup.exception}>{errors.userId}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>PASSWORD</span>
             <input type="password" name="pwd" value={formData.pwd} onChange={handleChange} />
-            <div className={styles.exception}>{errors.pwd}</div>
+            <div className={singup.exception}>{errors.pwd}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>CONFIRM PASSWORD</span>
             <input type="password" name="confirmPwd" value={formData.confirmPwd} onChange={handleChange} />
-            <div className={styles.exception}>{errors.confirmPwd}</div>
+            <div className={singup.exception}>{errors.confirmPwd}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>NAME</span>
             <input type="text" name="name" value={formData.name} onChange={handleChange}/>
-            <div className={styles.exception}>{errors.name}</div>
+            <div className={singup.exception}>{errors.name}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>GENDER</span>
-              <div className={styles.radioContainer}>
+              <div className={singup.radioContainer}>
                 <input type="radio" name="gender" value="male" checked={formData.gender === "male"} onChange={handleChange}/> Male
                 <input type="radio" name="gender" value="female" checked={formData.gender === "female"} onChange={handleChange}/> Female
               </div>
-                <div className={styles.exception}>{errors.gender}</div>
+                <div className={singup.exception}>{errors.gender}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>ADDRESS</span>
-            <div className={styles.addressContainer}>
-              <div className={styles.postalRow}>
+            <div className={singup.addressContainer}>
+              <div className={singup.postalRow}>
                 <input type="text" name="postalCode" placeholder="우편번호" value={formData.postalCode} onChange={handleChange} />
                 <button type="button" onClick={handleFindPostalCode}>우편번호 찾기</button>
               </div>
               
-              <div className={styles.detailedAddress}>
+              <div className={singup.detailedAddress}>
                 <input type="text" name="address" placeholder="기본 주소" value={formData.address} onChange={handleChange} />
               </div>
-              <div className={styles.detailedAddress}>
+              <div className={singup.detailedAddress}>
                 <input type="text" name="detailedAddress" placeholder="상세 주소" value={formData.detailedAddress} onChange={handleChange} />
-                <div className={styles.exception}>{errors.address}</div>
+                <div className={singup.exception}>{errors.address}</div>
               </div>
             </div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>PHONE</span>
-            <div className={styles.phoneRow}>
+            <div className={singup.phoneRow}>
               <input type="text" name="phone1" placeholder="010" maxLength="3" value={formData.phone1} onChange={handleChange} />
               <p>-</p>
               <input type="text" name="phone2" placeholder="0000" maxLength="4" value={formData.phone2} onChange={handleChange} />
               <p>-</p>
               <input type="text" name="phone3" placeholder="0000" maxLength="4" value={formData.phone3} onChange={handleChange} />
             </div>
-            <div className={styles.exception}>{errors.phone}</div>
+            <div className={singup.exception}>{errors.phone}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.formRow}>
+          <div className={singup.formRow}>
             <span>EMAIL</span>
-            <input className={styles.emaildetail}type="email" name="email" value={formData.email} onChange={handleChange} />
-            <div className={styles.exception}>{errors.email}</div>
+            <input className={singup.emaildetail}type="email" name="email" value={formData.email} onChange={handleChange} />
+            <div className={singup.exception}>{errors.email}</div>
           </div>
-          <hr className={styles.signupline} />
+          <hr className={singup.signupline} />
 
-          <div className={styles.signupbtn}>
-            <button type="submit" className={styles.submitButton}>회원가입</button>
+          <div className={singup.signupbtn}>
+            <button type="submit" className={singup.submitButton}>회원가입</button>
             <Link to="/user">
-            <button type="reset" className={styles.submitButton}>취소</button>
+            <button type="reset" className={singup.submitButton}>취소</button>
             </Link>
           </div>
         </form>

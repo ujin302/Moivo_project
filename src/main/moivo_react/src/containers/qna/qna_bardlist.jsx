@@ -11,7 +11,7 @@ const qna_boardlist = () => {
     const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
     const [enteredPassword, setEnteredPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const itemsPerPage = 7; // 페이지당 항목 수
+    const itemsPerPage = 6; // 페이지당 항목 수
 
     const qnaData = [
         {
@@ -141,14 +141,14 @@ const qna_boardlist = () => {
                         ))
                     )}
                 </div>
-                {/* 페이징 버튼 */}
-                <div className={QnA_b.pagination}>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)}>
-                            {page}
-                        </button>
-                    ))}
-                </div>
+                    {/* 페이징 버튼 */}
+                    <div className={QnA_b.pagination}>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)}>
+                                {page}
+                            </button>
+                        ))}
+                    </div>
             </div>
 
             {/* 비밀번호 확인 모달 */}

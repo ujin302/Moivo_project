@@ -4,7 +4,7 @@
 }
 
 .qnaboardheader {
-  height: 130px;
+  height: 110px;
 }
 
 .qnaboardTitle {
@@ -39,6 +39,7 @@
 }
 
 .qnaboardNaviBtn {
+  width: 150px;
   background-color: black;
   color: white;
   border: none;
@@ -70,9 +71,7 @@
   max-width: 1300px;
   margin: 0 auto;
   background: white;
-  border-radius: 4px;
   position: relative;
-  padding: 30px;
 }
 
 .qnaboardItem {
@@ -141,3 +140,59 @@
 .qnaboardSubmitBtn:active {
   transform: scale(0.98);
 }
+
+/* --- 반응형 미디어 쿼리 --- */
+@media (max-width: 1400px) {
+  .qnaboardNavi{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+
+  .qnaboardTitle::after {
+    width: 95%;
+    max-width: 1300px;
+  }
+
+  .qnaboard{
+    max-width: 100%;
+    padding: 0 30px;
+  }
+
+  .qnaboardContainer{
+    height: 700px;
+  }
+}
+@media (max-width: 700px) {
+  .qnaboardTitle{
+    font-size: 26px;   
+  }
+
+  .qnaboardNaviBtn{
+    width: 105px;
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  .qnaboardTitle::after {
+    width: 90%;
+    max-width: 1300px;
+  }
+  
+  .qnaboardItem{
+    font-size: 12px;
+  }
+
+  .qnaboardInput,
+  .qnaboardTextarea,
+  .qnaboardSelect{
+    font-size: 14px;
+  }
+
+  .qnaboardSubmitBtn{
+   font-size: 12px; 
+  }
+}
+
+

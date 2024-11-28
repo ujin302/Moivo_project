@@ -4,7 +4,7 @@
 }
 
 .faqheader {
-  height: 130px;
+  height: 110px;
 }
 
 /* QnA 설명 영역 */
@@ -43,6 +43,7 @@
 
 /* FAQ 네비게이션 버튼 */
 .faqNaviBtn {
+  width: 150px;
   background-color: black;
   color: white;
   border: none;
@@ -71,7 +72,6 @@
   max-width: 1300px;
   margin: 0 auto;
   background: white;
-  border-radius: 4px;
   position: relative;
 }
 
@@ -129,3 +129,54 @@
   max-height: 500px;
   padding: 10px 20px;
 }
+
+/* --- 반응형 미디어 쿼리 --- */
+@media (max-width: 1400px) {
+  .faqNavi {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+
+  .faqcoment::after {
+    width: 95%;
+    max-width: 1300px;
+  }
+
+  .faq {
+    max-width: 100%;
+    padding: 0 30px;
+  }
+
+  .faqss {
+    height: 700px;
+  }
+}
+
+@media (max-width: 700px) {
+  .faqcoment{
+    font-size: 26px;
+  }
+
+  .faqNaviBtn{
+    width: 105px;
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  .faqcoment::after {
+    width: 90%;
+    max-width: 1300px;
+  }
+
+  .faqItem{
+    font-size: 12px;
+  }
+
+  .faqss {
+    height: 700px;
+    /* height: auto; */
+    /* margin-bottom: 20px; */
+  }
+  }
