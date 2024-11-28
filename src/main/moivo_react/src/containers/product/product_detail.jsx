@@ -22,6 +22,8 @@ const ProductDetail = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState('details');
 
   const fetchProductDetail = async () => {
     setLoading(true);
@@ -112,6 +114,32 @@ const ProductDetail = () => {
     console.log('위시리스트에 추가:', product.id);
   };
 
+  const handleQuantityChange = (change) => {
+    const newQuantity = quantity + change;
+    if (newQuantity >= 1) {
+      setQuantity(newQuantity);
+      if (selectedProduct) {
+        setSelectedProduct({
+          ...selectedProduct,
+          count: newQuantity
+        });
+      }
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedProduct) {
+      alert('사이즈를 선택해주세요.');
+      return;
+    }
+    if (!token) {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+    // 장바구니 추가 로직 구현
+    console.log('장바구니에 추가:', { ...selectedProduct, quantity });
+  };
+
   if (loading) {
     return <LoadingModal isOpen={true} />;
   }
@@ -193,10 +221,24 @@ const ProductDetail = () => {
               <p>선택된 상품: {product?.name || "상품명 정보가 없습니다."}</p>
               <p>사이즈: {selectedProduct.size}</p>
               <p>수량: {selectedProduct.count}</p>
+              <div className={styles.quantityControl}>
+                <button onClick={() => handleQuantityChange(-1)}>-</button>
+                <span>{quantity}</span>
+                <button onClick={() => handleQuantityChange(1)}>+</button>
+              </div>
+              <p>총 가격: {(product?.price * quantity).toLocaleString()}원</p>
             </div>
           )}
 
           <div className={styles.actionButtons}>
+            <motion.button
+              className={styles.cartButton}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleAddToCart}
+            >
+              장바구니
+            </motion.button>
             <motion.button
               className={styles.purchaseButton}
               whileHover={{ scale: 1.05 }}
@@ -217,40 +259,88 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <div className={styles.detailSection}>
-        <h2>상품 상세 정보</h2>
-        <div className={styles.content}>
-          <p>{product.content}</p>
+      <div className={styles.tabSection}>
+        <div className={styles.tabButtons}>
+          <button
+            className={`${styles.tabButton} ${activeTab === 'details' ? styles.active : ''}`}
+            onClick={() => setActiveTab('details')}
+          >
+            상품 상세정보
+          </button>
+          <button
+            className={`${styles.tabButton} ${activeTab === 'reviews' ? styles.active : ''}`}
+            onClick={() => setActiveTab('reviews')}
+          >
+            리뷰
+          </button>
+          <button
+            className={`${styles.tabButton} ${activeTab === 'qna' ? styles.active : ''}`}
+            onClick={() => setActiveTab('qna')}
+          >
+            QNA
+          </button>
+          <button
+            className={`${styles.tabButton} ${activeTab === 'policy' ? styles.active : ''}`}
+            onClick={() => setActiveTab('policy')}
+          >
+            환불/교환정책
+          </button>
         </div>
-        <div className={styles.detailImages}>
-          {detailImages.map((img) => (
-            <img
-              key={img.id}
-              src={img.fileName}
-              alt="상품 상세 이미지"
-              className={styles.detailImage}
-            />
-          ))}
-        </div>
-      </div>
 
-      {product.reviewList && (
-        <div className={styles.reviewSection}>
-          <h2>상품 리뷰</h2>
-          {product.reviewList.length > 0 ? (
-            <div className={styles.reviewList}>
-              {product.reviewList.map((review) => (
-                <div key={review.id} className={styles.review}>
-                  <p className={styles.reviewContent}>{review.content}</p>
-                  <p className={styles.reviewAuthor}>{review.author}</p>
-                </div>
-              ))}
+        <div className={styles.tabContent}>
+          {activeTab === 'details' && (
+            <div className={styles.detailSection}>
+              <div className={styles.content}>
+                <p>{product.content}</p>
+              </div>
+              <div className={styles.detailImages}>
+                {detailImages.map((img) => (
+                  <img
+                    key={img.id}
+                    src={img.fileName}
+                    alt="상품 상세 이미지"
+                    className={styles.detailImage}
+                  />
+                ))}
+              </div>
             </div>
-          ) : (
-            <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+          )}
+
+          {activeTab === 'reviews' && (
+            <div className={styles.reviewSection}>
+              <h2>상품 리뷰</h2>
+              {product.reviewList && product.reviewList.length > 0 ? (
+                <div className={styles.reviewList}>
+                  {product.reviewList.map((review) => (
+                    <div key={review.id} className={styles.review}>
+                      <p className={styles.reviewContent}>{review.content}</p>
+                      <p className={styles.reviewAuthor}>{review.author}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'qna' && (
+            <div className={styles.qnaSection}>
+              <h2>상품 QNA</h2>
+              {/* QNA 컴포넌트 구현 */}
+              <p>준비중입니다.</p>
+            </div>
+          )}
+
+          {activeTab === 'policy' && (
+            <div className={styles.policySection}>
+              <h2>환불/교환 정책</h2>
+              {/* 환불/교환 정책 내용 */}
+              <p>준비중입니다.</p>
+            </div>
           )}
         </div>
-      )}
+      </div>
       <Footer />
     </div>
   );
