@@ -409,7 +409,6 @@ button, label {
     color: black;
     border: none;
     cursor: pointer;
-    z-index: 1000;
     margin-right: 13px;
     font-size: 13px;
 }
@@ -507,63 +506,117 @@ button, label {
     color: #2f2e2c;
   }
   
-/* 미디어 쿼리: 화면 크기가 768px 이하일 때 적용 */
+/* 미디어 쿼리 */
 @media (max-width: 768px) {
+    .heightWeightRow {
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+
+    .heightWeightRow input[type="number"] {
+        width: 100%; 
+    }
+
     .membershipBox {
-        flex-direction: column; /* 세로로 배치하여 공간을 더 효율적으로 사용 */
-        align-items: center; /* 멤버십 박스 중앙 정렬 */
+        flex-direction: column; 
+        align-items: center; 
     }
 
     .membershipImage {
-        margin: 0 auto 20px auto; /* 이미지 가운데 정렬 */
+        margin: 0 auto 20px auto; 
     }
 
     .formRow {
-        flex-direction: column; /* 수직으로 배치 */
-        align-items: flex-start; /* 왼쪽 정렬 */
+        flex-direction: column; 
+        align-items: flex-start; 
     }
 
     .formRow input {
-        width: 100%; /* 입력창 너비를 100%로 설정하여 화면에 맞게 */
-        padding: 12px; /* 입력창 여백 늘리기 */
+        width: 100%; 
+        padding: 12px; 
     }
 
     .addressContainer {
-        flex-direction: column; /* 주소 항목 세로로 정렬 */
+        flex-direction: column; 
     }
 
     .buttonRow {
-        flex-direction: column; /* 버튼들을 세로로 배치 */
-        gap: 15px; /* 버튼 간격 늘리기 */
+        flex-direction: column; 
+        gap: 15px; 
     }
 
     .submitButton,
     .cancelButton {
-        width: 100%; /* 버튼 너비를 100%로 설정 */
-        padding: 12px; /* 버튼 여백 늘리기 */
+        width: 100%;
+        padding: 12px; 
     }
 }
 
-/* 미디어 쿼리: 화면 크기가 480px 이하일 때 추가 조정 */
-@media (max-width: 480px) {
+
+@media (max-width: 576px) {
     .pageName {
-        font-size: 28px; /* 제목 크기 축소 */
+        font-size: 30px; 
+        margin-bottom: 35px;
     }
 
     .membershipInfo,
     .pointCoupon {
-        font-size: 14px; /* 멤버십 정보 폰트 크기 축소 */
+        font-size: 14px; 
     }
-}
 
-/* 반응형 처리 */
-@media (max-width: 768px) {
-    .heightWeightRow {
-        flex-direction: column; /* 화면이 좁아지면 세로로 배치 */
-        align-items: flex-start; /* 왼쪽 정렬 */
+    .backLink {
+        font-size: 23px;
+    }
+
+    .buttonRow {
+        font-size: 12pt;
+    }
+
+    .profileForm {
+        padding: 20px;
+        font-size: 12pt;
+    }
+
+    .formRow label {
+        width: 70px;
+        margin-bottom: 8px;
+        padding-right: 2px;
+    }
+
+    .membershipImage img {
+        margin-left: 10px;
+    }
+
+    .membershipInfo {
+        font-size: 15px;
+        margin-bottom: 7px;
+        text-align: center;
+    }
+
+    .membershipBox {
+        flex-direction: column; 
+        text-align: center;
+    }
+
+    .addressContainer {
+        margin-left: -9px;
+    }
+
+    .formRow .addressContainer .zipcode input[type="text"] {
+        width: 25%;
+        margin-right: 15px;
     }
 
     .heightWeightRow input[type="number"] {
-        width: 100%; /* 입력 필드 너비 100% */
+        margin-left: 0px;
+        width: 20%;
     }
+
+    .tooltip {
+        right: 35px;
+        bottom: auto;
+        top: 145px;
+        background-color: #b5a79d;
+    }
+
 }

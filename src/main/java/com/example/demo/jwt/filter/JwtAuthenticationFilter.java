@@ -35,14 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-    	
-    	// 추가 (리프레스토큰 적용 )
-    	String path = request.getRequestURI();
-        if ("/api/auth/refresh-token".equals(path)) {
-            chain.doFilter(request, response);
-            return;
-        }
-    	
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String jwt = header.substring(7);
