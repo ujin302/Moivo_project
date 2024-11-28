@@ -1,26 +1,129 @@
 @import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
 
-.membershipBox,
-.profileForm {
-    width: 98%; /* 동일한 너비 설정 */
-    margin: 20px auto; /* 가운데 정렬 */
-}
-
+/* 멤버십 박스 */
 .membershipBox {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    width: 98%;
+    width: 100%;
     margin: 20px auto;
     padding: 20px;
     background: #F6F2EE;
     border: 1px solid #988C73;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative; 
-    margin-top: 50px; /* 삭제 버튼과 더 가까워지도록 위쪽 마진을 조정 */
+    position: relative;
 }
 
-/* 기존 .postalCodeContainer 스타일 수정 */
+.membershipImage {
+    width: 50px;
+    height: 50px;
+    background: #F6F2EE;
+    margin-right: 50px;
+    margin-left: 20px;
+}
+
+.membershipImage img {
+    width: 50px;
+    height: 40px;
+    background: #F6F2EE;
+    margin-right: 50px;
+}
+
+.membershipInfo {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 14px;
+    text-align: left;
+    color: #2f2e2c;
+    margin-bottom: 5px;
+}
+
+.pointCoupon {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 16px;
+    text-align: left;
+    color: #2f2e2c;
+}
+
+/* 아이콘 영역 (우측 상단으로 위치) */
+.tooltipIcon {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.tooltipIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 툴팁 박스 */
+.tooltip {
+    font-family: 'GmarketSans', sans-serif;
+    position: absolute;
+    top: 90%;
+    left: -270px;
+    transform: translateY(-50%);
+    background-color: #988c7358;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+
+.couponSection {
+    display: flex; /* 가로로 배치 */
+    align-items: center; /* 수직 정렬 */
+    gap: 20px; /* POINT와 COUPON 간 간격 */
+    font-family: 'Italiana', serif;
+    font-size: 14px;
+}
+  
+  .pointCouponSection {
+    display: flex;
+    align-items: center; /* 수직 가운데 정렬 */
+    gap: 20px; /* POINT와 COUPON 간 간격 */
+  }
+  
+  .point {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 14px;
+}
+
+.coupon {
+    font-family: 'GmarketSans', sans-serif;
+    font-size: 14px;
+    position: relative; /* 툴팁 위치를 조정하기 위한 기준 */
+}
+  
+  .couponTooltip {
+    position: absolute;
+    top: 100%; /* COUPON 아래에 표시 */
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 13px;
+    width: 300px;
+  }
+  
+  .couponItem {
+    margin-bottom: 5px;
+  }
+  
+  .couponItem:last-child {
+    margin-bottom: 0; /* 마지막 항목 간격 제거 */
+  }
+
+
 .postalCodeContainer {
     display: flex;
     align-items: center;
@@ -33,6 +136,13 @@
     padding: 8px;
     border: 1px solid #988C73;
     font-size: 14px;
+}
+
+.postalCodeInput {
+    width: 120px;  /* 원하는 크기로 수정 */
+    padding: 8px;
+    font-size: 14px; /* 텍스트 크기 조정 */
+    margin-right: 10px; /* 우편번호 찾기 버튼과의 간격 조정 */
 }
 
 /* 우편번호 찾기 버튼 */
@@ -94,6 +204,10 @@
     color: #333;
 }
 
+.formRow .addressContainer .zipcode input[type="text"] {
+    width: 20%;
+    margin-right: 10px;
+}
 
 .membershipImage {
     width: 50px;
@@ -244,11 +358,11 @@ button, label {
 
 .phoneRow {
     display: flex;
-    gap: 5px;
+    width: 50%;
 }
 
 .phoneRow input {
-    text-align: center;
+    text-align: left;
 }
 
 .genderContainer {
@@ -288,8 +402,8 @@ button, label {
 
 .deleteButton {
     position: absolute;
-    top: 200px; /* 삭제 버튼을 멤버십 박스 바로 위에 배치 */
-    right: 20px; 
+    top: 180px; /* 삭제 버튼을 멤버십 박스 바로 위에 배치 */
+    right: 10px; 
     padding: 8px 18px;
     background-color: #E6E3E2; 
     color: black;

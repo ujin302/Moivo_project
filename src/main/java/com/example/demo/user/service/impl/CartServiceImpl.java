@@ -110,4 +110,37 @@ public class CartServiceImpl implements CartService {
                 cartEntity.getUserCartList().remove(userCartEntity);
                 userCartRepository.delete(userCartEntity);
         }
+
+        // 장바구니 수정
+        @Override
+        public void updateCartItem(int cartid, Integer count, String size) {
+        UserCartEntity userCartEntity = userCartRepository.findByCartEntity_Id(cartid)
+                .orElseThrow(() -> new RuntimeException("해당 장바구니 항목을 찾을 수 없습니다."));
+                System.out.println("여긴 안와??");
+                System.out.println("cartid 찍어 " + cartid);
+                System.out.println("count 찍어 " + count);
+                System.out.println("size 찍어 " + size);
+                // 수량 업데이트
+                if (count != null) {
+                        if (count <= 0) {
+                        throw new RuntimeException("수량은 1 이상이어야 합니다.");
+                        }
+                        userCartEntity.setCount(count);
+                        System.out.println("수량 업데이트 성공 !!!!!!!!!!!");
+                }
+
+                // 사이즈 업데이트
+                if (size != null) {
+                        try {
+                                userCartEntity.setSize(Size.valueOf(size.toUpperCase())); // "S" -> Size.S
+                                System.out.println("사이즈 업데이트 성공 !!!!!!!!!!!!");
+                        } catch (IllegalArgumentException e) {
+                                throw new RuntimeException("유효하지 않은 사이즈 값입니다: " + size);
+                        }
+                }
+
+                // 변경 사항 저장
+                userCartRepository.save(userCartEntity);
+                System.out.println("업데이트 모두 성공 !!!!!!!!!!!");
+        }
 }
