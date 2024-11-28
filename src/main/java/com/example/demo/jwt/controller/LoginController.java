@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +14,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.jwt.constants.SecurityConstants;
-import com.example.demo.jwt.custom.CustomUserDetailService;
 import com.example.demo.jwt.domain.AuthenticationRequest;
-import com.example.demo.jwt.domain.RefreshTokenRequest;
 import com.example.demo.jwt.prop.JwtProps;
-import com.example.demo.jwt.security.CustomUserDetails;
-import com.example.demo.jwt.util.JwtUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -35,12 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController {
     @Autowired
     private JwtProps jwtProps;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
-    private CustomUserDetailService customUserDetailService;
 
     /**
      * JWT를 생성하는 Login 요청임 (암호화)
@@ -127,32 +116,4 @@ public class LoginController {
 
         return new ResponseEntity<String>(parsedToken.toString(), HttpStatus.OK);
     }
-
-    // 권한 갱신
-    // 리프레시 토큰을 처리하는 엔드포인트 추가
-    @PostMapping("/auth/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        String refreshToken = refreshTokenRequest.getRefreshToken();
-        try {
-            // 리프레시 토큰 검증
-            Claims claims = jwtUtils.validateToken(refreshToken);
-            
-            // 리프레시 토큰에서 사용자 정보 추출
-            String userId = claims.getSubject();
-            
-            // 사용자 정보로 CustomUserDetails 객체 생성
-            UserDetails userDetails = customUserDetailService.loadUserByUsername(userId);
-            CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
-            
-            // 새로운 액세스 토큰 생성
-            String newAccessToken = jwtUtils.generateToken(customUserDetails);
-            
-            // 새로운 액세스 토큰 반환
-            return ResponseEntity.ok(newAccessToken);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
-        }
-    }
-
-
 }
