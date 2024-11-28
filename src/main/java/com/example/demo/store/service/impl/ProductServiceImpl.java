@@ -50,10 +50,6 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private NCPObjectStorageService ncpObjectStorageService;
 
-
-    @Autowired
-    private ProductPaging productPaging;
-
     @Autowired
     private NCPObjectStorageDTO ncpDTO;
 
