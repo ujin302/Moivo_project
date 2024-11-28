@@ -130,4 +130,27 @@
       width: 90%;
     }
   }
+
+  @media (max-width: 576px) {
+
+    .itemName {
+      font-size: 19px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .removeButton {
+      font-size: 17px;
+      padding: 6px 11px;
+    }
+
+    .backLink {
+      font-size: 23px;
+    }
+
+    .container {
+      padding-top: 40px;
+    }
+
+}
   
