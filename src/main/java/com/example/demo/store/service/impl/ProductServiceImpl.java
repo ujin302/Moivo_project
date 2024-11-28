@@ -196,6 +196,8 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> dtoList = pageProductList.getContent() // Java8 이상 사용시 Entity -> DTO 변환하는 방법
                 .stream()
                 .map(productEntity -> {
+                    System.out.println("Product ID: " + productEntity.getId());
+                    System.out.println("Original Image: " + productEntity.getImg());
                     return ProductDTO.toGetProductDTO(productEntity); // DTO로 변환
                 })
                 .collect(Collectors.toList());
