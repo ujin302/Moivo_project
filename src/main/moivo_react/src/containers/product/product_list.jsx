@@ -33,10 +33,9 @@ const ProductList = () => {
   const [categories, setCategories] = useState([{ id: 0, name: '전체' }]); // 카테고리 List
   const [activeCategory, setActiveCategory] = useState({ id: 0, name: '전체' });
   
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItem, setCartItem] = useState(0);
   const [wishItem, setWishItem] = useState(0);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [isWishModalOpen, setIsWishModalOpen] = useState(false);
   
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -86,8 +85,9 @@ const ProductList = () => {
 
         // 4. 사용자 Wish Data 요청
         if(id != null) {
-          // 사용자 Wish Data
-          getWishCount();
+          // 사용자 Wish & Cart Data
+          getWishCartCount('wish');
+          getWishCartCount('cart');
         }
         
         console.log(response.data);
@@ -113,8 +113,8 @@ const ProductList = () => {
   }, []);
 
   // 24.11.28 - uj
-  // 사용자 Wish Data 요청
-  const getWishCount = async () => {
+  // 사용자 Wish or Cart Data 요청
+  const getWishCartCount = async (type) => {
     try {
       const headers = {};
       if (token) {
@@ -122,7 +122,7 @@ const ProductList = () => {
       }
       
       // 1. wish Data 요청
-      const response = await axios.get(`${PATH.SERVER}/api/user/wish/list`, {
+      const response = await axios.get(`${PATH.SERVER}/api/user/${type}/list`, {
         headers,
         params: {
           userid : id
@@ -130,14 +130,23 @@ const ProductList = () => {
       });
   
       // 2. wish Data 저장
-      setWishItem(response.data.wishlist.length);
-      console.log("wish 상품 개수: " + wishItem);
+      switch (type) {
+        case 'wish':
+          setWishItem(response.data.wishlist.length);
+        break;
+        case 'cart':
+          setCartItem(response.data.totalItems);
+        break;
+        default:
+          break;
+      }
+      console.log(type, " 상품 개수: " + wishItem);
     } catch (error) {
       console.error("Error:", error.message, error.response);
       if (error.response?.status === 401) {
         console.error("인증 오류: ", error);
       } else {
-        console.error("사용자 Wish 정보를 가져오는 중 오류가 발생했습니다: ", error);
+        console.error("사용자 ", type, " 정보를 가져오는 중 오류가 발생했습니다: ", error);
       }
     } finally {
       setIsLoading(false);
@@ -157,7 +166,7 @@ const ProductList = () => {
       if(id != null) {
         await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}?userid=${id}`);
         console.log(`위시리스트에 상품(${product.id}) 추가 성공`);
-        getWishCount(); // 사용자 Wish Data 요청 호출
+        getWishCartCount('wish'); // 사용자 Wish Data 요청 호출
       } else {
         alert("로그인 후에 이용해주세요.");
       }
@@ -209,7 +218,6 @@ const ProductList = () => {
 
   const openCartModal = () => setIsCartModalOpen(true);
   const closeCartModal = () => setIsCartModalOpen(false);
-  const openWishModal = () => setIsWishModalOpen(true);
   
   // 상품 상세 화면 이동
   const handleProductClick = (productId) => {
@@ -226,6 +234,15 @@ const ProductList = () => {
     }
   }
 
+  // 11.28 - uj
+  // wish 목록 이동
+  const handleCartClick = () => {
+    if(id != null) {
+      navigate(`/cart`);
+    } else {
+      alert("로그인 후에 이용해주세요.");
+    }
+  }
   
   return (
     <div className={styles.container}>
@@ -414,21 +431,21 @@ const ProductList = () => {
           </motion.div>
           <motion.div
             className={styles.floatingButton}
-            data-totalitems={cartItems.length}
+            data-totalitems={cartItem}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={openCartModal}
+            onClick={handleCartClick}
           >
             <i className="fas fa-shopping-cart"></i>
           </motion.div>
         </div>
 
-        {/* 모달 (장바구니, 위시리스트) */}
+        {/* 모달 (장바구니) */}
         <ListModal
         isOpen={isCartModalOpen}
         onClose={closeCartModal}
         title="장바구니"
-        items={cartItems}
+        items={cartItem}
         onRemove={removeFromCart}
         onQuantityChange={updateCartQuantity}
         isLoggedIn={isLoggedIn}
