@@ -1,6 +1,7 @@
 package com.example.demo.configuration;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Map;
 
+@Primary
 @Configuration
 @Service
+//OAuth2 인증한 사용자 정보
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
