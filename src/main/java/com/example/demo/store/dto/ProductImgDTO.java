@@ -1,5 +1,6 @@
 package com.example.demo.store.dto;
 
+import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.entity.ProductImgEntity;
 
 import lombok.AllArgsConstructor;
@@ -25,8 +26,10 @@ public class ProductImgDTO {
     // 이미지 출력
     public static ProductImgDTO toGetProductImgDTO(ProductImgEntity entity) {
         ProductImgDTO dto = new ProductImgDTO();
+        NCPObjectStorageDTO ncpDTO = new NCPObjectStorageDTO();
+
         dto.setId(entity.getId());
-        dto.setFileName(entity.getFileName());
+        dto.setFileName(ncpDTO.getURL() + entity.getFileName());
         dto.setOriginalFileName(entity.getOriginalFileName());
         dto.setLayer(entity.getLayer());
 
