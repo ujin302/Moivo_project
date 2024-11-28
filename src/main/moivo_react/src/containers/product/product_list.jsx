@@ -11,123 +11,109 @@ import ListModal from "./pro_components/list_modal";
 import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
-  const { isLoggedIn, token } = useContext(AuthContext);
-  const [products, setProducts] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("newest");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const { isLoggedIn, token } = useContext(AuthContext); // 인증 컨텍스트에서 토큰 가져오기
+  const [categories, setCategories] = useState([]); // 동적으로 가져올 카테고리
+  const [activeCategory, setActiveCategory] = useState("All"); // 선택된 카테고리 상태
+  const [products, setProducts] = useState([]); // 상품 리스트
+  const [sortBy, setSortBy] = useState("newest"); // 정렬 기준
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const itemsPerPage = 15; // 한 페이지당 상품 개수
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([]);
-  const [wishItems, setWishItems] = useState([]);
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [isWishModalOpen, setIsWishModalOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
+  const [cartItems, setCartItems] = useState([]); // 장바구니 아이템
+  const [wishItems, setWishItems] = useState([]); // 위시리스트 아이템
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false); // 장바구니 모달
+  const [isWishModalOpen, setIsWishModalOpen] = useState(false); // 위시리스트 모달
+  const [searchOpen, setSearchOpen] = useState(false); // 검색창 상태
+  const [searchTerm, setSearchTerm] = useState(""); // 검색어
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+
+  // **카테고리 데이터 가져오기**
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${PATH.SERVER}/api/store`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data && response.data.category) {
+          setCategories([{ id: 0, name: "All" }, ...response.data.category]); // "All" 기본 추가
+        } else {
+          console.error("카테고리 데이터를 불러올 수 없습니다.");
+        }
+      } catch (error) {
+        console.error("카테고리 로드 중 오류 발생:", error);
+      }
+    };
+
+    fetchCategories();
+  }, [token]);
+
+  // **상품 데이터 가져오기**
   useEffect(() => {
     const fetchProducts = async () => {
-      setIsLoading(true);
+      setIsLoading(true); // 로딩 상태 시작
       try {
-        const headers = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
+        const headers = { Authorization: `Bearer ${token}` }; // 헤더 설정
 
         const response = await axios.get(`${PATH.SERVER}/api/store`, {
           headers,
           params: {
             page: currentPage - 1,
             size: itemsPerPage,
-            sortBy: sortBy,
-            categoryId: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
+            sortby: sortBy,
+            categoryid: activeCategory === "All" ? 0 : activeCategory, // "All"은 0으로 처리
             keyword: searchTerm,
-          }
+          },
         });
-        
-        if (response.data) {
-          setProducts(response.data.productList || []);
+
+        if (response.data && response.data.productList) {
+          setProducts(response.data.productList); // 상품 리스트 설정
+        } else {
+          setProducts([]); // 데이터가 없을 경우 초기화
         }
       } catch (error) {
-        if (error.response?.status === 401) {
-          console.error("인증 오류:", error);
-        } else {
-          console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
-        }
+        console.error("상품 데이터 로드 중 오류 발생:", error);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // 로딩 상태 종료
       }
     };
 
     fetchProducts();
   }, [activeCategory, sortBy, currentPage, searchTerm, token]);
 
-  const categories = ["All", "Outer", "Top", "Bottom"];
+  // **카테고리 클릭 핸들러**
+  const handleCategoryClick = (categoryId) => {
+    setActiveCategory(categoryId);
+    setCurrentPage(1); // 페이지를 첫 번째로 초기화
+  };
 
+  // **장바구니 추가 핸들러**
   const handleAddToCart = (product) => {
     const existingItem = cartItems.find((item) => item.id === product.id);
-  
     if (existingItem) {
       setCartItems((prev) =>
         prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         )
       );
     } else {
-      const cartProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        img: product.img || '',
-        quantity: 1,
-      };
-      setCartItems((prev) => [...prev, cartProduct]);
+      setCartItems((prev) => [...prev, { ...product, quantity: 1 }]);
     }
-    setIsCartModalOpen(true);
+    setIsCartModalOpen(true); // 모달 열기
   };
-  
+
+  // **위시리스트 추가 핸들러**
   const handleAddToWish = (product) => {
-    const existingItem = wishItems.find((item) => item.id === product.id);
-  
-    if (!existingItem) {
-      const wishProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        img: product.img || '',
-      };
-      setWishItems((prev) => [...prev, wishProduct]);
+    if (!wishItems.find((item) => item.id === product.id)) {
+      setWishItems((prev) => [...prev, product]);
       setIsWishModalOpen(true);
     }
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== productId));
-  };
-
-  const updateCartQuantity = (productId, quantity) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const removeFromWish = (productId) => {
-    setWishItems((prev) => prev.filter((item) => item.id !== productId));
-  };
-
-  const openCartModal = () => setIsCartModalOpen(true);
-  const closeCartModal = () => setIsCartModalOpen(false);
-  const openWishModal = () => setIsWishModalOpen(true);
-  const closeWishModal = () => setIsWishModalOpen(false);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-
+  // **상품 상세 보기 핸들러**
   const handleProductClick = (productId) => {
     navigate(`/product-detail/${productId}`);
   };
@@ -137,9 +123,10 @@ const ProductList = () => {
       <Banner />
       <div className={styles.productListWrapper}>
         <div className={styles.filterSection}>
+          {/* 카테고리 필터 */}
           <div className={styles.searchAndCategories}>
             <motion.div
-              className={`${styles.searchContainer} ${searchOpen ? styles.open : ''}`}
+              className={`${styles.searchContainer} ${searchOpen ? styles.open : ""}`}
               animate={{ width: searchOpen ? "300px" : "40px" }}
               transition={{ duration: 0.3 }}
             >
@@ -164,19 +151,20 @@ const ProductList = () => {
             <div className={styles.categoryList}>
               {categories.map((category) => (
                 <motion.button
-                  key={category}
+                  key={category.id}
                   className={`${styles.categoryItem} ${
-                    activeCategory === category ? styles.active : ''
+                    activeCategory === category.id ? styles.active : ""
                   }`}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => handleCategoryClick(category.id)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.85 }}
                 >
-                  {category}
+                  {category.name}
                 </motion.button>
               ))}
             </div>
           </div>
+          {/* 정렬 */}
           <select
             className={styles.sortDropdown}
             value={sortBy}
@@ -198,7 +186,7 @@ const ProductList = () => {
           }}
         >
           <AnimatePresence mode="popLayout">
-            {currentItems.map((product) => (
+            {products.map((product) => (
               <motion.div
                 key={product.id}
                 className={styles.productCard}
@@ -210,7 +198,6 @@ const ProductList = () => {
               >
                 <div className={styles.productImageWrapper}>
                   <img
-                    // src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
                     src={product.img}
                     alt={product.name}
                     className={styles.productImage}
@@ -270,10 +257,12 @@ const ProductList = () => {
           >
             &lt;
           </button>
-          {Array.from({ length: totalPages }, (_, index) => (
+          {Array.from({ length: Math.ceil(products.length / itemsPerPage) }, (_, index) => (
             <button
               key={index}
-              className={`${styles.pageButton} ${currentPage === index + 1 ? styles.active : ""}`}
+              className={`${styles.pageButton} ${
+                currentPage === index + 1 ? styles.active : ""
+              }`}
               onClick={() => setCurrentPage(index + 1)}
             >
               {index + 1}
@@ -282,14 +271,14 @@ const ProductList = () => {
           <button
             className={styles.pageButton}
             onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === Math.ceil(products.length / itemsPerPage)}
           >
             &gt;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(Math.ceil(products.length / itemsPerPage))}
+            disabled={currentPage === Math.ceil(products.length / itemsPerPage)}
           >
             &raquo;
           </button>
@@ -301,7 +290,7 @@ const ProductList = () => {
             data-totalitems={wishItems.length}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={openWishModal}
+            onClick={() => setIsWishModalOpen(true)}
           >
             <i className="fas fa-heart"></i>
           </motion.div>
@@ -310,32 +299,40 @@ const ProductList = () => {
             data-totalitems={cartItems.length}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={openCartModal}
+            onClick={() => setIsCartModalOpen(true)}
           >
             <i className="fas fa-shopping-cart"></i>
           </motion.div>
         </div>
 
-        {/* 모달 (장바구니, 위시리스트) */}
+        {/* 장바구니 모달 */}
         <ListModal
-        isOpen={isCartModalOpen}
-        onClose={closeCartModal}
-        title="장바구니"
-        items={cartItems}
-        onRemove={removeFromCart}
-        onQuantityChange={updateCartQuantity}
-        isLoggedIn={isLoggedIn}
-        navigate={navigate}
-      />
-      <ListModal
-        isOpen={isWishModalOpen}
-        onClose={closeWishModal}
-        title="위시리스트"
-        items={wishItems}
-        onRemove={removeFromWish}
-        isLoggedIn={isLoggedIn}
-        navigate={navigate}
-      />
+          isOpen={isCartModalOpen}
+          onClose={() => setIsCartModalOpen(false)}
+          title="장바구니"
+          items={cartItems}
+          onRemove={(id) => setCartItems((prev) => prev.filter((item) => item.id !== id))}
+          onQuantityChange={(id, quantity) =>
+            setCartItems((prev) =>
+              prev.map((item) =>
+                item.id === id ? { ...item, quantity } : item
+              )
+            )
+          }
+          isLoggedIn={isLoggedIn}
+          navigate={navigate}
+        />
+
+        {/* 위시리스트 모달 */}
+        <ListModal
+          isOpen={isWishModalOpen}
+          onClose={() => setIsWishModalOpen(false)}
+          title="위시리스트"
+          items={wishItems}
+          onRemove={(id) => setWishItems((prev) => prev.filter((item) => item.id !== id))}
+          isLoggedIn={isLoggedIn}
+          navigate={navigate}
+        />
 
         <LoadingModal isOpen={isLoading} />
       </div>
