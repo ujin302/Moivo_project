@@ -13,6 +13,7 @@ import LoadingModal from "./LoadingModal";
 const ProductList = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
   const [products, setProducts] = useState([]); // 상품 List
+  const [currentPage, setCurrentPage] = useState(0);
   const [pageInfo, setPageInfo] = useState({ // 페이징 정보
     "isFirst" : false,  // 1 페이지 여부
     "isLast" : false, // 마지막 페이지 여부
@@ -23,19 +24,25 @@ const ProductList = () => {
     "endPage" : 0 // 블락 마지막 페이지 수
   });
   const pageBlock = 3;
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("newest");
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 1;
-  const navigate = useNavigate();
+  const itemsPerPage = 5; // 화면에 보여지는 상품 개수 
+
+  const [sortBy, setSortBy] = useState("newest"); 
+  // const categories = ["All", "Outer", "Top", "Bottom"]; // 카테고리
+  const [categories, setCategories] = useState([{ id: 0, name: '전체' }]); // 카테고리 List
+  const [activeCategory, setActiveCategory] = useState({ id: 0, name: '전체' });
+  
   const [cartItems, setCartItems] = useState([]);
   const [wishItems, setWishItems] = useState([]);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isWishModalOpen, setIsWishModalOpen] = useState(false);
+  
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  
   const [isLoading, setIsLoading] = useState(false);
-
+  
+  const navigate = useNavigate();
+  
   // 페이지 렌더링
   useEffect(() => {
     console.log("useEffect");
@@ -67,9 +74,12 @@ const ProductList = () => {
             startPage: response.data.startPage,
             endPage: response.data.endPage
           });
-          // setCurrentPage(response.data.currentPage);
-          setCurrentPage(0);
+
+          setCategories([{ id: 0, name: '전체' }, ...response.data.category]);
+
+
           console.log(response.data);
+          console.log(categories);
           console.log(products);
           console.log(pageInfo);
           console.log(currentPage);
@@ -88,64 +98,70 @@ const ProductList = () => {
     fetchProducts();
   }, []);
 
+  // 11.28 - uj
   // 페이지 넘어가기 
   const onClickPage = async (page) => {
-    
     setIsLoading(true);
     try {
-        const headers = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        console.log("page : " + page);
-        const response = await axios.get(`${PATH.SERVER}/api/store`, {
-          headers,
-          params: {
-            page: page,
-            size: itemsPerPage,
-            sortBy: sortBy,
-            keyword: searchTerm,
-            block: pageBlock
-          }
-        });
-        console.log(response.data);
-        
-        // DB 데이터 저장
-        if (response.data) {
-          // 상품 데이터 설정
-          setProducts(response.data.productList || []);
-          // 페이지 데이터 설정
-          setPageInfo({
-            isFirst: response.data.isFirst,
-            isLast: response.data.isLast,
-            hasPrevious: response.data.hasPrevious,
-            hasNext: response.data.hasNext,
-            totalPages: response.data.totalPages,
-            startPage: response.data.startPage,
-            endPage: response.data.endPage
-          });
-          // 현재 페이지 설정
-          setCurrentPage(page);
-
-          console.log(response.data);
-          console.log(products);
-          console.log(pageInfo);
-          console.log("현재 페이지: " + currentPage);
-        }
-      } catch (error) {
-        console.error("Error:", error.message, error.response);
-        if (error.response?.status === 401) {
-          console.error("인증 오류:", error);
-        } else {
-          console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
-        }
-      } finally {
-        setIsLoading(false);
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
+      
+      console.log("page : " + page);
+      // alert(sortBy)
+      const response = await axios.get(`${PATH.SERVER}/api/store`, {
+        headers,
+        params: {
+          page: page,
+          size: itemsPerPage,
+          sortby: sortBy,
+          keyword: searchTerm,
+          block: pageBlock,
+          categoryid: activeCategory.id
+        }
+      });
+      console.log(response.data);
+      
+      // DB 데이터 저장
+      if (response.data) {
+        // 상품 데이터 설정
+        setProducts(response.data.productList || []);
+        // 페이지 데이터 설정
+        setPageInfo({
+          isFirst: response.data.isFirst,
+          isLast: response.data.isLast,
+          hasPrevious: response.data.hasPrevious,
+          hasNext: response.data.hasNext,
+          totalPages: response.data.totalPages,
+          startPage: response.data.startPage,
+          endPage: response.data.endPage
+        });
+        // 현재 페이지 설정
+        setCurrentPage(page);
+
+        console.log(response.data);
+        console.log(products);
+        console.log(pageInfo);
+        console.log("현재 페이지: " + currentPage);
+      }
+    } catch (error) {
+      console.error("Error:", error.message, error.response);
+      if (error.response?.status === 401) {
+        console.error("인증 오류:", error);
+      } else {
+        console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const categories = ["All", "Outer", "Top", "Bottom"];
+  // 11.28 - uj
+  // 카테고리, 정렬, 검색에 따른 상품 목록 렌더링
+  useEffect(() => {
+    onClickPage(0);
+  }, [sortBy, searchTerm, activeCategory]);
 
   // Cart 아이템 추가
   const handleAddToCart = (product) => {
@@ -186,7 +202,7 @@ const ProductList = () => {
     }
   };
 
-  // Cart 아이템 제거
+  // Cart 아이템 제거 ff
   const removeFromCart = (productId) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
@@ -219,8 +235,10 @@ const ProductList = () => {
     <div className={styles.container}>
       <Banner />
       <div className={styles.productListWrapper}>
+        {/* 상품 상단 */}
         <div className={styles.filterSection}>
           <div className={styles.searchAndCategories}>
+            {/* 검색바 */}
             <motion.div
               className={`${styles.searchContainer} ${searchOpen ? styles.open : ''}`}
               animate={{ width: searchOpen ? "300px" : "40px" }}
@@ -244,22 +262,25 @@ const ProductList = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </motion.div>
+            {/* 카테고리 */}
             <div className={styles.categoryList}>
               {categories.map((category) => (
                 <motion.button
-                  key={category}
+                  key={category.id}
                   className={`${styles.categoryItem} ${
                     activeCategory === category ? styles.active : ''
                   }`}
+                  // onClick={() => setActiveCategory(category)}
                   onClick={() => setActiveCategory(category)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.85 }}
                 >
-                  {category}
+                  {category.name}
                 </motion.button>
               ))}
             </div>
           </div>
+          {/* 정렬 */}
           <select
             className={styles.sortDropdown}
             value={sortBy}
