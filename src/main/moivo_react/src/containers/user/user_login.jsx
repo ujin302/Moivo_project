@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { PATH } from "../../../scripts/path";
 import styles from '../../assets/css/user_login.module.css';
 import axios from 'axios';
 
@@ -15,7 +16,7 @@ const user_login = () => {
     const fetchUserData = async () => {
         const token = sessionStorage.getItem("token"); // JWT를 가져옴
         try {
-            const response = await axios.get("http://localhost:8080/api/user/info", {    //  /api/user -> LoginController로 이동
+            const response = await axios.get(`${PATH.SERVER}/api/user/info`, {    //  /api/user -> LoginController로 이동
                 headers: {
                     Authorization: `Bearer ${token}`, // 헤더에 JWT 추가
                 },
@@ -30,7 +31,7 @@ const user_login = () => {
         e.preventDefault();
         try {
             console.log(formData);
-            const response = await axios.post("http://localhost:8080/api/user/login", formData);
+            const response = await axios.post(`${PATH.SERVER}/api/user/login`, formData);
 
             const {jwt, id, wishId, paymentId} = response.data;
 
@@ -39,7 +40,8 @@ const user_login = () => {
             sessionStorage.setItem("wishId", wishId);
             sessionStorage.setItem("paymentId", paymentId);
             
-            login();
+            login({ id, wishId, paymentId }, jwt);
+            
             alert("로그인 성공!");
             navigate("/");
         } catch (error) {

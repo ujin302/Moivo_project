@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.example.demo.user.dto.UserDTO;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +31,15 @@ public class UserEntity { // 사용자 & 관리자
 
     public enum Grade {
         LV1, LV2, LV3, LV4, LV5
+        // 0, 10, 30, 50, 70
     }
+
+    //양방량 매핑시킴
+    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WishEntity wishEntity; // Wish와 연결
+
+    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CartEntity cartEntity; // Cart와 연결
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,6 +81,7 @@ public class UserEntity { // 사용자 & 관리자
     private Grade grade = Grade.LV1;
     private double height;
     private double weight;
+
 
     // DTO -> Entity
 
@@ -123,4 +134,32 @@ public class UserEntity { // 사용자 & 관리자
 
         return entity;
     }
+
+    // Entity -> DTO 변환
+    public static UserDTO toGetUserDTO(UserEntity userEntity) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(userEntity.getId());
+        userDTO.setUserId(userEntity.getUserId());
+        userDTO.setName(userEntity.getName());
+        userDTO.setPwd(userEntity.getPwd());
+        userDTO.setEmail(userEntity.getEmail());
+        userDTO.setTel(userEntity.getTel());
+        userDTO.setBirth(userEntity.getBirth());
+        userDTO.setAddr1(userEntity.getAddr1());
+        userDTO.setAddr2(userEntity.getAddr2());
+        userDTO.setZipcode(userEntity.getZipcode());
+        userDTO.setGender(userEntity.getGender());
+        userDTO.setLoginType(userEntity.getLoginType());
+        userDTO.setAdmin(userEntity.isAdmin());
+        userDTO.setGrade(userEntity.getGrade()); 
+        userDTO.setHeight(userEntity.getHeight());
+        userDTO.setWeight(userEntity.getWeight());
+
+        return userDTO;
+    }
+
+    // 토큰 갱신 관련 _241127_sc
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
 }

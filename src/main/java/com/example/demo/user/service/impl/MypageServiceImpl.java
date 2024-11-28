@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.coupon.dto.CouponDTO;
+import com.example.demo.coupon.entity.CouponEntity;
+import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.entity.UserEntity;
@@ -26,15 +30,39 @@ public class MypageServiceImpl implements MypageService {
     @Autowired
     private WishRepository wishRepository;
 
+    @Autowired
+    private UserCouponRepository userCouponRepository;
+    
     // @Autowired
     //private AttendanceRepository attendanceRepository; // 출석
 
     @Override
-    public UserDTO getUserInfo(int userseq) {
-        UserEntity userEntity = userRepository.findById(userseq)
+    public UserDTO getUserInfo(int id) {
+        UserEntity userEntity = userRepository.findById(id)
                                               .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
         
-        return UserDTO.toGetUserDTO(userEntity);
+    // 쿠폰 정보 가져오기
+        List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(id)
+            .stream()
+            .map(userCoupon -> {
+                CouponEntity coupon = userCoupon.getCouponEntity();
+                return new CouponDTO(
+                    coupon.getId(),
+                    coupon.getName(),
+                    coupon.getGrade(),
+                    coupon.getDiscountType(),
+                    coupon.getDiscountValue(),
+                    coupon.getMinOrderPrice(),
+                    coupon.getActive()
+                );
+            })
+            .collect(Collectors.toList());
+
+        // UserDTO로 변환
+        UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
+        userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
+
+        return userDTO;
     }
 
     // @Override
@@ -50,8 +78,8 @@ public class MypageServiceImpl implements MypageService {
     // }
 
     @Override
-    public List<WishDTO> getWishlist(int userseq) {
-        List<WishEntity> wishEntities = wishRepository.findByUserEntity_Id(userseq);
+    public List<WishDTO> getWishlist(int id) {
+        List<WishEntity> wishEntities = wishRepository.findByUserEntity_Id(id);
         if (wishEntities.isEmpty()) {
             throw new RuntimeException("No wishlist items found for the user.");
         }

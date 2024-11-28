@@ -1,5 +1,6 @@
 package com.example.demo.store.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -17,34 +18,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/api/user/store")
+@RequestMapping("/api/store")
 public class StoreController {
 
     @Autowired
     private ProductService productService;
 
-    // 상품 페이징 처리
-    // 상품 검색
-    // 상품 상세 화면 (리뷰 포함)
-    @GetMapping("/{productSeq}")
-    public ResponseEntity<?> getProductDetail(@PathVariable int productSeq) {
-        System.out.println(productSeq);
-        Map<String, Object> map = productService.getProduct(productSeq);
-        // 값 존재 X
-        if (map == null)
-            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
-
-        // 값 존재 O
-        return ResponseEntity.ok(map);
-    }
-
-    //상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang
+    // 상품 리스트, 카테고리별 검색 or 키워드별 검색 후 페이징처리-11/25-tang
     @GetMapping("")
     public ResponseEntity<?> getProductAll(
-            @PageableDefault(page = 0, size = 9, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(page = 0, size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "block", required = false, defaultValue = "3") int block,
             @RequestParam(name = "sortby", required = false, defaultValue = "newest") String sortby,
             @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid,
-            @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword) {
+            @RequestParam(name = "keyword", required = false) String keyword) {
+
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("pageable", pageable); // 페이지 처리
+        dataMap.put("block", block); // 한 페이지에 보여줄 숫자
+        dataMap.put("sortby", sortby); // 정렬 기준
+        dataMap.put("categoryid", categoryid); // 카테고리 정렬 기준
+        dataMap.put("keyword", keyword); // 검색어
+
+        Map<String, Object> map = productService.getProductList(dataMap);
 
         //400 Bad Request: 잘못된 요청
         if (categoryid < 0 || sortby.isEmpty()) {
@@ -57,13 +53,26 @@ public class StoreController {
 //            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("401 Unauthorized");
 //        }
 
-        Map<String, Object> map = productService.getProductList(pageable, sortby, categoryid, keyword);
-        //404 값 존재 X
+        // 값 존재 X
         if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
 
-        //200 값 존재 O
+        // 값 존재 O
         return ResponseEntity.ok(map);
+    }
+
+    // 개별 상품 상세 정보 요청_241127-sc
+    @GetMapping("/product-detail/{productId}")
+    public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
+        try {
+            Map<String, Object> productData = productService.getProduct(productId);
+            if (productData == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(productData);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 }

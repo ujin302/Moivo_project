@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "../../assets/css/upload.module.css";
 import axios from "axios";
+import { PATH } from "../../../scripts/path";
 import Banner from "../../components/Banner/banner";
 
 const Upload = () => {
@@ -30,7 +31,7 @@ const Upload = () => {
 
   useEffect(() => {
     // 카테고리 정보 가져오기
-    axios.get("/api/categories").then((res) => {
+    axios.get(`${PATH.SERVER}/api/admin/store/category`).then((res) => {
       if (Array.isArray(res.data)) {
         setCategories(res.data);
       } else {
@@ -72,6 +73,13 @@ const Upload = () => {
 
   // 업로드 핸들러
   const handleUpload = async () => {
+    // const token = sessionStorage.getItem('token');
+    // if (!token) {
+    //   alert('관리자 로그인이 필요합니다.');
+    //   return;
+    // } ....
+    const formData = new FormData();
+
     if (
       !product.name ||
       !product.price ||
@@ -81,46 +89,37 @@ const Upload = () => {
       alert("모든 상품 정보를 입력해주세요.");
       return;
     }
-
+  
     if (!files.layer1 || !files.layer4 || files.layer2.length === 0 || files.layer3.length === 0) {
       alert("모든 레이어의 이미지를 업로드해주세요.");
       return;
     }
-
-    const formData = new FormData();
+  
+    // const formData = new FormData();
     formData.append("name", product.name);
     formData.append("price", product.price);
     formData.append("content", product.content);
     formData.append("categoryId", product.categoryId);
-
+  
     // 재고 데이터 추가
     Object.entries(stock).forEach(([size, count]) => {
       formData.append(`stock[${size}]`, count);
     });
 
-    // 파일 추가 (layer 정보와 함께)
-    formData.append("files", files.layer1);
-    formData.append("layers", 1);
-
-    files.layer2.forEach((file) => {
-      formData.append("files", file);
-      formData.append("layers", 2);
-    });
-
-    files.layer3.forEach((file) => {
-      formData.append("files", file);
-      formData.append("layers", 3);
-    });
-
-    formData.append("files", files.layer4);
-    formData.append("layers", 4);
+    // 사용자 파일 추가 (layer 정보와 함께)
+    formData.append("layer1", files.layer1); // 단일 파일
+    files.layer2.forEach((file) => formData.append("layer2", file)); // 다중 파일
+    files.layer3.forEach((file) => formData.append("layer3", file)); // 다중 파일
+    formData.append("layer4", files.layer4); // 단일 파일
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/store/upload",
+        `${PATH.SERVER}/api/admin/store/product`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
               (progressEvent.loaded * 100) / progressEvent.total
@@ -130,11 +129,13 @@ const Upload = () => {
         }
       );
 
-      alert("상품 업로드가 완료되었습니다.");
-      resetForm();
+      if (response.status === 200) {
+        alert("상품이 성공적으로 등록되었습니다.");
+        resetForm();
+      }
     } catch (error) {
-      console.error("업로드 실패:", error.response.data);
-      alert(`업로드에 실패했습니다: ${error.response.data.message}`);
+      console.error("업로드 실패:", error);
+      alert("상품 등록에 실패했습니다. 다시 시도해주세요.");
     }
   };
 

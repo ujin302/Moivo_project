@@ -22,7 +22,7 @@ public class CouponEntity {
     private String name; // 쿠폰 이름 
     private String grade; // 쿠폰 등급
 
-     @Column(name = "discounttype")
+    @Column(name = "discounttype")
     private String discountType; // 할인 타입
 
     @Column(name = "discountvalue")

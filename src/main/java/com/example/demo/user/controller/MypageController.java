@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.demo.user.dto.CartDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.MypageService;
@@ -21,36 +20,36 @@ public class MypageController {
     @Autowired
     private MypageService mypageService;
 
-    // 회원 정보
-    @GetMapping("/info/{userseq}")
-    public ResponseEntity<UserDTO> getUserInfo(@PathVariable int userseq) {
-        UserDTO userInfo = mypageService.getUserInfo(userseq);
-
+    // 회원 정보 (포스트맨 테스트 성공)
+    @GetMapping("/info/{id}")
+    public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) {
+        UserDTO userInfo = mypageService.getUserInfo(id);
+        System.out.println(userInfo);
         return ResponseEntity.ok(userInfo);
     }
 
     // // 쿠폰 정보 조회
-    // @GetMapping("/coupons/{userSeq}")
+    // @GetMapping("/coupons/{id}")
     // public ResponseEntity<List<CouponDTO>> getCoupons(@PathVariable int userSeq) {
     //     List<CouponDTO> coupons = mypageService.getCoupons(userSeq);
     //     return ResponseEntity.ok(coupons);
         
     // }
 
-    // 위시리스트 조회
-    @GetMapping("/wishlist/{userSeq}")
-    public ResponseEntity<List<WishDTO>> getWishlist(@PathVariable int userSeq) {
+    // 위시리스트 조회  (포스트맨 테스트 성공)
+    @GetMapping("/wishlist/{id}")
+    public ResponseEntity<List<WishDTO>> getWishlist(@PathVariable int id) {
 
-            List<WishDTO> wishlist = mypageService.getWishlist(userSeq);
+            List<WishDTO> wishlist = mypageService.getWishlist(id);
             return ResponseEntity.ok(wishlist);
         
     }
 /*
     // 주문 내역 조회
-    @GetMapping("/orders/{userSeq}")
+    @GetMapping("/orders/{id}")
     public ResponseEntity<List<OrderDTO>> getOrders(@PathVariable int userSeq) {
         try {
-            List<OrderDTO> orders = mypageService.getOrders(userSeq);
+            List<OrderDTO> orders = mypageService.getOrders(id);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

@@ -23,6 +23,7 @@ const Banner = () => {
       title: 'COMMUNITY',
       submenu: [
         { name: '파일업로드(임시)', navigateTo: '/upload' },
+        { name: '파일수정(임시)', navigateTo: '/update' },
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
         { name: 'REVIEW', navigateTo: '/qna/review' }
@@ -87,6 +88,7 @@ const Banner = () => {
           {isLoggedIn ? (
             <>
               <a href="/mypage" className={styles.utilityLink}>My Page</a>
+              <a href="/cart" className={styles.utilityLink}>Cart</a>
               <button onClick={handleLogout} className={styles.logoutButton}>Logout</button>
             </>
           ) : (
@@ -96,19 +98,12 @@ const Banner = () => {
             </>
           )}
 
-          <a href='/product-search' className={styles.utilityLink}>Search</a>
-
           <div className={styles.loginStatus}>
             <span>
               <span className={`${styles.status} ${isLoggedIn ? styles.on : styles.off}`}></span>
               {isLoggedIn ? 'ON' : 'OFF'}
             </span>
-            {isLoggedIn && (
-              <>
-                <span className={styles.expirationLabel}>로그인 만료</span>
-                <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span>
-              </>
-            )}
+            {isLoggedIn && ( <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span> )}
           </div>
 
         </div>

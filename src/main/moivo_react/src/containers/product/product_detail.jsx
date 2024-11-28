@@ -1,131 +1,103 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import styles from "../../assets/css/product_detail.module.css";
-import Banner from "../../components/Banner/banner";
-import Footer from "../../components/Footer/Footer";
-import products from "../../assets/dummydata/productDTO";
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaHeart, FaShoppingCart } from "react-icons/fa";
+import { AuthContext } from "../../contexts/AuthContext";
+import { PATH } from "../../../scripts/path";
+import Banner from "../../components/Banner/banner";
+import Footer from "../../components/Footer/Footer";
+import LoadingModal from "./LoadingModal";
+import styles from "../../assets/css/product_detail.module.css";
 
 const ProductDetail = () => {
-  /* ===== STATE MANAGEMENT ===== */
+  const { isLoggedIn, token } = useContext(AuthContext);
   const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [mainImg, setMainImg] = useState("");
-  const [selectedSize, setSize] = useState("");
-  const [quantity, setQuantity] = useState(1);
-
-  /* ===== DUMMY DATA ===== */
-  // 리뷰 더미 데이터
-  const [reviews] = useState([
-    {
-      id: 1,
-      username: "user1",
-      rating: 5,
-      content: "정말 좋은 상품이에요!",
-      date: "2024-03-20"
-    },
-    {
-      id: 2,
-      username: "user2",
-      rating: 4,
-      content: "배송이 빨라요",
-      date: "2024-03-19"
-    }
-  ]);
-
-  // 재고 더미 데이터
-  const [stockData] = useState([
-    { id: 7, size: 'S', count: 2, productId: 13 },
-    { id: 8, size: 'M', count: 11, productId: 13 },
-    { id: 9, size: 'L', count: 5, productId: 13 }
-  ]);
   
-  const [selectedStock, setSelectedStock] = useState(null);
-
-  // 섬네일 캐러셀을 위한 상태
+  // 상품 데이터 상태
+  const [productData, setProductData] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [category, setCategory] = useState(null);
+  
+  // 이미지 관련 상태
+  const [productImages, setProductImages] = useState([]);
+  const [mainImage, setMainImage] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slidesPerView = 4;
-
-  // 현재 활성화된 탭을 관리하는 state 추가
+  const [slidesPerView, setSlidesPerView] = useState(1);
+  
+  // 사이즈 및 수량 상태
+  const [selectedSize, setSelectedSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [availableSizes, setAvailableSizes] = useState([]);
+  
+  // 리뷰 관련 상태
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const [activeTab, setActiveTab] = useState('상품정보');
 
-  const nextSlide = () => {
-    if (currentSlide < product?.productimg.length - slidesPerView) {
-      setCurrentSlide(prev => prev + 1);
-    }
-  };
+  // 위시리스트 상태
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
-  const prevSlide = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide(prev => prev - 1);
-    }
-  };
+  // 로딩 상태
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const selectedProduct = products.find((product) => product.id === parseInt(id));
-    if (selectedProduct) {
-      setProduct(selectedProduct);
-      setMainImg(selectedProduct.productimg[0].fileurl);
-    } else {
-      setProduct(null);
-    }
-  }, [id]);
-
-  // API 연동 시 사용할 데이터 fetch 함수 (현재는 주석처리)
-  /*
-  useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchProductDetail = async () => {
+      setIsLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8080/api/stock/${id}`);
-        setStockData(response.data);
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const response = await axios.get(`${PATH.SERVER}/api/store/product-detail/${id}`, { headers });
+        
+        if (response.data) {
+          setProductData(response.data);
+          setProduct(response.data.Product);
+          setCategory(response.data.Category);
+          
+          // 이미지 설정
+          const sortedImages = response.data.ImgList.sort((a, b) => a.layer - b.layer);
+          setProductImages(sortedImages);
+          const mainImg = sortedImages.find(img => img.layer === 1);
+          if (mainImg) {
+            setMainImage(mainImg.fileName);
+          }
+          
+          // 재고 설정
+          const stockInfo = response.data.Stock;
+          const sizes = Object.keys(stockInfo).filter(size => stockInfo[size] > 0);
+          setAvailableSizes(sizes);
+          if (sizes.length > 0) {
+            setSelectedSize(sizes[0]);
+          }
+          
+          // 리뷰 설정
+          const reviewList = response.data.ReviewList;
+          setReviews(reviewList);
+          if (reviewList.length > 0) {
+            const totalRating = reviewList.reduce((sum, review) => sum + review.rating, 0);
+            setAverageRating(totalRating / reviewList.length);
+          }
+          setReviewCount(reviewList.length);
+        }
       } catch (error) {
-        console.error('재고 정보를 불러오는데 실패했습니다:', error);
+        console.error("상품 상세 정보를 가져오는데 실패했습니다:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchStockData();
-  }, [id]);
-  */
 
-  // const prevSlide = () => {
-  //   if (currentSlide > 0) {
-  //     setCurrentSlide(prev => prev - 1);
-  //   }
-  // };
-
-  // 사이즈 선택 핸들러
-  const handleSizeChange = (e) => {
-    const size = e.target.value;
-    setSize(size);
-    const stock = stockData.find(item => item.size === size);
-    setSelectedStock(stock);
-    setQuantity(1);
-  };
-
-  // 수량 변경 핸들러
-  const handleQuantityChange = (newQuantity) => {
-    if (selectedStock && newQuantity >= 1 && newQuantity <= selectedStock.count) {
-      setQuantity(newQuantity);
-    }
-  };
-
-  // 탭 변경 핸들러
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-  };
-
-  // 위시리스트 핸들러 추가
-  const handleWishlist = () => {
-    // 로그인 체크 로직이 필요할 수 있습니다
-    navigate(`/mypage/wish?productId=${id}`);
-  };
+    fetchProductDetail();
+  }, [id, token]);
 
   // 구매 핸들러 추가
   const handlePurchase = () => {
-    // 임시로 이동을 막아둡니다
-    // navigate(`/api/payment?productId=${id}`);
-    console.log('구매 기능 준비 중입니다.');
+    if (!isLoggedIn) {
+      navigate('/user');
+    } else {
+      console.log('구매 기능 준비 중');
+    }
   };
 
   /* ===== TAB CONTENT RENDERER ===== */
@@ -246,7 +218,7 @@ const ProductDetail = () => {
               <div className={styles.thumbnailWrapper}>
                 {product?.productimg.slice(currentSlide, currentSlide + slidesPerView).map((img) => (
                   <div 
-                    key={img.id} 
+                    key={img.id || img.fileurl}
                     className={`${styles.thumbnailItem} ${mainImg === img.fileurl ? styles.activeThumbnail : ''}`}
                     onClick={() => setMainImg(img.fileurl)}
                   >
@@ -343,7 +315,7 @@ const ProductDetail = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                구매하기
+                <FaShoppingCart /> 구매하기
               </motion.button>
               <motion.button 
                 className={`${styles.actionBtn} ${styles.wishlistButton}`}
@@ -381,6 +353,9 @@ const ProductDetail = () => {
 
       {/* 푸터 영역 */}
       <Footer />
+      
+      {/* LoadingModal 추가 */}
+      <LoadingModal isOpen={isLoading} />
     </div>
   );
 };
