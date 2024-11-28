@@ -23,52 +23,57 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchProductDetail = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchProductDetail = async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const headers = {};
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await axios.get(
-          `${PATH.SERVER}/api/store/product-detail/${productId}`,
-          { 
-            headers,
-            withCredentials: true 
-          }
-        );
-
-        if (!response.data || !response.data.id) {
-          throw new Error('상품 정보를 불러올 수 없습니다.');
-        }
-
-        if (response.data) {
-          const productData = response.data.product;
-          const productImgs = response.data.productImgs || [];
-          const productStocks = response.data.productStocks || [];
-
-          // 이미지 분류
-          const mainImg = productImgs.find(img => img.layer === 1);
-          const thumbnails = productImgs.filter(img => img.layer === 2);
-          const details = productImgs.filter(img => img.layer === 3);
-
-          setProduct(productData);
-          setMainImage(mainImg ? mainImg.fileName : productData.img);
-          setThumbnailImages(thumbnails);
-          setDetailImages(details);
-          setStocks(productStocks);
-        }
-      } catch (e) {
-        setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
+    try {
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
-      setLoading(false);
-    };
+      console.log('Fetching product detail for ID:', productId);
+      const response = await axios.get(
+        `${PATH.SERVER}/api/store/product-detail/${productId}`,
+        { headers }
+      );
 
+      console.log('API Response:', response.data);
+
+      if (!response.data) {
+        throw new Error('상품 정보를 불러올 수 없습니다.');
+      }
+
+      const { product, imgList, stockList } = response.data;
+      
+      // 상품 기본 정보 설정
+      setProduct(product);
+      
+      // 메인 이미지 설정 (layer가 1인 이미지)
+      const mainImg = imgList.find(img => img.layer === 1);
+      setMainImage(mainImg ? mainImg.fileName : product.img);
+      
+      // 썸네일 이미지 설정 (layer가 2인 이미지들)
+      const thumbnails = imgList.filter(img => img.layer === 2);
+      setThumbnailImages(thumbnails);
+      
+      // 상세 이미지 설정 (layer가 3인 이미지들)
+      const details = imgList.filter(img => img.layer === 3);
+      setDetailImages(details);
+      
+      // 재고 정보 설정
+      setStocks(stockList);
+
+    } catch (error) {
+      console.error('Error fetching product detail:', error);
+      setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProductDetail();
   }, [productId, token]);
 
@@ -103,7 +108,7 @@ const ProductDetail = () => {
       alert('로그인이 필요한 서비스입니다.');
       return;
     }
-    // 위시리스트 추가 로직 구현
+    // 위시리스트 추가 로직 구현  
     console.log('위시리스트에 추가:', product.id);
   };
 

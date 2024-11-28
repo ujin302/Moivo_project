@@ -387,27 +387,40 @@ public class ProductServiceImpl implements ProductService {
         Optional<ProductEntity> productEntityOptional = productRepository.findById(productId);
         if (productEntityOptional.isPresent()) {
             ProductEntity productEntity = productEntityOptional.get();
-            ProductDTO productDTO = ProductDTO.toGetProductDTO(productEntity);
-            resultMap.put("product", productDTO);
             
-            List<ProductImgEntity> productImgEntities = imgRepository.findByProductEntity(productEntity);
-            List<ProductImgDTO> productImgDTOs = productImgEntities.stream()
-                    .map(ProductImgDTO::toGetProductImgDTO)
-                    .collect(Collectors.toList());
-            resultMap.put("productImgs", productImgDTOs);
+            // 상품 기본 정보
+            Map<String, Object> productMap = new HashMap<>();
+            productMap.put("id", productEntity.getId());
+            productMap.put("name", productEntity.getName());
+            productMap.put("content", productEntity.getContent());
+            productMap.put("price", productEntity.getPrice());
+            productMap.put("img", productEntity.getImg());
             
-            List<ProductStockEntity> productStockEntities = stockRepository.findByProductEntity(productEntity);
-            List<ProductStockDTO> productStockDTOs = productStockEntities.stream()
-                .map(entity -> {
-                    ProductStockDTO dto = new ProductStockDTO();
-                    dto.setId(entity.getId());
-                    dto.setProductId(entity.getProductEntity().getId());
-                    dto.setSize(entity.getSize().name());
-                    dto.setCount(entity.getCount());
-                    return dto;
+            // 이미지 리스트
+            List<Map<String, Object>> imgList = productEntity.getImgList().stream()
+                .map(img -> {
+                    Map<String, Object> imgMap = new HashMap<>();
+                    imgMap.put("id", img.getId());
+                    imgMap.put("fileName", img.getFileName());
+                    imgMap.put("layer", img.getLayer());
+                    return imgMap;
                 })
                 .collect(Collectors.toList());
-            resultMap.put("productStocks", productStockDTOs);
+            
+            // 재고 정보
+            List<Map<String, Object>> stockList = productEntity.getStockList().stream()
+                .map(stock -> {
+                    Map<String, Object> stockMap = new HashMap<>();
+                    stockMap.put("id", stock.getId());
+                    stockMap.put("size", stock.getSize().name());
+                    stockMap.put("count", stock.getCount());
+                    return stockMap;
+                })
+                .collect(Collectors.toList());
+            
+            resultMap.put("product", productMap);
+            resultMap.put("imgList", imgList);
+            resultMap.put("stockList", stockList);
         }
         
         return resultMap;

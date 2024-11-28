@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,8 +24,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/store")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 클라이언트 주소 허용 추가 에러 수정용 _김성찬 24.11.28 07:37
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class StoreController {
+
+    private static final Logger logger = LoggerFactory.getLogger(StoreController.class);
 
     @Autowired
     private ProductService productService;
@@ -55,18 +59,21 @@ public class StoreController {
 
     // 개별 상품 상세 정보 요청_241127-sc
     @GetMapping("/product-detail/{productId}")
-    public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
+    public ResponseEntity<?> getProductDetail(@PathVariable("productId") int productId) {
+        logger.info("Fetching product detail for productId: {}", productId);
         try {
             Map<String, Object> productData = productService.getProductDetail(productId);
-            if (productData == null) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+            if (productData == null || productData.isEmpty()) {
+                logger.warn("Product detail not found for productId: {}", productId);
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND)
+                    .body(Map.of("error", "상품을 찾을 수 없습니다."));
             }
-            return ResponseEntity.ok()
-                .header("Access-Control-Allow-Origin", "http://localhost:5173")
-                .header("Access-Control-Allow-Credentials", "true")
-                .body(productData);
+            logger.info("Product detail found for productId: {}", productId);
+            return ResponseEntity.ok(productData);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
+            logger.error("Error fetching product detail for productId: " + productId, e);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "상품 정보를 가져오는 중 오류가 발생했습니다."));
         }
     }
 
