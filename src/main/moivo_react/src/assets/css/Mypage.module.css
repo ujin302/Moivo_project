@@ -408,11 +408,11 @@
     }
 
     .arrowLeft {
-        left: 20px; 
+        left: 6px; 
     }
 
     .arrowRight {
-        right: 20px; 
+        right: 6px; 
     }
 
     .title {
@@ -503,6 +503,10 @@
 
     .menuItem {
         font-size: 16px;
+    }
+
+    .arrow img {
+        width: 20px;
     }
   }
   
