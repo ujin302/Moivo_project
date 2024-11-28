@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { PATH } from "../../../scripts/path";
 import signin from '../../assets/css/user_login.module.css';
 import axios from 'axios';
 
 const user_login = () => {
 
   const navigate = useNavigate();
-  const { login: loginContext } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({ userId: '', pwd: '' });
   const [error, setError] = useState('');
 
@@ -39,7 +40,7 @@ const user_login = () => {
             sessionStorage.setItem("wishId", wishId);
             sessionStorage.setItem("cartid", cartid);
             
-            login({ id, wishId, paymentId }, jwt);
+            login({ id, wishId, cartid }, jwt);
             
             alert("로그인 성공!");
             navigate("/");
