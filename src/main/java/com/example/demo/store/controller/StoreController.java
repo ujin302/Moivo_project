@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.store.service.ProductService;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/store")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 클라이언트 주소 허용 추가 에러 수정용 _김성찬 24.11.28 07:37
 public class StoreController {
 
     @Autowired
@@ -58,7 +61,10 @@ public class StoreController {
             if (productData == null) {
                 return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
             }
-            return ResponseEntity.ok(productData);
+            return ResponseEntity.ok()
+                .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                .header("Access-Control-Allow-Credentials", "true")
+                .body(productData);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

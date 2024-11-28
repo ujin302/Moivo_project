@@ -1,10 +1,10 @@
-import { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FaHeart } from 'react-icons/fa';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from '../../../scripts/path';
-import axios from 'axios';
 import styles from '../../assets/css/product_detail.module.css';
 import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
@@ -14,49 +14,59 @@ const ProductDetail = () => {
   const { productId } = useParams();
   const { token } = useContext(AuthContext);
   const [product, setProduct] = useState(null);
-  const [productImgs, setProductImgs] = useState({ thumbnails: [], details: [] });
-  const [productStocks, setProductStocks] = useState([]);
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
+  const [thumbnailImages, setThumbnailImages] = useState([]);
+  const [detailImages, setDetailImages] = useState([]);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [stocks, setStocks] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
-      setIsLoading(true);
+      setLoading(true);
+      setError(null);
+
       try {
         const headers = {};
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await axios.get(`${PATH.SERVER}/api/store/product-detail/${productId}`, {
-          headers,
-        });
+        const response = await axios.get(
+          `${PATH.SERVER}/api/store/product-detail/${productId}`,
+          { 
+            headers,
+            withCredentials: true 
+          }
+        );
+
+        if (!response.data || !response.data.id) {
+          throw new Error('상품 정보를 불러올 수 없습니다.');
+        }
 
         if (response.data) {
           const productData = response.data.product;
-          const imgData = response.data.productImgs || [];
-          const stockData = response.data.productStocks || [];
+          const productImgs = response.data.productImgs || [];
+          const productStocks = response.data.productStocks || [];
 
-          // 이미지를 layer 값에 따라 분류
-          const mainImg = imgData.find(img => img.layer === 1);
-          const thumbnailImages = imgData.filter(img => img.layer === 2);
-          const detailImages = imgData.filter(img => img.layer === 3);
+          // 이미지 분류
+          const mainImg = productImgs.find(img => img.layer === 1);
+          const thumbnails = productImgs.filter(img => img.layer === 2);
+          const details = productImgs.filter(img => img.layer === 3);
 
           setProduct(productData);
-          setMainImage(mainImg ? mainImg.fileName : '이미지 없음');
-          setProductImgs({
-            thumbnails: thumbnailImages,
-            details: detailImages
-          });
-          setProductStocks(stockData);
+          setMainImage(mainImg ? mainImg.fileName : productData.img);
+          setThumbnailImages(thumbnails);
+          setDetailImages(details);
+          setStocks(productStocks);
         }
-      } catch (error) {
-        console.error('상품 상세 정보를 가져오는 중 오류가 발생했습니다:', error);
-      } finally {
-        setIsLoading(false);
+      } catch (e) {
+        setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
       }
+
+      setLoading(false);
     };
 
     fetchProductDetail();
@@ -75,7 +85,7 @@ const ProductDetail = () => {
     setSelectedProduct({
       id: product.id,
       size: size,
-      count: 1 // 기본 수량을 1로 설정
+      count: 1
     });
   };
 
@@ -84,6 +94,7 @@ const ProductDetail = () => {
       alert('사이즈를 선택해주세요.');
       return;
     }
+    // 구매 로직 구현
     console.log('구매하기:', selectedProduct);
   };
 
@@ -92,11 +103,34 @@ const ProductDetail = () => {
       alert('로그인이 필요한 서비스입니다.');
       return;
     }
+    // 위시리스트 추가 로직 구현
     console.log('위시리스트에 추가:', product.id);
   };
 
-  if (isLoading || !product) {
-    return <LoadingModal isOpen={isLoading} />;
+  if (loading) {
+    return <LoadingModal isOpen={true} />;
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorWrapper}>
+        <div className={styles.errorMessage}>{error}</div>
+        <button 
+          className={styles.retryButton}
+          onClick={() => {
+            setError(null);
+            setLoading(true);
+            fetchProductDetail();
+          }}
+        >
+          재시도
+        </button>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return null;
   }
 
   return (
@@ -107,12 +141,12 @@ const ProductDetail = () => {
           <div className={styles.mainImageContainer}>
             <img 
               src={mainImage} 
-              alt={product.name || '상품 이미지'} 
-              className={styles.mainImage} 
+              alt={product.name} 
+              className={styles.mainImage}
             />
           </div>
           <div className={styles.thumbnailContainer}>
-            {productImgs.thumbnails.map((img) => (
+            {thumbnailImages.map((img) => (
               <img
                 key={img.id}
                 src={img.fileName}
@@ -125,13 +159,13 @@ const ProductDetail = () => {
         </div>
 
         <div className={styles.infoSection}>
-          <h1 className={styles.productName}>{product.name}</h1>
-          <p className={styles.price}>{product.price?.toLocaleString()}원</p>
+          <h1 className={styles.productName}>{product?.name || "상품명 정보가 없습니다."}</h1>
+          <p className={styles.price}>{product?.price?.toLocaleString() || "가격 정보가 없습니다."}</p>
           
           <div className={styles.sizeSection}>
             <h3>사이즈 선택</h3>
             <div className={styles.sizeGrid}>
-              {productStocks.map((stock) => (
+              {stocks.map((stock) => (
                 <button
                   key={stock.id}
                   className={`${styles.sizeButton} ${
@@ -151,7 +185,7 @@ const ProductDetail = () => {
 
           {selectedProduct && (
             <div className={styles.selectedInfo}>
-              <p>선택된 상품: {product.name}</p>
+              <p>선택된 상품: {product?.name || "상품명 정보가 없습니다."}</p>
               <p>사이즈: {selectedProduct.size}</p>
               <p>수량: {selectedProduct.count}</p>
             </div>
@@ -180,8 +214,11 @@ const ProductDetail = () => {
 
       <div className={styles.detailSection}>
         <h2>상품 상세 정보</h2>
+        <div className={styles.content}>
+          <p>{product.content}</p>
+        </div>
         <div className={styles.detailImages}>
-          {productImgs.details.map((img) => (
+          {detailImages.map((img) => (
             <img
               key={img.id}
               src={img.fileName}
@@ -192,43 +229,23 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <div className={styles.reviewSection}>
-        <h2>상품 리뷰</h2>
-        {product.reviews && product.reviews.length > 0 ? (
-          <div className={styles.reviewList}>
-            {product.reviews.map((review) => (
-              <div key={review.id} className={styles.review}>
-                <p className={styles.reviewContent}>{review.content}</p>
-                <p className={styles.reviewAuthor}>{review.author}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
-        )}
-
-        <div className={styles.exampleReviewSection}>
-          <h3>리뷰 예시</h3>
-          <div className={styles.exampleReview}>
-            <p className={styles.reviewContent}>
-              이 상품은 정말 마음에 듭니다. 품질도 좋고 디자인도 멋져요!
-            </p>
-            <p className={styles.reviewAuthor}>홍길동</p>
-          </div>
+      {product.reviewList && (
+        <div className={styles.reviewSection}>
+          <h2>상품 리뷰</h2>
+          {product.reviewList.length > 0 ? (
+            <div className={styles.reviewList}>
+              {product.reviewList.map((review) => (
+                <div key={review.id} className={styles.review}>
+                  <p className={styles.reviewContent}>{review.content}</p>
+                  <p className={styles.reviewAuthor}>{review.author}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+          )}
         </div>
-      </div>
-
-      <div className={styles.qnaSection}>
-        <h2>Q&A</h2>
-        <div className={styles.qna}>
-          <div className={styles.question}>
-            <p>Q: 이 상품은 어떤 소재로 만들어졌나요?</p>
-          </div>
-          <div className={styles.answer}>
-            <p>A: 안녕하세요. 이 상품은 100% 면으로 제작되었습니다. 감사합니다.</p>
-          </div>
-        </div>
-      </div>
+      )}
       <Footer />
     </div>
   );
