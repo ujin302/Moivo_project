@@ -145,5 +145,49 @@ public class CartServiceImpl implements CartService {
         cartEntity.getUserCartList().remove(userCartEntity);
         userCartRepository.delete(userCartEntity);
     }
+
+    // 장바구니 상품 업데이트
+    @Override
+    public void updateCartItem(int cartId, Integer newCount, String newSize) {
+        // 1. 장바구니 항목 찾기
+        UserCartEntity userCartEntity = userCartRepository.findByCartEntity_Id(cartId)
+                .orElseThrow(() -> new RuntimeException("해당 장바구니 항목이 존재하지 않습니다."));
+
+        // 2. 사이즈 업데이트 처리
+        if (newSize != null) {
+            try {
+                ProductStockEntity.Size sizeEnum = ProductStockEntity.Size.valueOf(newSize.toUpperCase());
+                ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
+                        userCartEntity.getProductEntity(),
+                        sizeEnum
+                );
+                if (stockEntity == null || stockEntity.getCount() < (newCount != null ? newCount : userCartEntity.getCount())) {
+                    throw new RuntimeException("해당 사이즈의 재고가 부족합니다.");
+                }
+                userCartEntity.setSize(sizeEnum);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("유효하지 않은 사이즈 값입니다: " + newSize);
+            }
+        }
+
+        // 3. 수량 업데이트 처리
+        if (newCount != null) {
+            if (newCount <= 0) {
+                throw new RuntimeException("수량은 1 이상이어야 합니다.");
+            }
+            ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
+                    userCartEntity.getProductEntity(),
+                    userCartEntity.getSize()
+            );
+            if (stockEntity == null || stockEntity.getCount() < newCount) {
+                throw new RuntimeException("재고가 부족합니다.");
+            }
+            userCartEntity.setCount(newCount);
+        }
+
+        // 4. 업데이트된 데이터를 저장
+        userCartRepository.save(userCartEntity);
+    }
+
 }
 

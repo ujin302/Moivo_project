@@ -39,45 +39,12 @@ const Cart = () => {
   }, [userid]);
 
   console.log(cartItems);
-  const handleQuantityChange = async (id, action) => {
-    const currentItem = cartItems.find((item) => item.cartid === id);
-    const newQuantity = currentItem.count + (action === "increase" ? 1 : -1);
-    if (newQuantity < 1) return;
 
-    try {
-      await axios.put(`http://localhost:8080/api/user/cart/update/${id}`, {
-        userid: userid,
-        quantity: newQuantity,
-      });
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.cartid === id ? { ...item, count: newQuantity } : item
-        )
-      );
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-    }
-  };
-  const handleSizeChange = async (id, newSize) => {
-    try {
-      await axios.put(`http://localhost:8080/api/user/cart/update/${id}`, {
-        userid: userid,
-        size: newSize,
-      });
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.cartid === id ? { ...item, size: newSize } : item
-        )
-      );
-    } catch (error) {
-      console.error("Error updating size:", error);
-    }
-  };
 
   const handleRemoveItem = async (id) => {
     const token = sessionStorage.getItem("token");
     console.log("token = " + token);
-
+  
     console.log("Removing item with id:", id);
     try {
       await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
@@ -99,14 +66,23 @@ const Cart = () => {
     }
   };
 
-  const handleUpdateItem = async (cartid, newCount, newSize) => {
+  const handleUpdateItem = async (cartId, newCount, newSize) => {
     const token = sessionStorage.getItem("token");
+    console.log(token);
+    console.log("cartId = " + cartId);
+
+    if (!token) {
+      console.error("No token found, user might not be authenticated.");
+      alert("로그인 후 다시 시도해 주세요.");
+      return;
+    }
+    
     try {
       await axios.put(
-        `http://localhost:8080/api/user/cart/update/${cartid}`,
+        `http://localhost:8080/api/user/cart/update/${cartId}`,
         {
-          count: newCount,
-          size: newSize,
+          count: newCount, // 변경할 카운트
+          size: newSize,   // 변경할 사이즈
         },
         {
           headers: {
@@ -114,18 +90,14 @@ const Cart = () => {
           },
         }
       );
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.cartid === cartid
-            ? { ...item, count: newCount || item.count, size: newSize || item.size }
-            : item
-        )
-      );
+      // 상태 업데이트
     } catch (error) {
       console.error("Error updating cart item:", error);
       alert("수정 중 문제가 발생했습니다.");
     }
   };
+
+  
   const totalPrice = cartItems
     .filter((item) => selectedItems.includes(item.cartid))
     .reduce((total, item) => total + item.price * item.count, 0);

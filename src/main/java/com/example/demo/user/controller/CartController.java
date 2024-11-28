@@ -1,6 +1,7 @@
 package com.example.demo.user.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +34,35 @@ public class CartController {
 
 
     // 장바구니에서 상품 삭제   11.26 - yjy   (포스트맨 성공)
-    @DeleteMapping("/delete/{productId}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProduct(
-            @PathVariable int productId,
+            @PathVariable(name = "id") int productId,
             @RequestParam(name = "userid") int userId) {
 
         cartService.deleteProduct(productId, userId);
         return ResponseEntity.ok(null);
     }
+
+    @PutMapping("/update/{cartId}")
+    public ResponseEntity<Void> updateCartItem(
+            @PathVariable(name = "cartId") int cartid, 
+            @RequestBody Map<String, Object> updates) {
+
+        System.out.println(cartid);
+        System.out.println(updates);
+            
+        try {
+            Integer count = (Integer) updates.get("count");
+            String size = (String) updates.get("size");
+            System.out.println("여기 와?");
+            cartService.updateCartItem(cartid, count, size);
+    
+            return ResponseEntity.ok().build(); // 200 
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // 400 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 
+        }
+    }
+
 }
