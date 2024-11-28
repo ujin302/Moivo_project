@@ -2,6 +2,7 @@ package com.example.demo.store.entity;
 
 import java.util.List;
 
+import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.dto.ProductDTO;
 
 import jakarta.persistence.CascadeType;
@@ -72,7 +73,6 @@ public class ProductEntity { // 상품
     // 상품 출력
     public static ProductEntity toGetProductEntity(ProductDTO dto) {
         ProductEntity entity = new ProductEntity();
-        // 상품 등록이기 때문에 seq 존재하지 않음.
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setImg(dto.getImg());
