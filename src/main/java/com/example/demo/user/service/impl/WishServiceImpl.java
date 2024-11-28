@@ -58,7 +58,7 @@ public class WishServiceImpl implements WishService {
         Map<String, Object> map = new HashMap<>();
 
         // userId에 해당하는 사용자의 WishEntity 찾기
-        WishEntity wishEntity = wishRepository.findById(userId).orElse(null);
+        WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
 
         // 유저의 찜 목록이 존재한다면
         if (wishEntity != null) {
