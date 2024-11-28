@@ -34,7 +34,7 @@ const qna_faqboard = () => {
                     <button className={QnA.faqNaviBtn}>문의 게시글</button>
                 </Link>
             </div>
-                
+                <div className={QnA.faqss}>
                 <div className={QnA.faq}>
                     {/* FAQ 항목 1 */}
                     <div className={QnA.faqItem}>
@@ -127,6 +127,7 @@ const qna_faqboard = () => {
                             </p>
                         )}
                     </div>
+                </div>
                 </div>
             </div>
             <Footer/>

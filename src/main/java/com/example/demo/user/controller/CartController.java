@@ -33,12 +33,11 @@ public class CartController {
 
 
     // 장바구니에서 상품 삭제   11.26 - yjy   (포스트맨 성공)
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{productId}")
     public ResponseEntity<?> deleteProduct(
-            @PathVariable(name = "id") int productId,
+            @PathVariable int productId,
             @RequestParam(name = "userid") int userId) {
-        System.out.println("productId = " + productId);
-        System.out.println("userId = " + userId);
+
         cartService.deleteProduct(productId, userId);
         return ResponseEntity.ok(null);
     }
