@@ -59,7 +59,7 @@ const MypageWish = () => {
             {wishlistItems.map((item) => (
               <div key={item.id} className={styles.wishlistItem}>
                 <div className={styles.itemImage}>
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.img} alt={item.name} />
                 </div>
                 <div className={styles.itemInfo}>
                   <div className={styles.itemName}>{item.name}</div>

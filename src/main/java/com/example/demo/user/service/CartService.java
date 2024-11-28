@@ -16,5 +16,5 @@ public interface CartService {
     // 장바구니에서 상품 삭제
     public void deleteProduct(int productId, int userId);
 
-    public void updateCartItem(int cartItemId, int userId, Integer count, String size);
+    public void updateCartItem(int cartid, Integer count, String size);
 }

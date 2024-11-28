@@ -68,16 +68,23 @@ public class CartController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{cartId}")
     public ResponseEntity<Void> updateCartItem(
-            @PathVariable(name = "id") int cartItemId,
-            @RequestParam(name = "userid") int userId,
-            @RequestBody Map<String, Object> updates) {
+            @PathVariable(name = "cartId") int cartid, 
+            @RequestBody Map<String, Object> updates,
+            @RequestHeader("Authorization") String authorization) {
+        
+        // Authorization 헤더에서 "Bearer <token>" 추출
+        String token = authorization.replace("Bearer ", "");
+        System.out.println(token);
+        System.out.println(cartid);
+        System.out.println(updates);
+            
         try {
             Integer count = (Integer) updates.get("count");
             String size = (String) updates.get("size");
-    
-            cartService.updateCartItem(cartItemId, userId, count, size);
+            System.out.println("여기 와?");
+            cartService.updateCartItem(cartid, count, size);
     
             return ResponseEntity.ok().build(); // 200 
         } catch (RuntimeException e) {

@@ -23,6 +23,7 @@ const Cart = () => {
         // productDTO 데이터를 포함하여 필요한 구조로 변환
         const mappedItems = fetchedItems.map((item) => ({
           ...item,
+          cartId: item.cartId,
           ...item.productDTO, // productDTO 데이터 병합
 
         }));
@@ -39,7 +40,7 @@ const Cart = () => {
   }, [userid]);
 
   console.log(cartItems);
-
+  console.log(cartItems.cartId);
 
   const handleRemoveItem = async (id) => {
     const token = sessionStorage.getItem("token");
@@ -66,14 +67,23 @@ const Cart = () => {
     }
   };
 
-  const handleUpdateItem = async (cartid, newCount, newSize) => {
+  const handleUpdateItem = async (cartId, newCount, newSize) => {
     const token = sessionStorage.getItem("token");
+    console.log(token);
+    console.log("cartId = " + cartId);
+
+    if (!token) {
+      console.error("No token found, user might not be authenticated.");
+      alert("로그인 후 다시 시도해 주세요.");
+      return;
+    }
+    
     try {
       await axios.put(
-        `http://localhost:8080/api/user/cart/update/${cartid}`,
+        `http://localhost:8080/api/user/cart/update/${cartId}`,
         {
-          count: newCount,
-          size: newSize,
+          count: newCount, // 변경할 카운트
+          size: newSize,   // 변경할 사이즈
         },
         {
           headers: {
@@ -81,14 +91,7 @@ const Cart = () => {
           },
         }
       );
-
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.cartid === cartid
-            ? { ...item, count: newCount || item.count, size: newSize || item.size }
-            : item
-        )
-      );
+      // 상태 업데이트
     } catch (error) {
       console.error("Error updating cart item:", error);
       alert("수정 중 문제가 발생했습니다.");
@@ -96,7 +99,7 @@ const Cart = () => {
   };
 
   const totalPrice = cartItems
-    .filter((item) => selectedItems.includes(item.cartid))
+    .filter((item) => selectedItems.includes(item.cartId))
     .reduce((total, item) => total + item.price * item.count, 0);
 
   if (loading) return <div>Loading...</div>;
@@ -109,20 +112,20 @@ const Cart = () => {
         {cartItems.length > 0 ? (
           <div className={styles.cartContainer}>
             {cartItems.map((item) => (
-              <div key={item.cartid} className={styles.cartItem}>
+              <div key={item.cartId} className={styles.cartItem}>
                 <input
                   type="checkbox"
-                  id={`checkbox-${item.cartid}`}
-                  checked={selectedItems.includes(item.cartid)}
+                  id={`checkbox-${item.cartId}`}
+                  checked={selectedItems.includes(item.cartId)}
                   onChange={() =>
                     setSelectedItems((prev) =>
-                      prev.includes(item.cartid)
-                        ? prev.filter((id) => id !== item.cartid)
-                        : [...prev, item.cartid]
+                      prev.includes(item.cartId)
+                        ? prev.filter((id) => id !== item.cartId)
+                        : [...prev, item.cartId]
                     )
                   }
                 />
-                <label htmlFor={`checkbox-${item.cartid}`}></label>
+                <label htmlFor={`checkbox-${item.cartId}`}></label>
                 <div className={styles.productImage}>
                   <img src={item.img || "../image/default.jpg"} alt={item.name} />
                 </div>
@@ -132,9 +135,9 @@ const Cart = () => {
                   <div className={styles.productPrice}>KRW {item.price.toLocaleString()}</div>
                     <div className={styles.sizeSelector}>
                     <select
-                      id={`size-select-${item.cartid}`}
+                      id={`size-select-${item.cartId}`}
                       value={item.size}
-                      onChange={(e) => handleUpdateItem(item.cartid, null, e.target.value)}
+                      onChange={(e) => handleUpdateItem(item.cartId, null, e.target.value)}
                     >
                       <option value="S">S</option>
                       <option value="M">M</option>
@@ -144,21 +147,21 @@ const Cart = () => {
                     <div className={styles.quantityControls}>
                       <button
                         onClick={() => {
-                          if (item.count > 1) handleUpdateItem(item.cartid, item.count - 1, null);
+                          if (item.count > 1) handleUpdateItem(item.cartId, item.count - 1, null);
                         }}
                       >
                         -
                       </button>
                       <span>{item.count}</span>
                       <button
-                        onClick={() => handleUpdateItem(item.cartid, item.count + 1, null)}
+                        onClick={() => handleUpdateItem(item.cartId, item.count + 1, null)}
                       >
                         +
                       </button>
                     </div>
                     <button
                       className={styles.removeButton}
-                      onClick={() => handleRemoveItem(item.id)} // `cartid`를 전달
+                      onClick={() => handleRemoveItem(item.id)}
                     >
                       REMOVE
                     </button>
@@ -173,7 +176,7 @@ const Cart = () => {
                 className={styles.checkoutButton}
                 onClick={() =>
                   navigate("/payment", {
-                    state: { items: cartItems.filter((item) => selectedItems.includes(item.cartid)) },
+                    state: { items: cartItems.filter((item) => selectedItems.includes(item.cartId)) },
                   })
                 }
               >
