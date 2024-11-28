@@ -24,7 +24,7 @@ const ProductList = () => {
     "endPage" : 0 // 블락 마지막 페이지 수
   });
   const pageBlock = 3;
-  const itemsPerPage = 5; // 화면에 보여지는 상품 개수 
+  const itemsPerPage = 15; // 화면에 보여지는 상품 개수 
 
   const [sortBy, setSortBy] = useState("newest"); 
   // const categories = ["All", "Outer", "Top", "Bottom"]; // 카테고리
@@ -187,22 +187,26 @@ const ProductList = () => {
   };
   
   // Wish 아이템 추가
-  const handleAddToWish = (product) => {
-    const existingItem = wishItems.find((item) => item.id === product.id);
-  
-    if (!existingItem) {
-      const wishProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        img: product.img || '',
-      };
-      setWishItems((prev) => [...prev, wishProduct]);
-      setIsWishModalOpen(true);
+  const handleAddToWish = async (product) => {
+    try {
+      const id = sessionStorage.getItem("id");
+
+      if(id != null) {
+        await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}?userid=${id}`);
+        console.log(`위시리스트에 상품(${product.id}) 추가 성공`);
+      } else {
+        alert("로그인 후에 이용해주세요.");
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        console.error("인증 오류:", error);
+      } else {
+        console.error("위시리스트에 추가하는 중 오류가 발생했습니다:", error);
+      }
     }
   };
 
-  // Cart 아이템 제거 ff
+  // Cart 아이템 제거
   const removeFromCart = (productId) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
@@ -316,7 +320,6 @@ const ProductList = () => {
                 <h1>{product.id}</h1>
                 <div className={styles.productImageWrapper}>
                   <img
-                    // src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
                     src={product.img}
                     alt={product.name}
                     className={styles.productImage}
