@@ -30,7 +30,7 @@ const routeConfig = [
   { path: "/user_signup", element: <User_signup /> },
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
-  { path: "/product-detail/:id", element: <ProductDetail /> },
+  { path: "/product-detail/:productId", element: <ProductDetail /> },
   { path: "/product-order", element: <ProductOrder /> },
   { path: "/product-order-success", element: <SuccessPage /> },
   { path: "/product-order-fail", element: <FailPage /> },

@@ -13,4 +13,5 @@ public interface ProductStockRepository extends JpaRepository<ProductStockEntity
 
     // 상품 기준으로 추출 - 24.11.25 - uj
     public List<ProductStockEntity> findByProductEntity(ProductEntity productEntity);
+    
 }

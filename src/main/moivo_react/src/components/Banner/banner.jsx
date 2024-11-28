@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import styles from '../../assets/css/banner.module.css';
-import axios from 'axios';
 
 const Banner = () => {
   const navigate = useNavigate();
@@ -14,8 +13,6 @@ const Banner = () => {
       title: 'SHOP',
       submenu: [
         { name: 'ALL', navigateTo: '/product-list' },
-        { name: 'NEW', navigateTo: '/product-list' },
-        { name: 'BEST', navigateTo: '/product-list' },
         { name: 'Dashboard', navigateTo: '/product-board' }
       ]
     },
@@ -26,7 +23,6 @@ const Banner = () => {
         { name: '파일수정(임시)', navigateTo: '/update' },
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
-        { name: 'REVIEW', navigateTo: '/qna/review' }
       ]
     }
   ];

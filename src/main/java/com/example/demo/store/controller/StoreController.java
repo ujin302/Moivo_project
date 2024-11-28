@@ -45,7 +45,7 @@ public class StoreController {
     @GetMapping("/product-detail/{productId}")
     public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
         try {
-            Map<String, Object> productData = productService.getProduct(productId);
+            Map<String, Object> productData = productService.getProductDetail(productId);
             if (productData == null) {
                 return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
             }
