@@ -1,6 +1,7 @@
 package com.example.demo.store.dto;
 
 import com.example.demo.configuration.NCPStorageConfig;
+import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.entity.ProductEntity;
 
 import lombok.AllArgsConstructor;
@@ -23,13 +24,14 @@ public class ProductDTO { // 상품
     // 상품 데이터 출력
     public static ProductDTO toGetProductDTO(ProductEntity entity) {
         ProductDTO dto = new ProductDTO();
+        NCPObjectStorageDTO ncpDTO = new NCPObjectStorageDTO();
 
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setContent(entity.getContent());
         dto.setPrice(entity.getPrice());
         dto.setCategoryId(entity.getCategoryEntity().getId());
-        dto.setImg(entity.getImg());
+        dto.setImg(ncpDTO.getURL() + entity.getImg());
         return dto;
     }
 }

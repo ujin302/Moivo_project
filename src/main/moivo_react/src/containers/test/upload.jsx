@@ -106,33 +106,11 @@ const Upload = () => {
       formData.append(`stock[${size}]`, count);
     });
 
-    // Layer 1: 메인 이미지 (단일 파일)
-    if (files.layer1) {
-      formData.append("files", files.layer1);
-      formData.append("layer", 1);
-    }
-
-    // Layer 2: 섬네일 이미지 (단일 또는 다중 파일)
-    if (files.layer2.length > 0) {
-      files.layer2.forEach(file => {
-        formData.append("files", file);
-        formData.append("layer", 2);
-      });
-    }
-
-    // Layer 3: 상품 상세 이미지들 (다중 파일)
-    if (files.layer3.length > 0) {
-      files.layer3.forEach(file => {
-        formData.append("files", file);
-        formData.append("layer", 3);
-      });
-    }
-
-    // Layer 4: 배송 이미지 (단일 파일)
-    if (files.layer4) {
-      formData.append("files", files.layer4);
-      formData.append("layer", 4);
-    }
+    // 사용자 파일 추가 (layer 정보와 함께)
+    formData.append("layer1", files.layer1); // 단일 파일
+    files.layer2.forEach((file) => formData.append("layer2", file)); // 다중 파일
+    files.layer3.forEach((file) => formData.append("layer3", file)); // 다중 파일
+    formData.append("layer4", files.layer4); // 단일 파일
 
     try {
       const response = await axios.post(
