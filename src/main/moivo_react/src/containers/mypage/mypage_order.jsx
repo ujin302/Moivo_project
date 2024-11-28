@@ -96,7 +96,7 @@ const mypage_order = () => {
                                     <div className={styles.image}>
                                         <img src={mainItem.image} alt={mainItem.productName} />
                                     </div>
-                                    <div className={styles.column}>
+                                    <div className={styles.column3}>
                                         {mainItem.productName} ({mainItem.quantity}개)
                                         {additionalCount > 0 && ` 외 ${additionalCount}개`}
                                         <br />
