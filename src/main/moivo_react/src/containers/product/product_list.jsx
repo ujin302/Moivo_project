@@ -139,6 +139,7 @@ const ProductList = () => {
         });
         // 현재 페이지 설정
         setCurrentPage(page);
+
         console.log(response.data);
         console.log(products);
         console.log(pageInfo);
