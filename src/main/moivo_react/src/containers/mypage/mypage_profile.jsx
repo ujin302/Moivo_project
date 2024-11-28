@@ -127,8 +127,9 @@ const MypageProfile = () => {
     return (
         <div>
             <div>
+                <Banner />
                 <div className={styles.profileContainer}>
-                    <Banner />
+                    
                     <div className={styles.pageName}>PROFILE</div>
 
                     <button className={styles.deleteButton} onClick={handleDeleteAccount}>

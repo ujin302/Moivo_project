@@ -71,12 +71,9 @@ public class CartController {
     @PutMapping("/update/{cartId}")
     public ResponseEntity<Void> updateCartItem(
             @PathVariable(name = "cartId") int cartid, 
-            @RequestBody Map<String, Object> updates,
-            @RequestHeader("Authorization") String authorization) {
+            @RequestBody Map<String, Object> updates) {
         
         // Authorization 헤더에서 "Bearer <token>" 추출
-        String token = authorization.replace("Bearer ", "");
-        System.out.println(token);
         System.out.println(cartid);
         System.out.println(updates);
             
