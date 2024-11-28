@@ -19,7 +19,7 @@ const MypageWish = () => {
         const wishlist = response.data.wishlist || []; //서버에서 받은 데이터 저장
         
         // wishlist 안에서 product 정보를 추출하여 상태에 저장
-        const formattedWishlist = wishlist.map(item => item.productDTO); // productDTO로 변경
+        const formattedWishlist = wishlist.map(item => item.product);
         setWishlistItems(formattedWishlist);
       } catch (error) {
         console.error("Failed to fetch wishlist:", error);
@@ -29,8 +29,9 @@ const MypageWish = () => {
   }, [userid]); //userid가 변경될 때마다 함수 호출
   console.log(wishlistItems);
 
-  // 찜 목록에서 삭제
-  const handleRemove = async (productId) => {
+
+   // 찜 목록에서 삭제
+   const handleRemove = async (productId) => {
     console.log("productId = " + productId);
     console.log("userId = " + userid);
 
@@ -47,13 +48,13 @@ const MypageWish = () => {
       console.error("Failed to remove item:", error);
     }
   };
-
+  
   return (
     <div className={styles.wishlistPage}>
       <Banner />
       <div className={styles.title}>WISHLIST</div>
       <div className={styles.container}>
-        {wishlistItems.length > 0 ? (
+      {wishlistItems.length > 0 ? (
           <div className={styles.wishlistContainer}>
             {wishlistItems.map((item) => (
               <div key={item.id} className={styles.wishlistItem}>
@@ -65,7 +66,7 @@ const MypageWish = () => {
                   <div className={styles.itemPrice}>{item.price}원</div>
                   <button
                     className={styles.removeButton}
-                    onClick={() => handleRemove(item.id)} // productDTO의 id 사용
+                    onClick={() => handleRemove(item.id)}
                   >
                     Remove
                   </button>
@@ -77,10 +78,10 @@ const MypageWish = () => {
           <div className={styles.emptyMessage}>Your wishlist is empty.</div>
         )}
         <div className={styles.bottomBar}></div>
-        <Link to="/mypage" className={styles.backLink}>
-          Go Back to MyPage
-        </Link>
-      </div>
+          <Link to="/mypage" className={styles.backLink}>
+            Go Back to MyPage
+          </Link>
+        </div>
       <Footer />
     </div>
   );

@@ -144,19 +144,19 @@ const MypageMain = () => {
                 )}
               </div>
             <div className={styles.couponSection}>
-            <div className={styles.point}>POINT: <strong>5000</strong></div>
-            <div className={styles.coupon}>
-                COUPON: &nbsp;
-                {userInfo && userInfo.coupons ? (
-                  userInfo.coupons.map((coupon, index) => (
-                    <strong key={index}>{coupon.name}</strong>
-                  ))
-                ) : (
-                  "쿠폰 정보를 불러오는 중입니다..."
-                )}
+              <div className={styles.point}>POINT: <strong>5000</strong></div>
+                <div className={styles.coupon}>
+                    COUPON: &nbsp;
+                    {userInfo && userInfo.coupons ? (
+                      userInfo.coupons.map((coupon, index) => (
+                        <strong key={index}>{coupon.name}</strong>
+                      ))
+                    ) : (
+                      "쿠폰 정보를 불러오는 중입니다..."
+                    )}
+                </div>
+              </div>
             </div>
-          </div>
-          </div>
             {/* 아이콘 영역 (우측 상단에 배치) */}
             <div 
               className={styles.tooltipIcon} 

@@ -39,41 +39,7 @@ const Cart = () => {
   }, [userid]);
 
   console.log(cartItems);
-  const handleQuantityChange = async (id, action) => {
-    const currentItem = cartItems.find((item) => item.cartid === id);
-    const newQuantity = currentItem.count + (action === "increase" ? 1 : -1);
-    if (newQuantity < 1) return;
 
-    try {
-      await axios.put(`http://localhost:8080/api/user/cart/update/${id}`, {
-        userid: userid,
-        quantity: newQuantity,
-      });
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.cartid === id ? { ...item, count: newQuantity } : item
-        )
-      );
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-    }
-  };
-
-  const handleSizeChange = async (id, newSize) => {
-    try {
-      await axios.put(`http://localhost:8080/api/user/cart/update/${id}`, {
-        userid: userid,
-        size: newSize,
-      });
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.cartid === id ? { ...item, size: newSize } : item
-        )
-      );
-    } catch (error) {
-      console.error("Error updating size:", error);
-    }
-  };
 
   const handleRemoveItem = async (id) => {
     const token = sessionStorage.getItem("token");
@@ -97,6 +63,35 @@ const Cart = () => {
       } else {
         alert("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       }
+    }
+  };
+
+  const handleUpdateItem = async (cartid, newCount, newSize) => {
+    const token = sessionStorage.getItem("token");
+    try {
+      await axios.put(
+        `http://localhost:8080/api/user/cart/update/${cartid}`,
+        {
+          count: newCount,
+          size: newSize,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.cartid === cartid
+            ? { ...item, count: newCount || item.count, size: newSize || item.size }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating cart item:", error);
+      alert("수정 중 문제가 발생했습니다.");
     }
   };
 
@@ -135,31 +130,40 @@ const Cart = () => {
                   <div className={styles.productName}>{item.name}</div>
                   <div className={styles.productContent}>{item.content}</div>
                   <div className={styles.productPrice}>KRW {item.price.toLocaleString()}</div>
-                  <div className={styles.sizeSelector}>
-                    <label htmlFor={`size-select-${item.cartid}`}>Size: </label>
+                    <div className={styles.sizeSelector}>
                     <select
                       id={`size-select-${item.cartid}`}
                       value={item.size}
-                      onChange={(e) => handleSizeChange(item.cartid, e.target.value)}
+                      onChange={(e) => handleUpdateItem(item.cartid, null, e.target.value)}
                     >
-                      <option value="S">S</option>   
+                      <option value="S">S</option>
                       <option value="M">M</option>
                       <option value="L">L</option>
                     </select>
+                    </div>
+                    <div className={styles.quantityControls}>
+                      <button
+                        onClick={() => {
+                          if (item.count > 1) handleUpdateItem(item.cartid, item.count - 1, null);
+                        }}
+                      >
+                        -
+                      </button>
+                      <span>{item.count}</span>
+                      <button
+                        onClick={() => handleUpdateItem(item.cartid, item.count + 1, null)}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      className={styles.removeButton}
+                      onClick={() => handleRemoveItem(item.id)} // `cartid`를 전달
+                    >
+                      REMOVE
+                    </button>
                   </div>
-                  <div className={styles.quantityControls}>
-                    <button onClick={() => handleQuantityChange(item.cartid, "decrease")}>-</button>
-                    <span>{item.count}</span>
-                    <button onClick={() => handleQuantityChange(item.cartid, "increase")}>+</button>
-                  </div>
-                  <button
-                    className={styles.removeButton}
-                    onClick={() => handleRemoveItem(item.id)} // `cartid`를 전달
-                  >
-                    REMOVE
-                  </button>
                 </div>
-              </div>
             ))}
             <div className={styles.totalSection}>
               <div className={styles.totalText}>
