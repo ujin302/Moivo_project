@@ -18,13 +18,15 @@ const ProductList = () => {
     "isLast" : false, // 마지막 페이지 여부
     "hasPrevious" : false, // 이전 페이지 여부
     "hasNext" : false, // 다음 페이지 여부
-    "totalPages" : 0 // 페이지 개수
+    "totalPages" : 0, // 페이지 개수
+    "startPage" : 0, // 블락 첫번째 페이지 수
+    "endPage" : 0 // 블락 마지막 페이지 수
   });
   const pageBlock = 3;
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5;
+  const itemsPerPage = 1;
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [wishItems, setWishItems] = useState([]);
@@ -34,7 +36,10 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // 페이지 렌더링
   useEffect(() => {
+    console.log("useEffect");
+    
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
@@ -46,11 +51,8 @@ const ProductList = () => {
         const response = await axios.get(`${PATH.SERVER}/api/store`, {
           headers,
           params: {
-            page: currentPage - 1,
             size: itemsPerPage,
-            sortBy: sortBy,
-            categoryId: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
-            keyword: searchTerm,
+            block: pageBlock
           }
         });
         
@@ -61,7 +63,9 @@ const ProductList = () => {
             isLast: response.data.isLast,
             hasPrevious: response.data.hasPrevious,
             hasNext: response.data.hasNext,
-            totalPages: response.data.totalPages
+            totalPages: response.data.totalPages,
+            startPage: response.data.startPage,
+            endPage: response.data.endPage
           });
           // setCurrentPage(response.data.currentPage);
           setCurrentPage(0);
@@ -85,59 +89,65 @@ const ProductList = () => {
   }, []);
 
   // 페이지 넘어가기 
-  const onClickPage () => {
-    useEffect(() => {
-      const fetchProducts = async () => {
-        setIsLoading(true);
-        try {
-          const headers = {};
-          if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-          }
-  
-          const response = await axios.get(`${PATH.SERVER}/api/store`, {
-            headers,
-            params: {
-              page: currentPage - 1,
-              size: itemsPerPage,
-              sortBy: sortBy,
-              categoryId: activeCategory === "All" ? 0 : categories.indexOf(activeCategory),
-              keyword: searchTerm,
-            }
-          });
-          
-          if (response.data) {
-            setProducts(response.data.productList || []);
-            setPageInfo({
-              isFirst: response.data.isFirst,
-              isLast: response.data.isLast,
-              hasPrevious: response.data.hasPrevious,
-              hasNext: response.data.hasNext,
-              totalPages: response.data.totalPages
-            });
-            // setCurrentPage(response.data.currentPage);
-            setCurrentPage(0);
-            console.log(response.data);
-            console.log(products);
-            console.log(pageInfo);
-            console.log(currentPage);
-          }
-        } catch (error) {
-          if (error.response?.status === 401) {
-            console.error("인증 오류:", error);
-          } else {
-            console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
-          }
-        } finally {
-          setIsLoading(false);
+  const onClickPage = async (page) => {
+    
+    setIsLoading(true);
+    try {
+        const headers = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
         }
-      };
-  
-      fetchProducts();
-  }
+        
+        console.log("page : " + page);
+        const response = await axios.get(`${PATH.SERVER}/api/store`, {
+          headers,
+          params: {
+            page: page,
+            size: itemsPerPage,
+            sortBy: sortBy,
+            keyword: searchTerm,
+            block: pageBlock
+          }
+        });
+        console.log(response.data);
+        
+        // DB 데이터 저장
+        if (response.data) {
+          // 상품 데이터 설정
+          setProducts(response.data.productList || []);
+          // 페이지 데이터 설정
+          setPageInfo({
+            isFirst: response.data.isFirst,
+            isLast: response.data.isLast,
+            hasPrevious: response.data.hasPrevious,
+            hasNext: response.data.hasNext,
+            totalPages: response.data.totalPages,
+            startPage: response.data.startPage,
+            endPage: response.data.endPage
+          });
+          // 현재 페이지 설정
+          setCurrentPage(page);
+
+          console.log(response.data);
+          console.log(products);
+          console.log(pageInfo);
+          console.log("현재 페이지: " + currentPage);
+        }
+      } catch (error) {
+        console.error("Error:", error.message, error.response);
+        if (error.response?.status === 401) {
+          console.error("인증 오류:", error);
+        } else {
+          console.error("상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+  };
 
   const categories = ["All", "Outer", "Top", "Bottom"];
 
+  // Cart 아이템 추가
   const handleAddToCart = (product) => {
     const existingItem = cartItems.find((item) => item.id === product.id);
   
@@ -160,6 +170,7 @@ const ProductList = () => {
     setIsCartModalOpen(true);
   };
   
+  // Wish 아이템 추가
   const handleAddToWish = (product) => {
     const existingItem = wishItems.find((item) => item.id === product.id);
   
@@ -175,10 +186,12 @@ const ProductList = () => {
     }
   };
 
+  // Cart 아이템 제거
   const removeFromCart = (productId) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
+  // Cart 아이템 수정
   const updateCartQuantity = (productId, quantity) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -187,6 +200,7 @@ const ProductList = () => {
     );
   };
 
+  // Wish 아이템 제거
   const removeFromWish = (productId) => {
     setWishItems((prev) => prev.filter((item) => item.id !== productId));
   };
@@ -196,13 +210,7 @@ const ProductList = () => {
   const openWishModal = () => setIsWishModalOpen(true);
   const closeWishModal = () => setIsWishModalOpen(false);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
-  // const totalPages = Math.ceil(products.length / itemsPerPage);
-  // const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-
+  // 상품 상세 화면 이동
   const handleProductClick = (productId) => {
     navigate(`/product-detail/${productId}`);
   };
@@ -283,6 +291,8 @@ const ProductList = () => {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
               >
+                
+                <h1>{product.id}</h1>
                 <div className={styles.productImageWrapper}>
                   <img
                     // src={product.imgList && product.imgList.length > 0 ? product.imgList[0].fileName : ""}
@@ -330,40 +340,46 @@ const ProductList = () => {
           </AnimatePresence>
         </motion.div>
 
+        {/* 페이징 처리 */}
         <motion.div className={styles.paginationContainer}>
           <button
             className={styles.pageButton}
-            onClick={() => setCurrentPage(0)}
+            onClick={() => onClickPage(0)}
             disabled={pageInfo.isFirst}
           >
             &laquo;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => setCurrentPage(currentPage - 1)}
+            onClick={() => onClickPage(currentPage - 1)}
             disabled={!pageInfo.hasPrevious}
           >
             &lt;
           </button>
-          {Array.from({ length: pageBlock }, (_, index) => (
-            <button
-              key={index}
-              className={`${styles.pageButton} ${currentPage === index + 1 ? styles.active : ""}`}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
+          {(() => {
+            return Array.from({ length: pageInfo.endPage - pageInfo.startPage }, (_, index) => {
+              const pageIndex = pageInfo.startPage + index;
+              return (
+                <button
+                  key={pageIndex}
+                  className={`${styles.pageButton} ${currentPage === pageIndex ? styles.active : ""}`}
+                  onClick={() => onClickPage(pageIndex)}
+                >
+                  {pageIndex + 1}
+                </button>
+              );
+            });
+          })()}
           <button
             className={styles.pageButton}
-            onClick={() => setCurrentPage(currentPage + 1)}
+            onClick={() => onClickPage(currentPage + 1)}
             disabled={!pageInfo.hasNext}
           >
             &gt;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => setCurrentPage(totalPages)}
+            onClick={() => onClickPage(pageInfo.totalPages - 1)}
             disabled={pageInfo.isLast}
           >
             &raquo;
