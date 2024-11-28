@@ -152,6 +152,21 @@
   color: #8B7355;
 }
 
+.utilityLink2 {
+  text-decoration: none;
+  color: #2F2E2C;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  display: block;
+}
+
+.utilityLink2:hover {
+  color: #8B7355;
+}
+
 /* 로그아웃 버튼 */
 .logoutButton {
   background: none;
@@ -222,3 +237,198 @@
   font-style: italic;
   color: #888;
 }
+
+.text {
+  display: inline-block; /* 기본 상태에서는 텍스트 표시 */
+  font-size: 14px;
+  margin-right: 8px; /* 텍스트와 아이콘 간격 */
+}
+
+.iconImage {
+  display: none; /* 기본 상태에서는 아이콘 숨김 */
+  width: 24px;
+  height: 24px;
+}
+
+
+
+
+/* 반응형 추가 */
+@media screen and (max-width: 1200px) {
+  .inner {
+    padding: 0 15px;
+  }
+
+  .navList {
+    gap: 30px;
+  }
+
+  .navLink {
+    font-size: 16px;
+  }
+
+  .subMenu {
+    width: 180px;
+    padding: 10px;
+  }
+
+  .subLink {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .utility {
+    gap: 15px;
+  }
+
+  .utilityLink {
+    font-size: 13px;
+  }
+
+  .logoutButton {
+    font-size: 13px;
+  }
+
+  .loginStatus {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .banner {
+    height: auto;
+    padding: 15px 0;
+  }
+
+  .inner {
+    flex-wrap: wrap;
+  }
+
+  .nav {
+    margin-top: 10px;
+  }
+
+  .navList {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .subMenu {
+    width: 150px;
+  }
+
+  .subLink {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navList {
+    gap: 15px;
+  }
+
+  .utility {
+    gap: 10px;
+  }
+
+  .navLink {
+    font-size: 14px;
+  }
+
+  .subMenu {
+    width: 140px;
+    padding: 8px;
+  }
+
+  .subLink {
+    font-size: 12px;
+  }
+
+  .loginStatus {
+    display: none; /* 숨김 설정 */
+  }
+
+  .text {
+    display: none; /* 576px 이하에서 텍스트 숨김 */
+  }
+
+  .iconImage {
+    display: inline-block; /* 576px 이하에서 아이콘 표시 */
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .banner {
+    padding: 10px 0;
+  }
+
+  .inner {
+    padding: 0 12px;
+  }
+
+  .logo {
+    font-size: 32px;
+    text-align: center;
+  }
+
+  .navList {
+    flex-direction: row;
+    align-items: center;
+    gap: 21px;
+  }
+
+  .navLink {
+    font-size: 14px;
+  }
+
+  .subMenu {
+    width: 145px;
+    padding: 5px;
+    margin-top: 10px;
+  }
+
+  .subLink {
+    font-size: 17px;
+    padding: 10px;
+  }
+
+  .utility {
+    flex-direction: column;
+    gap: 10px;
+    align-items: baseline;
+    margin-top: 10px;
+    display: block;
+  }
+
+  .utilityLink,
+  .utilityLink2,
+  .logoutButton {
+    font-size: 12px;
+  }
+
+  .loginStatus {
+    display: none;
+  }
+
+  .text {
+    display: none;
+  }
+
+  .iconImage {
+    display: inline-block; 
+    margin-right: 10px;
+  }
+
+  .logoutButton {
+    display: block;
+    margin-top: 10px;
+    margin-left: -5px;
+  }
+
+  .utilityLink2{
+    margin-bottom: 7px;
+  }
+}
+

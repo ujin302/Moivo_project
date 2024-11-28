@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+    	
+    	// 추가 (리프레스토큰 적용 )
+    	String path = request.getRequestURI();
+        if ("/api/auth/refresh-token".equals(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+    	
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String jwt = header.substring(7);
@@ -47,16 +54,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .build()
                         .parseClaimsJws(jwt);
 
-                String userseq = parsedToken.getBody().get("uid", String.class);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userseq);
+                        String userId = parsedToken.getBody().get("userId", String.class);
+                        logger.info("JWT로 파싱된 userId: " + userId);
 
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                System.out.println("중간 성공");
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("성공");
             } catch (Exception e) {
-                SecurityContextHolder.clearContext();
+                logger.error("토큰 발급 안됨", e);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰 발급 안됨");
+
+                return; //필터 체인 종료
             }
         }
 

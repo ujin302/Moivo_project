@@ -1,0 +1,149 @@
+/* 전체 결제 페이지 스타일 */
+.paymentFrame {
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 130px;
+    background: #f6f2ee;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 제목 스타일 */
+.title {
+    font-family: "Italiana", serif;
+    font-size: 32px;
+    text-align: center;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+/* 결제 정보 컨테이너 */
+.paymentContainer {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 결제 세부 정보 */
+.paymentDetails {
+    background: #f9f6f3;
+    padding: 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
+}
+
+/* 결제 요약 */
+.paymentSummary {
+    margin-bottom: 20px;
+}
+
+.summaryItem {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.summaryLabel {
+    font-family: "Italiana", serif;
+    font-size: 16px;
+    color: #555;
+}
+
+.summaryValue {
+    font-family: "Italiana", serif;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* 결제 버튼 */
+.payButton {
+    background: #333;
+    color: #fff;
+    padding: 15px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.payButton:hover {
+    background: #555;
+}
+
+/* 결제 상품 리스트 */
+.productList,
+.paymentContainer {
+    width: 90%;
+    max-width: 800px;
+}
+
+.productItem, .paymentDetails {
+    padding: 20px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    background-color: #f9f6f3;
+    margin-bottom: 20px;
+}
+
+.productItem {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f9f6f3;
+    border: 1px solid #ddd;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.productItem:hover {
+    transform: scale(1.02);
+}
+
+.productImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.productDetails {
+    flex: 1;
+}
+
+.productName {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.productPrice {
+    font-size: 16px;
+    color: #777;
+}
+
+/* 쿠폰 코드 및 입력 필드 */
+.couponContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.deliveryAddress {
+    margin-top: 5px;
+}
+
+.inputField {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}

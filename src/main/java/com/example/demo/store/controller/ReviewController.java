@@ -22,12 +22,13 @@ public class ReviewController {
     @PostMapping("")
     public ResponseEntity<String> insertReview(@ModelAttribute ReviewDTO reviewDTO,
             @RequestParam(name = "userid") int userid,
-            @RequestParam(name = "prductid") int productid) {
-
+            @RequestParam(name = "productid") int productid) {
+                // product 오타 수정 (prductid)
         reviewService.insertReview(reviewDTO, userid, productid);
         return ResponseEntity.ok("리뷰 작성");
     }
 
     // 리뷰 수정
+
     // 리뷰 삭제
 }

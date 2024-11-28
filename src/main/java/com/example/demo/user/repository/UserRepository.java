@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     Optional<UserEntity> findByUserId(String userId); // 사용자 계정 Userid
 
+    Optional<UserEntity> findByRefreshToken(String refreshToken); // 토큰 갱신 관련 _241127_sc
+
 }

@@ -36,7 +36,7 @@ const ProductBoard = () => {
   // AI 패션 추천 API 호출
   // const getWeatherFashion = async (temp, weatherCondition) => {
   //   try {
-  //     const response = await axios.post('/api/fashion/recommend', {
+  //     const response = await axios.post('${PATH.SERVER}/api/fashion/recommend', {
   //       temperature: temp,
   //       weather: weatherCondition
   //     });

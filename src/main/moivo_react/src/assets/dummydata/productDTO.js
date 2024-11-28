@@ -69,8 +69,8 @@ const products = [
     stock: 80,
     productimg: [
       { id: 1, filename: "testimage01.jpg", fileurl: img1, layer: 1, productid: 1 },
-      { id: 2, filename: "testimage01.jpg", fileurl: img1, layer: 2, productid: 1 },
-      { id: 3, filename: "testimage01.jpg", fileurl: img1, layer: 3, productid: 1 },
+      { id: 2, filename: "testimage02.jpg", fileurl: img2, layer: 2, productid: 1 },
+      { id: 3, filename: "testimage03.jpg", fileurl: img3, layer: 3, productid: 1 },
     ],
   },
   {

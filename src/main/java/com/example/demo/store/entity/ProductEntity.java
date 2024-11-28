@@ -2,6 +2,7 @@ package com.example.demo.store.entity;
 
 import java.util.List;
 
+import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.dto.ProductDTO;
 
 import jakarta.persistence.CascadeType;
@@ -44,7 +45,7 @@ public class ProductEntity { // 상품
     private ProductCategoryEntity categoryEntity;
 
     // 상품 1개 : 이미지 n개
-    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImgEntity> imgList;
 
     // 상품 1개 : 사이즈 3개
@@ -52,7 +53,7 @@ public class ProductEntity { // 상품
     private List<ProductStockEntity> stockList;
 
     // 상품 1개 : 리뷰 n개
-    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ReviewEntity> reviewList;
 
     // dto => entity
@@ -72,7 +73,6 @@ public class ProductEntity { // 상품
     // 상품 출력
     public static ProductEntity toGetProductEntity(ProductDTO dto) {
         ProductEntity entity = new ProductEntity();
-        // 상품 등록이기 때문에 seq 존재하지 않음.
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setImg(dto.getImg());
