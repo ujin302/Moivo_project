@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState(''); // 선택한 사이즈
   const [stocks, setStocks] = useState([]); // 재고 정보
   const [selectedProduct, setSelectedProduct] = useState(null); // 선택한 상품
+  const [reviews, setReviews] = useState([]); // 리뷰 정보
   const [loading, setLoading] = useState(false); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
   const [quantity, setQuantity] = useState(1); // 수량
@@ -37,7 +38,8 @@ const ProductDetail = () => {
 
       console.log('Fetching product detail for ID:', productId); // 상품 ID 로깅
       const response = await axios.get(
-        `${PATH.SERVER}/api/store/product-detail/${productId}`,
+        // `${PATH.SERVER}/api/store/product-detail/${productId}`,
+        `${PATH.SERVER}/api/store/${productId}`,
         { headers }
       );
 
@@ -47,8 +49,9 @@ const ProductDetail = () => {
         throw new Error('상품 정보를 불러올 수 없습니다.');
       }
 
-      const { product, imgList, stockList } = response.data; // 상품, 이미지, 재고 정보 추출
+      const { product, imgList, stockList, reviewList } = response.data; // 상품, 이미지, 재고 정보 추출
       
+      console.log(response.data);
       // 상품 기본 정보 설정
       setProduct(product);
       
@@ -66,6 +69,10 @@ const ProductDetail = () => {
       
       // 재고 정보 설정
       setStocks(stockList);
+
+      // 리뷰 정보 설정
+      setReviews(reviewList);
+      
 
     } catch (error) {
       console.error('Error fetching product detail:', error);
@@ -382,9 +389,9 @@ const ProductDetail = () => {
               {activeTab === 'reviews' && (
                 <div className={styles.reviewSection}>
                   <h2 className={styles.reviewHeading}>상품 리뷰</h2>
-                  {product.reviewList && product.reviewList.length > 0 ? (
-                    <div className={styles.reviewList}>
-                      {product.reviewList.map((review) => (
+                  {reviews && reviews.length > 0 ? (
+                    <div className={styles.reviewList}> 
+                      {reviews.map((review) => (
                         <motion.div 
                           key={review.id} 
                           className={styles.review}
@@ -393,7 +400,7 @@ const ProductDetail = () => {
                           viewport={{ once: true }}
                         >
                           <p className={styles.reviewContent}>{review.content}</p>
-                          <p className={styles.reviewAuthor}>{review.author}</p>
+                          <p className={styles.reviewAuthor}>{review.userName}</p>
                         </motion.div>
                       ))}
                     </div>
