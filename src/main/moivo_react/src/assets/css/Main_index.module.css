@@ -28,6 +28,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    margin-top: 100px;
 }
 
 .imageSection {
@@ -81,23 +82,6 @@
     font-family: 'Ibarra Real Nova', serif;
 }
 
-.menuBar {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.menuBarLine {
-    width: 50px;
-    height: 2px;
-    background: #BEBF97;
-    border: 2px solid #BEBF97;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-}
-
 @media (max-width: 1512px) {
     .container {
         flex-direction: row;
@@ -143,13 +127,14 @@
     color: #2F2E2C;
     font-family: 'Italiana', serif;
     position: relative;
-    flex-direction: row; /* 오른쪽에 이미지 배치 row-reverse */
+    flex-direction: row;
+    overflow-x: hidden;
 }
 
 .imageSection2 {
     width: 832px;
     height: 100%;
-    background-image: url('../image/main_image2.jpg'); /* 새로운 이미지 경로 */
+    background-image: url('../image/main_image2.jpg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
@@ -218,106 +203,6 @@
         font-size: 2vw;
         width: 58%;
     }
-}
-
-
-
-/* Footer */
-.mainFooter {
-    background: #2F2E2C;
-    font-family: 'Italiana', sans-serif;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    padding: 2rem 0;
-}
-
-.footerGridContainer {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-gap: 1.5rem;
-}
-
-.footerGridContainer div {
-    padding: 1rem;
-}
-
-.mainFooter .nav-logo {
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.mainFooter ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.mainFooter ul li {
-    padding: 0.3rem 0;
-}
-
-.mainFooter ul li a {
-    text-decoration: none;
-    color: #F6F2EE;
-}
-
-.mainFooter input[type="email"] {
-    width: 90%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.mainFooter .btn {
-    background-color: #333;
-    color: #F6F2EE;
-    padding: 0.5rem 1rem;
-    border: none;
-    cursor: pointer;
-}
-
-
-.menu {
-    position: absolute;
-    top: 70px;
-    right: 30px;
-    width: 200px;
-    background-color: #2F2E2C;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transform: translateY(-200%);
-    transition: transform 0.3s ease-in-out;
-    opacity: 0;
-    visibility: hidden;
-}
-
-.menuOpen {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-}
-
-.menuList {
-    list-style: none;
-    padding: 10px;
-    margin: 0;
-}
-
-.menuList li {
-    margin: 10px 0;
-}
-
-.menuList li a {
-    text-decoration: none;
-    color: #F6F2EE;
-    font-size: 16px;
-}
-
-.menuBar {
-    cursor: pointer;
-}
-
-.menuBarLine {
-    transition: transform 0.3s ease;
 }
 
 /* main3 */
@@ -635,6 +520,11 @@
 
 /* 반응형 웹 페이지 */
 @media (max-width: 700px) {
+
+    .video{
+        margin-top: 85px;
+    }
+
     .book {
         width: 100%;
     }
