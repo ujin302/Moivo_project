@@ -125,7 +125,7 @@ const MypageOrderDetails = () => {
                             <div className={styles.image}>
                                 <img src={item.image} alt={`order-${index}`} />
                             </div>
-                            <div className={styles.column}>
+                            <div className={styles.column3}>
                                 {item.productName} <br />[옵션: {item.option}]
                             </div>
                             <div className={styles.column}>{item.quantity}</div> {/* 수량 표시 */}
