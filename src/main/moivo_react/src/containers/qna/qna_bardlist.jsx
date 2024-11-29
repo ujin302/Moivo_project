@@ -6,7 +6,6 @@ import Banner from '../../components/Banner/banner';
 
 const qna_boardlist = () => {
     const [activeIndex, setActiveIndex] = useState(null);
-    const [currentUser, setCurrentUser] = useState('user123'); // 현재 로그인된 사용자 ID
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
     const [enteredPassword, setEnteredPassword] = useState('');
@@ -15,7 +14,6 @@ const qna_boardlist = () => {
 
     const qnaData = [
         {
-            type: '일반 문의',
             title: '제품 배송 언제 되나요?',
             secret: false,
             userId: 'user123',
@@ -25,7 +23,6 @@ const qna_boardlist = () => {
             password: ''
         },
         {
-            type: '비밀 문의',
             title: '개인 정보 관련 문의',
             secret: true,
             userId: 'user456',
@@ -35,7 +32,6 @@ const qna_boardlist = () => {
             password: '4567'
         },
         {
-            type: '기타 문의',
             title: '결제 방법 변경은 어떻게 하나요?',
             secret: false,
             userId: 'user789',
@@ -44,11 +40,11 @@ const qna_boardlist = () => {
             answer: '결제 방법 변경은 고객센터를 통해 가능합니다.',
             password: ''
         },
-        { type: '기타 문의', title: '추가 질문 1', secret: false, userId: 'user123', date: '2024-11-18', question: '내용1', answer: null, password: '' },
-        { type: '기타 문의', title: '추가 질문 2', secret: false, userId: 'user123', date: '2024-11-17', question: '내용2', answer: null, password: '' },
-        { type: '기타 문의', title: '추가 질문 3', secret: false, userId: 'user123', date: '2024-11-16', question: '내용3', answer: null, password: '' },
-        { type: '기타 문의', title: '추가 질문 4', secret: false, userId: 'user123', date: '2024-11-15', question: '내용4', answer: null, password: '' },
-        { type: '기타 문의', title: '추가 질문 5', secret: false, userId: 'user123', date: '2024-11-14', question: '내용5', answer: null, password: '' },
+        { title: '추가 질문 1', secret: false, userId: 'user123', date: '2024-11-18', question: '내용1', answer: null, password: '' },
+        { title: '추가 질문 2', secret: false, userId: 'user123', date: '2024-11-17', question: '내용2', answer: null, password: '' },
+        { title: '추가 질문 3', secret: false, userId: 'user123', date: '2024-11-16', question: '내용3', answer: null, password: '' },
+        { title: '추가 질문 4', secret: false, userId: 'user123', date: '2024-11-15', question: '내용4', answer: null, password: '' },
+        { title: '추가 질문 5', secret: false, userId: 'user123', date: '2024-11-14', question: '내용5', answer: null, password: '' },
     ];
 
     // 페이징 데이터 계산
@@ -119,11 +115,17 @@ const qna_boardlist = () => {
                         currentPageData.map((item, index) => (
                             <div key={index} className={QnA_b.qnalistItem}>
                                 <div className={QnA_b.qnalistHeader} onClick={() => handleToggle(index + startIndex, item.secret)}>
-                                    <span className={QnA_b.qnalistQuestionType}>{item.type}</span>
-                                    <span className={QnA_b.qnalistQuestionTitle}>
-                                        {item.secret ? '비밀 문의' : item.title}
+                                    <span className={QnA_b.qnalistQuestionType}>
+                                        {/* secret 값으로 아이콘 결정 */}
+                                        {item.secret ? (
+                                            <i className="fas fa-lock"></i> // 비밀글에 자물쇠 아이콘
+                                        ) : (
+                                            <i className="fas fa-question-circle"></i> // 일반 문의에 물음표 아이콘
+                                        )}
                                     </span>
-                                    {item.secret && <span className={QnA_b.qnalistSecretLabel}>비밀 문의입니다.</span>}
+                                    <span className={QnA_b.qnalistQuestionTitle}>
+                                        {item.secret ? '비밀글입니다.' : item.title} {/* 비밀글 제목을 '비밀글입니다.'로 수정 */}
+                                    </span>
                                 </div>
                                 {activeIndex === index + startIndex && (
                                     <div className={QnA_b.qnalistDetails}>
@@ -141,14 +143,14 @@ const qna_boardlist = () => {
                         ))
                     )}
                 </div>
-                    {/* 페이징 버튼 */}
-                    <div className={QnA_b.pagination}>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)}>
-                                {page}
-                            </button>
-                        ))}
-                    </div>
+                {/* 페이징 버튼 */}
+                <div className={QnA_b.pagination}>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)}>
+                            {page}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* 비밀번호 확인 모달 */}
