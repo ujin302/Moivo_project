@@ -45,6 +45,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log(id);
     const fetchProductDetail = async () => {
       setIsLoading(true);
       try {
@@ -52,6 +53,7 @@ const ProductDetail = () => {
         const response = await axios.get(`${PATH.SERVER}/api/store/product-detail/${id}`, { headers });
         
         if (response.data) {
+          console.log(response.data);
           setProductData(response.data);
           setProduct(response.data.Product);
           setCategory(response.data.Category);
@@ -106,14 +108,14 @@ const ProductDetail = () => {
       case '상품정보':
         return (
           <div className={styles.detailImages}>
-            {product?.productimg.map((img) => (
+            {/* {product?.productimg.map((img) => (
               <img
                 key={img.id}
                 src={img.fileurl}
                 alt={`${product.name} 상세이미지`}
                 className={styles.detailImage}
               />
-            ))}
+            ))} */}
           </div>
         );
       case '리뷰':
@@ -198,25 +200,25 @@ const ProductDetail = () => {
           <div className={styles.mainImageSection}>
             {/* 메인 이미지 */}
             <div className={styles.mainImageWrapper}>
-              <img
+              {/* <img
                 src={mainImg || "/placeholder.jpg"}
                 alt={product?.name}
                 className={styles.mainImage}
-              />
+              /> */}
             </div>
             
             {/* 섬네일 캐러셀 */}
             <div className={styles.thumbnailSection}>
-              <button 
+              {/* <button 
                 className={`${styles.carouselButton} ${styles.prevButton}`}
                 onClick={prevSlide}
                 disabled={currentSlide === 0}
               >
                 ‹
-              </button>
+              </button> */}
               
               <div className={styles.thumbnailWrapper}>
-                {product?.productimg.slice(currentSlide, currentSlide + slidesPerView).map((img) => (
+                {/* {product?.productimg.slice(currentSlide, currentSlide + slidesPerView).map((img) => (
                   <div 
                     key={img.id || img.fileurl}
                     className={`${styles.thumbnailItem} ${mainImg === img.fileurl ? styles.activeThumbnail : ''}`}
@@ -228,16 +230,16 @@ const ProductDetail = () => {
                       className={styles.thumbnail}
                     />
                   </div>
-                ))}
+                ))} */}
               </div>
 
-              <button 
+              {/* <button 
                 className={`${styles.carouselButton} ${styles.nextButton}`}
                 onClick={nextSlide}
                 disabled={currentSlide >= product?.productimg.length - slidesPerView}
               >
                 ›
-              </button>
+              </button> */}
             </div>
           </div>
 
@@ -254,7 +256,7 @@ const ProductDetail = () => {
               <div className={styles.optionRow}>
                 <span className={styles.optionLabel}>사이즈</span>
                 <div className={styles.optionContent}>
-                  <select
+                  {/* <select
                     value={selectedSize}
                     onChange={handleSizeChange}
                     className={styles.sizeSelect}
@@ -269,11 +271,11 @@ const ProductDetail = () => {
                         {stock.size} {stock.count === 0 ? '(품절)' : ''}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
                 </div>
               </div>
 
-              {selectedStock && (
+              {/* {selectedStock && (
                 <div className={styles.optionRow}>
                   <span className={styles.optionLabel}>수량</span>
                   <div className={styles.optionContent}>
@@ -304,7 +306,7 @@ const ProductDetail = () => {
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* 액션 버튼 */}
@@ -317,14 +319,14 @@ const ProductDetail = () => {
               >
                 <FaShoppingCart /> 구매하기
               </motion.button>
-              <motion.button 
+              {/* <motion.button 
                 className={`${styles.actionBtn} ${styles.wishlistButton}`}
                 onClick={handleWishlist}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <FaHeart /> 위시리스트
-              </motion.button>
+              </motion.button> */}
             </div>
           </div>
         </div>
