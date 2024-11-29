@@ -250,14 +250,6 @@
     .column {
         font-size: 12px;
     }
-
-    .column:first-child {
-        flex: 2; /* 작은 화면에서 첫 번째 열 더 넓게 */
-    }
-
-    .row {
-        flex-direction: column; /* 세로 정렬 */
-    }
     
     .image {
         flex: 0 0 80px;
@@ -268,5 +260,60 @@
     .image img {
         max-width: 60px;
         max-height: 80px;
+    }
+}
+
+@media (max-width: 576px) {
+    .memberFrame {
+        margin: 0 auto;
+        width: 100%;
+        padding-top: 90px;
+        padding-left: 7px;
+        padding-right: 7px;
+        padding-bottom: 10px;
+    }
+
+    .instructions {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .order {
+        font-size: 38px;
+    }
+
+    .backLink {
+        font-size: 23px;
+    }
+
+    .column {
+        font-size: 12px;
+    }
+
+    .column2 {
+        font-size: 14px;
+        line-height: 18px;
+        color: #645d4c;
+        font-weight: 900;
+    }
+
+    .column3 {
+        font-size: 13px;
+    }
+
+    .row{
+        padding: 14px;
+        gap: 7px;
+    }
+
+    .image {
+        flex: 0 0 70px;
+        height: 84px;
+        padding-right: 0px;
+    }
+
+    .reviewButton {
+        padding: 10px 15px;
+        margin-left: 5px;
     }
 }

@@ -20,4 +20,7 @@ public interface ProductService {
 
     public void deleteProduct(int productId);
 
+    // 상품 상세 정보 가져오기 - 24.11.28 - 김성찬
+    public Map<String, Object> getProductDetail(int productId);
+
 }
