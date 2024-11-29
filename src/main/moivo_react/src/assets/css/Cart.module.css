@@ -24,6 +24,7 @@
     gap: 20px;
   }
   
+  
   /* 장바구니 아이템 */
   .cartItem {
     display: flex;
@@ -136,7 +137,28 @@
     background: #f2dede;
     color: #c0392b;
   }
-  
+/* 품절 메시지 */
+.soldOutMessage {
+  color: red;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* 품절된 상품의 사이즈 및 수량 변경 불가 경고 */
+.soldOutWarning {
+  color: gray;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+/* 품절된 상품의 제거 버튼 비활성화 */
+.cartItem.soldOut .removeButton {
+  background: #f5f5f5;
+  color: #ccc;
+  border: 1px solid #ddd;
+  cursor: not-allowed;
+}
+
   /* 총 금액 섹션 */
   .totalSection {
     display: flex;
