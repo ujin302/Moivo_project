@@ -22,6 +22,10 @@ import lombok.Data;
 @Table(name = "product")
 public class ProductEntity { // 상품
 
+    public enum Gender {
+        MAN, WOMAN, ALL
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -39,7 +43,7 @@ public class ProductEntity { // 상품
     private int price; // 상품 가격
 
     @Column(length = 2, nullable = false)
-    private String gender; // 성별 F or M
+    private Gender gender; // 성별
 
     // 상품 n개 : 카테고리 1개
     @ManyToOne
@@ -68,7 +72,7 @@ public class ProductEntity { // 상품
         entity.setImg(dto.getImg());
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
-        entity.setContent(dto.getGender());
+        entity.setGender(dto.getGender());
 
         return entity;
     }
@@ -81,7 +85,7 @@ public class ProductEntity { // 상품
         entity.setImg(dto.getImg());
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
-        entity.setContent(dto.getGender());
+        entity.setGender(dto.getGender());
 
         return entity;
     }

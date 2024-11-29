@@ -90,6 +90,9 @@ const ProductList = () => {
           getWishCartCount('cart');
         }
         
+        // 5. 현재 페이지 설정
+        setCurrentPage(page);
+        
         console.log(response.data);
         console.log(categories);
         console.log(products);
@@ -374,14 +377,14 @@ const ProductList = () => {
         <motion.div className={styles.paginationContainer}>
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(0)}
+            onClick={() => fetchProducts(0)}
             disabled={pageInfo.isFirst}
           >
             &laquo;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(currentPage - 1)}
+            onClick={() => fetchProducts(currentPage - 1)}
             disabled={!pageInfo.hasPrevious}
           >
             &lt;
@@ -393,7 +396,7 @@ const ProductList = () => {
                 <button
                   key={pageIndex}
                   className={`${styles.pageButton} ${currentPage === pageIndex ? styles.active : ""}`}
-                  onClick={() => onClickPage(pageIndex)}
+                  onClick={() => fetchProducts(pageIndex)}
                 >
                   {pageIndex + 1}
                 </button>
@@ -402,14 +405,14 @@ const ProductList = () => {
           })()}
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(currentPage + 1)}
+            onClick={() => fetchProducts(currentPage + 1)}
             disabled={!pageInfo.hasNext}
           >
             &gt;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(pageInfo.totalPages - 1)}
+            onClick={() => fetchProducts(pageInfo.totalPages - 1)}
             disabled={pageInfo.isLast}
           >
             &raquo;
