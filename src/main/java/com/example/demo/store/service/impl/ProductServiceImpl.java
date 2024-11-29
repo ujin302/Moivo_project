@@ -1,10 +1,10 @@
 package com.example.demo.store.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.demo.store.dto.*;
@@ -24,7 +24,7 @@ import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductImgEntity;
 import com.example.demo.store.entity.ProductStockEntity;
 import com.example.demo.store.entity.ReviewEntity;
-import com.example.demo.store.entity.ProductStockEntity.Size;
+import com.example.demo.store.entity.ProductEntity.Gender;
 import com.example.demo.store.repository.ProductCategoryRepository;
 import com.example.demo.store.repository.ProductImgRepository;
 import com.example.demo.store.repository.ProductRepository;
@@ -259,6 +259,7 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setName(productDTO.getName());
         productEntity.setContent(productDTO.getContent());
         productEntity.setPrice(productDTO.getPrice());
+        productEntity.setGender(productDTO.getGender());
 
         // 2. 카테고리 Entity 추출
         ProductCategoryEntity categoryEntity = categoryRepository
@@ -328,6 +329,13 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.save(productEntity);
+    }
+
+    // 24.11.29 - uj
+    // 상품 성별 리스트 추출
+    @Override
+    public List<Gender> getGenders() {
+        return Arrays.asList(Gender.values());
     }
 
     // 24.11.27 - 상품 삭제 - uj
