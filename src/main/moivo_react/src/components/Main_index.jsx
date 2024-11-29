@@ -188,7 +188,7 @@ const Main_index = () => {
                         }`}
                     >
                         {slides.map((s, i) => (
-                            <Link to="/product">
+                            <Link to="/product-list">
                                 <li key={i} className={styles.slide_list}>
                                     
                                         <img
@@ -208,7 +208,7 @@ const Main_index = () => {
                         }`}
                     >
                         {slides.map((s, i) => (
-                            <Link to="/product">
+                            <Link to="/product-list">
                                 <li key={i} className={styles.slide_list}>
                                         <img
                                             src={s.src}
@@ -235,7 +235,7 @@ const Main_index = () => {
                     <h2>Moivo</h2>
                     <span>f/w 최대 90% Sale</span>
                     </div>
-                    <Link to="/product">
+                    <Link to="/product-list">
                         <div className={styles.page2}>
                         <h2>Sale Product</h2>
                         <span>This is second page...</span>
