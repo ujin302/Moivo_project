@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { PATH } from "../../scripts/path";
 import PropTypes from 'prop-types';
