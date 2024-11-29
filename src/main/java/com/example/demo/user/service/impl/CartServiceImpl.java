@@ -146,48 +146,73 @@ public class CartServiceImpl implements CartService {
         userCartRepository.delete(userCartEntity);
     }
 
-    // 장바구니 상품 업데이트
+    // 장바구니 상품 업데이트 11.28 sumin
     @Override
-    public void updateCartItem(int cartId, Integer newCount, String newSize) {
-        // 1. 장바구니 항목 찾기
-        UserCartEntity userCartEntity = userCartRepository.findByCartEntity_Id(cartId)
-                .orElseThrow(() -> new RuntimeException("해당 장바구니 항목이 존재하지 않습니다."));
-
-        // 2. 사이즈 업데이트 처리
-        if (newSize != null) {
-            try {
-                ProductStockEntity.Size sizeEnum = ProductStockEntity.Size.valueOf(newSize.toUpperCase());
-                ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
-                        userCartEntity.getProductEntity(),
-                        sizeEnum
-                );
-                if (stockEntity == null || stockEntity.getCount() < (newCount != null ? newCount : userCartEntity.getCount())) {
-                    throw new RuntimeException("해당 사이즈의 재고가 부족합니다.");
-                }
-                userCartEntity.setSize(sizeEnum);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("유효하지 않은 사이즈 값입니다: " + newSize);
-            }
-        }
-
-        // 3. 수량 업데이트 처리
-        if (newCount != null) {
-            if (newCount <= 0) {
-                throw new RuntimeException("수량은 1 이상이어야 합니다.");
-            }
+    public UserCartDTO updateCartItem(int userCartId, Integer count, String size) {
+        // 장바구니 항목 확인
+        UserCartEntity userCartEntity = userCartRepository.findById(userCartId)
+                .orElseThrow(() -> new RuntimeException("해당 장바구니 항목이 없습니다."));
+    
+        System.out.println("userCartId = " + userCartId);
+        System.out.println("count = " + count);
+        System.out.println("size = " + size);
+    
+        // null 값이 아닌 경우에만 업데이트 처리
+        if (size != null) {
+            // 상품 재고 확인
             ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
                     userCartEntity.getProductEntity(),
-                    userCartEntity.getSize()
+                    ProductStockEntity.Size.valueOf(size.toUpperCase())
             );
-            if (stockEntity == null || stockEntity.getCount() < newCount) {
-                throw new RuntimeException("재고가 부족합니다.");
+    
+            if (stockEntity == null || stockEntity.getCount() < (count != null ? count : userCartEntity.getCount())) {
+                throw new RuntimeException("해당 사이즈의 재고가 부족합니다.");
             }
-            userCartEntity.setCount(newCount);
+    
+            userCartEntity.setSize(ProductStockEntity.Size.valueOf(size.toUpperCase()));
+        }
+    
+        if (count != null) {
+            if (userCartEntity.getSize() != null) {
+                ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
+                        userCartEntity.getProductEntity(),
+                        userCartEntity.getSize()
+                );
+    
+                if (stockEntity.getCount() < count) {
+                    throw new RuntimeException("재고가 부족합니다.");
+                }
+            }
+
+            userCartEntity.setCount(count);
+        }
+    
+        // 업데이트된 데이터 저장
+        userCartRepository.save(userCartEntity);
+    
+        // ProductDTO 생성
+        ProductDTO productDTO = ProductDTO.toGetProductDTO(userCartEntity.getProductEntity());
+        
+        // 현재 사이즈에 해당하는 재고 수량 가져오기
+        int stockCount = 0;
+        for (ProductStockEntity stock : userCartEntity.getProductEntity().getStockList()) {
+            if (stock.getSize().equals(userCartEntity.getSize())) {
+                stockCount = stock.getCount();
+                break; // 원하는 재고를 찾으면 종료 !
+            }
         }
 
-        // 4. 업데이트된 데이터를 저장
-        userCartRepository.save(userCartEntity);
+        // UserCartDTO 생성 및 반환
+        return new UserCartDTO(
+            userCartEntity.getId(),
+            userCartEntity.getCartEntity().getId(),
+            productDTO,
+            userCartEntity.getSize() != null ? userCartEntity.getSize().toString() : null,
+            userCartEntity.getCount(),
+            stockCount
+        );
     }
+    
 
 }
 

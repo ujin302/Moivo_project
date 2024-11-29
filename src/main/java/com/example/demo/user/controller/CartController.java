@@ -43,7 +43,8 @@ public class CartController {
         return ResponseEntity.ok(null);
     }
 
-    @PutMapping("/update/{cartId}")
+    // 장바구니 수량&사이즈 수정 11.28 sumin
+    @PutMapping("/update/{cartId}") 
     public ResponseEntity<Void> updateCartItem(
             @PathVariable(name = "cartId") int cartid, 
             @RequestBody Map<String, Object> updates) {
