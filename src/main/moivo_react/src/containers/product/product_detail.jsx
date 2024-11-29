@@ -52,7 +52,15 @@ const ProductDetail = () => {
       const { product, imgList, stockList, reviewList } = response.data; // 상품, 이미지, 재고 정보 추출
       
       console.log(response.data);
-      // 상품 기본 정보 설정
+      // 상품 정보가 없는 경우 처리
+      if (!product) {
+        throw new Error('상품 정보가 존재하지 않습니다.');
+      }
+
+      // 이미지 처리 전 로그
+      console.log('처리할 이미지 목록:', imgList);
+
+      // 이미지 설정 전 null 체크 추가
       setProduct(product);
       
       // 메인 이미지 설정 (layer가 1인 이미지)
@@ -67,11 +75,12 @@ const ProductDetail = () => {
       const details = imgList.filter(img => img.layer === 3);
       setDetailImages(details);
       
-      // 재고 정보 설정
-      setStocks(stockList);
+      // 재고 및 리뷰 정보 설정 전 로그
+      console.log('설정할 재고 정보:', stockList);
+      console.log('설정할 리뷰 정보:', reviewList);
 
-      // 리뷰 정보 설정
-      setReviews(reviewList);
+      setStocks(stockList || []);
+      setReviews(reviewList || []);
       
 
     } catch (error) {
@@ -85,6 +94,17 @@ const ProductDetail = () => {
   useEffect(() => {
     fetchProductDetail();
   }, [productId, token]);
+
+  useEffect(() => {
+    console.log('현재 상태:', {
+      product,
+      mainImage,
+      thumbnailImages,
+      detailImages,
+      stocks,
+      reviews
+    });
+  }, [product, mainImage, thumbnailImages, detailImages, stocks, reviews]);
 
   const handleThumbnailClick = (imgUrl) => { // 썸네일 이미지 클릭 시 메인 이미지 변경
     setMainImage(imgUrl);
@@ -148,10 +168,12 @@ const ProductDetail = () => {
   };
 
   if (loading) { // 로딩 중일 때 로딩 모달 표시
+    console.log('로딩 중...');
     return <LoadingModal isOpen={true} />;
   }
 
   if (error) { // 에러 발생 시 에러 메시지 표시
+    console.log('에러 발생:', error);
     return (
       <div className={styles.errorWrapper}>
         <div className={styles.errorMessage}>{error}</div>
@@ -170,6 +192,7 @@ const ProductDetail = () => {
   }
 
   if (!product) {
+    console.log('상품 정보 없음');
     return null;
   }
 
@@ -399,13 +422,40 @@ const ProductDetail = () => {
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true }}
                         >
+                          <div className={styles.reviewHeader}>
+                            <span className={styles.rating}>★ {review.rating}</span>
+                            <span className={styles.reviewAuthor}>{review.userName}</span>
+                          </div>
                           <p className={styles.reviewContent}>{review.content}</p>
-                          <p className={styles.reviewAuthor}>{review.userName}</p>
                         </motion.div>
                       ))}
                     </div>
                   ) : (
-                    <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+                    <div className={styles.noReviewContainer}>
+                      <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+                      <div className={styles.exampleReviews}>
+                        <h3>리뷰 예시</h3>
+                        <div className={styles.exampleReview}>
+                          <div className={styles.reviewHeader}>
+                            <span className={styles.rating}>★ 4.5</span>
+                            <span className={styles.reviewAuthor}>홍길동</span>
+                          </div>
+                          <p className={styles.reviewContent}>
+                            상품이 너무 마음에 들어요! 사이즈도 딱 맞고 배송도 빨랐습니다.
+                            다음에도 구매하고 싶네요.
+                          </p>
+                        </div>
+                        <div className={styles.exampleReview}>
+                          <div className={styles.reviewHeader}>
+                            <span className={styles.rating}>★ 5.0</span>
+                            <span className={styles.reviewAuthor}>김철수</span>
+                          </div>
+                          <p className={styles.reviewContent}>
+                            퀄리티가 정말 좋아요. 가격대비 만족스럽습니다!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
@@ -413,14 +463,60 @@ const ProductDetail = () => {
               {activeTab === 'qna' && (
                 <div className={styles.qnaSection}>
                   <h2 className={styles.sectionHeading}>상품 QNA</h2>
-                  <p>준비중입니다.</p>
+                  <div className={styles.qnaList}>
+                    <div className={styles.qnaItem}>
+                      <div className={styles.question}>
+                        <span className={styles.qnaLabel}>Q.</span>
+                        <p>사이즈가 평소 사이즈보다 작나요?</p>
+                        <span className={styles.qnaAuthor}>- 구매예정자</span>
+                      </div>
+                      <div className={styles.answer}>
+                        <span className={styles.qnaLabel}>A.</span>
+                        <p>정사이즈로 제작되었습니다. 평소 신으시는 사이즈로 주문해주시면 됩니다.</p>
+                        <span className={styles.qnaAuthor}>- 판매자</span>
+                      </div>
+                    </div>
+                    <div className={styles.qnaItem}>
+                      <div className={styles.question}>
+                        <span className={styles.qnaLabel}>Q.</span>
+                        <p>배송은 보통 얼마나 걸리나요?</p>
+                        <span className={styles.qnaAuthor}>- 구매희망</span>
+                      </div>
+                      <div className={styles.answer}>
+                        <span className={styles.qnaLabel}>A.</span>
+                        <p>주문 후 1-2일 내에 출고되며, 출고 후 1-2일 내에 수령 가능합니다.</p>
+                        <span className={styles.qnaAuthor}>- 판매자</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {activeTab === 'policy' && (
                 <div className={styles.policySection}>
                   <h2 className={styles.sectionHeading}>환불/교환 정책</h2>
-                  <p>준비중입니다.</p>
+                  <div className={styles.policyContent}>
+                    <h3>교환/반품 안내</h3>
+                    <ul>
+                      <li>상품 수령 후 7일 이내에 교환/반품이 가능합니다.</li>
+                      <li>제품에 하자가 있는 경우 무상으로 교환/반품이 가능합니다.</li>
+                      <li>고객의 단순 변심으로 인한 교환/반품의 경우 배송비는 고객 부담입니다.</li>
+                    </ul>
+                    
+                    <h3>교환/반품이 불가능한 경우</h3>
+                    <ul>
+                      <li>상품 수령 후 7일이 경과한 경우</li>
+                      <li>착용한 흔적이 있거나 상품이 훼손된 경우</li>
+                      <li>상품의 택이나 라벨이 제거된 경우</li>
+                      <li>고객의 부주의로 인해 상품이 훼손된 경우</li>
+                    </ul>
+
+                    <h3>환불 안내</h3>
+                    <ul>
+                      <li>상품 회수 확인 후 3영업일 이내에 환불이 진행됩니다.</li>
+                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을 수 있습니다.</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </motion.div>
