@@ -3,6 +3,7 @@ package com.example.demo.store.dto;
 import com.example.demo.configuration.NCPStorageConfig;
 import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.store.entity.ProductEntity.Gender;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class ProductDTO { // 상품
     private String img;
     private String content;
     private int price;
-    private String gender; // 성별 F or M
+    private Gender gender; // 성별 F or M
     private int categoryId;
 
     // entity => dto 변환
