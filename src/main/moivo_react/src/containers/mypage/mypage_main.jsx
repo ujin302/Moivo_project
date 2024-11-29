@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Mypage.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import { PATH } from '../../../scripts/path';
 
 const MypageMain = () => {
   const [userInfo, setUserInfo] = useState(null); // 사용자 정보 저장
@@ -10,7 +11,7 @@ const MypageMain = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    //const userSeq = sessionStorage.getItem("userSeq");
+    const id = sessionStorage.getItem("id");
     console.log(token);
     if (!token) {
       alert("로그인이 필요합니다.");
@@ -18,10 +19,8 @@ const MypageMain = () => {
       return;
     }
 
-    const id = 1; // 사용자 ID예시
-
     // API 호출
-    fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {
+    fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`, // 인증 토큰 전달
       },

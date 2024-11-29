@@ -7,6 +7,8 @@ import com.example.demo.store.dto.ProductDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -42,6 +44,7 @@ public class ProductEntity { // 상품
     @Column(nullable = false)
     private int price; // 상품 가격
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 2, nullable = false)
     private Gender gender; // 성별
 
