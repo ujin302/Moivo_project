@@ -244,12 +244,6 @@ const ProductList = () => {
     }
   }
 
-  // 페이지 이동 처리
-  // const onClickPage = (page) => {
-  //   setCurrentPage(page);
-  //   fetchProducts(page);
-  // };
-  
   return (
     <div className={styles.container}>
       <Banner />
