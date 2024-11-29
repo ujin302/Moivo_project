@@ -34,13 +34,13 @@ public class SecurityConfig {
                 http
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(authorize -> authorize
+                                                        .requestMatchers("/api/user/**", "/api/admin/**", "/api/store/**")
+                                                        .permitAll()
                                                 // .requestMatchers("/api/user/join", "/api/user/login").permitAll()
                                                 // //api/user/coupons, store 이걸 넣어도 되도록
-                                                .requestMatchers("/api/user/**", "/api/admin/**").permitAll()
-                                                .requestMatchers("/api/store/**").permitAll()  // 상품 관련 API는 모두 허용
-                                                .requestMatchers("/api/auth/**").permitAll()   // 인증 관련 API는 모두 허용 추가_김성찬
-                                                // .requestMatchers("/api/user/**").permitAll()  
+                                                //.requestMatchers("/api/auth/**").permitAll()   // 인증 관련 API는 모두 허용 추가_김성찬
                                                 // .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 권한 명시
+                                                // .requestMatchers("/api/**").permitAll()
                                                 .anyRequest().authenticated()) // 나머지 경로는 인증 필요
                                 .exceptionHandling(exception -> exception
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
