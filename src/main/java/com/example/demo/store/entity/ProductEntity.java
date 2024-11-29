@@ -25,7 +25,7 @@ import lombok.Data;
 public class ProductEntity { // 상품
 
     public enum Gender {
-        MAN, WOMAN, ALL
+        ALL, MAN, WOMAN
     }
 
     @Id
@@ -45,7 +45,7 @@ public class ProductEntity { // 상품
     private int price; // 상품 가격
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 2, nullable = false)
+    @Column(length = 10, nullable = false)
     private Gender gender; // 성별
 
     // 상품 n개 : 카테고리 1개

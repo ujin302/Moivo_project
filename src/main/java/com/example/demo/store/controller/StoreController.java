@@ -51,10 +51,10 @@ public class StoreController {
     }
 
     // 24.11.29 - 상품 상세 내용 추출 - uj
-    @GetMapping("/{productSeq}")
-    public ResponseEntity<?> getProductDetail(@PathVariable int productSeq) {
-        System.out.println(productSeq);
-        Map<String, Object> map = productService.getProduct(productSeq);
+    @GetMapping("/{productId}")
+    public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
+        System.out.println(productId);
+        Map<String, Object> map = productService.getProduct(productId);
         // 값 존재 X
         if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
