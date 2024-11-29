@@ -227,6 +227,22 @@ const Upload = () => {
             </div>
           </div>
 
+          <div>
+          <h2 className={styles.sectionTitle}>성별</h2>
+            <div className={styles.stockGrid}>
+              {Object.entries(stock).map(([size, count]) => (
+                <div key={size} className={styles.stockItem}>
+                  <label className={styles.label}>{size} 사이즈</label>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    value={count}
+                    onChange={(e) => handleStockChange(size, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
           <div className={styles.fileSection}>
             <h2 className={styles.sectionTitle}>이미지 업로드</h2>
             
