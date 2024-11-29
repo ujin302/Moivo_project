@@ -4,6 +4,7 @@ import styles from "../../assets/css/Cart.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import axios from "axios";
+import { PATH } from '../../../scripts/path';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/user/cart/list`, {
+        const response = await axios.get(`${PATH.SERVER}/api/user/cart/list`, {
           params: { userid },
         });
         const fetchedItems = response.data.cartItems || [];
@@ -63,7 +64,7 @@ const Cart = () => {
   const handleUpdateItem = async (id, newCount, newSize) => {
     const token = sessionStorage.getItem("token");
     console.log("usercartId = ", id);
-  
+    
     // stockCount 초과 방지
     const item = cartItems.find((item) => item.usercartId === id);
     if (newCount > item.stockCount) {
@@ -71,12 +72,13 @@ const Cart = () => {
       return;
     }
   
+    // 사이즈를 변경하려는 경우, newSize가 null이 아니면 사이즈도 갱신
     try {
       await axios.put(
         `http://localhost:8080/api/user/cart/update/${id}`,
         {
           count: newCount,
-          size: newSize,
+          size: newSize !== null ? newSize : item.size, // 사이즈가 null일 경우 기존 사이즈 유지
         },
         {
           headers: {
@@ -87,7 +89,7 @@ const Cart = () => {
       setCartItems((prevItems) =>
         prevItems.map((item) =>
           item.usercartId === id
-            ? { ...item, count: newCount, size: newSize }
+            ? { ...item, count: newCount, size: newSize !== null ? newSize : item.size }
             : item
         )
       );
@@ -134,46 +136,59 @@ const Cart = () => {
                   <div className={styles.productPrice}>
                     KRW {item.price.toLocaleString()}
                   </div>
-                  <div className={styles.sizeSelector}>
-                    <select
-                      id={`size-select-${item.usercartId}`}
-                      value={item.size}
-                      onChange={(e) =>
-                        handleUpdateItem(item.usercartId, item.count, e.target.value)
-                      }
-                    >
-                      <option value="S">S</option>
-                      <option value="M">M</option>
-                      <option value="L">L</option>
-                    </select>
-                    <button
-                      onClick={() => {
-                        if (item.count > 1) handleUpdateItem(item.usercartId, item.count - 1, null);
-                      }}
-                    >
-                      -
-                    </button>
-                    <span>{item.count}</span>
-                    <button
-                      onClick={() => {
-                        if (item.count < item.stockCount) {
-                          handleUpdateItem(item.usercartId, item.count + 1, null);
-                        } else {
-                          alert("재고를 초과할 수 없습니다.");
+
+                  {/* 품절된 상품 표시 */}
+                  {item.soldOut && (
+                    <div className={styles.soldOutMessage}>품절된 상품입니다.</div>
+                  )}
+
+                  {/* 수량 및 사이즈 변경 불가 처리 */}
+                  {!item.soldOut ? (
+                    <div className={styles.sizeSelector}>
+                      <select
+                        id={`size-select-${item.usercartId}`}
+                        value={item.size}
+                        onChange={(e) =>
+                          handleUpdateItem(item.usercartId, item.count, e.target.value)
                         }
-                      }}
-                    >
-                      +
-                    </button>
-                  </div>
+                      >
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                      </select>
+                      <button
+                        onClick={() => {
+                          if (item.count > 1) handleUpdateItem(item.usercartId, item.count - 1, null);
+                        }}
+                      >
+                        -
+                      </button>
+                      <span>{item.count}</span>
+                      <button
+                        onClick={() => {
+                          if (item.count < item.stockCount) {
+                            handleUpdateItem(item.usercartId, item.count + 1, null);
+                          } else {
+                            alert("재고를 초과할 수 없습니다.");
+                          }
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <div>변경할 수 없습니다.</div>
+                  )}
+
                   <button
-                      className={styles.removeButton}
-                      onClick={() => handleRemoveItem(item.id)}
-                    >
-                      REMOVE
-                    </button>
-                  </div>
+                    className={styles.removeButton}
+                    onClick={() => handleRemoveItem(item.id)}
+                    disabled={item.soldOut}  // 품절된 상품의 제거 버튼도 비활성화
+                  >
+                    REMOVE
+                  </button>
                 </div>
+              </div>
             ))}
             <div className={styles.totalSection}>
               <div className={styles.totalText}>

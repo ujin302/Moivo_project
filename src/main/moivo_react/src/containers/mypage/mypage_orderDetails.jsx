@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styles from "../../assets/css/Mypage_orderDetails.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import { PATH } from '../../../scripts/path';
 
 const MypageOrderDetails = () => {
     const navigate = useNavigate();
@@ -107,8 +108,8 @@ const MypageOrderDetails = () => {
                 <section className={styles.tableSection}>
                     <div className={styles.table}>
                     <div className={styles.row}>
-                        <div className={styles.column2}>주문일자<br />[주문번호]</div>
-                        <div className={styles.column2}>이미지</div>
+                        <div className={styles.column2}>주문일자</div>
+                        <div className={styles.column2}>상품</div>
                         <div className={styles.column2}>상품정보</div>
                         <div className={styles.column2}>수량</div> {/* 수량 열 추가 */}
                         <div className={styles.column2}>상품금액</div>
@@ -118,9 +119,6 @@ const MypageOrderDetails = () => {
                         <div className={styles.row} key={index}>
                             <div className={styles.column}>
                                 {item.orderDate} <br />
-                                <Link to={`/mypage/order/`} className={styles.orderLink}>
-                                    [{item.orderNumber}]
-                                </Link>
                             </div>
                             <div className={styles.image}>
                                 <img src={item.image} alt={`order-${index}`} />
