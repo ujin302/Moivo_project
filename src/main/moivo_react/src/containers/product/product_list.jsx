@@ -216,7 +216,6 @@ const ProductList = () => {
     );
   };
 
-  const openCartModal = () => setIsCartModalOpen(true);
   const closeCartModal = () => setIsCartModalOpen(false);
   
   // 상품 상세 화면 이동
@@ -325,8 +324,6 @@ const ProductList = () => {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
               >
-                
-                <h1>{product.id}</h1>
                 <div className={styles.productImageWrapper}>
                   <img
                     src={product.img}

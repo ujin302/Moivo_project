@@ -17,6 +17,7 @@ public class ProductDTO { // 상품
     private String img;
     private String content;
     private int price;
+    private String gender; // 성별 F or M
     private int categoryId;
 
     // entity => dto 변환
@@ -28,10 +29,12 @@ public class ProductDTO { // 상품
 
         dto.setId(entity.getId());
         dto.setName(entity.getName());
+        dto.setImg(ncpDTO.getURL() + entity.getImg());
         dto.setContent(entity.getContent());
         dto.setPrice(entity.getPrice());
+        dto.setGender(entity.getGender());
         dto.setCategoryId(entity.getCategoryEntity().getId());
-        dto.setImg(ncpDTO.getURL() + entity.getImg());
+
         return dto;
     }
 }

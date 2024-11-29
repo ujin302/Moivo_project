@@ -50,48 +50,14 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private NCPObjectStorageService ncpObjectStorageService;
 
-    @Autowired
-    private NCPObjectStorageDTO ncpDTO;
-
-    // 24.11.28 - 상품 상세 정보 추출, entity -> dto 변환 - 성찬
-    public static ProductStockDTO toGetProductStockDTO(ProductStockEntity entity) {
-        ProductStockDTO dto = new ProductStockDTO();
-        dto.setId(entity.getId());
-        dto.setProductId(entity.getProductEntity().getId());
-        dto.setSize(entity.getSize().name());
-        dto.setCount(entity.getCount());
-        return dto;
-    }
-    // dto => entity 변환
-    public static ProductStockEntity toSaveEntity(ProductStockDTO stockDTO, ProductEntity productEntity) {
-        ProductStockEntity entity = new ProductStockEntity();
-        entity.setProductEntity(productEntity);
-        entity.setCount(stockDTO.getCount());
-        switch (stockDTO.getSize()) {
-            case "S":
-                entity.setSize(Size.S);
-                break;
-            case "M":
-                entity.setSize(Size.M);
-                break;
-            case "L":
-                entity.setSize(Size.L);
-                break;
-            default:
-                entity.setSize(Size.S);
-                break;
-        }
-
-        return entity;
-    }
-
+    // 상품 상세 정보 출력 - uj
     @Override
     public Map<String, Object> getProduct(int productId) {
         Map<String, Object> map = new HashMap<>();
 
         // 1. 상품 정보 추출
         ProductEntity productEntity = productRepository.findById(productId).orElseThrow(null);
-        map.put("Product", ProductDTO.toGetProductDTO(productEntity));
+        map.put("product", ProductDTO.toGetProductDTO(productEntity));
 
         // 2. 이미지 추출
         List<ProductImgDTO> imgList = new ArrayList<>();
@@ -101,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
 
             System.out.println(imgDTO);
         }
-        map.put("ImgList", imgList);
+        map.put("imgList", imgList);
 
         // 3. 리뷰 추출
         List<ReviewDTO> reviewList = new ArrayList<>();
@@ -110,18 +76,19 @@ public class ProductServiceImpl implements ProductService {
             reviewList.add(reviewDTO);
             System.out.println(reviewDTO);
         }
-        map.put("ReviewList", reviewList);
+        map.put("reviewList", reviewList);
 
         // 4. 재고 추출
-        Map<String, Integer> stockMap = new HashMap<>();
+        List<ProductStockDTO> stockList = new ArrayList<>();
         for (ProductStockEntity stockEntity : productEntity.getStockList()) {
-            stockMap.put(stockEntity.getSize().toString(), stockEntity.getCount());
+            stockList.add(ProductStockDTO.toGetProductStockDTO(stockEntity));
         }
+        map.put("stockList", stockList);
 
-        map.put("Stock", stockMap);
         return map;
     }
 
+    // 상품 등록 - uj
     @Override
     @SuppressWarnings("unchecked")
     public void saveProduct(Map<String, Object> map) {
@@ -156,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    // NCP 업로드 & 이미지 테이블에 Data 저장 (메인 Img ProductEntity에 설정)
+    // NCP 업로드 & 이미지 테이블에 Data 저장 (메인 Img ProductEntity에 설정) - uj
     private void saveImgFiles(List<MultipartFile> files, ProductEntity product, int layer) {
         for (MultipartFile file : files) {
             try {
@@ -261,6 +228,7 @@ public class ProductServiceImpl implements ProductService {
         return map;
     }
 
+    // 상품 카테고리 추출 - uj
     @Override
     public List<ProductCategoryDTO> getCategory() {
         List<ProductCategoryDTO> list = new ArrayList<>();
@@ -376,54 +344,6 @@ public class ProductServiceImpl implements ProductService {
         // 5. 장바구니에서 상품 삭제
 
         // 6.
-    }
-
-
-    // 24.11.28 - 상품 상세 정보 추출 - sc
-    @Override
-    public Map<String, Object> getProductDetail(int productId) {
-        Map<String, Object> resultMap = new HashMap<>();
-        
-        Optional<ProductEntity> productEntityOptional = productRepository.findById(productId);
-        if (productEntityOptional.isPresent()) {
-            ProductEntity productEntity = productEntityOptional.get();
-            
-            // 상품 기본 정보
-            Map<String, Object> productMap = new HashMap<>();
-            productMap.put("id", productEntity.getId());
-            productMap.put("name", productEntity.getName());
-            productMap.put("content", productEntity.getContent());
-            productMap.put("price", productEntity.getPrice());
-            productMap.put("img", productEntity.getImg());
-            
-            // 이미지 리스트
-            List<Map<String, Object>> imgList = productEntity.getImgList().stream()
-                .map(img -> {
-                    Map<String, Object> imgMap = new HashMap<>();
-                    imgMap.put("id", img.getId());
-                    imgMap.put("fileName", img.getFileName());
-                    imgMap.put("layer", img.getLayer());
-                    return imgMap;
-                })
-                .collect(Collectors.toList());
-            
-            // 재고 정보
-            List<Map<String, Object>> stockList = productEntity.getStockList().stream()
-                .map(stock -> {
-                    Map<String, Object> stockMap = new HashMap<>();
-                    stockMap.put("id", stock.getId());
-                    stockMap.put("size", stock.getSize().name());
-                    stockMap.put("count", stock.getCount());
-                    return stockMap;
-                })
-                .collect(Collectors.toList());
-            
-            resultMap.put("product", productMap);
-            resultMap.put("imgList", imgList);
-            resultMap.put("stockList", stockList);
-        }
-        
-        return resultMap;
     }
 
 }
