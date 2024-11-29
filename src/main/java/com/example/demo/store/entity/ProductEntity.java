@@ -2,7 +2,6 @@ package com.example.demo.store.entity;
 
 import java.util.List;
 
-import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.dto.ProductDTO;
 
 import jakarta.persistence.CascadeType;
@@ -39,6 +38,9 @@ public class ProductEntity { // 상품
     @Column(nullable = false)
     private int price; // 상품 가격
 
+    @Column(length = 2, nullable = false)
+    private String gender; // 성별 F or M
+
     // 상품 n개 : 카테고리 1개
     @ManyToOne
     @JoinColumn(name = "categoryid", nullable = false)
@@ -66,6 +68,7 @@ public class ProductEntity { // 상품
         entity.setImg(dto.getImg());
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
+        entity.setContent(dto.getGender());
 
         return entity;
     }
@@ -78,6 +81,7 @@ public class ProductEntity { // 상품
         entity.setImg(dto.getImg());
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
+        entity.setContent(dto.getGender());
 
         return entity;
     }
