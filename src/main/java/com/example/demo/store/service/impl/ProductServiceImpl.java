@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.demo.store.dto.*;
@@ -23,6 +24,7 @@ import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductImgEntity;
 import com.example.demo.store.entity.ProductStockEntity;
 import com.example.demo.store.entity.ReviewEntity;
+import com.example.demo.store.entity.ProductStockEntity.Size;
 import com.example.demo.store.repository.ProductCategoryRepository;
 import com.example.demo.store.repository.ProductImgRepository;
 import com.example.demo.store.repository.ProductRepository;
@@ -47,6 +49,41 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private NCPObjectStorageService ncpObjectStorageService;
+
+    @Autowired
+    private NCPObjectStorageDTO ncpDTO;
+
+    // 24.11.28 - 상품 상세 정보 추출, entity -> dto 변환 - 성찬
+    public static ProductStockDTO toGetProductStockDTO(ProductStockEntity entity) {
+        ProductStockDTO dto = new ProductStockDTO();
+        dto.setId(entity.getId());
+        dto.setProductId(entity.getProductEntity().getId());
+        dto.setSize(entity.getSize().name());
+        dto.setCount(entity.getCount());
+        return dto;
+    }
+    // dto => entity 변환
+    public static ProductStockEntity toSaveEntity(ProductStockDTO stockDTO, ProductEntity productEntity) {
+        ProductStockEntity entity = new ProductStockEntity();
+        entity.setProductEntity(productEntity);
+        entity.setCount(stockDTO.getCount());
+        switch (stockDTO.getSize()) {
+            case "S":
+                entity.setSize(Size.S);
+                break;
+            case "M":
+                entity.setSize(Size.M);
+                break;
+            case "L":
+                entity.setSize(Size.L);
+                break;
+            default:
+                entity.setSize(Size.S);
+                break;
+        }
+
+        return entity;
+    }
 
     @Override
     public Map<String, Object> getProduct(int productId) {
@@ -339,6 +376,54 @@ public class ProductServiceImpl implements ProductService {
         // 5. 장바구니에서 상품 삭제
 
         // 6.
+    }
+
+
+    // 24.11.28 - 상품 상세 정보 추출 - sc
+    @Override
+    public Map<String, Object> getProductDetail(int productId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        
+        Optional<ProductEntity> productEntityOptional = productRepository.findById(productId);
+        if (productEntityOptional.isPresent()) {
+            ProductEntity productEntity = productEntityOptional.get();
+            
+            // 상품 기본 정보
+            Map<String, Object> productMap = new HashMap<>();
+            productMap.put("id", productEntity.getId());
+            productMap.put("name", productEntity.getName());
+            productMap.put("content", productEntity.getContent());
+            productMap.put("price", productEntity.getPrice());
+            productMap.put("img", productEntity.getImg());
+            
+            // 이미지 리스트
+            List<Map<String, Object>> imgList = productEntity.getImgList().stream()
+                .map(img -> {
+                    Map<String, Object> imgMap = new HashMap<>();
+                    imgMap.put("id", img.getId());
+                    imgMap.put("fileName", img.getFileName());
+                    imgMap.put("layer", img.getLayer());
+                    return imgMap;
+                })
+                .collect(Collectors.toList());
+            
+            // 재고 정보
+            List<Map<String, Object>> stockList = productEntity.getStockList().stream()
+                .map(stock -> {
+                    Map<String, Object> stockMap = new HashMap<>();
+                    stockMap.put("id", stock.getId());
+                    stockMap.put("size", stock.getSize().name());
+                    stockMap.put("count", stock.getCount());
+                    return stockMap;
+                })
+                .collect(Collectors.toList());
+            
+            resultMap.put("product", productMap);
+            resultMap.put("imgList", imgList);
+            resultMap.put("stockList", stockList);
+        }
+        
+        return resultMap;
     }
 
 }
