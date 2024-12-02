@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "../../assets/css/Mypage_board.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import { PATH } from '../../../scripts/path';
 
 const mypage_board = () => {
   const reviews = [
