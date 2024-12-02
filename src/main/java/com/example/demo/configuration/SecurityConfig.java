@@ -41,8 +41,6 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    private OAuth2UserServiceImpl oAuth2UserServiceImpl;
-
     //OAuth2UserService 설정
     private final DefaultOAuth2UserService oAuth2UserService;
 
@@ -56,11 +54,11 @@ public class SecurityConfig {
         http
                 //OAuth2 소셜로그인 설정
                 .oauth2Login(oauth2 -> oauth2
-                        .clientRegistrationRepository((clientRegistrationRepository)) //OAuth2 공급자 설정
-                        .authorizedClientRepository(authorizedClientRepository()) //클라이언트 정보 설정
+                        .clientRegistrationRepository((clientRegistrationRepository)) //OAuth2 공급자 설정 ex Kakao or Google
+                        .authorizedClientRepository(authorizedClientRepository()) //인증된 클라이언트 정보를 저장하는 레포지토리
                         .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("http://localhost:5173/api/user/oauth2/callback/kakao"))
-                        .successHandler(successHandler())) //로그인 성공 후, custom success handler 사용
+                        .successHandler(successHandler())) //로그인 후, success handler로 Security Context에 저장 해야하는데 안먹힘ㅜ
 
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
@@ -140,14 +138,15 @@ public class SecurityConfig {
         return new CustomOAuth2UserService();
     }
 
+    //클라이언트 인증 정보를 세션에 저장
     @Bean
     public OAuth2AuthorizedClientRepository authorizedClientRepository() {
         return new HttpSessionOAuth2AuthorizedClientRepository();
     }
 
+    //로그인 성공시 호출 SecurityContext 저장관련
     @Bean
     public AuthenticationSuccessHandler successHandler() {
-        System.out.println("securiity 들어와?");
         return new CustomAuthenticationSuccessHandler();  // Custom handler에서 SecurityContext 설정
     }
 
