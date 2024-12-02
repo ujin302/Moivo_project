@@ -30,6 +30,12 @@ const Banner = () => {
         { name: '게시판', navigateTo: '/qna_board' },
         { name: 'REVIEW', navigateTo: '/qna/review' }
       ]
+    },
+    {
+      title: 'ADMIN',
+      submenu: [
+        { name: 'DashBoard', navigateTo: '/dashboard' },
+      ]
     }
   ];
 

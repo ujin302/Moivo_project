@@ -1,0 +1,91 @@
+.dashboardMain{
+    height: 100%;
+    background-color: #fff;
+    border: 1px solid red;
+}
+.dashboardContainer {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f7fa;
+}
+
+.dashboardTitle {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.statsContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.statCard {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 23%;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-10px);
+}
+
+.statTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00aaff;
+}
+
+.notificationsContainer,
+.recentActivitiesContainer {
+    margin-top: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.notificationsTitle,
+.recentActivitiesTitle {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.notificationsList,
+.recentActivitiesList {
+    list-style: none;
+    padding-left: 0;
+}
+
+.notificationItem,
+.recentActivityItem {
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #555;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.notificationItem:hover,
+.recentActivityItem:hover {
+    background-color: #e9ecef;
+}
