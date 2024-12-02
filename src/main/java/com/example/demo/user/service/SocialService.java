@@ -1,10 +1,11 @@
 package com.example.demo.user.service;
 
 import com.example.demo.user.entity.UserEntity;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public interface SocialService {
 
-    static UserEntity loginWithKakao(String code) {
-        return null;
-    }
+    UserEntity loginWithKakao(String code, String provider) throws JsonProcessingException;
+
+    public void saveOrUpdateUser(UserEntity userEntity);
 }

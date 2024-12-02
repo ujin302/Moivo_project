@@ -164,11 +164,11 @@ public class UserEntity { // 사용자 & 관리자
     private String refreshToken;
 
     // Kakao 사용자 데이터 저장
-    public static UserEntity toSaveKakaoUserEntity(JsonNode jsonNode) {
+    public static UserEntity toSaveKakaoUserEntity(String userId, String nickname) {
         UserEntity entity = new UserEntity();
-        entity.setId(jsonNode.get("id").asInt()); // Kakao ID
-        entity.setEmail(jsonNode.get("kakao_account").get("email").asText()); // Email
-        entity.setName(jsonNode.get("properties").get("nickname").asText()); // 닉네임
+
+        entity.setUserId(userId); // userid
+        entity.setName(nickname); // 닉네임
 
         // Kakao 로그인이므로 LoginType 설정
         entity.setLoginType(LoginType.KAKAO);

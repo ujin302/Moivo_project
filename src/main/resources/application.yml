@@ -1,54 +1,15 @@
 spring:
   config:
     import: "classpath:external-config.properties"
-
-  datasource:
-    # Oracle 설정
-    # url: jdbc:oracle:thin:@localhost:1521:XE
-    # username: c##java
-    # password: 1234
-    # driver-class-name: oracle.jdbc.driver.OracleDriver
-
-    # MySQL 설정
-    #  url: jdbc:mysql://localhost:3306/moivotest?useSSL=false&serverTimezone=Asia/Seoul
-    #  username: root
-    #  password: 1234
-    #  driver-class-name: com.mysql.cj.jdbc.Driver
-
-    # MySQL - NAVER Cloud 설정
-    url: jdbc:mysql://db-2vrk3j-kr.vpc-pub-cdb.ntruss.com:3306/moivodb?serverTimezone=Asia/Seoul
-    username: moivo
-    password: bitcamp123!@#
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate.format_sql: true
-      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
-
-  servlet:
-    multipart:
-      max-file-size: -1 # 파일당 최대 크기 (-1은 무제한)
-      max-request-size: -1 # 요청 전체 최대 크기 (-1은 무제한)
-
-  #application.yml에 등록하면 git에 올릴때 인증정보가 노출되는 문제가 있어서
-  #노출되지 않길 원한다면 별도의 yml을 생성하여 인증정보만 관리하도록 하여 이를 .gitignore에서 처리
-  #yml은 resouce 디렉토리 하위에 google or naver.yml 파일생성.
-  #.gitignore에
-  ###인증정보 제외
-  #/src/main/resources/google or naver.yml 추가
   security:
     oauth2:
       client:
         registration:
           kakao:
-            client-id: "714a575754949434c7f9e10bb527da9a"
-            client-secret: "zAQRGb72z0JexxUESus4CMGV90BYP4Rs"
-            redirect-uri: "http://localhost:8080/api/user/oauth2/callback/kakao"
-            authorization_grant-type: authorization_code
+            client-id: 714a575754949434c7f9e10bb527da9a
+            client-secret: zAQRGb72z0JexxUESus4CMGV90BYP4Rs
+            redirect-uri: http://localhost:5173/api/user/oauth2/callback/kakao
+            authorization-grant-type: authorization_code
             client-authentication-method: post
             scope: # 동의 항목들 다시 체크 필요
               - profile_nickname    # 닉네임
@@ -61,7 +22,7 @@ spring:
           naver:
             client-id: "rkLzelLLwohrsT5K3PzP"
             client-secret: "oc5jSCKdG5"
-            redirect-uri: "http://localhost:8080/api/user/oauth2/callback/naver"
+            redirect-uri: "http://localhost:5173/api/user/oauth2/callback/naver"
             authorization-grant-type: authorization_code
             client-authentication-method: post
             scope:
@@ -106,6 +67,37 @@ spring:
             token-uri: https://oauth2.googleapis.com/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
             user-name-attribute: sub
+  datasource:
+    # Oracle 설정
+    # url: jdbc:oracle:thin:@localhost:1521:XE
+    # username: c##java
+    # password: 1234
+    # driver-class-name: oracle.jdbc.driver.OracleDriver
+
+    # MySQL 설정
+    #  url: jdbc:mysql://localhost:3306/moivotest?useSSL=false&serverTimezone=Asia/Seoul
+    #  username: root
+    #  password: 1234
+    #  driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # MySQL - NAVER Cloud 설정
+    url: jdbc:mysql://db-2vrk3j-kr.vpc-pub-cdb.ntruss.com:3306/moivodb?serverTimezone=Asia/Seoul
+    username: moivo
+    password: bitcamp123!@#
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+
+  servlet:
+    multipart:
+      max-file-size: -1 # 파일당 최대 크기 (-1은 무제한)
+      max-request-size: -1 # 요청 전체 최대 크기 (-1은 무제한)
 
 ncp:
   storage:
@@ -113,3 +105,21 @@ ncp:
     secret-key: E59E91B8E8475F97570C5CC1B44F87162DCDBF24
     region: kr-standard
     endpoint: http://kr.object.ncloudstorage.com
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans # Actuator의 Bean 목록 확인
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+#application.yml에 등록하면 git에 올릴때 인증정보가 노출되는 문제가 있어서
+#노출되지 않길 원한다면 별도의 yml을 생성하여 인증정보만 관리하도록 하여 이를 .gitignore에서 처리
+#yml은 resouce 디렉토리 하위에 google or naver.yml 파일생성.
+#.gitignore에
+###인증정보 제외
+#/src/main/resources/google or naver.yml 추가
+

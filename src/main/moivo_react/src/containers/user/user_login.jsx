@@ -86,7 +86,7 @@ const user_login = () => {
               {/*<a href="#" className={styles.social}><i className="fab fa-google-plus-g"></i></a>*/}
               {/*  const 원래 REST_API_KEY = '백엔드에서 줘야됌';*/}
               {/*  const REDIRECT_URI = '백엔드에서 줘야됌';*/}
-              <a href="https://kauth.kakao.com/oauth/authorize?client_id=714a575754949434c7f9e10bb527da9a&redirect_uri=http://localhost:8080/api/user/oauth2/callback/kakao&response_type=code" className={styles.social}><i className="fab fa-kakao"></i>Kakao</a>
+              <a href="http://localhost:5173/api/user/kakao" className={styles.social}><i className="fab fa-kakao"></i>Kakao</a>
               <a href="http://accounts.google.com/o/oauth2/v2/auth?client_id=679990079220-prfchh4nd9k9oit85na1guc84jk6pjje.apps.googleusercontent.com&redirect_uri=http://localhost:8080/api/user/oauth2/callback/google&response_type=code" className={styles.social}><i className="fab fa-google-plus-g"></i></a>
               <a href="https://nid.naver.com/oauth2.0/authorize?client_id=rkLzelLLwohrsT5K3PzP&redirect_uri=http://localhost:8080/api/user/oauth2/callback/naver&response_type=code" className={styles.social}><i className="fab fa-kakao"></i>Naver</a>
               {/*<a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=714a575754949434c7f9e10bb527da9a&redirect_uri=http://localhost:8080/api/user/oauth2/callback/kakao" className={styles.social}><i className="fab fa-linkedin-in"></i></a>*/}

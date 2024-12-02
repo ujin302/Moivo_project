@@ -38,6 +38,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         saveOrUpdate(attributes, registrationId);
 
         // OAuth2 사용자 객체 반환
+        // Spring Secrurity 사용시 ROLE_ 들어가야함
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 attributes,
@@ -47,11 +48,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private void saveOrUpdate(Map<String, Object> attributes, String registrationId) {
         // 사용자 정보를 저장하거나 업데이트
         // 예: DB에 저장, 기존 사용자 업데이트 등
-        System.out.println("Social Login Info - Provider: " + registrationId);
-        System.out.println("User Attributes: " + attributes);
-
-        // 실제로는 JPA 또는 MyBatis를 통해 DB 연동
-        // 예:
         // userRepository.saveOrUpdate(attributes);
     }
 }
