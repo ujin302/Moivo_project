@@ -107,31 +107,6 @@ public class SecurityConfig {
 //    @Bean
 //    public ClientRegistrationRepository clientRegistrationRepository() {
 //        // Kakao ClientRegistration 설정
-//        ClientRegistration kakao = ClientRegistration.withRegistrationId("kakao")
-//                .clientId("714a575754949434c7f9e10bb527da9a")
-//                .clientSecret("zAQRGb72z0JexxUESus4CMGV90BYP4Rs")
-//                .redirectUri("http://localhost:8080/api/user/oauth2/callback/kakao")
-//                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
-//                .tokenUri("https://kauth.kakao.com/oauth/token")
-//                .userInfoUri("https://kapi.kakao.com/v2/user/me")
-//                .userNameAttributeName("id")
-//                .clientName("Kakao")
-//                .authorizationGrantType(new AuthorizationGrantType("authorization_code"))
-//                .scope("profile_nickname", "profile_image")
-//                .build();
-//
-//        ClientRegistration google = ClientRegistration.withRegistrationId("google")
-//                .clientId("679990079220-prfchh4nd9k9oit85na1guc84jk6pjje.apps.googleusercontent.com")
-//                .clientSecret("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")
-//                .redirectUri("http://localhost:8080/api/user/oauth2/callback/google")
-//                .authorizationUri("https://accounts.google.com/o/oauth2/auth")
-//                .authorizationGrantType(new AuthorizationGrantType("authorization_code"))
-//                .tokenUri("https://oauth2.googleapis.com/token")
-//                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-//                .scope("profile", "email")
-//                .build();
-//
-//        return new InMemoryClientRegistrationRepository(kakao, google);
 //    }
 
     //OAuth2 인증 후 사용자 정보를 저장할 메서드
