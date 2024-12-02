@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.store.dto.ProductCategoryDTO;
 import com.example.demo.store.dto.ProductDTO;
+import com.example.demo.store.entity.ProductEntity.Gender;
 import com.example.demo.store.service.ProductService;
 
 import java.util.HashMap;
@@ -109,6 +110,14 @@ public class AdminStoreController {
         }
 
         return ResponseEntity.ok(null);
+    }
+
+    // 24.11.29 - uj
+    // 상품 성별 리스트 추출
+    @GetMapping("/gender")
+    public ResponseEntity<List<Gender>> getGenders() {
+        List<Gender> list = productService.getGenders();
+        return ResponseEntity.ok(list);
     }
 
     // 상품 삭제 - 24.11.27 - uj

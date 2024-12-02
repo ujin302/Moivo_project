@@ -9,10 +9,12 @@ const Upload = () => {
     name: "",
     price: "",
     content: "",
-    categoryId: "",
+    categoryId: 0,
+    gender: ""
   });
 
   const [categories, setCategories] = useState([]);
+  const [genders, setGenders] = useState([]);
 
   const [stock, setStock] = useState({
     S: 0,
@@ -36,6 +38,13 @@ const Upload = () => {
         setCategories(res.data);
       } else {
         console.error("카테고리 데이터는 배열이 아닙니다 ? :", res.data);
+      }
+    });
+
+    // 성별 정보 가져오기
+    axios.get(`${PATH.SERVER}/api/admin/store/gender`).then((res) => {
+      if (Array.isArray(res.data)) {
+        setGenders(res.data);
       }
     });
   }, []);
@@ -100,10 +109,11 @@ const Upload = () => {
     formData.append("price", product.price);
     formData.append("content", product.content);
     formData.append("categoryId", product.categoryId);
+    formData.append("gender", product.gender);
   
     // 재고 데이터 추가
     Object.entries(stock).forEach(([size, count]) => {
-      formData.append(`stock[${size}]`, count);
+      formData.append(`${size}`, count);
     });
 
     // 사용자 파일 추가 (layer 정보와 함께)
@@ -205,6 +215,23 @@ const Upload = () => {
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>성별</label>
+            <select
+              className={styles.select}
+              name="gender"
+              value={product.gender}
+              onChange={handleInputChange}
+            >
+              <option value="">성별 선택</option>
+              {genders.map((gender, index) => (
+                <option key={index} value={gender}>
+                  {gender}
                 </option>
               ))}
             </select>

@@ -4,11 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.store.entity.ProductEntity;
-import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.WishService;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +50,7 @@ public class WishController {
     // 찜한거 삭제 - 24.11.25 - yjy
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable(name = "productId") int productId,
-                                           @RequestParam(name = "userid") int userId) {
+            @RequestParam(name = "userid") int userId) {
         try {
             wishService.deleteProduct(productId, userId);
             return ResponseEntity.ok().build(); // 200 OK

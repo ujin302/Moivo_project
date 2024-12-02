@@ -37,10 +37,10 @@ public class MypageController {
     // }
 
     // 위시리스트 조회  (포스트맨 테스트 성공)
-    @GetMapping("/wishlist/{id}")
-    public ResponseEntity<List<WishDTO>> getWishlist(@PathVariable int id) {
-
-            List<WishDTO> wishlist = mypageService.getWishlist(id);
+    @GetMapping("/wishlist/{userid}")
+    public ResponseEntity<List<WishDTO>> getWishlist(@PathVariable(name = "userid") int userid) {
+            System.out.println("여기오나 ?? " + userid);
+            List<WishDTO> wishlist = mypageService.getWishlist(userid);
             return ResponseEntity.ok(wishlist);
         
     }

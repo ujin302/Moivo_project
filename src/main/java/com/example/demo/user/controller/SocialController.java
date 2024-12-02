@@ -1,6 +1,7 @@
 package com.example.demo.user.controller;
 
 //import com.example.demo.configuration.OAuthProperties;
+
 import com.example.demo.security.handler.CustomOAuth2User;
 import com.example.demo.security.utils.SecurityUtils;
 import com.example.demo.user.entity.UserEntity;
@@ -10,9 +11,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +26,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SocialController {
 
-//    private final OAuthProperties oAuthProperties;
-    private final OAuth2UserService oAuth2UserService;
+//    private final OAuthProperties oAuthProperties; // 추후 OAuth 구글, 네이버 로그인 추가시 사용
 
     private final SocialService socialService;
-    private SecurityUtils securityUtils;
-
+    private SecurityUtils securityUtils; // OAuth 로그인, 일반로그인 체크
 
     @Autowired
     private OAuth2AuthorizedClientService authorizedClientService;
@@ -62,7 +64,7 @@ public class SocialController {
         System.out.println("Controller authentication = " + authentication);
         // SecurityContext에 설정
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("Controller SecurityContextHolder.getContext().getAuthentication()" + SecurityContextHolder.getContext().getAuthentication());
+        System.out.println("Controller SecurityContextHolder.getContext().getAuthentication() = " + SecurityContextHolder.getContext().getAuthentication());
         //설정까진 됐는데 유지가 안되는지 anonymous로 초기화됨 이유모름
 
         //OAuth2 확인
@@ -78,6 +80,10 @@ public class SocialController {
         return "redirect:" + "http://localhost:5173";
     }
 
+    @GetMapping("/oauth2/access-token")
+    public String getAccessToken(Authentication authentication) {
+        return socialService.getUserAccessToken(authentication);
+    }
 
 }
 

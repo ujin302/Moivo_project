@@ -34,49 +34,57 @@ public class WishServiceImpl implements WishService {
     @Autowired
     private ProductRepository productRepository;
 
-    // 찜한거 담는거
+    // 찜한거 담는거 - 24.11.28 - uj
     @Override
     public void addProduct(int productId, int userId) {
         WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
         UserWishEntity userWishEntity = new UserWishEntity();
-        ProductEntity productEntity = productRepository.findById(productId).orElse(null);
+        ProductEntity productEntity = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("해당 상품(" + productId + ")이 없습니다."));
 
-        userWishEntity.setProductEntity(productEntity);
-        userWishEntity.setWishEntity(wishEntity);
-        userWishRepository.save(userWishEntity);
+        // 상품이 존재하지 않을 경우에만
+        UserWishEntity entity = userWishRepository.findByWishEntityAndProductEntity(wishEntity, productEntity)
+                .orElse(null);
+        if (entity == null) {
+            userWishEntity.setProductEntity(productEntity);
+            userWishEntity.setWishEntity(wishEntity);
+            userWishRepository.save(userWishEntity);
+        }
     }
 
     // 찜한거 출력 - 24.11.25 sumin
     @Override
     public Map<String, Object> printWish(int userId) {
+        System.out.println("userId ==== " + userId);
+
         Map<String, Object> map = new HashMap<>();
 
-        // userId에 해당하는 사용자의 WishEntity 찾기 
-        WishEntity wishEntity = wishRepository.findById(userId).orElse(null);
-
-        //유저의 찜 목록이 존재한다면
+        // userId에 해당하는 사용자의 WishEntity 찾기
+        WishEntity wishEntity = wishRepository.findByUserEntity_Id(userId).get(0);
+        // 유저의 찜 목록이 존재한다면
         if (wishEntity != null) {
             // UserWishEntity 리스트에서 각 상품 정보 가져오기
             List<ProductDTO> productList = wishEntity.getUserWishList().stream()
-                // 각 UserWishEntity의 ProductEntity를 ProductDTO로 변환    
-                .map(userWish -> ProductDTO.toGetProductDTO(userWish.getProductEntity())) // ProductEntity를 ProductDTO로 변환
-                .collect(Collectors.toList());
+                    // 각 UserWishEntity의 ProductEntity를 ProductDTO로 변환
+                    .map(userWish -> ProductDTO.toGetProductDTO(userWish.getProductEntity())) // ProductEntity를
+                                                                                              // ProductDTO로 변환
+                    .collect(Collectors.toList());
 
             // 가져온 ProductDTO 리스트를 WishDTO 리스트로 변환
             List<WishDTO> wishDTOList = productList.stream() // 찜한 상품의 정보가 담김
-                .map(product -> {
-                    // WishDTO 객체 생성 및 설정
-                    WishDTO wishDTO = new WishDTO();
-                    wishDTO.setProduct(product); // ProductDTO를 WishDTO에 설정
-                    return wishDTO; // 변환된 WishDTO 반환
-                })
-                .collect(Collectors.toList());
+                    .map(product -> {
+                        // WishDTO 객체 생성 및 설정
+                        WishDTO wishDTO = new WishDTO();
+                        wishDTO.setProduct(product); // ProductDTO를 WishDTO에 설정
+                        return wishDTO; // 변환된 WishDTO 반환
+                    })
+                    .collect(Collectors.toList());
 
             // 최종적으로 'wishlist'라는 키에 WishDTO 리스트를 맵에 저장
-            map.put("wishlist", wishDTOList); 
+            map.put("wishlist", wishDTOList);
         } else {
             // 찜 목록이 없다면 'wishlist'에 빈 리스트를 저장
-            map.put("wishlist", new ArrayList<>()); 
+            map.put("wishlist", new ArrayList<>());
         }
         return map;
     }

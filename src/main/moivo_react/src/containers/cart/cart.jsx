@@ -4,6 +4,7 @@ import styles from "../../assets/css/Cart.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import axios from "axios";
+import { PATH } from '../../../scripts/path';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -13,22 +14,17 @@ const Cart = () => {
   const userid = 3;
 
   useEffect(() => {
-
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/user/cart/list`, {
+        const response = await axios.get(`${PATH.SERVER}/api/user/cart/list`, {
           params: { userid },
         });
         const fetchedItems = response.data.cartItems || [];
-        // productDTO 데이터를 포함하여 필요한 구조로 변환
         const mappedItems = fetchedItems.map((item) => ({
           ...item,
-          cartId: item.cartId,
           ...item.productDTO, // productDTO 데이터 병합
-
+          usercartId: item.id, // usercart의 id를 별도로 저장
         }));
-        console.log("fetchedItems = " + fetchedItems);
-        console.log("mappedItems = " + mappedItems);
         setCartItems(mappedItems);
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -39,8 +35,7 @@ const Cart = () => {
     fetchCartItems();
   }, [userid]);
 
-  console.log(cartItems);
-  console.log(cartItems.cartId);
+  console.log(cartItems); 
 
   const handleRemoveItem = async (id) => {
     const token = sessionStorage.getItem("token");
@@ -50,13 +45,12 @@ const Cart = () => {
     try {
       await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // 토큰이 제대로 전달되는지 확인
+          Authorization: `Bearer ${token}`, 
         },
         params: { userid },
       });
-      // 상태 업데이트에서 id를 사용
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-      console.log(`Item with id ${id} removed successfully`);
+      console.log(`${id} 상품 삭제 성공 ~`);
     } catch (error) {
       console.error("Error removing item:", error);
       if (error.response?.status === 401) {
@@ -67,23 +61,24 @@ const Cart = () => {
     }
   };
 
-  const handleUpdateItem = async (cartId, newCount, newSize) => {
+  const handleUpdateItem = async (id, newCount, newSize) => {
     const token = sessionStorage.getItem("token");
-    console.log(token);
-    console.log("cartId = " + cartId);
-
-    if (!token) {
-      console.error("No token found, user might not be authenticated.");
-      alert("로그인 후 다시 시도해 주세요.");
+    console.log("usercartId = ", id);
+    
+    // stockCount 초과 방지
+    const item = cartItems.find((item) => item.usercartId === id);
+    if (newCount > item.stockCount) {
+      alert("재고를 초과할 수 없습니다.");
       return;
     }
-    
+  
+    // 사이즈를 변경하려는 경우, newSize가 null이 아니면 사이즈도 갱신
     try {
       await axios.put(
-        `http://localhost:8080/api/user/cart/update/${cartId}`,
+        `http://localhost:8080/api/user/cart/update/${id}`,
         {
-          count: newCount, // 변경할 카운트
-          size: newSize,   // 변경할 사이즈
+          count: newCount,
+          size: newSize !== null ? newSize : item.size, // 사이즈가 null일 경우 기존 사이즈 유지
         },
         {
           headers: {
@@ -91,20 +86,26 @@ const Cart = () => {
           },
         }
       );
-      // 상태 업데이트
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.usercartId === id
+            ? { ...item, count: newCount, size: newSize !== null ? newSize : item.size }
+            : item
+        )
+      );
     } catch (error) {
-      console.error("Error updating cart item:", error);
-      alert("수정 중 문제가 발생했습니다.");
+      console.error(error);
+      alert("수정 중 문제가 발생했습니다. !!");
     }
   };
-
+  
   const totalPrice = cartItems
-    .filter((item) => selectedItems.includes(item.cartId))
-    .reduce((total, item) => total + item.price * item.count, 0);
+  .filter((item) => selectedItems.includes(item.usercartId)) // 선택된 아이템만 필터링
+  .reduce((total, item) => total + item.price * item.count, 0);
 
   if (loading) return <div>Loading...</div>;
 
-   return (
+  return (
     <div>
       <Banner />
       <div className={styles.cartFrame}>
@@ -112,61 +113,82 @@ const Cart = () => {
         {cartItems.length > 0 ? (
           <div className={styles.cartContainer}>
             {cartItems.map((item) => (
-              <div key={item.cartId} className={styles.cartItem}>
+              <div key={item.usercartId} className={styles.cartItem}>
                 <input
                   type="checkbox"
-                  id={`checkbox-${item.cartId}`}
-                  checked={selectedItems.includes(item.cartId)}
+                  id={`${item.usercartId}`}
+                  checked={selectedItems.includes(item.usercartId)}
                   onChange={() =>
                     setSelectedItems((prev) =>
-                      prev.includes(item.cartId)
-                        ? prev.filter((id) => id !== item.cartId)
-                        : [...prev, item.cartId]
+                      prev.includes(item.usercartId)
+                        ? prev.filter((id) => id !== item.usercartId)
+                        : [...prev, item.usercartId]
                     )
                   }
                 />
-                <label htmlFor={`checkbox-${item.cartId}`}></label>
+                <label htmlFor={`${item.usercartId}`}></label>
                 <div className={styles.productImage}>
                   <img src={item.img || "../image/default.jpg"} alt={item.name} />
                 </div>
                 <div className={styles.productDetails}>
                   <div className={styles.productName}>{item.name}</div>
                   <div className={styles.productContent}>{item.content}</div>
-                  <div className={styles.productPrice}>KRW {item.price.toLocaleString()}</div>
+                  <div className={styles.productPrice}>
+                    KRW {item.price.toLocaleString()}
+                  </div>
+
+                  {/* 품절된 상품 표시 */}
+                  {item.soldOut && (
+                    <div className={styles.soldOutMessage}>품절된 상품입니다.</div>
+                  )}
+
+                  {/* 수량 및 사이즈 변경 불가 처리 */}
+                  {!item.soldOut ? (
                     <div className={styles.sizeSelector}>
-                    <select
-                      id={`size-select-${item.cartId}`}
-                      value={item.size}
-                      onChange={(e) => handleUpdateItem(item.cartId, null, e.target.value)}
-                    >
-                      <option value="S">S</option>
-                      <option value="M">M</option>
-                      <option value="L">L</option>
-                    </select>
-                    </div>
-                    <div className={styles.quantityControls}>
+                      <select
+                        id={`size-select-${item.usercartId}`}
+                        value={item.size}
+                        onChange={(e) =>
+                          handleUpdateItem(item.usercartId, item.count, e.target.value)
+                        }
+                      >
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                      </select>
                       <button
                         onClick={() => {
-                          if (item.count > 1) handleUpdateItem(item.cartId, item.count - 1, null);
+                          if (item.count > 1) handleUpdateItem(item.usercartId, item.count - 1, null);
                         }}
                       >
                         -
                       </button>
                       <span>{item.count}</span>
                       <button
-                        onClick={() => handleUpdateItem(item.cartId, item.count + 1, null)}
+                        onClick={() => {
+                          if (item.count < item.stockCount) {
+                            handleUpdateItem(item.usercartId, item.count + 1, null);
+                          } else {
+                            alert("재고를 초과할 수 없습니다.");
+                          }
+                        }}
                       >
                         +
                       </button>
                     </div>
-                    <button
-                      className={styles.removeButton}
-                      onClick={() => handleRemoveItem(item.id)}
-                    >
-                      REMOVE
-                    </button>
-                  </div>
+                  ) : (
+                    <div>변경할 수 없습니다.</div>
+                  )}
+
+                  <button
+                    className={styles.removeButton}
+                    onClick={() => handleRemoveItem(item.id)}
+                    disabled={item.soldOut}  // 품절된 상품의 제거 버튼도 비활성화
+                  >
+                    REMOVE
+                  </button>
                 </div>
+              </div>
             ))}
             <div className={styles.totalSection}>
               <div className={styles.totalText}>
@@ -176,7 +198,11 @@ const Cart = () => {
                 className={styles.checkoutButton}
                 onClick={() =>
                   navigate("/payment", {
-                    state: { items: cartItems.filter((item) => selectedItems.includes(item.cartId)) },
+                    state: {
+                      items: cartItems.filter((item) =>
+                        selectedItems.includes(item.usercartId)
+                      ),
+                    },
                   })
                 }
               >
@@ -191,6 +217,6 @@ const Cart = () => {
       <Footer />
     </div>
   );
-};
-
-export default Cart;
+  };
+  
+  export default Cart;

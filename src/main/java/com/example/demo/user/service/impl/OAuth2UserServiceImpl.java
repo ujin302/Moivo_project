@@ -14,9 +14,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 
@@ -43,10 +46,15 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String redirectUri;
 
-    //private final OAuthProperties oAuthProperties;
+    //private final OAuthProperties oAuthProperties; //추후 Google, Naver 사용시
 
+    private final OAuth2AuthorizedClientService authorizedClientService;
+    
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     @Override
@@ -94,10 +102,44 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
 
         return oAuth2User;
     }
+//    public String getAccessTokenReturn() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            // 인증되지 않은 사용자는 처리하지 않음
+//            return "인증되지 않은 사용자입니다.";
+//        }
+//        System.out.println("getAccessTokenReturn authentication = " + authentication);
+//        //받는거보면 getAccessTokenReturn authentication = AnonymousAuthenticationToken [Principal=anonymousUser, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=65B989C1CD5A759B513365A16DE2C07F], Granted Authorities=[ROLE_ANONYMOUS]]
+//        // Spring Security 쓰려면 Granted Authorities=[ROLE_ANONYMOUS] ROLE_USER 이런식으로 수정필요할듯
+//
+//        // 인증된 사용자의 액세스 토큰 처리
+//        String url = "http://localhost:5173/api/user/oauth2/access-token";
+//        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+//        return response.getBody();
+//    }
+
+    // 인증된 사용자의 액세스 토큰을 가져오는 메서드
+    public String getUserAccessToken(Authentication authentication) {
+        // 클라이언트 등록 ID (여기서는 kakao), 사용자 ID (authentication.getName())
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                "kakao",  // clientRegistrationId (application.yml에 설정된 이름)
+                authentication.getName()  // 현재 인증된 사용자의 이름
+        );
+        System.out.println("Impl authorizedClient .getAccessToken().getTokenValue() = " + authorizedClient.getAccessToken().getTokenValue());
+
+        // 액세스 토큰이 존재하면 반환
+        if (authorizedClient != null) {
+            return authorizedClient.getAccessToken().getTokenValue();
+        }
+
+        // 액세스 토큰이 없으면 메시지 반환
+        return "Access token 없음";
+    }
 
     //사용자가 카카오 계정으로 인증되었음을 증명받음
     //카카오 로그인 코드로 액세스 토큰 요청
     public String getAccessToken(String code, String provider) throws JsonProcessingException {
+
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -126,7 +168,6 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-
         return jsonNode.get("access_token").asText();
     }
 
@@ -192,8 +233,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
         String username = userEntity.getName();
         String userID = userEntity.getUserId();
 
+        //getAccessTokenReturn();
         // 3. DB에 UserEntity 저장
-        // 스프링 시큐리티 합치면 추후엔 ROLL_USER 이런식으로 바꿔줘야할듯?
+        // 스프링 시큐리티 합치면 추후엔 ROLE_USER ROLE_KAKAO 이런식으로 바꿔줘야할듯?
         userEntity.setLoginType(UserEntity.LoginType.valueOf("KAKAO"));
 //        userRepository.save(userEntity);
         return userEntity;
@@ -218,9 +260,18 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
 
         // 로그인 상태로 설정 (세션에 사용자 정보 추가)
         SecurityContextHolder.getContext().setAuthentication(
-//                new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("ROLE_USER"))
+//                new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("ROLE_USER")) ROLE_KAKAO
                 new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("KAKAO"))
         );
+        // 세션에서 인증 정보 출력
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("Authenticated User: " + principal); // 사용자 정보 출력
+            System.out.println("Authorities: " + authentication.getAuthorities()); // 권한 정보 출력
+        } else {
+            System.out.println("No authentication found.");
+        }
     }
 
 }

@@ -72,6 +72,7 @@ const mypage_order = () => {
                             <div className={styles.column2}>주문일자<br />[주문번호]</div>
                             <div className={styles.column2}>이미지</div>
                             <div className={styles.column2}>상품정보</div>
+                            <div className={styles.column2}>총 수량</div>
                             <div className={styles.column2}>총 금액</div>
                             <div className={styles.column2}>주문처리상태</div>
                         </div>
@@ -82,6 +83,12 @@ const mypage_order = () => {
                             // 총 금액 계산
                             const totalPrice = order.items.reduce(
                                 (sum, item) => sum + item.price * item.quantity,
+                                0
+                            );
+
+                            // 총 수량 계산
+                            const totalQuantity = order.items.reduce(
+                                (sum, item) => sum + item.quantity,
                                 0
                             );
 
@@ -96,28 +103,34 @@ const mypage_order = () => {
                                     <div className={styles.image}>
                                         <img src={mainItem.image} alt={mainItem.productName} />
                                     </div>
+                                    <div className={styles.column3}>
+                                        <div className={styles.productInfo}>
+                                            {mainItem.productName} ({mainItem.quantity}개)
+                                            {additionalCount > 0 && ` 외 ${additionalCount}개`}
+                                            <br />
+                                            [옵션: {mainItem.productOptions}]
+                                        </div>
+                                    </div>
                                     <div className={styles.column}>
-                                        {mainItem.productName} ({mainItem.quantity}개)
-                                        {additionalCount > 0 && ` 외 ${additionalCount}개`}
-                                        <br />
-                                        [옵션: {mainItem.productOptions}]
+                                        {totalQuantity}개 {/* 이 위치로 이동 */}
                                     </div>
                                     <div className={styles.column}>
                                         KRW {totalPrice.toLocaleString()} {/* 총 금액 */}
                                     </div>
                                     <div className={styles.column}>
                                         {order.status}
-                                        <button className={styles.reviewButton}>REVIEW</button>
                                     </div>
                                 </div>
                             );
                         })}
+
                     </div>
-                    <Link to="/mypage" className={styles.backLink}>
-                        Go Back to MyPage
-                    </Link>
+                    <div className={styles.bottomBar}></div>
+                        <Link to="/mypage" className={styles.backLink}>
+                            Go Back to MyPage
+                        </Link>
+                    </div>
                 </div>
-            </div>
             <Footer />
         </div>
     );

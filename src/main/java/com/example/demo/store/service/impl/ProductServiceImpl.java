@@ -1,6 +1,7 @@
 package com.example.demo.store.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductImgEntity;
 import com.example.demo.store.entity.ProductStockEntity;
 import com.example.demo.store.entity.ReviewEntity;
+import com.example.demo.store.entity.ProductEntity.Gender;
 import com.example.demo.store.repository.ProductCategoryRepository;
 import com.example.demo.store.repository.ProductImgRepository;
 import com.example.demo.store.repository.ProductRepository;
@@ -48,13 +50,14 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private NCPObjectStorageService ncpObjectStorageService;
 
+    // 상품 상세 정보 출력 - uj
     @Override
     public Map<String, Object> getProduct(int productId) {
         Map<String, Object> map = new HashMap<>();
 
         // 1. 상품 정보 추출
         ProductEntity productEntity = productRepository.findById(productId).orElseThrow(null);
-        map.put("Product", ProductDTO.toGetProductDTO(productEntity));
+        map.put("product", ProductDTO.toGetProductDTO(productEntity));
 
         // 2. 이미지 추출
         List<ProductImgDTO> imgList = new ArrayList<>();
@@ -64,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
 
             System.out.println(imgDTO);
         }
-        map.put("ImgList", imgList);
+        map.put("imgList", imgList);
 
         // 3. 리뷰 추출
         List<ReviewDTO> reviewList = new ArrayList<>();
@@ -73,18 +76,19 @@ public class ProductServiceImpl implements ProductService {
             reviewList.add(reviewDTO);
             System.out.println(reviewDTO);
         }
-        map.put("ReviewList", reviewList);
+        map.put("reviewList", reviewList);
 
         // 4. 재고 추출
-        Map<String, Integer> stockMap = new HashMap<>();
+        List<ProductStockDTO> stockList = new ArrayList<>();
         for (ProductStockEntity stockEntity : productEntity.getStockList()) {
-            stockMap.put(stockEntity.getSize().toString(), stockEntity.getCount());
+            stockList.add(ProductStockDTO.toGetProductStockDTO(stockEntity));
         }
+        map.put("stockList", stockList);
 
-        map.put("Stock", stockMap);
         return map;
     }
 
+    // 상품 등록 - uj
     @Override
     @SuppressWarnings("unchecked")
     public void saveProduct(Map<String, Object> map) {
@@ -119,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    // NCP 업로드 & 이미지 테이블에 Data 저장 (메인 Img ProductEntity에 설정)
+    // NCP 업로드 & 이미지 테이블에 Data 저장 (메인 Img ProductEntity에 설정) - uj
     private void saveImgFiles(List<MultipartFile> files, ProductEntity product, int layer) {
         for (MultipartFile file : files) {
             try {
@@ -196,6 +200,8 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> dtoList = pageProductList.getContent() // Java8 이상 사용시 Entity -> DTO 변환하는 방법
                 .stream()
                 .map(productEntity -> {
+                    System.out.println("Product ID: " + productEntity.getId());
+                    System.out.println("Original Image: " + productEntity.getImg());
                     return ProductDTO.toGetProductDTO(productEntity); // DTO로 변환
                 })
                 .collect(Collectors.toList());
@@ -222,6 +228,7 @@ public class ProductServiceImpl implements ProductService {
         return map;
     }
 
+    // 상품 카테고리 추출 - uj
     @Override
     public List<ProductCategoryDTO> getCategory() {
         List<ProductCategoryDTO> list = new ArrayList<>();
@@ -252,6 +259,7 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setName(productDTO.getName());
         productEntity.setContent(productDTO.getContent());
         productEntity.setPrice(productDTO.getPrice());
+        productEntity.setGender(productDTO.getGender());
 
         // 2. 카테고리 Entity 추출
         ProductCategoryEntity categoryEntity = categoryRepository
@@ -321,6 +329,13 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.save(productEntity);
+    }
+
+    // 24.11.29 - uj
+    // 상품 성별 리스트 추출
+    @Override
+    public List<Gender> getGenders() {
+        return Arrays.asList(Gender.values());
     }
 
     // 24.11.27 - 상품 삭제 - uj

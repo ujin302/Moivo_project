@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -56,9 +57,10 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .clientRegistrationRepository((clientRegistrationRepository)) //OAuth2 공급자 설정 ex Kakao or Google
                         .authorizedClientRepository(authorizedClientRepository()) //인증된 클라이언트 정보를 저장하는 레포지토리
-                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService)) // Spring Security. 참조해서 사용자 정보 API 호출 (Kakao의 경우 사용자 정보 URL은 https://kapi.kakao.com/v2/user/me)
+                                                                                                // oAuth2UserService를 사용해서 사용자 정보를 매핑하고 로드함.
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("http://localhost:5173/api/user/oauth2/callback/kakao"))
-                        .successHandler(successHandler())) //로그인 후, success handler로 Security Context에 저장 해야하는데 안먹힘ㅜ
+                        .successHandler(successHandler())) //로그인 후, success handler로 Security Context에 저장 해야하는데 안먹힘ㅜ 1 리다이렉트하면서 날라가거나, 2 저장로직이 제대로 안되거나
 
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
@@ -72,10 +74,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()) // 나머지 경로는 인증 필요
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                // JWT 필터를 OAuth2 인증 후에 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProps, customUserDetailsService), OAuth2LoginAuthenticationFilter.class)
-                // UsernamePasswordAuthenticationFilter 필터를 JWT 필터 후에 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProps, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProps, customUserDetailsService), OAuth2LoginAuthenticationFilter.class) // JWT 필터를 OAuth2 인증 필터보다 앞에 추가
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProps, customUserDetailsService), UsernamePasswordAuthenticationFilter.class); // JWT 필터를 UsernamePasswordAuthenticationFilter보다 앞에 추가
+
 
         return http.build();
     }
@@ -148,6 +149,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler successHandler() {
         return new CustomAuthenticationSuccessHandler();  // Custom handler에서 SecurityContext 설정
+    }
+
+    @Bean
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 
 
