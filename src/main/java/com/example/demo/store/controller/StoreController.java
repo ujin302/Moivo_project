@@ -53,7 +53,7 @@ public class StoreController {
     // 24.11.29 - 상품 상세 내용 추출 - uj
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
-        System.out.println(productId);
+        System.out.println("상품 상세 조회 요청: " + productId);
         Map<String, Object> map = productService.getProduct(productId);
         // 값 존재 X
         if (map == null)

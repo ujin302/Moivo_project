@@ -31,62 +31,77 @@ const ProductDetail = () => {
     setError(null);
 
     try {
-      const headers = {}; // 헤더 초기화
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`; 
+      // 세션 스토리지에서 토큰 가져오기
+      const sessionToken = sessionStorage.getItem('token');
+      console.log('Session Token:', sessionToken); // 토큰 값 확인
+
+      // 토큰이 없으면 에러 처리
+      if (!sessionToken) {
+        throw new Error('로그인이 필요한 서비스입니다.');
       }
-      // 토큰 포함
+
+      const headers = {
+        'Authorization': `Bearer ${sessionToken}`,
+        'Content-Type': 'application/json'
+      };
       
-      console.log('Fetching product detail for ID:', productId); // 상품 ID 로깅
+      console.log('Request Headers:', headers);
+      console.log('Fetching product detail for ID:', productId);
+      
       const response = await axios.get(
-        // `${PATH.SERVER}/api/store/product-detail/${productId}`,
         `${PATH.SERVER}/api/store/${productId}`,
-        { headers }
+        { 
+          headers,
+          withCredentials: true 
+        }
       );
 
-      console.log('API Response:', response.data); // API 응답 로깅
+      console.log('API Response:', response.data);
 
       if (!response.data) {
         throw new Error('상품 정보를 불러올 수 없습니다.');
       }
 
-      const { product, imgList, stockList, reviewList } = response.data; // 상품, 이미지, 재고 정보 추출
+      const { product, imgList, stockList, reviewList } = response.data;
       
-      console.log(response.data);
-      // 상품 정보가 없는 경우 처리
+      console.log('받은 데이터:', response.data);
       if (!product) {
         throw new Error('상품 정보가 존재하지 않습니다.');
       }
 
-      // 이미지 처리 전 로그
-      console.log('처리할 이미지 목록:', imgList);
-
-      // 이미지 설정 전 null 체크 추가
       setProduct(product);
+      setMainImage(product.img);
       
-      // 메인 이미지 설정 (layer가 1인 이미지)
-      const mainImg = imgList.find(img => img.layer === 1);
-      setMainImage(mainImg ? mainImg.fileName : product.img);
-      
-      // 썸네일 이미지 설정 (layer가 2인 이미지들)
-      const thumbnails = imgList.filter(img => img.layer === 2);
-      setThumbnailImages(thumbnails);
-      
-      // 상세 이미지 설정 (layer가 3인 이미지들)
-      const details = imgList.filter(img => img.layer === 3);
-      setDetailImages(details);
-      
-      // 재고 및 리뷰 정보 설정 전 로그
-      console.log('설정할 재고 정보:', stockList);
-      console.log('설정할 리뷰 정보:', reviewList);
+      if (imgList && Array.isArray(imgList)) {
+        const thumbnails = imgList.filter(img => img.layer === 2);
+        setThumbnailImages(thumbnails);
+        
+        const details = imgList.filter(img => img.layer === 3);
+        setDetailImages(details);
+      }
 
       setStocks(stockList || []);
       setReviews(reviewList || []);
-      
 
     } catch (error) {
       console.error('Error fetching product detail:', error);
-      setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
+      if (error.response) {
+        console.log('Error response:', error.response);
+        console.log('Error response headers:', error.response.headers);
+        console.log('Error response data:', error.response.data);
+        
+        if (error.response.status === 401) {
+          setError('인증에 실패했습니다. 다시 로그인해주세요.');
+        } else if (error.response.status === 404) {
+          setError('상품을 찾을 수 없습니다.');
+        } else {
+          setError(`상품 정보를 불러오는 중 오류가 발생했습니다. (${error.response.status})`);
+        }
+      } else if (error.message) {
+        setError(error.message);
+      } else {
+        setError('서버와 통신 중 오류가 발생했습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -94,7 +109,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     fetchProductDetail();
-  }, [productId, token]);
+  }, [productId]); // productId만 의존성으로 유지
 
   useEffect(() => {
     console.log('현재 상태:', {
@@ -485,7 +500,7 @@ const ProductDetail = () => {
                       </div>
                       <div className={styles.answer}>
                         <span className={styles.qnaLabel}>A.</span>
-                        <p>주문 후 1-2일 내에 출고되며, 출고 후 1-2일 내에 수령 가능합니다.</p>
+                        <p>주문 후 1-2일 내에 출고되며, 출고 후 1-2일 내 수령 가능합니다.</p>
                         <span className={styles.qnaAuthor}>- 판매자</span>
                       </div>
                     </div>
