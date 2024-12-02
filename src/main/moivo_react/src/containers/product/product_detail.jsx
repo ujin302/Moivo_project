@@ -33,9 +33,10 @@ const ProductDetail = () => {
     try {
       const headers = {}; // 헤더 초기화
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`; // 토큰 포함
+        headers['Authorization'] = `Bearer ${token}`; 
       }
-
+      // 토큰 포함
+      
       console.log('Fetching product detail for ID:', productId); // 상품 ID 로깅
       const response = await axios.get(
         // `${PATH.SERVER}/api/store/product-detail/${productId}`,
