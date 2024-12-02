@@ -161,11 +161,11 @@ const qna_boardlist = () => {
                         {/* 드롭다운 목록 */}
                         {isDropdownVisible && (
                             <ul className={QnA_b.filterList}>
-                                <li onClick={() => { setSelectedType(''); setIsDropdownVisible(false); }}>전체</li>
-                                <li onClick={() => { setSelectedType('일반문의'); setIsDropdownVisible(false); }}>일반문의</li>
-                                <li onClick={() => { setSelectedType('비밀문의'); setIsDropdownVisible(false); }}>비밀문의</li>
-                                <li onClick={() => { setSelectedType('사이즈문의'); setIsDropdownVisible(false); }}>사이즈문의</li>
-                                <li onClick={() => { setSelectedType('기타문의'); setIsDropdownVisible(false); }}>기타문의</li>
+                                <li onClick={() => { setSelectedType(''); setIsDropdownVisible(false); setActiveIndex(null); }}>전체</li>
+                                <li onClick={() => { setSelectedType('일반문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>일반문의</li>
+                                <li onClick={() => { setSelectedType('비밀문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>비밀문의</li>
+                                <li onClick={() => { setSelectedType('사이즈문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>사이즈문의</li>
+                                <li onClick={() => { setSelectedType('기타문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>기타문의</li>
                             </ul>
                         )}
                     </div>
