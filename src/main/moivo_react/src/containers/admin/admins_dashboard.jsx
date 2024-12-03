@@ -24,7 +24,7 @@ const admins_dashboard = () => {  // 컴포넌트 이름을 'Dashboard'로 변�
         // 데이터 가져오는 로직을 여기에 추가
         // 예: fetch("/api/dashboard/stats")
         setStats({
-            totalSales: 150000,
+            totalSales: 150000,   
             totalOrders: 150,
             totalProducts: 75,
             totalCustomers: 200,
