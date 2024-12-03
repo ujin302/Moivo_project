@@ -28,6 +28,12 @@ const Banner = () => {
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
       ]
+    },
+    {
+      title: 'ADMIN',
+      submenu: [
+        { name: 'DashBoard', navigateTo: '/admins_dashboard' },
+      ]
     }
   ];
 

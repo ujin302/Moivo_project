@@ -245,7 +245,7 @@ const ProductList = () => {
       alert("로그인 후에 이용해주세요.");
     }
   }
-  
+
   return (
     <div className={styles.container}>
       <Banner />
@@ -333,11 +333,17 @@ const ProductList = () => {
                     alt={product.name}
                     className={styles.productImage}
                   />
-                  <div className={styles.productOverlay}>
+                  <div 
+                    className={styles.productOverlay}
+                    onClick={() => handleProductClick(product.id)}
+                  >
                     <div className={styles.actionButtons}>
                       <motion.button
                         className={styles.actionButton}
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -345,19 +351,14 @@ const ProductList = () => {
                       </motion.button>
                       <motion.button
                         className={styles.actionButton}
-                        onClick={() => handleAddToWish(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToWish(product);
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
                         <i className="fas fa-heart" />
-                      </motion.button>
-                      <motion.button
-                        className={styles.actionButton}
-                        onClick={() => handleProductClick(product.id)}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <i className="fas fa-eye" />
                       </motion.button>
                     </div>
                   </div>

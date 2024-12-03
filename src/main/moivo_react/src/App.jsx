@@ -24,6 +24,7 @@ import MypageOrderDetails from './containers/mypage/mypage_orderDetails';
 import MypageProfile from './containers/mypage/mypage_profile';
 import Cart from './containers/cart/cart';
 import Payment from './containers/pay/payment';
+import Dashboard from './containers/admin/admins_dashboard';
 
 const routeConfig = [
   { path: "/", element: <Main_index /> },
@@ -48,6 +49,7 @@ const routeConfig = [
   { path: "/qna_boardlist", element: <Qna_boardlist /> },
   { path: "/cart", element: <Cart /> },
   { path: "/payment", element: <Payment /> },
+  { path : "/admins_dashboard", element: <Dashboard/>}
 ];
 
 const App = () => {

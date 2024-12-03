@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHeart, FaShoppingCart, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard, FaRuler } from 'react-icons/fa';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from '../../../scripts/path';
 import styles from '../../assets/css/product_detail.module.css';
@@ -25,6 +25,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null); // 에러 상태
   const [quantity, setQuantity] = useState(1); // 수량
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
+  const [showSizeGuide, setShowSizeGuide] = useState(false); // 사이즈 가이드 표시 여부
 
   const fetchProductDetail = async () => { // 상품 상세 정보 가져오기
     setLoading(true);
@@ -220,6 +221,10 @@ const ProductDetail = () => {
               {product?.name || "상품명 정보가 없습니다."}
             </motion.h1>
             
+            <motion.div className={styles.productMeta}>
+              <span className={styles.productCode}>상품코드: {product?.id}</span>
+            </motion.div>
+            
             <motion.p 
               className={styles.price}
               initial={{ opacity: 0, x: -20 }}
@@ -228,7 +233,60 @@ const ProductDetail = () => {
             >
               {product?.price?.toLocaleString()}원
             </motion.p>
+
+            <div className={styles.productInfo}>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>배송 정보</span>
+                <span className={styles.infoValue}>
+                  <span className={styles.highlight}>무료배송</span>
+                  <span className={styles.subInfo}>Moivo통운 | 3일 이내 출고</span>
+                </span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>적립금</span>
+                <span className={styles.infoValue}>
+                  {Math.floor(product?.price * 0.01).toLocaleString()}원 (1%)
+                  <span className={styles.subInfo}>+ 카드 추가적립 최대 1%</span>
+                </span>
+              </div>
+            </div>
             
+            <div className={styles.productFeatures}>
+              <div className={styles.featureItem}>
+                <FaTruck className={styles.featureIcon} />
+                <span>무료배송</span>
+              </div>
+              <div className={styles.featureItem}>
+                <FaExchangeAlt className={styles.featureIcon} />
+                <span>14일 이내 교환/반품</span>
+              </div>
+              <div className={styles.featureItem}>
+                <FaCreditCard className={styles.featureIcon} />
+                <span>카드 무이자</span>
+              </div>
+            </div>
+
+            <div className={styles.productTags}>
+              <span className={styles.tag}>#겨울아우터</span>
+              <span className={styles.tag}>#데일리룩</span>
+              <span className={styles.tag}>#트렌디</span>
+            </div>
+
+            <div className={styles.deliveryInfo}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoTitle}>배송방법</span>
+                <span className={styles.infoContent}>Moivo 직접배송</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoTitle}>결제방법</span>
+                <div className={styles.paymentMethods}>
+                  <span className={styles.paymentMethod}>신용카드</span>
+                  <span className={styles.paymentMethod}>무통장입금</span>
+                  <span className={styles.paymentMethod}>카카오페이</span>
+                </div>
+              </div>
+            </div>
+
             <motion.div 
               className={styles.sizeSection}
               initial={{ opacity: 0, y: 20 }}
@@ -290,36 +348,45 @@ const ProductDetail = () => {
             )}
 
             <motion.div 
-              className={styles.actionButtons}
+              className={styles.actionButtonsVertical}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <motion.button
-                className={styles.cartButton}
-                onClick={handleAddToCart}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaShoppingCart /> 장바구니
-              </motion.button>
-              <motion.button
-                className={styles.purchaseButton}
+                className={`${styles.actionButton} ${styles.purchaseButton}`}
                 onClick={handlePurchase}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                구매하기
+                바로 구매하기
               </motion.button>
               <motion.button
-                className={styles.wishlistButton}
-                onClick={handleAddToWishlist}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className={`${styles.actionButton} ${styles.cartButton}`}
+                onClick={handleAddToCart}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <FaHeart /> 위시리스트
+                <FaShoppingCart /> 장바구니 담기
+              </motion.button>
+              <motion.button
+                className={`${styles.actionButton} ${styles.wishlistButton}`}
+                onClick={handleAddToWishlist}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <FaHeart /> 위시리스트 추가
               </motion.button>
             </motion.div>
+
+            <motion.button 
+              className={styles.inquiryButton}
+              onClick={() => {/* 문의하기 로직 */}}
+              whileHover={{ scale: 1.02 }}
+            >
+              상품 문의하기
+          </motion.button>
+          
           </div>
         </motion.div>
 
@@ -399,13 +466,40 @@ const ProductDetail = () => {
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true }}
                         >
+                          <div className={styles.reviewHeader}>
+                            <span className={styles.rating}>★ {review.rating}</span>
+                            <span className={styles.reviewAuthor}>{review.userName}</span>
+                          </div>
                           <p className={styles.reviewContent}>{review.content}</p>
-                          <p className={styles.reviewAuthor}>{review.userName}</p>
                         </motion.div>
                       ))}
                     </div>
                   ) : (
-                    <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+                    <div className={styles.noReviewContainer}>
+                      <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
+                      <div className={styles.exampleReviews}>
+                        <h3>리뷰 예시</h3>
+                        <div className={styles.exampleReview}>
+                          <div className={styles.reviewHeader}>
+                            <span className={styles.rating}>★ 4.5</span>
+                            <span className={styles.reviewAuthor}>홍길동</span>
+                          </div>
+                          <p className={styles.reviewContent}>
+                            상품이 너무 마음에 들어요! 사이즈도 딱 맞고 배송도 빨랐습니다.
+                            다음에도 구매하고 싶네요.
+                          </p>
+                        </div>
+                        <div className={styles.exampleReview}>
+                          <div className={styles.reviewHeader}>
+                            <span className={styles.rating}>★ 5.0</span>
+                            <span className={styles.reviewAuthor}>김철수</span>
+                          </div>
+                          <p className={styles.reviewContent}>
+                            퀄리티가 정말 좋아요. 가격대비 만족스럽습니다!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
@@ -413,14 +507,60 @@ const ProductDetail = () => {
               {activeTab === 'qna' && (
                 <div className={styles.qnaSection}>
                   <h2 className={styles.sectionHeading}>상품 QNA</h2>
-                  <p>준비중입니다.</p>
+                  <div className={styles.qnaList}>
+                    <div className={styles.qnaItem}>
+                      <div className={styles.question}>
+                        <span className={styles.qnaLabel}>Q.</span>
+                        <p>사이즈가 평소 사이즈보다 작나요?</p>
+                        <span className={styles.qnaAuthor}>- 구매예정자</span>
+                      </div>
+                      <div className={styles.answer}>
+                        <span className={styles.qnaLabel}>A.</span>
+                        <p>정사이즈로 제작되었습니다. 평소 신으시는 사이즈로 주문해주시면 됩니다.</p>
+                        <span className={styles.qnaAuthor}>- 판매자</span>
+                      </div>
+                    </div>
+                    <div className={styles.qnaItem}>
+                      <div className={styles.question}>
+                        <span className={styles.qnaLabel}>Q.</span>
+                        <p>배송은 보통 얼마나 걸리나요?</p>
+                        <span className={styles.qnaAuthor}>- 구매희망</span>
+                      </div>
+                      <div className={styles.answer}>
+                        <span className={styles.qnaLabel}>A.</span>
+                        <p>주문 후 1-2일 내에 출고되며, 출고 후 1-2일 내 수령 가능합니다.</p>
+                        <span className={styles.qnaAuthor}>- 판매자</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {activeTab === 'policy' && (
                 <div className={styles.policySection}>
                   <h2 className={styles.sectionHeading}>환불/교환 정책</h2>
-                  <p>준비중입니다.</p>
+                  <div className={styles.policyContent}>
+                    <h3>교환/반품 안내</h3>
+                    <ul>
+                      <li>상품 수령 후 7일 이내에 교환/반품이 가능합니다.</li>
+                      <li>제품에 하자가 있는 경우 무상으로 교환/반품 가능합니다.</li>
+                      <li>고객의 단순 변심으로 인한 교환/반품의 경우 배송비는 고객 부담입니다.</li>
+                    </ul>
+                    
+                    <h3>교환/반품이 불가능한 경우</h3>
+                    <ul>
+                      <li>상품 수령 후 7일이 경과한 경우</li>
+                      <li>착용한 흔적이 있거나 상품이 훼손된 경우</li>
+                      <li>상품의 택이나 라벨이 제거된 경우</li>
+                      <li>고객의 부주의로 인해 상품이 훼손된 경우</li>
+                    </ul>
+
+                    <h3>환불 안내</h3>
+                    <ul>
+                      <li>상품 회수 확인 후 3영업일 이내에 환불이 진행됩니다.</li>
+                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을 수 있습니다.</li>
+                    </ul>
+                  </div>
                 </div>
               )}
             </motion.div>
