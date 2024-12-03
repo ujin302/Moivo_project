@@ -21,21 +21,21 @@ public class UserController {
     @Autowired
     private UserCouponService userCouponService;
 
-// 회원가입
-@PostMapping("/join")
-public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
-    int userId = userService.insert(userDTO);
+    // 회원가입
+    @PostMapping("/join")
+    public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
+        int userId = userService.insert(userDTO);
 
-    // 회원가입이 성공한 후, LV1 쿠폰 발급 2024.11.25 sumin
-    try {
-        userCouponService.updateCouponByUserAndGrade(userId, "LV1");  // LV1 쿠폰 발급
-        System.out.println("회원가입 후 LV1 쿠폰이 발급되었습니다.");
-    } catch (Exception e) {
-        return new ResponseEntity<>("회원가입 후 쿠폰 발급 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        // 회원가입이 성공한 후, LV1 쿠폰 발급 2024.11.25 sumin
+        try {
+            userCouponService.updateCouponByUserAndGrade(userId, "LV1");  // LV1 쿠폰 발급
+            System.out.println("회원가입 후 LV1 쿠폰이 발급되었습니다.");
+        } catch (Exception e) {
+            return new ResponseEntity<>("회원가입 후 쿠폰 발급 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>("회원가입 성공: " + userId, HttpStatus.CREATED);
     }
-
-    return new ResponseEntity<>("회원가입 성공: " + userId, HttpStatus.CREATED);
-}
 
     // 결제에 따른 등급 업데이트 2024.11.25 sumin
     @PostMapping("/updateGrade/{userId}")
@@ -72,16 +72,16 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
                 // 토큰에서 userId 추출
                 Map<String, Object> userData = userService.getUserDataFromToken(jwt);
                 String userId = (String) userData.get("userId");
-                
+
                 // 새 토큰 발급
                 Map<String, Object> result = userService.refreshUserToken(userId);
                 return ResponseEntity.ok(result);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(Map.of("error", "유효하지 않은 토큰 형식"));
+                    .body(Map.of("error", "유효하지 않은 토큰 형식"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(Map.of("error", "토큰 갱신 실패: " + e.getMessage()));
+                    .body(Map.of("error", "토큰 갱신 실패: " + e.getMessage()));
         }
     }
 

@@ -42,6 +42,18 @@ public class StoreController {
         dataMap.put("keyword", keyword); // 검색어
 
         Map<String, Object> map = productService.getProductList(dataMap);
+
+        //400 Bad Request: 잘못된 요청
+        if (categoryid < 0 || sortby.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.SC_BAD_REQUEST).body("400 Bad Request");
+        }
+
+        //401 Unauthorized: 인증되지 않은 사용자
+        //추후 토큰 사용시 사용예정
+//        if (token == null || !isValidToken(token)) {
+//            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("401 Unauthorized");
+//        }
+
         // 값 존재 X
         if (map == null)
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);

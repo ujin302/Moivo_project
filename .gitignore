@@ -37,3 +37,6 @@ out/
 .vscode/
 
 /src/main/moivo_react/node_modules
+
+##소셜로그인 설정 yml 무시
+socialLogin.yml
