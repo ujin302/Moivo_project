@@ -34,7 +34,7 @@ const Banner = () => {
     {
       title: 'ADMIN',
       submenu: [
-        { name: 'DashBoard', navigateTo: '/dashboard' },
+        { name: 'DashBoard', navigateTo: '/admins_dashboard' },
       ]
     }
   ];

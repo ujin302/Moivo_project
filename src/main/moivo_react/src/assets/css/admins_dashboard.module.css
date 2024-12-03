@@ -1,8 +1,12 @@
 .dashboardMain{
     height: 100%;
     background-color: #fff;
-    border: 1px solid red;
 }
+
+.dashboardheader{
+    height: 110px;
+}
+
 .dashboardContainer {
     padding: 20px;
     font-family: 'Arial', sans-serif;

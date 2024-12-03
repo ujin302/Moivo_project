@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import admin_dashboard from '../../assets/css/admin_dashboard.module.css';
+import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
+import Banner from '../../components/Banner/banner';
+import Admins_side from '../../components/admin_sidebar/admins_side';
 
-const dashboard = () => {  // 컴포넌트 이름을 'Dashboard'로 변경
+const admins_dashboard = () => {  // 컴포넌트 이름을 'Dashboard'로 변경
     const [stats, setStats] = useState({
         totalSales: 0,
         totalOrders: 0,
@@ -31,6 +33,8 @@ const dashboard = () => {  // 컴포넌트 이름을 'Dashboard'로 변경
 
     return (
         <div className={admin_dashboard.dashboardMain}>
+            <div><Admins_side/></div>
+            <div className={admin_dashboard.dashboardheader}></div>
             <div className={admin_dashboard.dashboardContainer}>
                 <h2 className={admin_dashboard.dashboardTitle}>관리자 대시보드</h2>
                 
@@ -82,4 +86,4 @@ const dashboard = () => {  // 컴포넌트 이름을 'Dashboard'로 변경
     );
 };
 
-export default dashboard;
+export default admins_dashboard;
