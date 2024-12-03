@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHeart, FaShoppingCart, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard, FaRuler } from 'react-icons/fa';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from '../../../scripts/path';
 import styles from '../../assets/css/product_detail.module.css';
@@ -25,83 +25,59 @@ const ProductDetail = () => {
   const [error, setError] = useState(null); // 에러 상태
   const [quantity, setQuantity] = useState(1); // 수량
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
+  const [showSizeGuide, setShowSizeGuide] = useState(false); // 사이즈 가이드 표시 여부
 
   const fetchProductDetail = async () => { // 상품 상세 정보 가져오기
     setLoading(true);
     setError(null);
 
     try {
-      // 세션 스토리지에서 토큰 가져오기
-      const sessionToken = sessionStorage.getItem('token');
-      console.log('Session Token:', sessionToken); // 토큰 값 확인
-
-      // 토큰이 없으면 에러 처리
-      if (!sessionToken) {
-        throw new Error('로그인이 필요한 서비스입니다.');
+      const headers = {}; // 헤더 초기화
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`; // 토큰 포함
       }
 
-      const headers = {
-        'Authorization': `Bearer ${sessionToken}`,
-        'Content-Type': 'application/json'
-      };
-      
-      console.log('Request Headers:', headers);
-      console.log('Fetching product detail for ID:', productId);
-      
+      console.log('Fetching product detail for ID:', productId); // 상품 ID 로깅
       const response = await axios.get(
+        // `${PATH.SERVER}/api/store/product-detail/${productId}`,
         `${PATH.SERVER}/api/store/${productId}`,
-        { 
-          headers,
-          withCredentials: true 
-        }
+        { headers }
       );
 
-      console.log('API Response:', response.data);
+      console.log('API Response:', response.data); // API 응답 로깅
 
       if (!response.data) {
         throw new Error('상품 정보를 불러올 수 없습니다.');
       }
 
-      const { product, imgList, stockList, reviewList } = response.data;
+      const { product, imgList, stockList, reviewList } = response.data; // 상품, 이미지, 재고 정보 추출
       
-      console.log('받은 데이터:', response.data);
-      if (!product) {
-        throw new Error('상품 정보가 존재하지 않습니다.');
-      }
-
+      console.log(response.data);
+      // 상품 기본 정보 설정
       setProduct(product);
-      setMainImage(product.img);
       
-      if (imgList && Array.isArray(imgList)) {
-        const thumbnails = imgList.filter(img => img.layer === 2);
-        setThumbnailImages(thumbnails);
-        
-        const details = imgList.filter(img => img.layer === 3);
-        setDetailImages(details);
-      }
+      // 메인 이미지 설정 (layer가 1인 이미지)
+      const mainImg = imgList.find(img => img.layer === 1);
+      setMainImage(mainImg ? mainImg.fileName : product.img);
+      
+      // 썸네일 이미지 설정 (layer가 2인 이미지들)
+      const thumbnails = imgList.filter(img => img.layer === 2);
+      setThumbnailImages(thumbnails);
+      
+      // 상세 이미지 설정 (layer가 3인 이미지들)
+      const details = imgList.filter(img => img.layer === 3);
+      setDetailImages(details);
+      
+      // 재고 정보 설정
+      setStocks(stockList);
 
-      setStocks(stockList || []);
-      setReviews(reviewList || []);
+      // 리뷰 정보 설정
+      setReviews(reviewList);
+      
 
     } catch (error) {
       console.error('Error fetching product detail:', error);
-      if (error.response) {
-        console.log('Error response:', error.response);
-        console.log('Error response headers:', error.response.headers);
-        console.log('Error response data:', error.response.data);
-        
-        if (error.response.status === 401) {
-          setError('인증에 실패했습니다. 다시 로그인해주세요.');
-        } else if (error.response.status === 404) {
-          setError('상품을 찾을 수 없습니다.');
-        } else {
-          setError(`상품 정보를 불러오는 중 오류가 발생했습니다. (${error.response.status})`);
-        }
-      } else if (error.message) {
-        setError(error.message);
-      } else {
-        setError('서버와 통신 중 오류가 발생했습니다.');
-      }
+      setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -109,18 +85,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     fetchProductDetail();
-  }, [productId]); // productId만 의존성으로 유지
-
-  useEffect(() => {
-    console.log('현재 상태:', {
-      product,
-      mainImage,
-      thumbnailImages,
-      detailImages,
-      stocks,
-      reviews
-    });
-  }, [product, mainImage, thumbnailImages, detailImages, stocks, reviews]);
+  }, [productId, token]);
 
   const handleThumbnailClick = (imgUrl) => { // 썸네일 이미지 클릭 시 메인 이미지 변경
     setMainImage(imgUrl);
@@ -184,12 +149,10 @@ const ProductDetail = () => {
   };
 
   if (loading) { // 로딩 중일 때 로딩 모달 표시
-    console.log('로딩 중...');
     return <LoadingModal isOpen={true} />;
   }
 
   if (error) { // 에러 발생 시 에러 메시지 표시
-    console.log('에러 발생:', error);
     return (
       <div className={styles.errorWrapper}>
         <div className={styles.errorMessage}>{error}</div>
@@ -208,7 +171,6 @@ const ProductDetail = () => {
   }
 
   if (!product) {
-    console.log('상품 정보 없음');
     return null;
   }
 
@@ -259,6 +221,10 @@ const ProductDetail = () => {
               {product?.name || "상품명 정보가 없습니다."}
             </motion.h1>
             
+            <motion.div className={styles.productMeta}>
+              <span className={styles.productCode}>상품코드: {product?.id}</span>
+            </motion.div>
+            
             <motion.p 
               className={styles.price}
               initial={{ opacity: 0, x: -20 }}
@@ -267,7 +233,60 @@ const ProductDetail = () => {
             >
               {product?.price?.toLocaleString()}원
             </motion.p>
+
+            <div className={styles.productInfo}>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>배송 정보</span>
+                <span className={styles.infoValue}>
+                  <span className={styles.highlight}>무료배송</span>
+                  <span className={styles.subInfo}>Moivo통운 | 3일 이내 출고</span>
+                </span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>적립금</span>
+                <span className={styles.infoValue}>
+                  {Math.floor(product?.price * 0.01).toLocaleString()}원 (1%)
+                  <span className={styles.subInfo}>+ 카드 추가적립 최대 1%</span>
+                </span>
+              </div>
+            </div>
             
+            <div className={styles.productFeatures}>
+              <div className={styles.featureItem}>
+                <FaTruck className={styles.featureIcon} />
+                <span>무료배송</span>
+              </div>
+              <div className={styles.featureItem}>
+                <FaExchangeAlt className={styles.featureIcon} />
+                <span>14일 이내 교환/반품</span>
+              </div>
+              <div className={styles.featureItem}>
+                <FaCreditCard className={styles.featureIcon} />
+                <span>카드 무이자</span>
+              </div>
+            </div>
+
+            <div className={styles.productTags}>
+              <span className={styles.tag}>#겨울아우터</span>
+              <span className={styles.tag}>#데일리룩</span>
+              <span className={styles.tag}>#트렌디</span>
+            </div>
+
+            <div className={styles.deliveryInfo}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoTitle}>배송방법</span>
+                <span className={styles.infoContent}>Moivo 직접배송</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoTitle}>결제방법</span>
+                <div className={styles.paymentMethods}>
+                  <span className={styles.paymentMethod}>신용카드</span>
+                  <span className={styles.paymentMethod}>무통장입금</span>
+                  <span className={styles.paymentMethod}>카카오페이</span>
+                </div>
+              </div>
+            </div>
+
             <motion.div 
               className={styles.sizeSection}
               initial={{ opacity: 0, y: 20 }}
@@ -329,36 +348,45 @@ const ProductDetail = () => {
             )}
 
             <motion.div 
-              className={styles.actionButtons}
+              className={styles.actionButtonsVertical}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
               <motion.button
-                className={styles.cartButton}
-                onClick={handleAddToCart}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaShoppingCart /> 장바구니
-              </motion.button>
-              <motion.button
-                className={styles.purchaseButton}
+                className={`${styles.actionButton} ${styles.purchaseButton}`}
                 onClick={handlePurchase}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                구매하기
+                바로 구매하기
               </motion.button>
               <motion.button
-                className={styles.wishlistButton}
-                onClick={handleAddToWishlist}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className={`${styles.actionButton} ${styles.cartButton}`}
+                onClick={handleAddToCart}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <FaHeart /> 위시리스트
+                <FaShoppingCart /> 장바구니 담기
+              </motion.button>
+              <motion.button
+                className={`${styles.actionButton} ${styles.wishlistButton}`}
+                onClick={handleAddToWishlist}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <FaHeart /> 위시리스트 추가
               </motion.button>
             </motion.div>
+
+            <motion.button 
+              className={styles.inquiryButton}
+              onClick={() => {/* 문의하기 로직 */}}
+              whileHover={{ scale: 1.02 }}
+            >
+              상품 문의하기
+          </motion.button>
+          
           </div>
         </motion.div>
 
@@ -515,7 +543,7 @@ const ProductDetail = () => {
                     <h3>교환/반품 안내</h3>
                     <ul>
                       <li>상품 수령 후 7일 이내에 교환/반품이 가능합니다.</li>
-                      <li>제품에 하자가 있는 경우 무상으로 교환/반품이 가능합니다.</li>
+                      <li>제품에 하자가 있는 경우 무상으로 교환/반품 가능합니다.</li>
                       <li>고객의 단순 변심으로 인한 교환/반품의 경우 배송비는 고객 부담입니다.</li>
                     </ul>
                     
