@@ -16,5 +16,6 @@ public class UserCartDTO {
     private String size; // 상품 사이즈 (S, M, L)
     private int count; // 상품 수량
     private int stockCount; // ProductStock에서 가져온 재고 수량
+    private boolean isSoldOut;  // 품절 여부
 }
 

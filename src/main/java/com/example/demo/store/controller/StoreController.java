@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.store.service.ProductService;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -49,18 +50,17 @@ public class StoreController {
         return ResponseEntity.ok(map);
     }
 
-    // 개별 상품 상세 정보 요청_241127-sc
-    @GetMapping("/product-detail/{productId}")
-    public ResponseEntity<?> getProductDetail(@PathVariable int productId) {
-        try {
-            Map<String, Object> productData = productService.getProduct(productId);
-            if (productData == null) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
-            }
-            return ResponseEntity.ok(productData);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    // 24.11.29 - 상품 상세 내용 추출 - uj
+    @GetMapping("/{productId}")
+    public ResponseEntity<?> getProductDetail(@PathVariable("productId") int productId) {
+        System.out.println("상품 상세 조회 요청: " + productId);
+        Map<String, Object> map = productService.getProduct(productId);
+        // 값 존재 X
+        if (map == null)
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+
+        // 값 존재 O
+        return ResponseEntity.ok(map);
     }
 
 }

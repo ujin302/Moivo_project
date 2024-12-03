@@ -47,83 +47,87 @@ public class CartServiceImpl implements CartService {
         // 사용자 장바구니 가져오기
         CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                 .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
-
+    
         // 상품 정보 가져오기
         ProductEntity productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("해당 상품이 없습니다."));
-
-        // 입력된 사이즈를 `ProductStockEntity.Size`로 변환
-        ProductStockEntity.Size sizeEnum;
-        try {
-            sizeEnum = ProductStockEntity.Size.valueOf(size.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("유효하지 않은 사이즈 값입니다: " + size);
-        }
-
-        // 상품 재고 확인
+    
+        // 입력된 사이즈를 Enum으로 변환
+        ProductStockEntity.Size sizeEnum = ProductStockEntity.Size.valueOf(size.toUpperCase());
+    
+        // 재고 확인
         ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(productEntity, sizeEnum);
         if (stockEntity == null || stockEntity.getCount() < count) {
             throw new RuntimeException("해당 사이즈의 재고가 부족합니다.");
         }
-
+    
         // 장바구니에 추가
         UserCartEntity userCartEntity = new UserCartEntity();
         userCartEntity.setCartEntity(cartEntity);
         userCartEntity.setProductEntity(productEntity);
         userCartEntity.setCount(count);
-        userCartEntity.setSize(sizeEnum); // Enum 값으로 설정
-
-        // 저장
+        userCartEntity.setSize(sizeEnum);
+    
         userCartEntity = userCartRepository.save(userCartEntity);
-
+    
+        // 재고 수량 계산
+        int stockCount = 0;
+        for (ProductStockEntity stock : productEntity.getStockList()) {
+            if (stock.getSize().equals(sizeEnum)) {
+                stockCount = stock.getCount();
+                break;
+            }
+        }
+    
         // DTO 반환
         ProductDTO productDTO = ProductDTO.toGetProductDTO(productEntity);
         return new UserCartDTO(
                 userCartEntity.getId(),
                 cartEntity.getId(),
                 productDTO,
-                sizeEnum.name(), // Enum -> String 변환
+                sizeEnum.name(),
                 count,
-                stockEntity.getCount() // 남은 재고 수량
+                stockCount,
+                stockCount <= 0 // 품절 여부
         );
     }
 
-    // 장바구니 출력
     @Override
     public Map<String, Object> printCart(int userId) {
         // 사용자 장바구니 가져오기
         CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                 .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
-
+    
         // 장바구니 상품 목록 가져오기
         List<UserCartEntity> userCartEntities = userCartRepository.findByCartEntity_Id(cartEntity.getId());
-
-        // DTO 리스트 생성
+    
         List<UserCartDTO> cartList = new ArrayList<>();
         for (UserCartEntity userCart : userCartEntities) {
             ProductDTO productDTO = ProductDTO.toGetProductDTO(userCart.getProductEntity());
-
-            // 상품 재고 확인
-            ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
-                    userCart.getProductEntity(),
-                    userCart.getSize()
-            );
-            int stockCount = (stockEntity != null) ? stockEntity.getCount() : 0;
-
+    
+            // 재고 수량 계산
+            int stockCount = 0;
+            for (ProductStockEntity stock : userCart.getProductEntity().getStockList()) {
+                if (stock.getSize().equals(userCart.getSize())) {
+                    stockCount = stock.getCount();
+                    break;
+                }
+            }
+    
             // DTO 생성
             UserCartDTO userCartDTO = new UserCartDTO(
                     userCart.getId(),
                     cartEntity.getId(),
                     productDTO,
-                    userCart.getSize().name(), // Enum -> String 변환
+                    userCart.getSize().name(),
                     userCart.getCount(),
-                    stockCount
+                    stockCount,
+                    stockCount <= 0 // 품절 여부
             );
-
+    
             cartList.add(userCartDTO);
         }
-
-        // 결과 맵 반환
+    
         Map<String, Object> cartMap = new HashMap<>();
         cartMap.put("cartItems", cartList);
         cartMap.put("totalItems", cartList.size());
@@ -145,5 +149,60 @@ public class CartServiceImpl implements CartService {
         cartEntity.getUserCartList().remove(userCartEntity);
         userCartRepository.delete(userCartEntity);
     }
-}
 
+    // 장바구니 상품 업데이트 11.28 sumin
+    @Override
+    public UserCartDTO updateCartItem(int userCartId, Integer count, String size) {
+        // 장바구니 항목 확인
+        UserCartEntity userCartEntity = userCartRepository.findById(userCartId)
+                .orElseThrow(() -> new RuntimeException("해당 장바구니 항목이 없습니다."));
+    
+        // 사이즈 업데이트
+        if (size != null) {
+            ProductStockEntity.Size sizeEnum = ProductStockEntity.Size.valueOf(size.toUpperCase());
+            ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
+                    userCartEntity.getProductEntity(), sizeEnum);
+    
+            if (stockEntity == null || stockEntity.getCount() < (count != null ? count : userCartEntity.getCount())) {
+                throw new RuntimeException("해당 사이즈의 재고가 부족합니다.");
+            }
+            userCartEntity.setSize(sizeEnum);
+        }
+    
+        // 수량 업데이트
+        if (count != null) {
+            if (userCartEntity.getSize() != null) {
+                ProductStockEntity stockEntity = productStockRepository.findByProductEntityAndSize(
+                        userCartEntity.getProductEntity(), userCartEntity.getSize());
+                if (stockEntity.getCount() < count) {
+                    throw new RuntimeException("재고가 부족합니다.");
+                }
+            }
+            userCartEntity.setCount(count);
+        }
+    
+        // 업데이트된 데이터 저장
+        userCartRepository.save(userCartEntity);
+    
+        // 재고 수량 계산
+        int stockCount = 0;
+        for (ProductStockEntity stock : userCartEntity.getProductEntity().getStockList()) {
+            if (stock.getSize().equals(userCartEntity.getSize())) {
+                stockCount = stock.getCount();
+                break;
+            }
+        }
+    
+        // DTO 생성
+        ProductDTO productDTO = ProductDTO.toGetProductDTO(userCartEntity.getProductEntity());
+        return new UserCartDTO(
+                userCartEntity.getId(),
+                userCartEntity.getCartEntity().getId(),
+                productDTO,
+                userCartEntity.getSize().name(),
+                userCartEntity.getCount(),
+                stockCount,
+                stockCount <= 0 // 품절 여부
+        );
+    }
+}

@@ -2,12 +2,13 @@ package com.example.demo.store.entity;
 
 import java.util.List;
 
-import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.dto.ProductDTO;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +23,10 @@ import lombok.Data;
 @Entity
 @Table(name = "product")
 public class ProductEntity { // 상품
+
+    public enum Gender {
+        ALL, MAN, WOMAN
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +43,10 @@ public class ProductEntity { // 상품
 
     @Column(nullable = false)
     private int price; // 상품 가격
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10, nullable = false)
+    private Gender gender; // 성별
 
     // 상품 n개 : 카테고리 1개
     @ManyToOne
@@ -66,6 +75,7 @@ public class ProductEntity { // 상품
         entity.setImg(dto.getImg());
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
+        entity.setGender(dto.getGender());
 
         return entity;
     }
@@ -78,6 +88,7 @@ public class ProductEntity { // 상품
         entity.setImg(dto.getImg());
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
+        entity.setGender(dto.getGender());
 
         return entity;
     }

@@ -6,6 +6,7 @@ import axios from 'axios';
 import mypageIcon from '../../assets/image/mypage.png'; 
 import cartIcon from '../../assets/image/cart.png';
 
+
 const Banner = () => {
   const navigate = useNavigate();
   const { isLoggedIn, logout, tokenExpiration } = useContext(AuthContext);
@@ -16,8 +17,6 @@ const Banner = () => {
       title: 'SHOP',
       submenu: [
         { name: 'ALL', navigateTo: '/product-list' },
-        { name: 'NEW', navigateTo: '/product-list' },
-        { name: 'BEST', navigateTo: '/product-list' },
         { name: 'Dashboard', navigateTo: '/product-board' }
       ]
     },
@@ -28,7 +27,6 @@ const Banner = () => {
         { name: '파일수정(임시)', navigateTo: '/update' },
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
-        { name: 'REVIEW', navigateTo: '/qna/review' }
       ]
     },
     {

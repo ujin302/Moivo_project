@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import styles from '../assets/css/Main_index.module.css';
 import video from '../assets/image/main_banner1.mp4';
+import Banner from "../components/Banner/banner";
 import { Link } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -86,49 +87,12 @@ const Main_index = () => {
 
     return (
         <div className={styles.maindiv}>
+            <Banner/>
             {/* banner */}
             <div className={styles.videoContainer}>
                 <video className={styles.video} autoPlay muted loop>
                     <source src={video} type="video/mp4" />
                 </video>
-                {/* 메뉴바 */}
-                <div
-                    className={`${styles.menuBar} ${menuOpen ? styles.menuOpen : ''}`}
-                    onClick={toggleMenu}
-                >
-                    <div className={styles.menuBarLine}></div>
-                    <div className={styles.menuBarLine}></div>
-                    <div className={styles.menuBarLine}></div>
-                </div>
-
-                {/* 토글 메뉴 */}
-                <div className={`${styles.menu} ${menuOpen ? styles.menuOpen : ''}`}>
-                <ul className={styles.menuList}>
-                    {isLoggedIn ? (
-                    <>
-                        <li>
-                        <Link to="/mypage">MyPage</Link> {/* 로그인 상태: 마이페이지 */}
-                        </li>
-                        <li>
-                        <a href="#" onClick={handleLogout}>Logout</a> {/* 로그아웃 */}
-                        </li>
-                    </>
-                    ) : (
-                    <li>
-                        <Link to="/user">Login</Link> {/* 비로그인 상태: 로그인 */}
-                    </li>
-                    )}
-                    <li>
-                    <Link to="/product-list">STORE</Link>
-                    </li>
-                    <li>
-                    <Link to="/qna_faqboard">QnA</Link>
-                    </li>
-                    <li>
-                    <a href="#">토글메뉴 4번</a>
-                    </li>
-                </ul>
-                </div>
             </div>
 
             {/* main_part1 */}
@@ -169,7 +133,7 @@ const Main_index = () => {
                 <div 
                     className={styles.textSection2} 
                     data-aos="fade-up" 
-                    data-aos-offset="100%"  // 화면 중앙에서 트리거
+                    data-aos-offset="50%"  // 화면 중앙에서 트리거
                     data-aos-delay="1200"   // 지연 시간 1200ms
                 >
                     <h1 className={styles.title2}>Moivo</h1>
@@ -224,7 +188,7 @@ const Main_index = () => {
                         }`}
                     >
                         {slides.map((s, i) => (
-                            <Link to="/product">
+                            <Link to="/product-list">
                                 <li key={i} className={styles.slide_list}>
                                     
                                         <img
@@ -244,7 +208,7 @@ const Main_index = () => {
                         }`}
                     >
                         {slides.map((s, i) => (
-                            <Link to="/product">
+                            <Link to="/product-list">
                                 <li key={i} className={styles.slide_list}>
                                         <img
                                             src={s.src}
@@ -271,7 +235,7 @@ const Main_index = () => {
                     <h2>Moivo</h2>
                     <span>f/w 최대 90% Sale</span>
                     </div>
-                    <Link to="/product">
+                    <Link to="/product-list">
                         <div className={styles.page2}>
                         <h2>Sale Product</h2>
                         <span>This is second page...</span>
