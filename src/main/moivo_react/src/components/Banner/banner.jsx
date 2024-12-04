@@ -2,14 +2,17 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import styles from '../../assets/css/banner.module.css';
-import axios from 'axios';
 import mypageIcon from '../../assets/image/mypage.png'; 
 import cartIcon from '../../assets/image/cart.png';
 
 const Banner = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, logout, tokenExpiration } = useContext(AuthContext);
+  const { isAuthenticated, logout, tokenExpiration } = useContext(AuthContext);
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
+
+  useEffect(() => {
+    console.log('현재 인증 상태:', isAuthenticated);
+  }, [isAuthenticated]);
 
   const navLinks = [
     {
@@ -37,15 +40,13 @@ const Banner = () => {
     setOpenMenuIndex(openMenuIndex === idx ? null : idx);
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('id');
-    sessionStorage.removeItem('paymentId');
-    sessionStorage.removeItem('wishId');
-
-    logout();
-    alert('로그아웃되었습니다.');
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+    }
   };
 
   const formatExpiration = (expiration) => {
@@ -87,17 +88,27 @@ const Banner = () => {
         </nav>
 
         <div className={styles.utility}>
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <>
-              {/* My Page */}
-              <a href="/mypage" className={styles.utilityLink}>
+              <a 
+                onClick={(e) => {
+                  e.preventDefault();  // 기본 동작 방지
+                  navigate('/user/mypage');
+                }} 
+                className={styles.utilityLink}
+              >
                 <span className={styles.text}>My Page</span>
-                <img src={mypageIcon} className={styles.iconImage} />
+                <img src={mypageIcon} className={styles.iconImage} alt="mypage" />
               </a>
-              {/* Cart */}
-              <a href="/cart" className={styles.utilityLink}>
+              <a 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/cart');
+                }} 
+                className={styles.utilityLink}
+              >
                 <span className={styles.text}>Cart</span>
-                <img src={cartIcon}  className={styles.iconImage} />
+                <img src={cartIcon} className={styles.iconImage} alt="cart" />
               </a>
               <button onClick={handleLogout} className={styles.logoutButton}>
                 Logout
@@ -105,17 +116,33 @@ const Banner = () => {
             </>
           ) : (
             <>
-              <a href="/user" className={styles.utilityLink2}>Login</a>
-              <a href="/user_signup" className={styles.utilityLink2}>Sign Up</a>
+              <a 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/user');
+                }} 
+                className={styles.utilityLink2}
+              >
+                Login
+              </a>
+              <a 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/user_signup');
+                }} 
+                className={styles.utilityLink2}
+              >
+                Sign Up
+              </a>
             </>
           )}
 
           <div className={styles.loginStatus}>
             <span>
-              <span className={`${styles.status} ${isLoggedIn ? styles.on : styles.off}`}></span>
-              {isLoggedIn ? 'ON' : 'OFF'}
+              <span className={`${styles.status} ${isAuthenticated ? styles.on : styles.off}`}></span>
+              {isAuthenticated ? 'ON' : 'OFF'}
             </span>
-            {isLoggedIn && ( <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span> )}
+            {isAuthenticated && ( <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span> )}
           </div>
 
         </div>

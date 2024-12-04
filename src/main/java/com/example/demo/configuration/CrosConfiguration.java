@@ -17,7 +17,9 @@ public class CrosConfiguration implements WebMvcConfigurer {
         .allowedOrigins("http://localhost:5173")
         .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE")
         .allowedHeaders("Authorization", "Content-Type", "X-Requested-With")
-        .allowCredentials(true);
+        .exposedHeaders("Authorization")
+        .allowCredentials(true)
+        .maxAge(3600);
 
     }
 }

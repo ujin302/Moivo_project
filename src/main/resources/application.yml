@@ -16,10 +16,10 @@ spring:
   #  driver-class-name: com.mysql.cj.jdbc.Driver
 
     # MySQL - NAVER Cloud 설정
-      url: jdbc:mysql://db-2vrk3j-kr.vpc-pub-cdb.ntruss.com:3306/moivodb?serverTimezone=Asia/Seoul
-      username: moivo
-      password: bitcamp123!@#
-      driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db-2vrk3j-kr.vpc-pub-cdb.ntruss.com:3306/moivodb?serverTimezone=Asia/Seoul
+    username: moivo
+    password: bitcamp123!@#
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -40,3 +40,8 @@ ncp:
     secret-key: E59E91B8E8475F97570C5CC1B44F87162DCDBF24
     region: kr-standard
     endpoint: http://kr.object.ncloudstorage.com
+
+jwt:
+  secret: ${jwt.secret}
+  access-token-validity: 900000  # 15분
+  refresh-token-validity: 604800000  # 7일

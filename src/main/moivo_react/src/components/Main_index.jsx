@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from '../assets/css/Main_index.module.css';
 import video from '../assets/image/main_banner1.mp4';
 import { Link } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { AuthContext } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 //확인하기 위해 아래 사용 NCP 연동 시 수정 및 삭제
 import image1 from "../assets/image/1_outer.jpg";
@@ -17,7 +17,7 @@ import Footer from './Footer/Footer';
 const Main_index = () => {
     const [animate, setAnimate] = useState(true);
     const [menuOpen, setMenuOpen] = useState(false);
-    const { isLoggedIn, logout } = useContext(AuthContext);
+    const { isAuthenticated, logout } = useAuth();
 
     //확인하기 위해 아래 사용 NCP 연동 시 수정 및 삭제
     const slides = [
@@ -104,7 +104,7 @@ const Main_index = () => {
                 {/* 토글 메뉴 */}
                 <div className={`${styles.menu} ${menuOpen ? styles.menuOpen : ''}`}>
                 <ul className={styles.menuList}>
-                    {isLoggedIn ? (
+                    {isAuthenticated ? (
                     <>
                         <li>
                         <Link to="/mypage">MyPage</Link> {/* 로그인 상태: 마이페이지 */}

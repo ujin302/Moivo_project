@@ -8,11 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.coupon.service.UserCouponService;
+import com.example.demo.jwt.util.JwtUtil;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.service.UserService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/user")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
 
     @Autowired
@@ -21,11 +26,15 @@ public class UserController {
     @Autowired
     private UserCouponService userCouponService;
 
-// 회원가입
-@PostMapping("/join")
-public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
-    int userId = userService.insert(userDTO);
+    @Autowired
+    private JwtUtil jwtUtil;
 
+// 회원가입
+@PostMapping("/join")  // - yjy
+public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
+    String userId = userService.insert(userDTO);
+
+    /*
     // 회원가입이 성공한 후, LV1 쿠폰 발급 2024.11.25 sumin
     try {
         userCouponService.updateCouponByUserAndGrade(userId, "LV1");  // LV1 쿠폰 발급
@@ -33,10 +42,10 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
     } catch (Exception e) {
         return new ResponseEntity<>("회원가입 후 쿠폰 발급 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
+ */
     return new ResponseEntity<>("회원가입 성공: " + userId, HttpStatus.CREATED);
 }
-
+/*
     // 결제에 따른 등급 업데이트 2024.11.25 sumin
     @PostMapping("/updateGrade/{userId}")
     public ResponseEntity<Void> updateUserGrade(@PathVariable int userId) {
@@ -47,70 +56,70 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 NOT FOUND 상태 코드만 반환
         }
     }
-
-    // 로그인 API
+ */
+    // 로그인
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody UserDTO userDTO) {
-        System.out.println("=== 로그인 시도 ===");
-        System.out.println("받은 ID: " + userDTO.getUserId());
-        System.out.println("받은 비밀번호 길이: " + (userDTO.getPwd() != null ? userDTO.getPwd().length() : "null"));
-
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest,
+                                                   HttpServletResponse response) {
+        String userId = loginRequest.get("userId");
+        String pwd = loginRequest.get("pwd");
         try {
-            Map<String, Object> result = userService.login(userDTO.getUserId(), userDTO.getPwd());
-            return ResponseEntity.ok(result);
+            System.out.println("로그인 시도 - userId: " + userId); // 디버깅
+            Map<String, Object> loginResult = userService.login(userId, pwd);
+            
+            // Refresh Token을 쿠키에 설정
+            Cookie refreshTokenCookie = new Cookie("refreshToken", 
+                (String) loginResult.get("refreshToken"));
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setPath("/");
+            refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+            response.addCookie(refreshTokenCookie);
+
+            // Refresh Token은 응답 바디에서 제거
+            loginResult.remove("refreshToken");
+            System.out.println("로그인 성공!!");
+
+            return ResponseEntity.ok(loginResult);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    // 토큰 갱신 _241127_sc
-    @PostMapping("/refresh-token")
-    public ResponseEntity<Map<String, Object>> refreshToken(@RequestHeader("Authorization") String token) {
-        try {
-            if (token != null && token.startsWith("Bearer ")) {
-                String jwt = token.substring(7);
-                // 토큰에서 userId 추출
-                Map<String, Object> userData = userService.getUserDataFromToken(jwt);
-                String userId = (String) userData.get("userId");
-                
-                // 새 토큰 발급
-                Map<String, Object> result = userService.refreshUserToken(userId);
-                return ResponseEntity.ok(result);
-            }
+            System.out.println("로그인 실패: " + e.getMessage()); // 디버깅
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(Map.of("error", "유효하지 않은 토큰 형식"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body(Map.of("error", "토큰 갱신 실패: " + e.getMessage()));
-        }
-    }
-
-    // 토큰 유효성 검사 _241126_sc
-    @GetMapping("/validate-token")
-    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String token) {
-        try {
-            // 토큰 유효성 검사 로직
-            if (token != null && token.startsWith("Bearer ")) {
-                String jwt = token.substring(7);
-                // JWT 유효성 검증
-                if (userService.validateToken(jwt)) {
-                    return ResponseEntity.ok().build();
-                }
-            }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                .body(Map.of("error", e.getMessage()));
         }
     }
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        userService.logout(token); // 로그아웃 로직 서비스 호출
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String accesstoken,
+                                       @CookieValue("refreshToken") String refreshToken) {
+        userService.logout(accesstoken, refreshToken);
         return ResponseEntity.ok("로그아웃 성공");
     }
 
     // 소셜 로그인
 
+    // 사용자 정보 조회 엔드포인트 추가
+    @GetMapping("/info")
+    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
+        try {
+            // Bearer 토큰에서 실제 토큰 값 추출
+            String actualToken = token.substring(7);
+            
+            // 토큰 유효성 검사
+            if (!userService.validateToken(actualToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "유효하지 않은 토큰입니다."));
+            }
 
+            // 토큰에서 사용자 정보 추출
+            Map<String, Object> userData = userService.getUserDataFromToken(actualToken);
+            String userId = (String) userData.get("userId");
+            
+            // 사용자 정보 조회
+            UserDTO userInfo = userService.findUserById(userId);
+            return ResponseEntity.ok(userInfo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", e.getMessage()));
+        }
+    }
 }

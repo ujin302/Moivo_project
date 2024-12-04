@@ -14,5 +14,5 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
     public List<PaymentEntity> findByUserEntity_Id(Integer userId);
 
     // 특정 User의 Payment 조회 (특정 월에 대한 데이터)
-    List<PaymentEntity> findByUserEntity_IdAndPaymentDateBetween(Integer userId, LocalDateTime startDate, LocalDateTime endDate);
+    List<PaymentEntity> findByUserEntity_IdAndPaymentDateBetween(int userId, LocalDateTime startDate, LocalDateTime endDate);
 }

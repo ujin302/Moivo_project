@@ -1,26 +1,22 @@
+import axios from 'axios';
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from "../../../scripts/path";
 import signin from '../../assets/css/user_login.module.css';
-import axios from 'axios';
+import apiClient from '../../utils/apiClient';
 
 const user_login = () => {
 
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login} = useContext(AuthContext);
   const [formData, setFormData] = useState({ userId: '', pwd: '' });
   const [error, setError] = useState('');
 
     //사용자 데이터 요청하는 함수임
     const fetchUserData = async () => {
-        const token = sessionStorage.getItem("token"); // JWT를 가져옴
         try {
-            const response = await axios.get(`${PATH.SERVER}/api/user/info`, {    //  /api/user -> LoginController로 이동
-                headers: {
-                    Authorization: `Bearer ${token}`, // 헤더에 JWT 추가
-                },
-            });
+            const response = await apiClient.get('/api/user/info');
             console.log("사용자 정보:", response.data);
         } catch (error) {
             console.error("데이터 요청 실패:", error);
@@ -30,31 +26,28 @@ const user_login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log(formData);
-            const response = await axios.post(`${PATH.SERVER}/api/user/login`, formData);
-
-            const {jwt, id, wishId, cartid} = response.data;
-
-            sessionStorage.setItem("token", jwt);
-            sessionStorage.setItem("id", id);
-            sessionStorage.setItem("wishId", wishId);
-            sessionStorage.setItem("cartid", cartid);
-            
-            login({ id, wishId, cartid }, jwt);
-            
-            alert("로그인 성공!");
-            navigate("/");
+            const success = await login(formData.userId, formData.pwd);
+            if (success) {
+                await fetchUserData();
+                navigate('/');
+            } else {
+                setError('로그인에 실패했습니다.');
+            }
         } catch (error) {
-            console.error("로그인 실패:", error);
-            alert("로그인에 실패했습니다.");
+            if (error.response) {
+                setError(error.response.data?.error || '아이디 또는 비밀번호가 올바르지 않습니다.');
+            } else {
+                setError('서버와의 통신 중 오류가 발생했습니다.');
+            }
+            console.error('로그인 오류:', error);
         }
     };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+      setFormData({
+          ...formData,
+          [e.target.name]: e.target.value,
+      });
   };
 
   return (
@@ -72,7 +65,7 @@ const user_login = () => {
             </div>
             <span>If you don't want to sign up,<br/>or use your account instead.</span>
             {error && <div className={signin.error}>{error}</div>}
-            <input type="text" name="userId" value={formData.id} onChange={handleChange} placeholder="ID" required/>
+            <input type="text" name="userId" value={formData.userId} onChange={handleChange} placeholder="ID" required/>
             <input type="password" name="pwd" value={formData.pwd} onChange={handleChange} placeholder="Password" required/>
             <a href="#">Forgot your password?</a>
             <button type="submit">Sign In</button>

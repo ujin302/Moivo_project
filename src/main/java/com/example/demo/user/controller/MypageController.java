@@ -20,9 +20,15 @@ public class MypageController {
     @Autowired
     private MypageService mypageService;
 
+    // 마이페이지 메인
+    @GetMapping("")
+    public ResponseEntity<String> mypageMain() {
+        return ResponseEntity.ok().build();
+    }
+
     // 회원 정보 (포스트맨 테스트 성공)
     @GetMapping("/info/{id}")
-    public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) {
+    public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) { 
         UserDTO userInfo = mypageService.getUserInfo(id);
         System.out.println(userInfo);
         return ResponseEntity.ok(userInfo);
@@ -38,7 +44,7 @@ public class MypageController {
 
     // 위시리스트 조회  (포스트맨 테스트 성공)
     @GetMapping("/wishlist/{id}")
-    public ResponseEntity<List<WishDTO>> getWishlist(@PathVariable int id) {
+    public ResponseEntity<List<WishDTO>> getWishlist(@PathVariable int id) { 
 
             List<WishDTO> wishlist = mypageService.getWishlist(id);
             return ResponseEntity.ok(wishlist);
@@ -67,7 +73,6 @@ public class MypageController {
         }
     }
  */
-
 
 
     // 주문내역 조회
