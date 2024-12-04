@@ -98,6 +98,9 @@ export const AuthProvider = ({ children }) => {
     setToken(authToken);
     setUser(userData);
     setIsLoggedIn(true);
+
+    //userDate 객체 출력 12-04 장훈
+    console.log("User Data:", userData);
     
     // axios 기본 설정에 토큰 추가
     axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
