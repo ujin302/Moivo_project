@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard, FaRuler } from 'react-icons/fa';
+import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard } from 'react-icons/fa';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from '../../../scripts/path';
 import styles from '../../assets/css/product_detail.module.css';
@@ -12,7 +12,7 @@ import LoadingModal from './LoadingModal';
 
 const ProductDetail = () => {
   const { productId } = useParams(); // 받아온 상품 ID
-  const { token } = useContext(AuthContext); // 토큰
+  const { token, userId } = useContext(AuthContext); // 토큰과 사용자 ID
   const [product, setProduct] = useState(null); // 상품 정보
   const [mainImage, setMainImage] = useState(''); // 메인 이미지
   const [thumbnailImages, setThumbnailImages] = useState([]); // 썸네일 이미지
@@ -25,7 +25,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null); // 에러 상태
   const [quantity, setQuantity] = useState(1); // 수량
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
-  const [showSizeGuide, setShowSizeGuide] = useState(false); // 사이즈 가이드 표시 여부
+  const navigate = useNavigate();
 
   const fetchProductDetail = async () => { // 상품 상세 정보 가져오기
     setLoading(true);
@@ -109,17 +109,53 @@ const ProductDetail = () => {
       alert('사이즈를 선택해주세요.');
       return;
     }
-    // 구매 로직 구현
-    console.log('구매하기:', selectedProduct);
-  };
-
-  const handleAddToWishlist = () => { // 위시리스트 버튼 클릭 시 선택한 상품 정보 출력
     if (!token) {
       alert('로그인이 필요한 서비스입니다.');
       return;
     }
-    // 위시리스트 추가 로직 구현  
-    console.log('위시리스트에 추가:', product.id);
+
+    // 선택한 상품 정보를 포함하여 payment 페이지로 이동
+    navigate('/payment', {
+      state: {
+        items: [{
+          ...product,
+          size: selectedProduct.size,
+          count: quantity,
+          totalPrice: product.price * quantity
+        }]
+      }
+    });
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!token) {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${PATH.SERVER}/api/user/wish/${product.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            userid: userId
+          }
+        }
+      );
+
+      if (response.status === 201) {
+        const confirmWish = window.confirm('위시리스트에 추가되었습니다. 위시리스트로 이동하시겠습니까?');
+        if (confirmWish) {
+          navigate('/mypage/wish');
+        }
+      }
+    } catch (error) {
+      console.error('위시리스트 추가 실패:', error);
+      alert('위시리스트 추가에 실패했습니다.');
+    }
   };
 
   const handleQuantityChange = (change) => { // 수량 변경 시 수량 업데이트
@@ -135,7 +171,7 @@ const ProductDetail = () => {
     }
   };
 
-  const handleAddToCart = () => { // 장바구니 버튼 클릭 시 선택한 상품 정보 출력
+  const handleAddToCart = async () => {
     if (!selectedProduct) {
       alert('사이즈를 선택해주세요.');
       return;
@@ -144,8 +180,33 @@ const ProductDetail = () => {
       alert('로그인이 필요한 서비스입니다.');
       return;
     }
-    // 장바구니 추가 로직 구현
-    console.log('장바구니에 추가:', { ...selectedProduct, quantity });
+
+    try {
+      const response = await axios.post(
+        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            userid: userId,
+            count: quantity,
+            size: selectedProduct.size
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        const confirmCart = window.confirm('장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?');
+        if (confirmCart) {
+          navigate('/cart');
+        }
+      }
+    } catch (error) {
+      console.error('장바구니 추가 실패:', error);
+      alert('장바구니 추가에 실패했습니다.');
+    }
   };
 
   if (loading) { // 로딩 중일 때 로딩 모달 표시
@@ -240,13 +301,6 @@ const ProductDetail = () => {
                 <span className={styles.infoValue}>
                   <span className={styles.highlight}>무료배송</span>
                   <span className={styles.subInfo}>Moivo통운 | 3일 이내 출고</span>
-                </span>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>적립금</span>
-                <span className={styles.infoValue}>
-                  {Math.floor(product?.price * 0.01).toLocaleString()}원 (1%)
-                  <span className={styles.subInfo}>+ 카드 추가적립 최대 1%</span>
                 </span>
               </div>
             </div>
@@ -377,16 +431,7 @@ const ProductDetail = () => {
               >
                 <FaHeart /> 위시리스트 추가
               </motion.button>
-            </motion.div>
-
-            <motion.button 
-              className={styles.inquiryButton}
-              onClick={() => {/* 문의하기 로직 */}}
-              whileHover={{ scale: 1.02 }}
-            >
-              상품 문의하기
-          </motion.button>
-          
+            </motion.div>       
           </div>
         </motion.div>
 
