@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Mypage.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import { PATH } from '../../../scripts/path';
 
 
 const MypageMain = () => {
@@ -23,6 +24,7 @@ const MypageMain = () => {
     const payload = token.split('.')[1];
     const decodedPayload = JSON.parse(atob(payload));
     const id = decodedPayload.id;  //토큰에 있는 id 추출
+    console.log("User ID:", id);
 
     // API 호출
     fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {

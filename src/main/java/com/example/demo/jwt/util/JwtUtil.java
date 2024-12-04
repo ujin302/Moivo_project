@@ -42,13 +42,14 @@ public class JwtUtil {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String userId, int id, int wishId, int cartId) {
+    public String generateAccessToken(String userId, int id, int wishId, int cartId, boolean isAdmin) {
         //payload에 추가하는 것들
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("id", id)  
                 .claim("wishId", wishId)
                 .claim("cartId", cartId)
+                .claim("isAdmin", isAdmin)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenDate))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -98,6 +99,16 @@ public class JwtUtil {
             .getBody();
         
         return claims.get("id", Integer.class);
+    }
+
+    //토큰에서 isAdmin 추출
+    public boolean getIsAdminFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+        return claims.get("isAdmin", Boolean.class);
     }
 
     // 토큰에서 만료 시간 추출

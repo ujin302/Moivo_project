@@ -12,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -24,8 +23,8 @@ public class ReviewEntity { // 리뷰
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; // 리뷰 고유 키
 
-    // 리뷰 1개 : 사용자 1개
-    @OneToOne
+    // 리뷰 n개 : 사용자 1개
+    @ManyToOne
     @JoinColumn(name = "userid", nullable = false)
     private UserEntity userEntity; // 사용자 (리뷰 작성자)
 

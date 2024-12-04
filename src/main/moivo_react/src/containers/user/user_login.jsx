@@ -43,52 +43,52 @@ const user_login = () => {
         }
     };
 
-  const handleChange = (e) => {
-      setFormData({
-          ...formData,
-          [e.target.name]: e.target.value,
-      });
-  };
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
-  return (
-    <div className={signin.loginMain}>
-      <div className={signin.container} id="container">
-        <div className={`${signin['form-container']} ${signin['sign-in-container']}`}>
-          <form onSubmit={handleSubmit}>
-            <Link to="/">
-              <h1>Moivo</h1>
-            </Link>
-            <div className={signin['social-container']}>
-              <a href="#" className={signin.social}><i className="fab fa-facebook-f"></i></a>
-              <a href="#" className={signin.social}><i className="fab fa-google-plus-g"></i></a>
-              <a href="#" className={signin.social}><i className="fab fa-linkedin-in"></i></a>
-            </div>
-            <span>If you don't want to sign up,<br/>or use your account instead.</span>
-            {error && <div className={signin.error}>{error}</div>}
-            <input type="text" name="userId" value={formData.userId} onChange={handleChange} placeholder="ID" required/>
-            <input type="password" name="pwd" value={formData.pwd} onChange={handleChange} placeholder="Password" required/>
-            <a href="#">Forgot your password?</a>
-            <button type="submit">Sign In</button>
-            <Link to="/user_signup">
-                <button type="submit" className={signin.singupbtn}>Sign Up</button>
-            </Link>
-          </form>
-        </div>
+    return (
+        <div className={signin.loginMain}>
+            <div className={signin.container} id="container">
+                <div className={`${signin['form-container']} ${signin['sign-in-container']}`}>
+                    <form onSubmit={handleSubmit}>
+                        <Link to="/">
+                            <h1>Moivo</h1>
+                        </Link>
+                        <div className={signin['social-container']}>
+                            <a href="http://localhost:5173/api/user/kakao" className={signin.social}><i className="fab fa-facebook-f"></i></a>
+                            <a href="#" className={signin.social}><i className="fab fa-google-plus-g"></i></a>
+                            <a href="#" className={signin.social}><i className="fab fa-linkedin-in"></i></a>
+                        </div>
+                        <span>If you don't want to sign up,<br/>or use your account instead.</span>
+                        {error && <div className={signin.error}>{error}</div>}
+                        <input type="text" name="userId" value={formData.id} onChange={handleChange} placeholder="ID" required/>
+                        <input type="password" name="pwd" value={formData.pwd} onChange={handleChange} placeholder="Password" required/>
+                        <a href="#">Forgot your password?</a>
+                        <button type="submit">Sign In</button>
+                        <Link to="/user_signup">
+                            <button type="submit" className={signin.singupbtn}>Sign Up</button>
+                        </Link>
+                    </form>
+                </div>
 
-        <div className={signin['overlay-container']}>
-          <div className={signin.overlay}>
-            <div className={`${signin['overlay-panel']} ${signin['overlay-right']}`}>
-              <h2>Hello, Style Icon!</h2>
-              <p>Enter your personal details and start journey with us</p>
-              <Link to="/user_signup">
-                <button className={signin.ghost} id="signUp">Sign Up</button>
-              </Link>
+                <div className={signin['overlay-container']}>
+                    <div className={signin.overlay}>
+                        <div className={`${signin['overlay-panel']} ${signin['overlay-right']}`}>
+                            <h2>Hello, Style Icon!</h2>
+                            <p>Enter your personal details and start journey with us</p>
+                            <Link to="/user_signup">
+                                <button className={signin.ghost} id="signUp">Sign Up</button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default user_login;

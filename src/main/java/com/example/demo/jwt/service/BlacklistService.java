@@ -3,7 +3,9 @@ package com.example.demo.jwt.service;
 import com.example.demo.jwt.entity.BlacklistEntity;
 import com.example.demo.jwt.repository.BlacklistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -22,5 +24,13 @@ public class BlacklistService {
     
     public boolean isTokenBlacklisted(String token) {
         return blacklistRepository.existsByToken(token);
+    }
+
+    // pm 12시에 만료된 토큰 삭제
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void cleanupExpiredTokens() {
+        Date now = new Date();
+        blacklistRepository.deleteByExpiryDateLessThan(now);
     }
 }

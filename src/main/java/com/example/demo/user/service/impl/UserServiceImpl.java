@@ -68,6 +68,16 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = UserEntity.toGetUserEntity(userDTO);
         userEntity.setPwd(passwordEncoder.encode(userDTO.getPwd()));
 
+         // Cart 엔티티 생성 및 연관관계 설정
+         CartEntity cartEntity = new CartEntity();
+         cartEntity.setUserEntity(userEntity);
+         userEntity.setCartEntity(cartEntity);  // 양방향 관계 설정
+         
+         // Wish 엔티티 생성 및 연관관계 설정
+         WishEntity wishEntity = new WishEntity();
+         wishEntity.setUserEntity(userEntity);
+         userEntity.setWishEntity(wishEntity);  // 양방향 관계 설정
+
         // 사용자 저장
         UserEntity savedUser = userRepository.save(userEntity);
 

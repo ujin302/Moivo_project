@@ -26,6 +26,7 @@ public class UserController {
     @Autowired
     private UserCouponService userCouponService;
 
+
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -46,6 +47,25 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
     return new ResponseEntity<>("회원가입 성공: " + userId, HttpStatus.CREATED);
 }
 /*
+
+  /*  // 회원가입
+    @PostMapping("/join")
+    public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
+        int userId = userService.insert(userDTO);
+
+        // 회원가입이 성공한 후, LV1 쿠폰 발급 2024.11.25 sumin
+        try {
+            userCouponService.updateCouponByUserAndGrade(userId, "LV1");  // LV1 쿠폰 발급
+            System.out.println("회원가입 후 LV1 쿠폰이 발급되었습니다.");
+        } catch (Exception e) {
+            return new ResponseEntity<>("회원가입 후 쿠폰 발급 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>("회원가입 성공: " + userId, HttpStatus.CREATED);
+    }
+ */      // 충돌 난거!!!!!
+
+ /*
     // 결제에 따른 등급 업데이트 2024.11.25 sumin
     @PostMapping("/updateGrade/{userId}")
     public ResponseEntity<Void> updateUserGrade(@PathVariable int userId) {

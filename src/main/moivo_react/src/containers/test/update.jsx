@@ -5,15 +5,18 @@ import { PATH } from "../../../scripts/path";
 import Banner from "../../components/Banner/banner";
 
 const Upload = () => {
+  const productId = 17; // 수정 상품 Id
   const [product, setProduct] = useState({
     id: 0,
     name: "",
     price: "",
     content: "",
-    categoryId : 0
+    categoryId : 0,
+    gender: ""
   });
 
   const [categories, setCategories] = useState([]);
+  const [genders, setGenders] = useState([]);
 
   const [stock, setStock] = useState({
     S: 0,
@@ -47,39 +50,49 @@ const Upload = () => {
       } else {
         console.error("카테고리 데이터는 배열이 아닙니다 ? :", res.data);
       }
+
+      // 성별 정보 가져오기
+      axios.get(`${PATH.SERVER}/api/admin/store/gender`).then((res) => {
+        if (Array.isArray(res.data)) {
+          setGenders(res.data);
+        }
+      });
     });
 
-    axios.get(`${PATH.SERVER}/api/user/store/13`).then((res) => {
+    axios.get(`${PATH.SERVER}/api/store/${productId}`).then((res) => {
       console.log(res.data)
       // 상품 정보 설정
       setProduct({
         ...product, 
-        'id' : res.data.Product.id,
-        'name' : res.data.Product.name,
-        'price' : res.data.Product.price,
-        'content' : res.data.Product.content,
-        'categoryId' : res.data.Product.categoryId
+        'id' : res.data.product.id,
+        'name' : res.data.product.name,
+        'price' : res.data.product.price,
+        'content' : res.data.product.content,
+        'categoryId' : res.data.product.categoryId,
+        'gender' : res.data.product.gender
       });
 
+      console.log(product);
+      
       // 이미지 설정
       var l1 = [];
       var l2 = [];
       var l3 = [];
       var l4 = [];
 
-      for (let i = 0; i < res.data.ImgList.length; i++) {
-        switch (res.data.ImgList[i].layer) {
+      for (let i = 0; i < res.data.imgList.length; i++) {
+        switch (res.data.imgList[i].layer) {
           case 1:
-            l1.push(res.data.ImgList[i])
+            l1.push(res.data.imgList[i])
             break;
           case 2:
-            l2.push(res.data.ImgList[i])
+            l2.push(res.data.imgList[i])
           break;
           case 3:
-            l3.push(res.data.ImgList[i])
+            l3.push(res.data.imgList[i])
           break;
           case 4:
-            l4.push(res.data.ImgList[i])
+            l4.push(res.data.imgList[i])
           break;
           default:
             break;
@@ -96,12 +109,13 @@ const Upload = () => {
       console.log(l1);
       
       // 재고 설정
-      setStock({
-        ...stock,
-        'S' : res.data.Stock.S,
-        'M' : res.data.Stock.M,
-        'L' : res.data.Stock.L
+      res.data.stockList.forEach((s) => {
+        setStock((prevStock) => ({
+          ...prevStock,
+          [s.size]: s.count,
+        }));
       });
+      console.log(stock);
       
     });
 
@@ -169,6 +183,7 @@ const Upload = () => {
     formData.append("price", product.price);
     formData.append("content", product.content);
     formData.append("categoryId", product.categoryId);
+    formData.append("gender", product.gender);
     console.log(product.categoryId);
     console.log("------------");
     
@@ -286,6 +301,23 @@ const Upload = () => {
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>성별</label>
+            <select
+              className={styles.select}
+              name="gender"
+              value={product.gender}
+              onChange={handleInputChange}
+            >
+              <option value="">성별 선택</option>
+              {genders.map((gender, index) => (
+                <option key={index} value={gender}>
+                  {gender}
                 </option>
               ))}
             </select>

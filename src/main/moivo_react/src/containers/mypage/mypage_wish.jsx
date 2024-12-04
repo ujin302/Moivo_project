@@ -4,6 +4,7 @@ import axios from "axios";
 import styles from "../../assets/css/Mypage_wish.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import { PATH } from '../../../scripts/path';
 
 const MypageWish = () => {
   const [wishlistItems, setWishlistItems] = useState([]); // 상태로 찜 목록 관리
@@ -11,10 +12,14 @@ const MypageWish = () => {
 
   // 찜 목록 가져오기
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
     const fetchWishlist = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/user/wish/list", {
-          params: { userid }, //쿼리 파라미터로 userid 전달
+        const response = await axios.get(`${PATH.SERVER}/api/user/wish/list`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Bearer 토큰 포함
+          },
+          params: { userid },
         });
         const wishlist = response.data.wishlist || []; //서버에서 받은 데이터 저장
         
@@ -36,7 +41,7 @@ const MypageWish = () => {
     console.log("userId = " + userid);
 
     try {
-      await axios.delete(`http://localhost:8080/api/user/wish/delete/${productId}`, {
+      await axios.delete(`${PATH.SERVER}/api/user/wish/delete/${productId}`, {
         params: { userid }, //userid는 쿼리 파라미터로 전달
       });
       // 삭제 성공 시 상태 업데이트하기

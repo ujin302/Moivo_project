@@ -16,4 +16,5 @@ public interface ProductStockRepository extends JpaRepository<ProductStockEntity
 
     // 상품 ID와 사이즈로 재고를 조회
     ProductStockEntity findByProductEntityAndSize(ProductEntity productEntity, ProductStockEntity.Size size);
+
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Mypage_profile.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
+import { PATH } from '../../../scripts/path';
 
 const MypageProfile = () => {
     const [userInfo, setUserInfo] = useState(null); // 사용자 정보 저장
@@ -25,18 +26,17 @@ const MypageProfile = () => {
 
     // Fetch user info when the component mounts
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
-        //const userSeq = sessionStorage.getItem("userSeq");
+        const token = localStorage.getItem("accessToken");
+        const id = localStorage.getItem("id");
 
-        if (!token) {
+        if (!token || !id) {
             alert("로그인이 필요합니다.");
             navigate("/user");
             return;
         }
 
-        const id = 8;
         // Example of fetching user info from an API
-        fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {
+        fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`, // 인증 토큰 전달
             },
@@ -51,8 +51,8 @@ const MypageProfile = () => {
                 setUserInfo(data);
                 setFormData({
                     userId: data.userId,
-                    pwd: data.pwd,
-                    confirmPassword: data.pwd, 
+                    pwd: data.pwd.trim(),
+                    confirmPassword: "",
                     name: data.name,
                     gender: data.gender,
                     zipcode: data.zipcode,

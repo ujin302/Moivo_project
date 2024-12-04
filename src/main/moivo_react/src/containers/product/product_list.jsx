@@ -12,7 +12,7 @@ import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
-  const id = sessionStorage.getItem("id"); // 사용자 pk
+  const id = localStorage.getItem("id"); // 사용자 pk
 
   const [products, setProducts] = useState([]); // 상품 List
   const [currentPage, setCurrentPage] = useState(0);
@@ -89,6 +89,9 @@ const ProductList = () => {
           getWishCartCount('wish');
           getWishCartCount('cart');
         }
+        
+        // 5. 현재 페이지 설정
+        setCurrentPage(page);
         
         console.log(response.data);
         console.log(categories);
@@ -216,7 +219,6 @@ const ProductList = () => {
     );
   };
 
-  const openCartModal = () => setIsCartModalOpen(true);
   const closeCartModal = () => setIsCartModalOpen(false);
   
   // 상품 상세 화면 이동
@@ -243,7 +245,7 @@ const ProductList = () => {
       alert("로그인 후에 이용해주세요.");
     }
   }
-  
+
   return (
     <div className={styles.container}>
       <Banner />
@@ -325,19 +327,23 @@ const ProductList = () => {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
               >
-                
-                <h1>{product.id}</h1>
                 <div className={styles.productImageWrapper}>
                   <img
                     src={product.img}
                     alt={product.name}
                     className={styles.productImage}
                   />
-                  <div className={styles.productOverlay}>
+                  <div 
+                    className={styles.productOverlay}
+                    onClick={() => handleProductClick(product.id)}
+                  >
                     <div className={styles.actionButtons}>
                       <motion.button
                         className={styles.actionButton}
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -345,19 +351,14 @@ const ProductList = () => {
                       </motion.button>
                       <motion.button
                         className={styles.actionButton}
-                        onClick={() => handleAddToWish(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToWish(product);
+                        }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
                         <i className="fas fa-heart" />
-                      </motion.button>
-                      <motion.button
-                        className={styles.actionButton}
-                        onClick={() => handleProductClick(product.id)}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <i className="fas fa-eye" />
                       </motion.button>
                     </div>
                   </div>
@@ -377,14 +378,14 @@ const ProductList = () => {
         <motion.div className={styles.paginationContainer}>
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(0)}
+            onClick={() => fetchProducts(0)}
             disabled={pageInfo.isFirst}
           >
             &laquo;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(currentPage - 1)}
+            onClick={() => fetchProducts(currentPage - 1)}
             disabled={!pageInfo.hasPrevious}
           >
             &lt;
@@ -396,7 +397,7 @@ const ProductList = () => {
                 <button
                   key={pageIndex}
                   className={`${styles.pageButton} ${currentPage === pageIndex ? styles.active : ""}`}
-                  onClick={() => onClickPage(pageIndex)}
+                  onClick={() => fetchProducts(pageIndex)}
                 >
                   {pageIndex + 1}
                 </button>
@@ -405,14 +406,14 @@ const ProductList = () => {
           })()}
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(currentPage + 1)}
+            onClick={() => fetchProducts(currentPage + 1)}
             disabled={!pageInfo.hasNext}
           >
             &gt;
           </button>
           <button
             className={styles.pageButton}
-            onClick={() => onClickPage(pageInfo.totalPages - 1)}
+            onClick={() => fetchProducts(pageInfo.totalPages - 1)}
             disabled={pageInfo.isLast}
           >
             &raquo;
