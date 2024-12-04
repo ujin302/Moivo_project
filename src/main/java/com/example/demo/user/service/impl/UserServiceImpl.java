@@ -1,9 +1,5 @@
 package com.example.demo.user.service.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +13,6 @@ import com.example.demo.jwt.prop.JwtProps;
 import com.example.demo.jwt.service.BlacklistService;
 import com.example.demo.jwt.service.RefreshTokenService;
 import com.example.demo.jwt.util.JwtUtil;
-import com.example.demo.payment.entity.PaymentEntity;
-import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.CartEntity;
 import com.example.demo.user.entity.UserEntity;
@@ -48,8 +42,6 @@ public class UserServiceImpl implements UserService {
     private WishRepository wishRepository;
     @Autowired
     private CartRepository cartRepository;
-    @Autowired
-    private PaymentRepository paymentRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -144,7 +136,7 @@ public class UserServiceImpl implements UserService {
         int wishId = getWishIdById(user.getId());
 
         // JWT 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getId(), wishId, cartId);
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getId(), wishId, cartId, user.isAdmin());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getId());
 
         // 응답에 포함될 데이터
