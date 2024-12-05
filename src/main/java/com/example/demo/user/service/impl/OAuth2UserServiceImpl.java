@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -56,52 +57,6 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
     @Autowired
     private RestTemplate restTemplate;
 
-
-    @Override
-    public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-//        // 부모 클래스(DefaultOAuth2UserService)에서 사용자 정보 가져오기
-//        OAuth2User oAuth2User = super.loadUser(request);
-//
-//        // 클라이언트 등록 ID (예: kakao, naver, google)
-//        String registrationId = request.getClientRegistration().getRegistrationId();
-//
-//        // 사용자 고유 ID가 매핑된 키 (예: sub, id 등)
-//        String userNameAttributeName = request.getClientRegistration()
-//                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-//
-//        // 사용자 정보 속성
-//        Map<String, Object> attributes = oAuth2User.getAttributes();
-//
-//        // 사용자 정보를 저장 또는 업데이트
-//        saveOrUpdate(attributes, registrationId);
-//
-//        // OAuth2 사용자 객체 반환
-//        // Spring Secrurity 사용시 ROLE_ 들어가야함
-//        return new DefaultOAuth2User(
-//                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-//                attributes,
-//                userNameAttributeName);
-        //------------------------------------------------------------------------------------
-
-        System.out.println("getClientRegistration = " + request.getClientRegistration());
-        System.out.println("getAccess Token = " + request.getAccessToken().getTokenValue());
-
-        OAuth2User oAuth2User = super.loadUser(request);
-        //구글로그인 버튼 클릭 -> 구글 로그인 창 -> 로그인 완료 -> code 리턴 -> AccessToken 요청
-        System.out.println("getAttributes = " + oAuth2User.getAttributes());
-
-//        String provider = request.getClientRegistration().getRegistrationId();
-//        String providerId = oAuth2User.getAttribute("sub");
-        String addr1 = request.getClientRegistration().getRegistrationId();
-        String addr2 = oAuth2User.getAttribute("sub");
-//        String username = provider + "-" + providerId;
-        String username = addr1 + "-" + addr2;
-        //String password = bCryptPasswordEncoder
-        String email = oAuth2User.getAttribute("email");
-        //String Role = "ROLE_USER";
-
-        return oAuth2User;
-    }
 //    public String getAccessTokenReturn() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        if (authentication == null || !authentication.isAuthenticated()) {
@@ -238,10 +193,18 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
         // 스프링 시큐리티 합치면 추후엔 ROLE_USER ROLE_KAKAO 이런식으로 바꿔줘야할듯?
         userEntity.setLoginType(UserEntity.LoginType.valueOf("KAKAO"));
 //        userRepository.save(userEntity);
+
+        // 4 Security Debug
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            System.out.println("Impl Login Authenticated = " + authentication.getName());
+        } else {
+            System.out.println("Authentication failed or not set.");
+        }
         return userEntity;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public void saveOrUpdateUser(UserEntity userEntity) {
         //사용자 존재여부 확인
         Optional<UserEntity> existingUser = userRepository.findByUserId(userEntity.getUserId());
@@ -259,19 +222,19 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
         }
 
         // 로그인 상태로 설정 (세션에 사용자 정보 추가)
-        SecurityContextHolder.getContext().setAuthentication(
-//                new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("ROLE_USER")) ROLE_KAKAO
-                new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("KAKAO"))
-        );
-        // 세션에서 인증 정보 출력
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            Object principal = authentication.getPrincipal();
-            System.out.println("Authenticated User: " + principal); // 사용자 정보 출력
-            System.out.println("Authorities: " + authentication.getAuthorities()); // 권한 정보 출력
-        } else {
-            System.out.println("No authentication found.");
-        }
+//        SecurityContextHolder.getContext().setAuthentication(
+////                new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("ROLE_USER")) ROLE_KAKAO
+//                new UsernamePasswordAuthenticationToken(userEntity, null, AuthorityUtils.createAuthorityList("KAKAO"))
+//        );
+//        // 세션에서 인증 정보 출력
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null) {
+//            Object principal = authentication.getPrincipal();
+//            System.out.println("Impl Authenticated User: " + principal); // 사용자 정보 출력
+//            System.out.println("Impl Authorities: " + authentication.getAuthorities()); // 권한 정보 출력
+//        } else {
+//            System.out.println("No authentication found.");
+//        }
     }
 
 }

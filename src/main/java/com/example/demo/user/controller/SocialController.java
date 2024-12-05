@@ -65,6 +65,7 @@ public class SocialController {
         // SecurityContext에 설정
         SecurityContextHolder.getContext().setAuthentication(authentication);
         System.out.println("Controller SecurityContextHolder.getContext().getAuthentication() = " + SecurityContextHolder.getContext().getAuthentication());
+        System.out.println("Controller SecurityContextHolder.getContext().getAuthentication() = 이 Oauth2AuthenticationToken이 저장되어야함");
         //설정까진 됐는데 유지가 안되는지 anonymous로 초기화됨 이유모름
 
         //OAuth2 확인
@@ -75,12 +76,22 @@ public class SocialController {
             System.out.println(securityUtils.isOAuthLogin() + "일반 로그인");
         }
 
-        socialService.saveOrUpdateUser(userEntity);
+        System.out.println("securityUtils.isOAuthLogin() = " + securityUtils.isOAuthLogin());
+        socialService.saveOrUpdateUser(userEntity); //저장하면서 void라 사라지는건가 ? 아 모르것다~
+        System.out.println("securityUtils.isOAuthLogin() = " + securityUtils.isOAuthLogin());
+
         // 로그인 페이지로 리턴
+        if (securityUtils.isOAuthLogin()) {
+            //true일떄
+            System.out.println("정상");
         return "redirect:" + "http://localhost:5173";
+        } else {
+            //여기오면 망한다
+            return "redirect:" + "http://localhost:5173/user";
+        }
     }
 
-    @GetMapping("/oauth2/access-token")
+    @PostMapping("/oauth2/access-token")
     public String getAccessToken(Authentication authentication) {
         return socialService.getUserAccessToken(authentication);
     }

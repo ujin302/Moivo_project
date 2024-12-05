@@ -6,16 +6,13 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 714a575754949434c7f9e10bb527da9a
-            client-secret: zAQRGb72z0JexxUESus4CMGV90BYP4Rs
-            redirect-uri: http://localhost:5173/api/user/oauth2/callback/kakao
+            client-id: "714a575754949434c7f9e10bb527da9a"
+            client-secret: "zAQRGb72z0JexxUESus4CMGV90BYP4Rs"
+            redirect-uri: "http://localhost:5173/api/user/oauth2/callback/kakao"
             authorization-grant-type: authorization_code
             client-authentication-method: post
             scope: # 동의 항목들 다시 체크 필요
               - profile_nickname    # 닉네임
-              - profile_image       # 프로필 사진
-              - account_email       # 카카오계정(이메일)
-              - gender              # 성별
             client-name: Kakao
             provider: kakao
 
