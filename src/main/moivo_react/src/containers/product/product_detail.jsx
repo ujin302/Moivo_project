@@ -138,7 +138,8 @@ const ProductDetail = () => {
         `${PATH.SERVER}/api/user/wish/${product.id}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           },
           params: {
             userid: userId
@@ -146,7 +147,7 @@ const ProductDetail = () => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         const confirmWish = window.confirm('위시리스트에 추가되었습니다. 위시리스트로 이동하시겠습니까?');
         if (confirmWish) {
           navigate('/mypage/wish');
@@ -154,7 +155,11 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.error('위시리스트 추가 실패:', error);
-      alert('위시리스트 추가에 실패했습니다.');
+      if (error.response?.status === 401) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+      } else {
+        alert('위시리스트 추가에 실패했습니다.');
+      }
     }
   };
 
@@ -184,10 +189,11 @@ const ProductDetail = () => {
     try {
       const response = await axios.post(
         `${PATH.SERVER}/api/user/cart/add/${product.id}`,
-        null,
+        {}, // 빈 객체를 body로 전송
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           },
           params: {
             userid: userId,
@@ -205,7 +211,11 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.error('장바구니 추가 실패:', error);
-      alert('장바구니 추가에 실패했습니다.');
+      if (error.response?.status === 401) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+      } else {
+        alert('장바구니 추가에 실패했습니다.');
+      }
     }
   };
 
