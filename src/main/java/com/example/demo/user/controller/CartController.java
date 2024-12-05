@@ -27,7 +27,7 @@ public class CartController {
 
     //장바구니 출력 11.26 - yjy    (포스트맨 성공)
     @GetMapping("/list")   
-    public ResponseEntity<?> printCart(@RequestParam(name = "userid") int userId) {
+    public ResponseEntity<?> printCart(@RequestParam(name = "userid") int userId) {  //userid는 유저 아이디 그 int형
         Map<String, Object> cartInfo = cartService.printCart(userId);
         return ResponseEntity.ok(cartInfo);
     }

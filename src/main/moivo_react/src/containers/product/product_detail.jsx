@@ -27,57 +27,93 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
   const navigate = useNavigate();
 
-  const fetchProductDetail = async () => { // 상품 상세 정보 가져오기
+  const fetchProductDetail = async () => { //상품 상세정보 불러오기
     setLoading(true);
     setError(null);
-
+  
     try {
-      const headers = {}; // 헤더 초기화
+      const headers = {};
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`; // 토큰 포함
+        headers['Authorization'] = `Bearer ${token}`;
       }
-
-      console.log('Fetching product detail for ID:', productId); // 상품 ID 로깅
-      const response = await axios.get(
-        // `${PATH.SERVER}/api/store/product-detail/${productId}`,
-        `${PATH.SERVER}/api/store/${productId}`,
-        { headers }
-      );
-
-      console.log('API Response:', response.data); // API 응답 로깅
-
-      if (!response.data) {
-        throw new Error('상품 정보를 불러올 수 없습니다.');
+  
+      try {
+        const response = await axios.get(
+          `${PATH.SERVER}/api/store/${productId}`,
+          { headers }
+        );
+  
+        const { product, imgList, stockList, reviewList } = response.data;
+        // ... 기존 데이터 처리 로직 ...
+  
+      } catch (error) {
+        // access 토큰 만료로 인한 401 에러인 경우
+        if (error.response?.status === 401) {
+          try {
+            // refresh 토큰으로 새로운 access 토큰 요청
+            const refreshToken = localStorage.getItem('refreshToken');
+            const refreshResponse = await axios.post(
+              `${PATH.SERVER}/api/auth/token/refresh`,
+              {},
+              {
+                headers: {
+                  'Authorization': `Bearer ${refreshToken}`
+                }
+              }
+            );
+  
+            // 새로운 access 토큰과 isAdmin 정보 저장
+            const { newAccessToken, isAdmin } = refreshResponse.data;
+            localStorage.setItem('accessToken', newAccessToken);
+            localStorage.setItem('isAdmin', isAdmin);
+  
+            // 새로운 토큰으로 상품 정보 재요청
+            const retryResponse = await axios.get(
+              `${PATH.SERVER}/api/store/${productId}`,
+              { 
+                headers: { 
+                  'Authorization': `Bearer ${newAccessToken}` 
+                } 
+              }
+            );
+  
+            const { product, imgList, stockList, reviewList } = retryResponse.data;
+            
+            // 상품 정보 설정
+            setProduct(product);
+            
+            // 메인 이미지 설정
+            const mainImg = imgList.find(img => img.layer === 1);
+            setMainImage(mainImg ? mainImg.fileName : product.img);
+            
+            // 썸네일 이미지 설정
+            const thumbnails = imgList.filter(img => img.layer === 2);
+            setThumbnailImages(thumbnails);
+            
+            // 상세 이미지 설정
+            const details = imgList.filter(img => img.layer === 3);
+            setDetailImages(details);
+            
+            // 재고 정보 설정
+            setStocks(stockList);
+            
+            // 리뷰 정보 설정
+            setReviews(reviewList);
+  
+          } catch (refreshError) {
+            // refresh 토큰도 만료된 경우
+            console.error('Token refresh failed:', refreshError);
+            // AuthContext의 logout 함수 호출 필요
+            setError('세션이 만료되었습니다. 다시 로그인해주세요.');
+          }
+        } else {
+          throw error;
+        }
       }
-
-      const { product, imgList, stockList, reviewList } = response.data; // 상품, 이미지, 재고 정보 추출
-      
-      console.log(response.data);
-      // 상품 기본 정보 설정
-      setProduct(product);
-      
-      // 메인 이미지 설정 (layer가 1인 이미지)
-      const mainImg = imgList.find(img => img.layer === 1);
-      setMainImage(mainImg ? mainImg.fileName : product.img);
-      
-      // 썸네일 이미지 설정 (layer가 2인 이미지들)
-      const thumbnails = imgList.filter(img => img.layer === 2);
-      setThumbnailImages(thumbnails);
-      
-      // 상세 이미지 설정 (layer가 3인 이미지들)
-      const details = imgList.filter(img => img.layer === 3);
-      setDetailImages(details);
-      
-      // 재고 정보 설정
-      setStocks(stockList);
-
-      // 리뷰 정보 설정
-      setReviews(reviewList);
-      
-
+  
     } catch (error) {
       console.error('Error fetching product detail:', error);
-      setError('상품 정보를 불러오는 중 오류가 발생했습니다.');
+      setError(error.message || '상품 정보를 불러오는 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

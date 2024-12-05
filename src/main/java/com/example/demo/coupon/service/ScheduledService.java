@@ -53,6 +53,7 @@ public class ScheduledService {
     }
     */
 
+    /*
     // 이 메서드를 직접 호출하여 바로 쿠폰 발급을 테스트할 수 있음
     public void issueCouponsImmediately() {
         List<UserDTO> users = userService.findAllUsers();
@@ -70,5 +71,5 @@ public class ScheduledService {
         System.out.println("user는 !!!" + user);
         userCouponService.updateCouponByUserAndGrade(user.getId(), user.getGrade().name());
     }
-    
+     */
 }

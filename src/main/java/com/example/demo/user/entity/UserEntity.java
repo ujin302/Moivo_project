@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.example.demo.user.dto.UserDTO;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -158,8 +159,19 @@ public class UserEntity { // 사용자 & 관리자
         return userDTO;
     }
 
-    // 토큰 갱신 관련 _241127_sc
-    @Column(name = "refresh_token")
-    private String refreshToken;
+
+    // Kakao 사용자 데이터 저장
+    public static UserEntity toSaveKakaoUserEntity(String userId, String nickname) {
+        UserEntity entity = new UserEntity();
+
+        entity.setUserId(userId); // userid
+        entity.setName(nickname); // 닉네임
+
+        // Kakao 로그인이므로 LoginType 설정
+        entity.setLoginType(LoginType.KAKAO);
+
+        return entity;
+    }
+
 
 }
