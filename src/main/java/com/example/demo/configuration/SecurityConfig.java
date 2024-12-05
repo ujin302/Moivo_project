@@ -93,6 +93,7 @@ public class SecurityConfig {
         return source;
     }
 
+
     //Kakao 로그인 설정(자동설정이 안되서 임시로 수동 삽입, 스프링부트 2.0이상에선 자동생성이 안될수도 있다고함)
     //import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
     //현재 위 import로 생성가능 yml설정과 동일.
