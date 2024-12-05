@@ -43,8 +43,28 @@ const ProductDetail = () => {
           { headers }
         );
   
-        const { product, imgList, stockList, reviewList } = response.data;
-        // ... 기존 데이터 처리 로직 ...
+        const { product: productData, imgList, stockList, reviewList } = response.data;
+ 
+        // 상품 정보 설정
+        setProduct(productData);
+        
+        // 메인 이미지 설정
+        const mainImg = imgList.find(img => img.layer === 1);
+        setMainImage(mainImg ? mainImg.fileName : productData.img);
+        
+        // 썸네일 이미지 설정
+        const thumbnails = imgList.filter(img => img.layer === 2);
+        setThumbnailImages(thumbnails);
+        
+        // 상세 이미지 설정
+        const details = imgList.filter(img => img.layer === 3);
+        setDetailImages(details);
+        
+        // 재고 정보 설정
+        setStocks(stockList);
+        
+        // 리뷰 정보 설정
+        setReviews(reviewList);
   
       } catch (error) {
         // access 토큰 만료로 인한 401 에러인 경우
@@ -77,14 +97,14 @@ const ProductDetail = () => {
               }
             );
   
-            const { product, imgList, stockList, reviewList } = retryResponse.data;
+            const { product: productData, imgList, stockList, reviewList } = retryResponse.data;
             
             // 상품 정보 설정
-            setProduct(product);
+            setProduct(productData);
             
             // 메인 이미지 설정
             const mainImg = imgList.find(img => img.layer === 1);
-            setMainImage(mainImg ? mainImg.fileName : product.img);
+            setMainImage(mainImg ? mainImg.fileName : productData.img);
             
             // 썸네일 이미지 설정
             const thumbnails = imgList.filter(img => img.layer === 2);
@@ -140,13 +160,27 @@ const ProductDetail = () => {
     });
   };
 
-  const handlePurchase = () => { // 구매 버튼 클릭 시 선택한 상품 정보 출력
+  const handleQuantityChange = (change) => { // 수량 변경 시 수량 업데이트
+    const newQuantity = quantity + change;
+    if (newQuantity >= 1) {
+      setQuantity(newQuantity);
+      if (selectedProduct) {
+        setSelectedProduct({
+          ...selectedProduct,
+          count: newQuantity
+        });
+      }
+    }
+  };
+
+  const handlePurchase = () => {
     if (!selectedProduct) {
       alert('사이즈를 선택해주세요.');
       return;
     }
     if (!token) {
       alert('로그인이 필요한 서비스입니다.');
+      navigate('/user');
       return;
     }
 
@@ -166,12 +200,16 @@ const ProductDetail = () => {
   const handleAddToWishlist = async () => {
     if (!token) {
       alert('로그인이 필요한 서비스입니다.');
+      navigate('/user');
       return;
     }
 
     try {
-      const response = await axios.get(
-        `${PATH.SERVER}/api/user/wish/${product.id}`,
+      const response = await axios.post(
+        `${PATH.SERVER}/api/user/wish/add`,
+        {
+          productId: product.id
+        },
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -199,19 +237,6 @@ const ProductDetail = () => {
     }
   };
 
-  const handleQuantityChange = (change) => { // 수량 변경 시 수량 업데이트
-    const newQuantity = quantity + change;
-    if (newQuantity >= 1) {
-      setQuantity(newQuantity);
-      if (selectedProduct) {
-        setSelectedProduct({
-          ...selectedProduct,
-          count: newQuantity
-        });
-      }
-    }
-  };
-
   const handleAddToCart = async () => {
     if (!selectedProduct) {
       alert('사이즈를 선택해주세요.');
@@ -219,22 +244,25 @@ const ProductDetail = () => {
     }
     if (!token) {
       alert('로그인이 필요한 서비스입니다.');
+      navigate('/user');
       return;
     }
 
     try {
       const response = await axios.post(
-        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
-        {}, // 빈 객체를 body로 전송
+        `${PATH.SERVER}/api/user/cart/add`,
+        {
+          productId: product.id,
+          size: selectedProduct.size,
+          count: quantity
+        },
         {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           params: {
-            userid: userId,
-            count: quantity,
-            size: selectedProduct.size
+            userid: userId
           }
         }
       );
@@ -649,7 +677,7 @@ const ProductDetail = () => {
                     <h3>환불 안내</h3>
                     <ul>
                       <li>상품 회수 확인 후 3영업일 이내에 환불이 진행됩니다.</li>
-                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을 수 있습니다.</li>
+                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을  있습니다.</li>
                     </ul>
                   </div>
                 </div>
