@@ -37,10 +37,13 @@ public class MypageServiceImpl implements MypageService {
     //private AttendanceRepository attendanceRepository; // 출석
 
     @Override
-    public UserDTO getUserInfo(int id) {
-        UserEntity userEntity = userRepository.findById(id)
-                                              .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
-        
+    public UserDTO getUserInfo(int id) { 
+        UserEntity userEntity = userRepository.findById(id);
+        if (userEntity == null) {
+            throw new RuntimeException("User not found");
+        }
+                                              
+        /*
     // 쿠폰 정보 가져오기
         List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(id)
             .stream()
@@ -57,10 +60,10 @@ public class MypageServiceImpl implements MypageService {
                 );
             })
             .collect(Collectors.toList());
-
+ */
         // UserDTO로 변환
         UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
-        userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
+        //userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
 
         return userDTO;
     }
@@ -81,7 +84,7 @@ public class MypageServiceImpl implements MypageService {
     public List<WishDTO> getWishlist(int id) {
         List<WishEntity> wishEntities = wishRepository.findByUserEntity_Id(id);
         if (wishEntities.isEmpty()) {
-            throw new RuntimeException("No wishlist items found for the user.");
+            throw new RuntimeException("사용자의 위시리스트가 없습니다.");
         }
 
         // WishEntity -> WishDTO 변환

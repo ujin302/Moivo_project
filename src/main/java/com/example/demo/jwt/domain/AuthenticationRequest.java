@@ -6,6 +6,6 @@ import lombok.Data;
 
 public class AuthenticationRequest {
     
-    private String name;
+    private String userId;
     private String pwd;
 }

@@ -1,9 +1,10 @@
+import axios from "axios";
 import React, { useState } from "react";
 import singup from '../../assets/css/user_sigup.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
-import axios from "axios";
+import { PATH } from "../../../scripts/path";
 
 function user_signup() {
   const navigate = useNavigate();
@@ -94,7 +95,7 @@ function user_signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/api/user/join", {
+      await axios.post(`${PATH.SERVER}/api/user/join`, {
         userId: formData.userId,
         pwd: formData.pwd,
         name: formData.name,

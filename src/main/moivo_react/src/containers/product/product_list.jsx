@@ -12,7 +12,7 @@ import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
   const { isLoggedIn, token } = useContext(AuthContext);
-  const id = sessionStorage.getItem("id"); // 사용자 pk
+  const id = localStorage.getItem("id"); // 사용자 pk
 
   const [products, setProducts] = useState([]); // 상품 List
   const [currentPage, setCurrentPage] = useState(0);

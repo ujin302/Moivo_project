@@ -13,13 +13,15 @@ spring:
             client-authentication-method: post
             scope: # 동의 항목들 다시 체크 필요
               - profile_nickname    # 닉네임
+              - profile_image       # 프로필 사진
+              - account_email       # 이메일
             client-name: Kakao
             provider: kakao
 
           naver:
             client-id: "rkLzelLLwohrsT5K3PzP"
             client-secret: "oc5jSCKdG5"
-            redirect-uri: "http://localhost:5173/api/user/oauth2/callback/naver"
+            redirect-uri: "http://localhost:8080/api/user/oauth2/callback/naver"
             authorization-grant-type: authorization_code
             client-authentication-method: post
             scope:
@@ -102,6 +104,12 @@ ncp:
     secret-key: E59E91B8E8475F97570C5CC1B44F87162DCDBF24
     region: kr-standard
     endpoint: http://kr.object.ncloudstorage.com
+
+
+jwt:
+  secret: ${jwt.secret}
+  access-token-validity: 900000  # 15분
+  refresh-token-validity: 604800000  # 7일
 
 management:
   endpoints:

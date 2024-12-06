@@ -12,7 +12,7 @@ const MypageWish = () => {
 
   // 찜 목록 가져오기
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     const fetchWishlist = async () => {
       try {
         const response = await axios.get(`${PATH.SERVER}/api/user/wish/list`, {

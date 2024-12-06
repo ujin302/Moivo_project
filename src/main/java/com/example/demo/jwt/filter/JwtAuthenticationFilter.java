@@ -1,70 +1,79 @@
 package com.example.demo.jwt.filter;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.example.demo.jwt.prop.JwtProps;
+import com.example.demo.jwt.service.RefreshTokenService;
+import com.example.demo.jwt.util.JwtUtil;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
+
+import org.springframework.util.StringUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtProps jwtProps;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
     private final UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtProps jwtProps, @Qualifier("customUserDetailsService")UserDetailsService userDetailsService) {
-        this.jwtProps = jwtProps;
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, RefreshTokenService refreshTokenService, UserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String jwt = header.substring(7);
-            byte[] signingKey = jwtProps.getSecretKey().getBytes();
-
-            try {
-                Jws<Claims> parsedToken = Jwts.parserBuilder()
-                        .setSigningKey(Keys.hmacShaKeyFor(signingKey))
-                        .build()
-                        .parseClaimsJws(jwt);
-
-                        String userId = parsedToken.getBody().get("userId", String.class);
-                        logger.info("JWT로 파싱된 userId: " + userId);
-
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-                System.out.println("중간 성공");
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                System.out.println("성공");
-            } catch (Exception e) {
-                logger.error("토큰 발급 안됨", e);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰 발급 안됨");
-
-                return; //필터 체인 종료
-            }
+        
+        String requestURI = request.getRequestURI();
+        
+        // 로그아웃 요청의 경우 토큰 검증을 건너뛰기
+        if (requestURI.equals("/api/auth/logout")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        chain.doFilter(request, response);
+        try {
+            String token = getJwtFromRequest(request);
+            
+            if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
+                String userId = jwtUtil.getUserIdFromToken(token);
+                
+                if (userId != null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Could not set user authentication in security context", ex);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }
+

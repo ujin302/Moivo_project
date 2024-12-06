@@ -5,35 +5,46 @@ import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import { PATH } from '../../../scripts/path';
 
+
 const MypageMain = () => {
   const [userInfo, setUserInfo] = useState(null); // 사용자 정보 저장
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const id = sessionStorage.getItem("id");
-    console.log(token);
+    const token = localStorage.getItem("accessToken");
+    console.log("Access Token:", token);
+    
     if (!token) {
-      alert("로그인이 필요합니다.");
-      navigate("/user");
-      return;
+        alert("로그인이 필요합니다.");
+        navigate("/user");
+        return;
     }
 
+    // 토큰 디코딩 (jwt-decode 없이)
+    const payload = token.split('.')[1];
+    const decodedPayload = JSON.parse(atob(payload));
+    const id = decodedPayload.id;  //토큰에 있는 id 추출
+    console.log("User ID:", id);
+
     // API 호출
-    fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // 인증 토큰 전달
-      },
+    fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        credentials: 'include'
     })
-      .then((response) => {
+    .then((response) => {
         if (!response.ok) {
-          throw new Error("사용자 정보를 가져오지 못했습니다.");
+            throw new Error("사용자 정보를 가져오지 못했습니다.");
         }
         return response.json();
       })
       .then((data) => {
         setUserInfo(data); // 사용자 정보 상태에 저장
-        console.log(data);
+        console.log("사용자 정보:" + data);
       })
       .catch((error) => {
         console.error("Error fetching user info:", error);
@@ -100,19 +111,6 @@ const MypageMain = () => {
     // 컴포넌트 언마운트 시 인터벌 제거
     return () => clearInterval(interval);
   }, [maxIndex]);
-
-  //추가
-  useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    const userSeq = sessionStorage.getItem("userSeq");
-
-    if (!token) {
-      alert("로그인이 필요합니다.");
-      navigate("/user");
-      return;
-    }
-
-});
 
   return (
     <div>

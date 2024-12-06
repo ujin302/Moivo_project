@@ -37,13 +37,6 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    //OAuth2UserService 설정
-    //private final DefaultOAuth2UserService oAuth2UserService;
-
-//    public SecurityConfig(DefaultOAuth2UserService oAuth2UserService) {
-//        this.oAuth2UserService = oAuth2UserService;
-//    }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -74,7 +67,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
-
 
         return http.build();
     }
@@ -133,7 +125,7 @@ public class SecurityConfig {
     }
 
     //클라이언트 인증 정보를 세션에 저장
-    //OAuth2 인증 사용하는 App에선 정상작동, 다만 Stateless 방식에선 사용 X라고함
+    //OAuth2 인증 사용하는 App에선 정상작동, 다만 Stateless 방식에선 사용 X 라고 함
     @Bean
     public OAuth2AuthorizedClientRepository authorizedClientRepository() {
         return new HttpSessionOAuth2AuthorizedClientRepository();
@@ -153,8 +145,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate(){
+    public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 }
-

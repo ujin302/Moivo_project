@@ -10,9 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -28,9 +26,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders;
 
 import java.util.Optional;
 
@@ -47,31 +45,31 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String redirectUri;
 
-    //private final OAuthProperties oAuthProperties; //추후 Google, Naver 사용시
+    //private final OAuthProperties oAuthProperties; //현재 사용 X 추후 Google, Naver 사용시
 
     private final OAuth2AuthorizedClientService authorizedClientService;
-    
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private RestTemplate restTemplate;
 
-//    public String getAccessTokenReturn() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            // 인증되지 않은 사용자는 처리하지 않음
-//            return "인증되지 않은 사용자입니다.";
-//        }
-//        System.out.println("getAccessTokenReturn authentication = " + authentication);
-//        //받는거보면 getAccessTokenReturn authentication = AnonymousAuthenticationToken [Principal=anonymousUser, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=65B989C1CD5A759B513365A16DE2C07F], Granted Authorities=[ROLE_ANONYMOUS]]
-//        // Spring Security 쓰려면 Granted Authorities=[ROLE_ANONYMOUS] ROLE_USER 이런식으로 수정필요할듯
-//
-//        // 인증된 사용자의 액세스 토큰 처리
-//        String url = "http://localhost:5173/api/user/oauth2/access-token";
-//        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-//        return response.getBody();
-//    }
+    public String getAccessTokenReturn() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            // 인증되지 않은 사용자는 처리하지 않음
+            return "인증되지 않은 사용자입니다.";
+        }
+        System.out.println("getAccessTokenReturn authentication = " + authentication);
+        //받는거보면 getAccessTokenReturn authentication = AnonymousAuthenticationToken [Principal=anonymousUser, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=65B989C1CD5A759B513365A16DE2C07F], Granted Authorities=[ROLE_ANONYMOUS]]
+        // Spring Security 쓰려면 Granted Authorities=[ROLE_ANONYMOUS] ROLE_USER 이런식으로 수정필요할듯
+
+        // 인증된 사용자의 액세스 토큰 처리
+        String url = "https://kauth.kakao.com/oauth/token";
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        return response.getBody();
+    }
 
     // 인증된 사용자의 액세스 토큰을 가져오는 메서드
     public String getUserAccessToken(Authentication authentication) {
@@ -97,9 +95,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
 
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
         System.out.println("provider" + provider);
-
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
@@ -126,7 +124,22 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
         return jsonNode.get("access_token").asText();
     }
 
-    public UserEntity getKakaoEntity(String accessToken) throws JsonProcessingException {
+    //카카오 로그인 처리
+    public String handleKakaoLogin(String code) throws JsonProcessingException {
+        String provider = "kakao";  // 카카오는 provider로 "kakao"를 사용
+        // getAccessToken을 호출하여 액세스 토큰을 얻음
+        return getAccessToken(code, provider);  // 액세스 토큰을 반환
+    }
+
+    public UserEntity handleKakaoUserInfo(String accessToken, String code) throws JsonProcessingException {
+        // 액세스 토큰을 사용하여 카카오 사용자 정보를 가져옴
+        //UserEntity userEntity = getKakaoEntity(accessToken);
+        // 필수 파라미터 로그 출력
+        System.out.println("client_id: " + clientId);
+        System.out.println("redirect_uri: " + redirectUri);
+        System.out.println("access_token: " + accessToken);
+        System.out.println("code: " + code);
+
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -142,6 +155,16 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
                 String.class
         );
 
+        // 응답 확인
+        System.out.println("Response Code: " + response.getStatusCode());
+        System.out.println("Response Body: " + response.getBody());
+
+        // 만약 401 오류가 발생하면, 액세스 토큰을 갱신해야 함
+        if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            System.out.println("Access token expired, requesting a new one.");
+            // refresh_token을 사용하여 새 토큰 발급
+        }
+
         // responseBody에 있는 정보 꺼내기
         String responseBody = response.getBody();
         System.out.println("responseBody = " + responseBody);
@@ -151,24 +174,11 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
         String userid = jsonNode.get("id").asText();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
-        System.out.println(nickname);
+        System.out.println("Impl handleKakaoUserInfo" + nickname);
 
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(userid);
         userEntity.setName(nickname);
-        return userEntity;
-    }
-
-    public String handleKakaoLogin(String code) throws JsonProcessingException {
-        String provider = "kakao";  // 카카오는 provider로 "kakao"를 사용
-        // getAccessToken을 호출하여 액세스 토큰을 얻음
-        String accessToken = getAccessToken(code, provider);
-        return accessToken;  // 액세스 토큰을 반환
-    }
-
-    public UserEntity handleKakaoUserInfo(String accessToken) throws JsonProcessingException {
-        // 액세스 토큰을 사용하여 카카오 사용자 정보를 가져옴
-        UserEntity userEntity = getKakaoEntity(accessToken);
 
         // UserEntity에는 카카오 로그인 정보가 저장됨
         // JSON 형식으로 수신
@@ -178,17 +188,26 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
     public UserEntity loginWithKakao(String code, String provider) throws JsonProcessingException {
         // 1. 인증 코드로 액세스 토큰 발급
         System.out.println("Impl사용자 code = " + code);
-        String accessToken = handleKakaoLogin(code);
+        System.out.println("reUrl" + redirectUri);
+        String accessToken = null;
+        try {
+            accessToken = handleKakaoLogin(code);
+        } catch (HttpClientErrorException e){
+            System.err.println("Login Error Code = " +e.getStackTrace());
+            System.err.println("Login Response Body = " + e.getResponseBodyAsString());
+            throw e;
+        }
         System.out.println("Impl사용자 accessToken = " + accessToken);
+
         // 2. 액세스 토큰으로 카카오 사용자 정보 조회
-        UserEntity userEntity = handleKakaoUserInfo(accessToken);
+        UserEntity userEntity = handleKakaoUserInfo(accessToken, code);
         System.out.println("Impl사용자 userEntity = " + userEntity);
 
         // 3. 사용자 정보 추출
         String username = userEntity.getName();
         String userID = userEntity.getUserId();
 
-        //getAccessTokenReturn();
+        getAccessTokenReturn();
         // 3. DB에 UserEntity 저장
         // 스프링 시큐리티 합치면 추후엔 ROLE_USER ROLE_KAKAO 이런식으로 바꿔줘야할듯?
         userEntity.setLoginType(UserEntity.LoginType.valueOf("KAKAO"));
