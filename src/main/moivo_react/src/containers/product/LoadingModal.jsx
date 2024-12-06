@@ -9,6 +9,8 @@ const LoadingModal = ({ isOpen }) => {
     '재고 현황을 확인하고 있습니다',
     '사이즈 정보를 체크하고 있습니다',
     '상품 리뷰를 가져오고 있습니다',
+    '트렌드 분석을 진행하고 있습니다',
+    '스타일 추천을 준비하고 있습니다'
   ];
 
   const [currentText, setCurrentText] = React.useState(0);
@@ -18,16 +20,25 @@ const LoadingModal = ({ isOpen }) => {
     if (isOpen) {
       const textInterval = setInterval(() => {
         setCurrentText((prev) => (prev + 1) % loadingTexts.length);
-      }, 1500);
+      }, 2000);
 
       const progressInterval = setInterval(() => {
-        setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
-      }, 50);
+        setProgress((prev) => {
+          if (prev >= 100) {
+            return 0;
+          }
+          const increment = Math.random() * 3 + 1;
+          return Math.min(prev + increment, 100);
+        });
+      }, 100);
 
       return () => {
         clearInterval(textInterval);
         clearInterval(progressInterval);
       };
+    } else {
+      setProgress(0);
+      setCurrentText(0);
     }
   }, [isOpen, loadingTexts.length]);
 
@@ -39,20 +50,21 @@ const LoadingModal = ({ isOpen }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
           <motion.div
             className={styles.modal}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ 
+              duration: 0.4,
+              ease: [0.4, 0, 0.2, 1]
+            }}
           >
             <div className={styles.loadingContainer}>
               <div className={styles.logoContainer}>
-                <div className={styles.fashionIcon}>
-                  <span className={styles.hanger}></span>
-                  <span className={styles.dress}></span>
-                </div>
+                <div className={styles.fashionIcon}></div>
               </div>
 
               <div className={styles.spinnerContainer}>
@@ -66,23 +78,34 @@ const LoadingModal = ({ isOpen }) => {
               <motion.div 
                 className={styles.loadingText}
                 key={currentText}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ 
                   opacity: 1, 
                   y: 0,
-                  transition: { duration: 0.5, ease: "easeOut" }
+                  transition: { 
+                    duration: 0.4,
+                    ease: [0.4, 0, 0.2, 1]
+                  }
                 }}
-                exit={{ opacity: 0, y: -20 }}
+                exit={{ opacity: 0, y: -10 }}
               >
                 {loadingTexts[currentText]}
               </motion.div>
 
               <div className={styles.progressBarContainer}>
-                <div 
-                  className={styles.progressBar} 
+                <motion.div 
+                  className={styles.progressBar}
                   style={{ width: `${progress}%` }}
                 />
-                <div className={styles.progressText}>{progress}%</div>
+                <motion.div 
+                  className={styles.progressText}
+                  key={Math.floor(progress)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {Math.floor(progress)}%
+                </motion.div>
               </div>
 
               <div className={styles.loadingDots}>
