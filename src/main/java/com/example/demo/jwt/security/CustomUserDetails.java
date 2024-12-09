@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 사용자의 역할 정보를 GrantedAuthority로 변환 (....왜 이걸로 변환하는거누....)
+        // 사용자의 역할 정보를 GrantedAuthority로 변환
         return userEntity.isAdmin()
                 ? List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
                 : List.of(new SimpleGrantedAuthority("ROLE_USER"));

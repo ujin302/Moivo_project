@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-    // 로그인 함수 추가
+    // 로그인 함수
     const login = async (userId, pwd) => {
         try {
             const response = await axios.post(`${PATH.SERVER}/api/user/login`, {
@@ -118,23 +118,32 @@ export const AuthProvider = ({ children }) => {
                 withCredentials: true  // 쿠키 전송을 위해 작성함
             });
 
-            if (response.data.accessToken) {
-                const { accessToken, refreshToken } = response.data;
-                setAccessToken(accessToken);
-                setRefreshToken(refreshToken);
-                setIsAuthenticated(true);
+            // 서버 응답 데이터 확인
+            console.log('서버 응답:', response.data);
 
-                localStorage.setItem('accessToken', response.data.accessToken);
-                localStorage.setItem('userId', response.data.userId);
-                localStorage.setItem('id', response.data.id);
-                localStorage.setItem('cartId', response.data.cartId);
-                localStorage.setItem('wishId', response.data.wishId); /////////
+            const { accessToken } = response.data;
 
-                // axios 기본 헤더 설정
-                axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-                return true;
+            // accessToken 확인
+            if (!accessToken) {
+                console.error('토큰이 없습니다:', response.data);
+                return false;
             }
-            return false;
+            
+            // localStorage에 저장
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('userId', response.data.userId);
+            localStorage.setItem('id', response.data.id);
+            localStorage.setItem('cartId', response.data.cartId);
+            localStorage.setItem('wishId', response.data.wishId);
+            localStorage.setItem('isAdmin', response.data.isAdmin);
+
+            // 상태 업데이트
+            setIsAuthenticated(true);
+
+            // axios 헤더 설정
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+            return true;
         } catch (error) {
             console.error('로그인 실패:', error);
             throw error;
@@ -151,27 +160,26 @@ export const AuthProvider = ({ children }) => {
                 if (error.response?.status === 401 && !originalRequest._retry) {
                     originalRequest._retry = true;
                     
-                    try {
-                    const refreshed = await refreshAccessToken();
-                    if (refreshed) {
-                        originalRequest.headers['Authorization'] = `Bearer ${getAccessToken()}`;
-                        return axios(originalRequest);
+                    const accessToken = getAccessToken();
+                    if (!accessToken) {
+                        removeTokens();
+                        setIsAuthenticated(false);
+                        navigate('/login');
+                        return Promise.reject(error);
                     }
-                } catch (refreshError) {
-                    removeTokens();
-                    setIsAuthenticated(false);
-                    navigate('/login');
-                    return Promise.reject(refreshError);
-                }
-            }
-            return Promise.reject(error);
-        }
-    );
 
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, [navigate]);
+                    // 토큰 재설정
+                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    return axios(originalRequest);
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            axios.interceptors.response.eject(interceptor);
+        };
+    }, [navigate]);
 
   // 초기 인증 상태 확인 (새로고침해도 로그인 상태 유지)
   useEffect(() => {
