@@ -28,7 +28,9 @@ const payment = () => {
 
   const handlePayment = () => {
     // 결제 페이지로 리다이렉트
-    navigate("/payment-method");
+    navigate("/payment-method", {
+      state: { cartItems, finalAmount },
+    });
   };
 
   const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -119,19 +121,6 @@ const payment = () => {
               결제하기
             </button>
           </div>
-
-          {/* 결제 상태 메시지 */}
-          {orderStatus && (
-            <div className={styles.orderStatus}>
-              {orderStatus === "success" ? (
-                <div className={styles.successMessage}>
-                  결제가 완료되었습니다! 주문이 처리 중입니다.
-                </div>
-              ) : (
-                <div className={styles.errorMessage}>결제 실패!</div>
-              )}
-            </div>
-          )}
         </div>
       </div>
       <Footer />
