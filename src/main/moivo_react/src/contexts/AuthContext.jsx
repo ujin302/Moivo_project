@@ -91,7 +91,6 @@ export const AuthProvider = ({ children }) => {
     // 사용자 정보 제거
     localStorage.removeItem('userId');
     localStorage.removeItem('id');
-    localStorage.removeItem('isAdmin');
     localStorage.removeItem('cartId');
     localStorage.removeItem('wishId');
 
@@ -128,7 +127,6 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('accessToken', response.data.accessToken);
                 localStorage.setItem('userId', response.data.userId);
                 localStorage.setItem('id', response.data.id);
-                localStorage.setItem('isAdmin', response.data.isAdmin);
                 localStorage.setItem('cartId', response.data.cartId);
                 localStorage.setItem('wishId', response.data.wishId); /////////
 
