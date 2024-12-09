@@ -3,17 +3,11 @@ import { useNavigate } from "react-router-dom"; // 페이지 이동을 위한 Ho
 import styles from "../../assets/css/Payment.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import { PATH } from "../../../scripts/path"; // API 경로 설정
 
-const Payment = () => {
+const payment = () => {
   const [orderStatus, setOrderStatus] = useState(null); // 결제 상태
   const [selectedCoupon, setSelectedCoupon] = useState(null); // 선택한 쿠폰
   const [deliveryAddress, setDeliveryAddress] = useState(""); // 배송지
-  const [payerName, setPayerName] = useState(""); // 결제자 이름
-  const [phoneNumber, setPhoneNumber] = useState(""); // 결제자 전화번호
-  const [isAddressEditable, setIsAddressEditable] = useState(false); // 배송지 수정 가능 여부
-  const [coupon, setCoupon] = useState(null); // 사용자 쿠폰 데이터
-  const [loading, setLoading] = useState(true); // 로딩 상태
   const navigate = useNavigate();
 
   const [cartItems] = useState([
@@ -21,49 +15,22 @@ const Payment = () => {
     { id: 2, name: "Ruffle baggy jeans", price: 129000, quantity: 2, image: "../image/only2.jpg" },
   ]);
 
-  // 사용자 정보 및 쿠폰 데이터 불러오기
+  const coupons = [
+    { id: 1, name: "5% 할인", discount: 0.05 },
+    { id: 2, name: "10,000원 할인", discount: 10000 },
+  ];
+
+  // 임의의 배송지 데이터 불러오기
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const id = localStorage.getItem("id");
-
-    if (!token || !id) {
-      alert("로그인이 필요합니다.");
-      navigate("/user");
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        // 사용자 정보 API 호출
-        const response = await fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) throw new Error("사용자 정보를 가져오지 못했습니다.");
-        const data = await response.json();
-
-        // 사용자 데이터 설정
-        setPayerName(data.name || "");
-        setPhoneNumber(data.tel || "");
-        setDeliveryAddress(`${data.addr1 || ""} ${data.addr2 || ""}`.trim());
-        setCoupon(data.coupons || null);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        alert("사용자 정보를 가져오는 중 오류가 발생했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [navigate]);
+    // 실제로는 API 호출로 불러올 수 있음
+    setDeliveryAddress("서울특별시 강남구 테헤란로 123");
+  }, []);
 
   const handlePayment = () => {
-    if (!payerName || !phoneNumber || !deliveryAddress) {
-      alert("모든 정보를 입력해주세요.");
-      return;
-    }
-    navigate("/payment-method");
+    // 결제 페이지로 리다이렉트
+    navigate("/payment-method", {
+      state: { cartItems, finalAmount },
+    });
   };
 
   const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -75,10 +42,6 @@ const Payment = () => {
       : 0;
 
   const finalAmount = totalAmount - discount + 3000;
-
-  if (loading) {
-    return <div>로딩 중...</div>; // 로딩 상태 표시
-  }
 
   return (
     <div>
@@ -124,60 +87,33 @@ const Payment = () => {
                 </span>
               </div>
             </div>
-
-            {/* 결제자 정보 */}
-            <div className={styles.payerInfo}>
-              <label>결제자 이름:</label>
-              <input
-                type="text"
-                value={payerName}
-                onChange={(e) => setPayerName(e.target.value)}
-                className={styles.inputField}
-                placeholder="이름을 입력하세요"
-              />
-              <label>전화번호:</label>
-              <input
-                type="text"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className={styles.inputField}
-                placeholder="전화번호를 입력하세요"
-              />
-            </div>
-
-            {/* 쿠폰 정보 */}
+            {/* 쿠폰 선택 */}
             <div className={styles.couponContainer}>
               <label>사용 가능한 쿠폰:</label>
-              <div className={styles.couponValue}>
-                {coupon ? <strong>{coupon.name}</strong> : "쿠폰 없음"}
-              </div>
+              <select
+                className={styles.inputField}
+                onChange={(e) =>
+                  setSelectedCoupon(coupons.find((coupon) => coupon.id === Number(e.target.value)))
+                }
+              >
+                <option value="">쿠폰을 선택하세요</option>
+                {coupons.map((coupon) => (
+                  <option key={coupon.id} value={coupon.id}>
+                    {coupon.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* 배송지 */}
             <div className={styles.deliveryAddress}>
               <label>배송지:</label>
-              {isAddressEditable || !deliveryAddress ? (
-                <input
-                  type="text"
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  className={styles.inputField}
-                  placeholder="배송지를 입력하세요"
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={deliveryAddress}
-                  readOnly
-                  className={styles.inputField}
-                />
-              )}
-              <button
-                className={styles.editButton}
-                onClick={() => setIsAddressEditable((prev) => !prev)}
-              >
-                {isAddressEditable ? "완료" : "수정"}
-              </button>
+              <input
+                type="text"
+                value={deliveryAddress}
+                readOnly
+                className={styles.inputField}
+              />
             </div>
 
             {/* 결제 버튼 */}
@@ -185,19 +121,6 @@ const Payment = () => {
               결제하기
             </button>
           </div>
-
-          {/* 결제 상태 메시지 */}
-          {orderStatus && (
-            <div className={styles.orderStatus}>
-              {orderStatus === "success" ? (
-                <div className={styles.successMessage}>
-                  결제가 완료되었습니다! 주문이 처리 중입니다.
-                </div>
-              ) : (
-                <div className={styles.errorMessage}>결제 실패!</div>
-              )}
-            </div>
-          )}
         </div>
       </div>
       <Footer />
@@ -205,4 +128,4 @@ const Payment = () => {
   );
 };
 
-export default Payment;
+export default payment;
