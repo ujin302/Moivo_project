@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Main_index from './components/main_index';
+import Main_index from './components/Main_index';
 import User_login from './containers/user/user_login';
 import User_signup from './containers/user/user_signup';
 import ProductBoard from './containers/product/product_board'; 
@@ -54,17 +54,15 @@ const routeConfig = [
 
 const App = () => {
   return (
-    <AuthProvider>
-      <MainProvider>
-        <Router>
-          <Routes>
-            {routeConfig.map(({ path, element }, index) => (
-              <Route key={index} path={path} element={element} />
-            ))}
-            </Routes>
-          </Router>
-      </MainProvider>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          {routeConfig.map(({ path, element }, index) => (
+            <Route key={index} path={path} element={element} />
+          ))}
+        </Routes>
+      </AuthProvider>
+    </Router>
   );
 };
 

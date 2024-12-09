@@ -15,7 +15,6 @@ spring:
               - profile_nickname    # 닉네임
               - profile_image       # 프로필 사진
               - account_email       # 카카오계정(이메일)
-              - gender              # 성별
             client-name: Kakao
             provider: kakao
 
@@ -106,6 +105,12 @@ ncp:
     region: kr-standard
     endpoint: http://kr.object.ncloudstorage.com
 
+
+jwt:
+  secret: ${jwt.secret}
+  access-token-validity: 900000  # 15분
+  refresh-token-validity: 604800000  # 7일
+
 management:
   endpoints:
     web:
@@ -122,3 +127,4 @@ logging:
 #.gitignore에
 ###인증정보 제외
 #/src/main/resources/google or naver.yml 추가
+

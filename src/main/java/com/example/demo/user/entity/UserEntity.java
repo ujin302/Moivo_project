@@ -159,9 +159,6 @@ public class UserEntity { // 사용자 & 관리자
         return userDTO;
     }
 
-    // 토큰 갱신 관련 _241127_sc
-    @Column(name = "refresh_token")
-    private String refreshToken;
 
     // Kakao 사용자 데이터 저장
     public static UserEntity toSaveKakaoUserEntity(String userId, String nickname) {
@@ -175,5 +172,6 @@ public class UserEntity { // 사용자 & 관리자
 
         return entity;
     }
+
 
 }

@@ -26,8 +26,8 @@ const MypageProfile = () => {
 
     // Fetch user info when the component mounts
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
-        const id = sessionStorage.getItem("id");
+        const token = localStorage.getItem("accessToken");
+        const id = localStorage.getItem("id");
 
         if (!token || !id) {
             alert("로그인이 필요합니다.");
