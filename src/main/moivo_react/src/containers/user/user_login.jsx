@@ -16,7 +16,12 @@ const user_login = () => {
     //사용자 데이터 요청하는 함수임
     const fetchUserData = async () => {
         try {
-            const response = await apiClient.get('/api/user/info');
+            const token = localStorage.getItem('accessToken');
+            const response = await apiClient.get('/api/user/info', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             console.log("사용자 정보:", response.data);
         } catch (error) {
             console.error("데이터 요청 실패:", error);
