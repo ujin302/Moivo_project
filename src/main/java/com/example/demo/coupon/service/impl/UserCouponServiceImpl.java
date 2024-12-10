@@ -39,7 +39,8 @@ public class UserCouponServiceImpl implements UserCouponService {
                 .orElseThrow(() -> new RuntimeException("해당 등급의 쿠폰을 찾을 수 없습니다."));
 
         // 2. userId를 기반으로 UserEntity 조회
-        UserEntity userEntity = userRepository.findById(userId);
+        UserEntity userEntity = userRepository.findById(userId)
+                                              .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
         if (userEntity == null) {
             throw new RuntimeException("User not found");
         }

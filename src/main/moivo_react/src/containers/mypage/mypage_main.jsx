@@ -27,7 +27,7 @@ const MypageMain = () => {
     console.log("User ID:", id);
 
     // API 호출
-    fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {
+    fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -45,6 +45,7 @@ const MypageMain = () => {
       .then((data) => {
         setUserInfo(data); // 사용자 정보 상태에 저장
         console.log("사용자 정보:" + data);
+        console.log("사용자 정보:", JSON.stringify(data, null, 2));
       })
       .catch((error) => {
         console.error("Error fetching user info:", error);
