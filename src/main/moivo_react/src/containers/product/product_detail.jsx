@@ -209,15 +209,16 @@ const ProductDetail = () => {
     }
 
     // 선택한 상품 정보를 포함하여 payment 페이지로 이동
+    const paymentItem = {
+      ...product,
+      size: selectedProduct.size,
+      count: quantity,
+      totalPrice: product.price * quantity,
+      img: mainImage // 메인 이미지 추가
+    };
+
     navigate('/payment', {
-      state: {
-        items: [{
-          ...product,
-          size: selectedProduct.size,
-          count: quantity,
-          totalPrice: product.price * quantity
-        }]
-      }
+      state: { cartItems: [paymentItem] }
     });
   };
 
@@ -228,23 +229,14 @@ const ProductDetail = () => {
     }
 
     try {
-      const response = await axios.post(
-        `${PATH.SERVER}/api/user/wish/add`,
-        {
-          productId: product.id
+      const response = await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          params: {
-            userid: userId
-          }
-        }
-      );
+        params: { userid: userId }
+      });
 
-      if (response.status === 201 || response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         const confirmWish = window.confirm('위시리스트에 추가되었습니다. 위시리스트로 이동하시겠습니까?');
         if (confirmWish) {
           navigate('/mypage/wish');
@@ -254,7 +246,6 @@ const ProductDetail = () => {
       console.error('위시리스트 추가 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        // navigate('/user');
       } else {
         alert('위시리스트 추가에 실패했습니다.');
       }
@@ -273,11 +264,10 @@ const ProductDetail = () => {
 
     try {
       const response = await axios.post(
-        `${PATH.SERVER}/api/user/cart/add`,
+        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
         {
-          productId: product.id,
-          size: selectedProduct.size,
-          count: quantity
+          count: quantity,
+          size: selectedProduct.size
         },
         {
           headers: {
@@ -300,7 +290,6 @@ const ProductDetail = () => {
       console.error('장바구니 추가 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        // navigate('/user');
       } else {
         alert('장바구니 추가에 실패했습니다.');
       }
