@@ -31,10 +31,10 @@ const statusData = {
 const admins_dashboard = () => {
   return (
     <div className={admin_dashboard.container}>
-      {/* Sidebar 영역 */}
-      <div className={admin_dashboard.sidebar}>
-        <Admins_side />
-      </div>
+    {/* Sidebar 영역 */}
+    <div className={admin_dashboard.sidebar}>
+    <Admins_side />
+    </div>
 
       {/* 메인 컨텐츠 영역 */}
       <div className={admin_dashboard.mainContent}>
@@ -126,6 +126,10 @@ const admins_dashboard = () => {
             </div>
           </div>
         </section>
+         {/* 2번 섹션 */}
+         <section className={admin_dashboard.section2}>
+
+         </section>
       </div>
     </div>
   );
