@@ -73,7 +73,7 @@ public class UserEntity { // 사용자 & 관리자
     @Column(nullable = false)
     private LoginType loginType = LoginType.MOIVO;
 
-    @Column(name = "isadmin", nullable = false)
+    @Column(name = "isAdmin", nullable = false)
     private boolean admin = false; // 기본값 설정
 
     // 등급 적용은 매달 1일

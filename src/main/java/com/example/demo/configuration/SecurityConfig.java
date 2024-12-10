@@ -9,20 +9,33 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -43,24 +56,36 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain authorizationServer(HttpSecurity http) throws Exception {
+//        ClientRegistrationRepository clientRegistrationRepository
+        // OAuth2 Authorization Server 기본 설정 적용 기본 인증 서버
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        System.out.println(OAuth2AuthenticationToken.class.getName());
+        // OpenID Connect (OIDC) 설정 추가
         http
-                //OAuth2 소셜로그인 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .clientRegistrationRepository((clientRegistrationRepository)) //OAuth2 공급자 설정 ex Kakao or Google
-                        .authorizedClientRepository(authorizedClientRepository()) //인증된 클라이언트 정보를 저장하는 레포지토리
-//                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService)) // Spring Security. 참조해서 사용자 정보 API 호출 (Kakao의 경우 사용자 정보 URL은 https://kapi.kakao.com/v2/user/me)
-                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService())) // Spring Security. 참조해서 사용자 정보 API 호출 (Kakao의 경우 사용자 정보 URL은 https://kapi.kakao.com/v2/user/me)
-                        // oAuth2UserService를 사용해서 사용자 정보를 매핑하고 로드함.
-                        .defaultSuccessUrl("http://localhost:5173")
-                        .failureUrl("/login?error=true")
-                        .redirectionEndpoint(endpoint -> endpoint.baseUri("http://localhost:5173/api/user/oauth2/callback/kakao"))
-                        .successHandler(successHandler())) //로그인 후, success handler로 Security Context에 저장 해야하는데 안먹힘ㅜ 1 리다이렉트하면서 날라가거나, 2 저장로직이 제대로 안되거나
+                .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+                .oidc(Customizer.withDefaults()); // OIDC 활성화
+        // HTML 요청에 대한 기본 인증 엔트리포인트 설정
+        http
+                .exceptionHandling((exceptions) -> exceptions
+                        .defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                        )
+                );
+
+        return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**", "/favicon.ico").permitAll() // OPTIONS 요청 허용
-                        .requestMatchers("/api/user/login", "/api/user/join", "/api/auth/token/refresh", "api/user/kakao", "api/user/oauth2/callback/**").permitAll()
+                        .requestMatchers("/api/user/login", "/api/user/join", "/api/auth/token/refresh", "/api/user/kakao", "/api/user/oauth2/callback/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
@@ -69,6 +94,22 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder()
+                .issuer("http://localhost:5173")
+                .authorizationEndpoint("/oauth2/v1/authorize")
+                .tokenEndpoint("/oauth2/v1/token")
+                .tokenIntrospectionEndpoint("/oauth2/v1/introspect") // 토큰 상태 확인
+                .tokenRevocationEndpoint("/oauth2/v1/revoke") // 토큰 폐기 (RFC 7009)
+                .jwkSetEndpoint("/oauth2/v1/jwks") // 공개키 확인
+                .oidcLogoutEndpoint("/connect/v1/logout")
+                .oidcUserInfoEndpoint("/connect/v1/userinfo") // 리소스 서버와 유저 정보 연관
+                .oidcClientRegistrationEndpoint("/connect/v1/register") // OAuth2 사용 신청
+                .build();
     }
 
     @Bean
@@ -88,35 +129,29 @@ public class SecurityConfig {
     //Kakao 로그인 설정(자동설정이 안되서 임시로 수동 삽입, 스프링부트 2.0이상에선 자동생성이 안될수도 있다고함)
     //import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
     //현재 위 import로 생성가능 yml설정과 동일.
-//    @Bean
-//    public ClientRegistrationRepository clientRegistrationRepository() {
-//        // Kakao ClientRegistration 설정
-//        ClientRegistration kakao = ClientRegistration.withRegistrationId("kakao")
-//                .clientId("714a575754949434c7f9e10bb527da9a")
-//                .clientSecret("zAQRGb72z0JexxUESus4CMGV90BYP4Rs")
-//                .redirectUri("http://localhost:8080/api/user/oauth2/callback/kakao")
-//                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
-//                .tokenUri("https://kauth.kakao.com/oauth/token")
-//                .userInfoUri("https://kapi.kakao.com/v2/user/me")
-//                .userNameAttributeName("id")
-//                .clientName("Kakao")
-//                .authorizationGrantType(new AuthorizationGrantType("authorization_code"))
-//                .scope("profile_nickname", "profile_image")
-//                .build();
-//
-//        ClientRegistration google = ClientRegistration.withRegistrationId("google")
-//                .clientId("679990079220-prfchh4nd9k9oit85na1guc84jk6pjje.apps.googleusercontent.com")
-//                .clientSecret("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")
-//                .redirectUri("http://localhost:8080/api/user/oauth2/callback/google")
-//                .authorizationUri("https://accounts.google.com/o/oauth2/auth")
-//                .authorizationGrantType(new AuthorizationGrantType("authorization_code"))
-//                .tokenUri("https://oauth2.googleapis.com/token")
-//                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-//                .scope("profile", "email")
-//                .build();
-//
-//        return new InMemoryClientRegistrationRepository(kakao, google);
-//    }
+    @Bean
+    public RegisteredClientRepository registeredClientRepository() {
+        // Kakao ClientRegistration 설정
+        RegisteredClient kakao = RegisteredClient.withId("kakao")
+                .clientId("6f5bc792a0f0199fd3df6a7dd153f1d7")
+                .clientSecret("KWJn3264i3Tf7Ald26x5wqMox9aXMEEQ")
+                .redirectUri("http://localhost:5173/api/user/oauth2/callback/kakao")
+                .clientName("Kakao")
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .scope("profile_nickname")
+                .build();
+
+        RegisteredClient google = RegisteredClient.withId("google")
+                .clientId("679990079220-prfchh4nd9k9oit85na1guc84jk6pjje.apps.googleusercontent.com")
+                .clientSecret("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")
+                .redirectUri("http://localhost:5173/api/user/oauth2/callback/google")
+                .authorizationGrantType(new AuthorizationGrantType("authorization_code"))
+                .scope("profile")
+                .build();
+
+        return new InMemoryRegisteredClientRepository(kakao, google);
+    }
 
     //OAuth2 인증 후 사용자 정보를 저장할 메서드
     @Bean
