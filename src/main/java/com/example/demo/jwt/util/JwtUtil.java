@@ -19,6 +19,8 @@ import com.example.demo.jwt.repository.BlacklistRepository;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -46,7 +48,8 @@ public class JwtUtil {
         //payload에 추가하는 것들
         return Jwts.builder()
                 .setSubject(userId)
-                .claim("id", id)  
+                .claim("userId", userId)
+                .claim("id", id)
                 .claim("wishId", wishId)
                 .claim("cartId", cartId)
                 .claim("isAdmin", isAdmin)
@@ -159,5 +162,26 @@ public class JwtUtil {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         
         return authentication;
+    }
+
+    // 토큰에서 사용자 데이터 추출
+    public Map<String, Object> getUserDataFromToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+            
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("userId", claims.getSubject());
+            userData.put("id", claims.get("id"));
+            userData.put("wishId", claims.get("wishId"));
+            userData.put("cartId", claims.get("cartId"));
+            userData.put("isAdmin", claims.get("isAdmin"));
+            return userData;
+        } catch (Exception e) {
+            throw new RuntimeException("토큰에서 사용자 정보를 추출할 수 없습니다.");
+        }
     }
 }

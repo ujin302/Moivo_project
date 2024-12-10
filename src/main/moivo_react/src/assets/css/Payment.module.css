@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
+
 /* 전체 결제 페이지 스타일 */
 .paymentFrame {
     width: 100%;
@@ -10,6 +12,67 @@
     align-items: center;
 }
 
+/* 기본 입력 필드 스타일 */
+.paymentFrame .userForm .formRow input,
+.paymentFrame .couponContainer input {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  color: #333;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* 입력 필드에 포커스되었을 때 스타일 */
+.paymentFrame .userForm .formRow input:focus,
+.paymentFrame .couponContainer input:focus {
+  outline: none;
+  border-color: #988c73;  /* 포커스 색상 */
+  background-color: #f9f6f3;  /* 포커스시 배경색 */
+}
+
+/* 입력 필드에 마우스를 올렸을 때 스타일 */
+.paymentFrame .userForm .formRow input:hover,
+.paymentFrame .couponContainer input:hover {
+  background-color: #f9f6f3;  /* 호버시 배경색 */
+  border-color: #988c73; /* 호버시 테두리 색상 */
+}
+
+/* 쿠폰 선택 스타일 */
+.paymentFrame .formRow select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+/* 쿠폰 선택시 포커스 스타일 */
+.paymentFrame .formRow select:focus {
+  outline: none;
+  border-color: #988c73; /* 포커스 색상 */
+}
+
+/* 쿠폰 레이블 스타일 */
+.paymentFrame .formRow label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* 옵션 (선택 목록) 스타일 */
+.paymentFrame .formRow select option {
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* 선택된 쿠폰 텍스트 강조 */
+.paymentFrame .formRow select option:checked {
+  background-color: #f0f0f0;
+}
+
 /* 제목 스타일 */
 .title {
     font-family: "Italiana", serif;
@@ -18,6 +81,30 @@
     color: #333;
     margin-bottom: 40px;
 }
+
+/* Payment 페이지에서만 적용되는 스타일 */
+.paymentFrame .addressRow input[type="text"] {
+  height: 40px; /* 높이 맞추기 */
+  padding: 0 10px; /* 좌우 여백 설정 */
+  font-size: 14px; /* 글자 크기 조정 */
+  line-height: 40px; /* 높이에 맞게 텍스트 중앙 정렬 */
+}
+
+/* 우편번호 검색 버튼 */
+.paymentFrame .addressRow button {
+    font-size: 12px;
+    background-color: #333;
+    color: #fff;
+    padding: 0px 30px; /* 좌우 여백을 줄여 크기 조정 */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .paymentFrame .addressRow button:hover {
+    background-color: #555;
+  }
+
 
 /* 결제 정보 컨테이너 */
 .paymentContainer {
@@ -44,23 +131,44 @@
 
 .summaryItem {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* 오른쪽 정렬 */
     margin-bottom: 10px;
+    align-items: center; /* 세로 중앙 정렬 */
 }
 
 .summaryLabel {
-    font-family: "Italiana", serif;
+    font-family: "GmarketSans", serif;
     font-size: 16px;
     color: #555;
+    margin-right: 10px;
 }
 
 .summaryValue {
-    font-family: "Italiana", serif;
+    font-family: "GmarketSans", serif;
     font-size: 16px;
     color: #333;
     font-weight: bold;
 }
 
+.addressRow {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .addressRow button {
+    padding: 8px 16px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .addressRow button:hover {
+    background-color: #555;
+  }
+
+  
 /* 결제 버튼 */
 .payButton {
     background: #333;
@@ -82,6 +190,16 @@
 .paymentContainer {
     width: 90%;
     max-width: 800px;
+}
+
+.productList {
+    width: 90%;
+    max-width: 800px; /* 사용자 정보 입력 섹션과 동일한 max-width */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box; /* 테두리와 패딩을 포함한 크기 계산 */
 }
 
 .productItem, .paymentDetails {
@@ -111,7 +229,6 @@
     width: 100px;
     height: 100px;
     object-fit: cover;
-    border-radius: 8px;
 }
 
 .productDetails {
@@ -130,12 +247,58 @@
     color: #777;
 }
 
-/* 쿠폰 코드 및 입력 필드 */
+/* 쿠폰 입력 필드 및 쿠폰 정보 */
 .couponContainer {
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
+    margin-bottom: 20px;
+  }
+  
+  .couponContainer input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    color: #333;
+    transition: border-color 0.3s ease;
+  }
+  
+  .couponContainer input:focus {
+    outline: none;
+    border-color: #988c73;
+  }
+  
+  .couponContainer .couponLabel {
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .couponContainer .couponValue {
+    font-size: 14px;
+    color: #777;
+  }
+  
+  /* 쿠폰 적용 버튼 */
+  .applyCouponButton {
+    background: #333;
+    color: white;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .applyCouponButton:hover {
+    background: #555;
+  }
+  
+  .applyCouponButton:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+  }
+  
 
 .deliveryAddress {
     margin-top: 5px;
@@ -146,4 +309,129 @@
     padding: 10px;
     border: 1px solid #ddd;
     font-size: 16px;
+}
+/* 사용자 정보 입력 섹션 */
+.userForm {
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .userForm h3 {
+    font-family: "Italiana", serif;
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .formRow {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .formRow label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .formRow input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: #333;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
+  
+  .formRow input:focus {
+    outline: none;
+  }
+  
+  .formRow input::placeholder {
+    color: #aaa;
+    font-size: 12px;
+  }
+  
+  /* 결제 버튼 */
+  .payButton {
+    align-self: center;
+    background-color: #333;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+  }
+  
+  .payButton:hover {
+    background-color: #555;
+  }
+
+    /* 하단 바 */
+    .bottomBar {
+        width: 70%;
+        height: 0.9px;
+        background-color: #988c73;
+        margin: 20px auto;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      
+      .bottomBar:hover {
+        background-color: #2f2e2c;
+      }
+      
+      /* 뒤로 가기 링크 */
+      .backLink {
+        display: block;
+        font-family: 'Italiana', serif;
+        font-size: 16px;
+        text-align: center;
+        color: #988c73;
+        text-decoration: none;
+        margin-top: 20px;
+        transition: color 0.3s ease;
+      }
+      
+      .backLink:hover {
+        color: #2f2e2c;
+      }
+
+/* 원래 가격에 작대기 */
+.originalPrice {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9em;
+}
+
+/* 할인된 가격 강조 */
+.discountedPrice {
+  color: #e74c3c;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+/* 최종 가격 (할인 없는 경우) */
+.finalPrice {
+  font-size: 1.1em;
+  color: #333;
+}
+
+.itemCount {
+  margin-left: 8px; /* 원하는 간격으로 조정 */
+  font-size: 16px; 
+  vertical-align: middle; /* 텍스트가 수직 정렬되도록 */
 }
