@@ -54,11 +54,12 @@ const ProductDetail = () => {
         
         // 메인 이미지 설정
         const mainImg = imgList.find(img => img.layer === 1);
-        setMainImage(mainImg ? mainImg.fileName : productData.img);
+        const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
+        setMainImage(mainImgUrl);
         
-        // 썸네일 이미지 설정
+        // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
         const thumbnails = imgList.filter(img => img.layer === 2);
-        setThumbnailImages(thumbnails);
+        setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
         
         // 상세 이미지 설정
         const details = imgList.filter(img => img.layer === 3);
@@ -108,11 +109,12 @@ const ProductDetail = () => {
             
             // 메인 이미지 설정
             const mainImg = imgList.find(img => img.layer === 1);
-            setMainImage(mainImg ? mainImg.fileName : productData.img);
+            const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
+            setMainImage(mainImgUrl);
             
-            // 썸네일 이미지 설정
+            // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
             const thumbnails = imgList.filter(img => img.layer === 2);
-            setThumbnailImages(thumbnails);
+            setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
             
             // 상세 이미지 설정
             const details = imgList.filter(img => img.layer === 3);
@@ -148,17 +150,21 @@ const ProductDetail = () => {
   }, [productId, token]);
 
   const handleThumbnailClick = (imgUrl, index) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setMainImage(imgUrl);
     setCurrentThumbnailIndex(index);
+    setTimeout(() => setIsAnimating(false), 300);
   };
 
   const handleThumbnailSlide = (direction) => {
     if (isAnimating) return;
     setIsAnimating(true);
     
+    const totalImages = thumbnailImages.length;
     const newIndex = direction === 'next'
-      ? (currentThumbnailIndex + 1) % thumbnailImages.length
-      : (currentThumbnailIndex - 1 + thumbnailImages.length) % thumbnailImages.length;
+      ? (currentThumbnailIndex + 1) % totalImages
+      : (currentThumbnailIndex - 1 + totalImages) % totalImages;
     
     setCurrentThumbnailIndex(newIndex);
     setMainImage(thumbnailImages[newIndex].fileName);
@@ -343,10 +349,13 @@ const ProductDetail = () => {
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <img 
+              <motion.img 
                 src={mainImage} 
                 alt={product.name} 
                 className={styles.mainImage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
                 onClick={() => handleThumbnailSlide('next')}
               />
             </motion.div>
@@ -362,20 +371,24 @@ const ProductDetail = () => {
               <motion.div 
                 className={styles.thumbnailContainer}
                 initial={false}
-                animate={{
-                  x: `${-currentThumbnailIndex * 100}%`
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
                 {thumbnailImages.map((img, index) => (
                   <motion.img
                     key={img.id}
                     src={img.fileName}
-                    alt={`${product.name} 썸네일`}
+                    alt={`${product.name} 이미지 ${index + 1}`}
                     className={`${styles.thumbnail} ${mainImage === img.fileName ? styles.active : ''}`}
                     onClick={() => handleThumbnailClick(img.fileName, index)}
-                    whileHover={{ y: -5 }}
-                    transition={{ duration: 0.2 }}
+                    whileHover={{ scale: 1.05 }}
+                    animate={mainImage === img.fileName ? { 
+                      scale: 1.05,
+                      borderColor: 'var(--accent-color)',
+                      transition: { duration: 0.3 }
+                    } : { 
+                      scale: 1,
+                      borderColor: 'transparent',
+                      transition: { duration: 0.3 }
+                    }}
                   />
                 ))}
               </motion.div>
@@ -440,7 +453,7 @@ const ProductDetail = () => {
 
             <div className={styles.productTags}>
               <span className={styles.tag}>#겨울아우터</span>
-              <span className={styles.tag}>#데일리룩</span>
+              <span className={styles.tag}>#데일룩</span>
               <span className={styles.tag}>#트렌디</span>
             </div>
 
