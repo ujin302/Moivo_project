@@ -118,15 +118,9 @@ export const AuthProvider = ({ children }) => {
                 withCredentials: true  // 쿠키 전송을 위해 작성함
             });
 
-            // 서버 응답 데이터 확인
-            console.log('서버 응답:', response.data);
-
             const { accessToken } = response.data;
-
-            // accessToken 확인
             if (!accessToken) {
-                console.error('토큰이 없습니다:', response.data);
-                return false;
+                throw new Error('로그인에 실패했습니다.');
             }
             
             // localStorage에 저장
@@ -142,11 +136,10 @@ export const AuthProvider = ({ children }) => {
 
             // axios 헤더 설정
             axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-
             return true;
+
         } catch (error) {
-            console.error('로그인 실패:', error);
-            throw error;
+            throw error.response?.data?.error || error.message;
         }
     };
 
@@ -164,7 +157,7 @@ export const AuthProvider = ({ children }) => {
                     if (!accessToken) {
                         removeTokens();
                         setIsAuthenticated(false);
-                        navigate('/login');
+                        navigate('/user');
                         return Promise.reject(error);
                     }
 

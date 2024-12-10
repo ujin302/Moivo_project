@@ -27,14 +27,13 @@ const MypageMain = () => {
     console.log("User ID:", id);
 
     // API 호출
-    fetch(`http://localhost:8080/api/user/mypage/info/${id}`, {
+    fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-        },
-        credentials: 'include'
+        }
     })
     .then((response) => {
         if (!response.ok) {

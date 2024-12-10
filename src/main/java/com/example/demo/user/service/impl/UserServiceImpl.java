@@ -300,48 +300,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-public UserEntity authenticate(String userId, String password) {
-    System.out.println("\n=== DB 인증 프로세스 시작 ===");
-    System.out.println("1. DB 접근 시도");
-    try {
-        // DB 연결 상태 확인
-        boolean isConnected = userRepository.count() >= 0;
-        System.out.println("DB 연결 상태: " + (isConnected ? "성공" : "실패"));
-        
-        System.out.println("2. 사용자 조회 시도");
-        System.out.println("조회할 userId: " + userId);
-        
-        // DB에서 사용자 조회
+    public UserEntity authenticate(String userId, String password) {
         Optional<UserEntity> userOptional = userRepository.findByUserId(userId);
         
-        System.out.println("DB 조회 결과: " + (userOptional.isPresent() ? "사용자 존재" : "사용자 없음"));
-        
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 사용자입니다.");
+        // 사용자가 없거나 비밀번호가 일치하지 않는 경우
+        if (userOptional.isEmpty() || 
+            !passwordEncoder.matches(password, userOptional.get().getPwd())) {
+            throw new RuntimeException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        UserEntity userEntity = userOptional.get();
-        System.out.println("3. 비밀번호 검증 시도");
-        System.out.println("입력된 비밀번호: " + password);
-        System.out.println("DB 저장된 암호화 비밀번호: " + userEntity.getPwd());
-        
-        boolean passwordMatch = passwordEncoder.matches(password, userEntity.getPwd());
-        System.out.println("비밀번호 일치 여부: " + passwordMatch);
-
-        if (!passwordMatch) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-
-        System.out.println("=== DB 인증 프로세스 완료 ===\n");
-        return userEntity;
-        
-    } catch (Exception e) {
-        System.out.println("=== DB 인증 프로세스 실패 ===");
-        System.out.println("에러 메시지: " + e.getMessage());
-        System.out.println("에러 타입: " + e.getClass().getName() + "\n");
-        throw e;
+        return userOptional.get();
     }
-}
 
     @Override
     public int getWishIdById(int id) {
