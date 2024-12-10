@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }) => {
             }
             return false;
         } catch (error) {
+            console.error('토큰 갱신 실패:', error);
             removeTokens();
             setIsAuthenticated(false);
             return false;
@@ -164,7 +165,7 @@ export const AuthProvider = ({ children }) => {
                     if (!accessToken) {
                         removeTokens();
                         setIsAuthenticated(false);
-                        navigate('/login');
+                        navigate('/user');
                         return Promise.reject(error);
                     }
 
@@ -208,3 +209,10 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
+// PropTypes 정의 추가
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired
+};
+
+export default AuthProvider;
