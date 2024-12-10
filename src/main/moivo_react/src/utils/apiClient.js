@@ -3,20 +3,22 @@ import { PATH } from "../../scripts/path";
 
 const apiClient = axios.create({
     baseURL: PATH.SERVER,
-    headers: {
-        "Content-Type": "application/json",
-    },
-    withCredentials: true, // 쿠키 포함
+    withCredentials: true
 });
 
-//요청 인터셉터
-apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+// 요청 인터셉터
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-});
+);
 
 //응답 인터셉터
 apiClient.interceptors.response.use(
