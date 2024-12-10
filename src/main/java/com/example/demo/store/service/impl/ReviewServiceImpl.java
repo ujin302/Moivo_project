@@ -27,7 +27,9 @@ public class ReviewServiceImpl implements ReviewService {
     // 리뷰 작성
     @Override
     public void insertReview(ReviewDTO reviewDTO, int userid, int productid) {
-        UserEntity userEntity = userRepository.findById(userid);
+        UserEntity userEntity = userRepository.findById(userid)
+                .orElseThrow(() -> new RuntimeException("User not found")); 
+
         if (userEntity == null) {
             throw new RuntimeException("User not found");
         }

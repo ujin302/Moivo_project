@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
+
 /* 전체 컨테이너 */
 .cartFrame {
     width: 100%;
@@ -70,8 +72,9 @@
   }
   
   .productPrice {
-    font-family: "Italiana", serif;
+    font-family: "GmarketSans", serif;
     font-size: 16px;
+    font-weight: 800;
     color: #988c73;
   }
   
@@ -159,36 +162,39 @@
   cursor: not-allowed;
 }
 
-  /* 총 금액 섹션 */
-  .totalSection {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding: 20px;
-    border-top: 1px solid #ccc;
-  }
-  
-  .totalText {
-    font-family: "Italiana", serif;
-    font-size: 18px;
-    color: #2f2e2c;
-  }
-  
-  .checkoutButton {
-    background: #988c73;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .checkoutButton:hover {
-    background: #2f2e2c;
-  }
-  
+/* 총 금액 섹션 */
+.totalSection {
+  font-weight: 600;
+  display: flex;
+  flex-direction: column; /* 세로로 정렬 */
+  align-items: flex-end; /* 오른쪽 끝에 정렬 */
+  margin-top: 20px;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+}
+
+.totalText {
+  font-family: "GmarketSans", serif;
+  font-size: 18px;
+  color: #2f2e2c;
+  margin-bottom: 10px; /* 버튼과의 간격 */
+}
+
+.checkoutButton {
+  font-family: "Italiana", serif;
+  background: #988c73;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkoutButton:hover {
+  background: #2f2e2c;
+}
+
   /* 빈 장바구니 */
   .emptyCart {
     text-align: center;
