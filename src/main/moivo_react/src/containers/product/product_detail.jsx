@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard, FaRuler } from 'react-icons/fa';
+import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard } from 'react-icons/fa';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from '../../../scripts/path';
 import styles from '../../assets/css/product_detail.module.css';
@@ -12,7 +12,9 @@ import LoadingModal from './LoadingModal';
 
 const ProductDetail = () => {
   const { productId } = useParams(); // 받아온 상품 ID
-  const { token } = useContext(AuthContext); // 토큰
+  const { isAuthenticated } = useContext(AuthContext);
+  const token = localStorage.getItem('accessToken');
+  const userId = localStorage.getItem('userId');
   const [product, setProduct] = useState(null); // 상품 정보
   const [mainImage, setMainImage] = useState(''); // 메인 이미지
   const [thumbnailImages, setThumbnailImages] = useState([]); // 썸네일 이미지
@@ -25,7 +27,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null); // 에러 상태
   const [quantity, setQuantity] = useState(1); // 수량
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
-  const [showSizeGuide, setShowSizeGuide] = useState(false); // 사이즈 가이드 표시 여부
+  const navigate = useNavigate();
 
   const fetchProductDetail = async () => { //상품 상세정보 불러오기
     setLoading(true);
@@ -43,8 +45,28 @@ const ProductDetail = () => {
           { headers }
         );
   
-        const { product, imgList, stockList, reviewList } = response.data;
-        // ... 기존 데이터 처리 로직 ...
+        const { product: productData, imgList, stockList, reviewList } = response.data;
+ 
+        // 상품 정보 설정
+        setProduct(productData);
+        
+        // 메인 이미지 설정
+        const mainImg = imgList.find(img => img.layer === 1);
+        setMainImage(mainImg ? mainImg.fileName : productData.img);
+        
+        // 썸네일 이미지 설정
+        const thumbnails = imgList.filter(img => img.layer === 2);
+        setThumbnailImages(thumbnails);
+        
+        // 상세 이미지 설정
+        const details = imgList.filter(img => img.layer === 3);
+        setDetailImages(details);
+        
+        // 재고 정보 설정
+        setStocks(stockList);
+        
+        // 리뷰 정보 설정
+        setReviews(reviewList);
   
       } catch (error) {
         // access 토큰 만료로 인한 401 에러인 경우
@@ -77,14 +99,14 @@ const ProductDetail = () => {
               }
             );
   
-            const { product, imgList, stockList, reviewList } = retryResponse.data;
+            const { product: productData, imgList, stockList, reviewList } = retryResponse.data;
             
             // 상품 정보 설정
-            setProduct(product);
+            setProduct(productData);
             
             // 메인 이미지 설정
             const mainImg = imgList.find(img => img.layer === 1);
-            setMainImage(mainImg ? mainImg.fileName : product.img);
+            setMainImage(mainImg ? mainImg.fileName : productData.img);
             
             // 썸네일 이미지 설정
             const thumbnails = imgList.filter(img => img.layer === 2);
@@ -140,24 +162,6 @@ const ProductDetail = () => {
     });
   };
 
-  const handlePurchase = () => { // 구매 버튼 클릭 시 선택한 상품 정보 출력
-    if (!selectedProduct) {
-      alert('사이즈를 선택해주세요.');
-      return;
-    }
-    // 구매 로직 구현
-    console.log('구매하기:', selectedProduct);
-  };
-
-  const handleAddToWishlist = () => { // 위시리스트 버튼 클릭 시 선택한 상품 정보 출력
-    if (!token) {
-      alert('로그인이 필요한 서비스입니다.');
-      return;
-    }
-    // 위시리스트 추가 로직 구현  
-    console.log('위시리스트에 추가:', product.id);
-  };
-
   const handleQuantityChange = (change) => { // 수량 변경 시 수량 업데이트
     const newQuantity = quantity + change;
     if (newQuantity >= 1) {
@@ -171,17 +175,116 @@ const ProductDetail = () => {
     }
   };
 
-  const handleAddToCart = () => { // 장바구니 버튼 클릭 시 선택한 상품 정보 출력
+  const handlePurchase = () => {
     if (!selectedProduct) {
       alert('사이즈를 선택해주세요.');
       return;
     }
-    if (!token) {
+    if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
+      // navigate('/user');
       return;
     }
-    // 장바구니 추가 로직 구현
-    console.log('장바구니에 추가:', { ...selectedProduct, quantity });
+
+    // 선택한 상품 정보를 포함하여 payment 페이지로 이동
+    navigate('/payment', {
+      state: {
+        items: [{
+          ...product,
+          size: selectedProduct.size,
+          count: quantity,
+          totalPrice: product.price * quantity
+        }]
+      }
+    });
+  };
+
+  const handleAddToWishlist = async () => {
+    if (!isAuthenticated || !token) {
+      alert('로그인이 필요한 서비스입니다.');
+      // navigate('/user');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${PATH.SERVER}/api/user/wish/add`,
+        {
+          productId: product.id
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            userid: userId
+          }
+        }
+      );
+
+      if (response.status === 201 || response.status === 200) {
+        const confirmWish = window.confirm('위시리스트에 추가되었습니다. 위시리스트로 이동하시겠습니까?');
+        if (confirmWish) {
+          navigate('/mypage/wish');
+        }
+      }
+    } catch (error) {
+      console.error('위시리스트 추가 실패:', error);
+      if (error.response?.status === 401) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        // navigate('/user');
+      } else {
+        alert('위시리스트 추가에 실패했습니다.');
+      }
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!selectedProduct) {
+      alert('사이즈를 선택해주세요.');
+      return;
+    }
+    if (!isAuthenticated || !token) {
+      alert('로그인이 필요한 서비스입니다.');
+      // navigate('/user');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${PATH.SERVER}/api/user/cart/add`,
+        {
+          productId: product.id,
+          size: selectedProduct.size,
+          count: quantity
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            userid: userId
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        const confirmCart = window.confirm('장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?');
+        if (confirmCart) {
+          navigate('/cart');
+        }
+      }
+    } catch (error) {
+      console.error('장바구니 추가 실패:', error);
+      if (error.response?.status === 401) {
+        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        // navigate('/user');
+      } else {
+        alert('장바구니 추가에 실패했습니다.');
+      }
+    }
   };
 
   if (loading) { // 로딩 중일 때 로딩 모달 표시
@@ -276,13 +379,6 @@ const ProductDetail = () => {
                 <span className={styles.infoValue}>
                   <span className={styles.highlight}>무료배송</span>
                   <span className={styles.subInfo}>Moivo통운 | 3일 이내 출고</span>
-                </span>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>적립금</span>
-                <span className={styles.infoValue}>
-                  {Math.floor(product?.price * 0.01).toLocaleString()}원 (1%)
-                  <span className={styles.subInfo}>+ 카드 추가적립 최대 1%</span>
                 </span>
               </div>
             </div>
@@ -413,16 +509,7 @@ const ProductDetail = () => {
               >
                 <FaHeart /> 위시리스트 추가
               </motion.button>
-            </motion.div>
-
-            <motion.button 
-              className={styles.inquiryButton}
-              onClick={() => {/* 문의하기 로직 */}}
-              whileHover={{ scale: 1.02 }}
-            >
-              상품 문의하기
-          </motion.button>
-          
+            </motion.div>       
           </div>
         </motion.div>
 
@@ -594,7 +681,7 @@ const ProductDetail = () => {
                     <h3>환불 안내</h3>
                     <ul>
                       <li>상품 회수 확인 후 3영업일 이내에 환불이 진행됩니다.</li>
-                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을 수 있습니다.</li>
+                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을  있습니다.</li>
                     </ul>
                   </div>
                 </div>
