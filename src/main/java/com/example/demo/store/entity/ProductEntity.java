@@ -48,6 +48,9 @@ public class ProductEntity { // 상품
     @Column(length = 10, nullable = false)
     private Gender gender; // 성별
 
+    @Column(name = "isdelete", nullable = false)
+    private Boolean delete = false; // 상품 삭제 시, true로 변경
+
     // 상품 n개 : 카테고리 1개
     @ManyToOne
     @JoinColumn(name = "categoryid", nullable = false)
