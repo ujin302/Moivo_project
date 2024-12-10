@@ -4,7 +4,7 @@ import styles from "../../assets/css/Cart.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import axios from "axios";
-import { PATH } from '../../../scripts/path';
+import { PATH } from "../../../scripts/path";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const userid = 3;
 
+  // 장바구니 데이터 가져오기
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
@@ -35,17 +36,13 @@ const Cart = () => {
     fetchCartItems();
   }, [userid]);
 
-  console.log(cartItems); 
-
+  // 상품 제거
   const handleRemoveItem = async (id) => {
-    const token = sessionStorage.getItem("token");
-    console.log("token = " + token);
-  
-    console.log("Removing item with id:", id);
+    const token = localStorage.getItem("accessToken");
     try {
-      await axios.delete(`http://localhost:8080/api/user/cart/delete/${id}`, {
+      await axios.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
         params: { userid },
       });
@@ -61,24 +58,20 @@ const Cart = () => {
     }
   };
 
+  // 상품 업데이트
   const handleUpdateItem = async (id, newCount, newSize) => {
-    const token = sessionStorage.getItem("token");
-    console.log("usercartId = ", id);
-    
-    // stockCount 초과 방지
+    const token = localStorage.getItem("accessToken");
     const item = cartItems.find((item) => item.usercartId === id);
     if (newCount > item.stockCount) {
       alert("재고를 초과할 수 없습니다.");
       return;
     }
-  
-    // 사이즈를 변경하려는 경우, newSize가 null이 아니면 사이즈도 갱신
     try {
       await axios.put(
-        `http://localhost:8080/api/user/cart/update/${id}`,
+        `${PATH.SERVER}/api/user/cart/update/${id}`,
         {
           count: newCount,
-          size: newSize !== null ? newSize : item.size, // 사이즈가 null일 경우 기존 사이즈 유지
+          size: newSize !== null ? newSize : item.size,
         },
         {
           headers: {
@@ -98,10 +91,24 @@ const Cart = () => {
       alert("수정 중 문제가 발생했습니다. !!");
     }
   };
-  
+
+  // 선택된 상품의 총 가격 계산
   const totalPrice = cartItems
-  .filter((item) => selectedItems.includes(item.usercartId)) // 선택된 아이템만 필터링
-  .reduce((total, item) => total + item.price * item.count, 0);
+    .filter((item) => selectedItems.includes(item.usercartId))
+    .reduce((total, item) => total + item.price * item.count, 0);
+
+  // 결제 페이지로 이동
+  const handleNavigateToPayment = () => {
+    if (selectedItems.length === 0) {
+      alert("상품을 선택해주세요.");
+      return; // 아무것도 선택되지 않으면 함수 종료
+    }
+
+    const selectedCartItems = cartItems.filter((item) =>
+      selectedItems.includes(item.usercartId)
+    );
+    navigate("/payment", { state: { cartItems: selectedCartItems } });
+  };
 
   if (loading) return <div>Loading...</div>;
 
@@ -114,10 +121,12 @@ const Cart = () => {
           <div className={styles.cartContainer}>
             {cartItems.map((item) => (
               <div key={item.usercartId} className={styles.cartItem}>
+                {/* 품절 상품 체크 불가 */}
                 <input
                   type="checkbox"
                   id={`${item.usercartId}`}
                   checked={selectedItems.includes(item.usercartId)}
+                  disabled={item.soldOut}
                   onChange={() =>
                     setSelectedItems((prev) =>
                       prev.includes(item.usercartId)
@@ -136,13 +145,9 @@ const Cart = () => {
                   <div className={styles.productPrice}>
                     KRW {item.price.toLocaleString()}
                   </div>
-
-                  {/* 품절된 상품 표시 */}
                   {item.soldOut && (
                     <div className={styles.soldOutMessage}>품절된 상품입니다.</div>
                   )}
-
-                  {/* 수량 및 사이즈 변경 불가 처리 */}
                   {!item.soldOut ? (
                     <div className={styles.sizeSelector}>
                       <select
@@ -179,11 +184,10 @@ const Cart = () => {
                   ) : (
                     <div>변경할 수 없습니다.</div>
                   )}
-
                   <button
                     className={styles.removeButton}
                     onClick={() => handleRemoveItem(item.id)}
-                    disabled={item.soldOut}  // 품절된 상품의 제거 버튼도 비활성화
+                    disabled={item.soldOut}
                   >
                     REMOVE
                   </button>
@@ -196,15 +200,7 @@ const Cart = () => {
               </div>
               <button
                 className={styles.checkoutButton}
-                onClick={() =>
-                  navigate("/payment", {
-                    state: {
-                      items: cartItems.filter((item) =>
-                        selectedItems.includes(item.usercartId)
-                      ),
-                    },
-                  })
-                }
+                onClick={handleNavigateToPayment}
               >
                 BUY NOW
               </button>
@@ -217,6 +213,6 @@ const Cart = () => {
       <Footer />
     </div>
   );
-  };
-  
-  export default Cart;
+};
+
+export default Cart;

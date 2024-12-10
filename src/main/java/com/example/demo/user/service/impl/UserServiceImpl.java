@@ -143,9 +143,11 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> result = new HashMap<>();
         result.put("accessToken", accessToken);
         result.put("refreshToken", refreshToken);  // 컨트롤러에서 제거될 예정
+        result.put("userId", user.getUserId());
         result.put("id", user.getId());
         result.put("cartId", cartId);
         result.put("wishId", wishId);
+        result.put("isAdmin", user.isAdmin());
 
         return result;
     }

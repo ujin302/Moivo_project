@@ -2,6 +2,7 @@ package com.example.demo.user.service.impl;
 
 //import com.example.demo.configuration.OAuthProperties;
 
+import com.example.demo.jwt.util.JwtUtil;
 import com.example.demo.security.handler.CustomOAuth2User;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.UserRepository;
@@ -9,6 +10,9 @@ import com.example.demo.user.service.SocialService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +38,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -41,7 +49,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 //카카오 소셜
-public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements SocialService {
+public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements SocialService, AuthenticationSuccessHandler {
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -52,9 +60,6 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
 
     String tokenUrl = "https://kauth.kakao.com/oauth/token";
 
-    @Autowired
-    HttpSession session;
-
     //private final OAuthProperties oAuthProperties; //현재 사용 X 추후 Google, Naver 사용시
 
     private final OAuth2AuthorizedClientService authorizedClientService;
@@ -64,6 +69,8 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private JwtUtil jwtUtil;
 
 //    public String getAccessTokenReturn() {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -130,9 +137,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
 
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
 
-        if(response.getStatusCode() == HttpStatus.OK) {
+        if (response.getStatusCode() == HttpStatus.OK) {
             System.out.println("토큰 성공응답 = " + response.getBody());
-        } else{
+        } else {
             System.out.println("에러 응답 = " + response.getBody());
         }
 
@@ -262,11 +269,11 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveOrUpdateUser(UserEntity userEntity) {
+    public void saveOrUpdateUser(UserEntity userEntity) throws ServletException, IOException {
         //사용자 존재여부 확인
         Optional<UserEntity> existingUser = userRepository.findByUserId(userEntity.getUserId());
-
         System.out.println("existingUser = " + existingUser);
+
         if (existingUser.isPresent()) {
             // 이미 존재하는 사용자일 경우 업데이트
             UserEntity userToUpdate = existingUser.get();
@@ -280,19 +287,53 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
             userRepository.save(userEntity);
             System.out.println("사용자 있음");
         }
+//        String userId, int id, int wishId, int cartId, boolean isAdmin)
+        System.out.println("여기서 accessToken 발급필요");
+//        UserEntity user = authenticate(String userId)
+//        String accessToken = jwtUtil.generateAccessToken();
 
-        //여기서부터 문제?
-        // 로그인 상태로 설정 (세션에 사용자 정보 추가)
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()){
-            OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-            CustomOAuth2User customUser = (CustomOAuth2User) oauthToken.getPrincipal();
+        // HttpServletRequest, HttpServletResponse 가져오기
+        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attr != null) {
+            HttpServletRequest request = attr.getRequest();
+            HttpServletResponse response = attr.getResponse();
 
-            System.out.println("oauthToken = " + oauthToken);
-            System.out.println("customUser = " + customUser);
-            session.setAttribute("user", customUser);
-            System.out.println("session.getAttribute(\"user\") = " + session.getAttribute("user"));
+            // 로그인 상태로 설정 (세션에 사용자 정보 추가)
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+                CustomOAuth2User customUser = (CustomOAuth2User) oauthToken.getPrincipal();
+                System.out.println("oauthToken = " + oauthToken);
+                System.out.println("customUser = " + customUser);
+
+                onAuthenticationSuccess(request, response, authentication);
+            }
         }
-   }
+    }
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        // 0. OAuth2 인증 후 , Oauth2Auth2AuthenticationToken으로 SercurityContext에 저장
+        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+
+        // 1. SecurityContextHolder에 인증 정보 설정
+        SecurityContextHolder.getContext().setAuthentication(oauthToken);
+
+        System.out.println("저장하려는 = " + authentication.getPrincipal());
+        // 2. 인증 정보를 세션에 저장
+        request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+        System.out.println("authentication.getName() = " + authentication.getName());
+        //response.sendRedirect("redirect:" + "http://localhost:5173" + authentication.getName());
+
+        // 3. 인증 성공 후 추가 작업
+        System.out.println("SPRINGSECURITYCONTEXT");
+        System.out.println(request.getSession().getAttribute("SPRING_SECURITY_CONTEXT"));
+
+        request.getSession().setAttribute("user", authentication.getPrincipal());
+
+
+//        super.onAuthenticationSuccess(request, response, authentication);
+    }
+
 
 }

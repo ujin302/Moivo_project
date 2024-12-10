@@ -95,6 +95,10 @@ public ResponseEntity<String> signup(@RequestBody UserDTO userDTO) {
             refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
             response.addCookie(refreshTokenCookie);
 
+            // isAdmin 값을 응답에 포함
+            UserDTO userInfo = userService.findUserById(userId);
+            loginResult.put("isAdmin", userInfo.isAdmin());
+
             // Refresh Token은 응답 바디에서 제거
             loginResult.remove("refreshToken");
             System.out.println("로그인 성공!!");

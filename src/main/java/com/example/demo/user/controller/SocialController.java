@@ -8,6 +8,7 @@ import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.service.SocialService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Collection;
 
 @Controller
@@ -65,7 +67,7 @@ public class SocialController {
     }
 
     @GetMapping("/oauth2/callback/{provider}")
-    public String socialLogin(@PathVariable String provider, @RequestParam String code, HttpServletRequest request) throws JsonProcessingException {
+    public String socialLogin(@PathVariable String provider, @RequestParam String code, HttpServletRequest request) throws IOException, ServletException {
 
         // 소셜 로그인 처리
         System.out.println("Controller 로그인");
@@ -91,7 +93,6 @@ public class SocialController {
         // SecurityContext에 설정
         SecurityContextHolder.getContext().setAuthentication(oAuth2AuthenticationToken);
         System.out.println("Controller SecurityContextHolder.getContext().getAuthentication() = " + SecurityContextHolder.getContext().getAuthentication());
-        //설정까진 됐는데 유지가 안되는지 anonymous로 초기화됨 이유모름
 
         //OAuth2 확인
         if (securityUtils.isOAuthLogin()) {

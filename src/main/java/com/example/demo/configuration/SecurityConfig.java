@@ -58,7 +58,6 @@ public class SecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain authorizationServer(HttpSecurity http) throws Exception {
-//        ClientRegistrationRepository clientRegistrationRepository
         // OAuth2 Authorization Server 기본 설정 적용 기본 인증 서버
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         System.out.println(OAuth2AuthenticationToken.class.getName());
