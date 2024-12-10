@@ -11,6 +11,7 @@ const SuccessPage = () => {
   const paymentKey = searchParams.get("paymentKey");
   const orderId = searchParams.get("orderId");
   const amount = searchParams.get("amount");
+  const addr = searchParams.get("addr");
 
   if (!paymentKey || !orderId || !amount) {
     return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
@@ -47,8 +48,8 @@ const SuccessPage = () => {
                 <td className={styles.column2}>{amount} 원</td>
               </tr>
               <tr>
-                <td className={styles.column2}>결제 키</td>
-                <td className={styles.column2}>{paymentKey}</td>
+                <td className={styles.column2}>배송지</td>
+                <td className={styles.column2}>{addr}</td>
               </tr>
             </tbody>
           </table>

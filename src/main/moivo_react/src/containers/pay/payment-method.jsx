@@ -8,15 +8,17 @@ const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
 const PaymentMethod = () => {
   const location = useLocation();
-  const { cartItems, finalAmount } = location.state;
+  const { userInfo, cartItems, totalAmount } = location.state;
   const [ready, setReady] = useState(false);
   const [customer, setCustomerName] = useState(null);
   const [orderName, setOrderName] = useState(null);
   const [widgets, setWidgets] = useState(null);
+  const [addr, setAddr] = useState(null);
   const [amount, setAmount] = useState({
     currency: "KRW",
-    value: finalAmount, // 결제할 금액 설정 (예: 100원)
+    value: totalAmount, // 결제할 금액 설정 (예: 100원)
   });
+
 
   useEffect(() => {
     // 알파벳 순서로 정렬 후 가장 앞 상품 이름 선택
@@ -33,7 +35,11 @@ const PaymentMethod = () => {
   }, [cartItems]);
 
   useEffect(() => {
-    setCustomerName("김토스");
+    setCustomerName(userInfo.name);
+  },[]);
+
+  useEffect(() => {
+    setAddr("(" + userInfo.zipcode + ")" + userInfo.addr1 + userInfo.addr2);
   },[]);
 
   useEffect(() => {
@@ -85,8 +91,8 @@ const PaymentMethod = () => {
                   orderId: generateRandomString(), // 고유 주문 ID
                   orderName: orderName, // 상품명
                   customerName: customer, // 고객명
-                  customerEmail: "customer123@gmail.com", // 고객 이메일
-                  successUrl: `${window.location.origin}/payment-success?customerName=${encodeURIComponent(customer)}&orderName=${encodeURIComponent(orderName)}&amount=${amount.value}`,
+                  customerEmail: userInfo.email, // 고객 이메일
+                  successUrl: `${window.location.origin}/payment-success?customerName=${encodeURIComponent(customer)}&orderName=${encodeURIComponent(orderName)}&addr=${encodeURIComponent(addr)}&amount=${amount.value}`,
                   failUrl: `${window.location.origin}/payment-fail`,
                 });
               } catch (error) {
