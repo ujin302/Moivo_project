@@ -28,6 +28,8 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1); // 수량
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
   const navigate = useNavigate();
+  const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const fetchProductDetail = async () => { //상품 상세정보 불러오기
     setLoading(true);
@@ -52,11 +54,12 @@ const ProductDetail = () => {
         
         // 메인 이미지 설정
         const mainImg = imgList.find(img => img.layer === 1);
-        setMainImage(mainImg ? mainImg.fileName : productData.img);
+        const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
+        setMainImage(mainImgUrl);
         
-        // 썸네일 이미지 설정
+        // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
         const thumbnails = imgList.filter(img => img.layer === 2);
-        setThumbnailImages(thumbnails);
+        setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
         
         // 상세 이미지 설정
         const details = imgList.filter(img => img.layer === 3);
@@ -106,11 +109,12 @@ const ProductDetail = () => {
             
             // 메인 이미지 설정
             const mainImg = imgList.find(img => img.layer === 1);
-            setMainImage(mainImg ? mainImg.fileName : productData.img);
+            const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
+            setMainImage(mainImgUrl);
             
-            // 썸네일 이미지 설정
+            // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
             const thumbnails = imgList.filter(img => img.layer === 2);
-            setThumbnailImages(thumbnails);
+            setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
             
             // 상세 이미지 설정
             const details = imgList.filter(img => img.layer === 3);
@@ -145,8 +149,27 @@ const ProductDetail = () => {
     fetchProductDetail();
   }, [productId, token]);
 
-  const handleThumbnailClick = (imgUrl) => { // 썸네일 이미지 클릭 시 메인 이미지 변경
+  const handleThumbnailClick = (imgUrl, index) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setMainImage(imgUrl);
+    setCurrentThumbnailIndex(index);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
+
+  const handleThumbnailSlide = (direction) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    
+    const totalImages = thumbnailImages.length;
+    const newIndex = direction === 'next'
+      ? (currentThumbnailIndex + 1) % totalImages
+      : (currentThumbnailIndex - 1 + totalImages) % totalImages;
+    
+    setCurrentThumbnailIndex(newIndex);
+    setMainImage(thumbnailImages[newIndex].fileName);
+    
+    setTimeout(() => setIsAnimating(false), 300);
   };
 
   const handleSizeSelect = (size, count) => { // 사이즈 선택 시 선택한 상품 정보 설정
@@ -182,48 +205,38 @@ const ProductDetail = () => {
     }
     if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      // navigate('/user');
       return;
     }
 
     // 선택한 상품 정보를 포함하여 payment 페이지로 이동
+    const paymentItem = {
+      ...product,
+      size: selectedProduct.size,
+      count: quantity,
+      totalPrice: product.price * quantity,
+      img: mainImage // 메인 이미지 추가
+    };
+
     navigate('/payment', {
-      state: {
-        items: [{
-          ...product,
-          size: selectedProduct.size,
-          count: quantity,
-          totalPrice: product.price * quantity
-        }]
-      }
+      state: { cartItems: [paymentItem] }
     });
   };
 
   const handleAddToWishlist = async () => {
     if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      // navigate('/user');
       return;
     }
 
     try {
-      const response = await axios.post(
-        `${PATH.SERVER}/api/user/wish/add`,
-        {
-          productId: product.id
+      const response = await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          params: {
-            userid: userId
-          }
-        }
-      );
+        params: { userid: userId }
+      });
 
-      if (response.status === 201 || response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         const confirmWish = window.confirm('위시리스트에 추가되었습니다. 위시리스트로 이동하시겠습니까?');
         if (confirmWish) {
           navigate('/mypage/wish');
@@ -233,7 +246,6 @@ const ProductDetail = () => {
       console.error('위시리스트 추가 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        // navigate('/user');
       } else {
         alert('위시리스트 추가에 실패했습니다.');
       }
@@ -247,17 +259,15 @@ const ProductDetail = () => {
     }
     if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      // navigate('/user');
       return;
     }
 
     try {
       const response = await axios.post(
-        `${PATH.SERVER}/api/user/cart/add`,
+        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
         {
-          productId: product.id,
-          size: selectedProduct.size,
-          count: quantity
+          count: quantity,
+          size: selectedProduct.size
         },
         {
           headers: {
@@ -280,7 +290,6 @@ const ProductDetail = () => {
       console.error('장바구니 추가 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        // navigate('/user');
       } else {
         alert('장바구니 추가에 실패했습니다.');
       }
@@ -329,24 +338,57 @@ const ProductDetail = () => {
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <img 
+              <motion.img 
                 src={mainImage} 
                 alt={product.name} 
                 className={styles.mainImage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                onClick={() => handleThumbnailSlide('next')}
               />
             </motion.div>
-            <div className={styles.thumbnailContainer}>
-              {thumbnailImages.map((img) => (
-                <motion.img
-                  key={img.id}
-                  src={img.fileName}
-                  alt={`${product.name} 썸네일`}
-                  className={`${styles.thumbnail} ${mainImage === img.fileName ? styles.active : ''}`}
-                  onClick={() => handleThumbnailClick(img.fileName)}
-                  whileHover={{ y: -5 }}
-                  transition={{ duration: 0.2 }}
-                />
-              ))}
+            <div className={styles.thumbnailSliderContainer}>
+              <motion.button
+                className={`${styles.sliderButton} ${styles.prevButton}`}
+                onClick={() => handleThumbnailSlide('prev')}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                &#8249;
+              </motion.button>
+              <motion.div 
+                className={styles.thumbnailContainer}
+                initial={false}
+              >
+                {thumbnailImages.map((img, index) => (
+                  <motion.img
+                    key={img.id}
+                    src={img.fileName}
+                    alt={`${product.name} 이미지 ${index + 1}`}
+                    className={`${styles.thumbnail} ${mainImage === img.fileName ? styles.active : ''}`}
+                    onClick={() => handleThumbnailClick(img.fileName, index)}
+                    whileHover={{ scale: 1.05 }}
+                    animate={mainImage === img.fileName ? { 
+                      scale: 1.05,
+                      borderColor: 'var(--accent-color)',
+                      transition: { duration: 0.3 }
+                    } : { 
+                      scale: 1,
+                      borderColor: 'transparent',
+                      transition: { duration: 0.3 }
+                    }}
+                  />
+                ))}
+              </motion.div>
+              <motion.button
+                className={`${styles.sliderButton} ${styles.nextButton}`}
+                onClick={() => handleThumbnailSlide('next')}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                &#8250;
+              </motion.button>
             </div>
           </div>
 
@@ -400,7 +442,7 @@ const ProductDetail = () => {
 
             <div className={styles.productTags}>
               <span className={styles.tag}>#겨울아우터</span>
-              <span className={styles.tag}>#데일리룩</span>
+              <span className={styles.tag}>#데일룩</span>
               <span className={styles.tag}>#트렌디</span>
             </div>
 
@@ -673,7 +715,7 @@ const ProductDetail = () => {
                     <h3>교환/반품이 불가능한 경우</h3>
                     <ul>
                       <li>상품 수령 후 7일이 경과한 경우</li>
-                      <li>착용한 흔적이 있거나 상품이 훼손된 경우</li>
+                      <li>착용 흔적이 있거나 상품이 훼손된 경우</li>
                       <li>상품의 택이나 라벨이 제거된 경우</li>
                       <li>고객의 부주의로 인해 상품이 훼손된 경우</li>
                     </ul>
