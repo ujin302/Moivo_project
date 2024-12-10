@@ -12,7 +12,9 @@ import LoadingModal from './LoadingModal';
 
 const ProductDetail = () => {
   const { productId } = useParams(); // 받아온 상품 ID
-  const { token, userId } = useContext(AuthContext); // 토큰과 사용자 ID
+  const { isAuthenticated } = useContext(AuthContext);
+  const token = localStorage.getItem('accessToken');
+  const userId = localStorage.getItem('userId');
   const [product, setProduct] = useState(null); // 상품 정보
   const [mainImage, setMainImage] = useState(''); // 메인 이미지
   const [thumbnailImages, setThumbnailImages] = useState([]); // 썸네일 이미지
@@ -178,9 +180,9 @@ const ProductDetail = () => {
       alert('사이즈를 선택해주세요.');
       return;
     }
-    if (!token) {
+    if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      navigate('/user');
+      // navigate('/user');
       return;
     }
 
@@ -198,9 +200,9 @@ const ProductDetail = () => {
   };
 
   const handleAddToWishlist = async () => {
-    if (!token) {
+    if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      navigate('/user');
+      // navigate('/user');
       return;
     }
 
@@ -231,6 +233,7 @@ const ProductDetail = () => {
       console.error('위시리스트 추가 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        // navigate('/user');
       } else {
         alert('위시리스트 추가에 실패했습니다.');
       }
@@ -242,9 +245,9 @@ const ProductDetail = () => {
       alert('사이즈를 선택해주세요.');
       return;
     }
-    if (!token) {
+    if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      navigate('/user');
+      // navigate('/user');
       return;
     }
 
@@ -277,6 +280,7 @@ const ProductDetail = () => {
       console.error('장바구니 추가 실패:', error);
       if (error.response?.status === 401) {
         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        // navigate('/user');
       } else {
         alert('장바구니 추가에 실패했습니다.');
       }

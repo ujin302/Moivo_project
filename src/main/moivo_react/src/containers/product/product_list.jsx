@@ -162,47 +162,106 @@ const ProductList = () => {
     fetchProducts(0);
   }, [sortBy, searchTerm, activeCategory]);
 
-  // 11.28 - uj
+  // 11.28 - uj , 24.12.05 - sc 로직 수정
   // Wish 아이템 추가 & 렌더링
   const handleAddToWish = async (product) => {
     try {
       if(id != null) {
-        await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}?userid=${id}`);
-        console.log(`위시리스트에 상품(${product.id}) 추가 성공`);
-        getWishCartCount('wish'); // 사용자 Wish Data 요청 호출
+        // await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}?userid=${id}`);
+        // console.log(`위시리스트에 상품(${product.id}) 추가 성공`);
+        // getWishCartCount('wish'); // 사용자 Wish Data 요청 호출
+        const response = await axios.post(
+          `${PATH.SERVER}/api/user/wish/add`,
+          {
+            productId: product.id
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              userid: id
+            }
+          }
+        );
+
+        if (response.status === 200 || response.status === 201) {
+          console.log(`위시리스트에 상품(${product.id}) 추가 성공`);
+          getWishCartCount('wish'); // 위시리스트 개수 업데이트
+        }
       } else {
         alert("로그인 후에 이용해주세요.");
       }
     } catch (error) {
       if (error.response?.status === 401) {
         console.error("인증 오류:", error);
+        alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
       } else {
         console.error("위시리스트에 추가하는 중 오류가 발생했습니다:", error);
+        alert("위시리스트 추가에 실패했습니다.");
       }
     }
   };
   
-  // Cart 아이템 추가
-  const handleAddToCart = (product) => {
-    const existingItem = cartItems.find((item) => item.id === product.id);
-  
-    if (existingItem) {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        )
-      );
-    } else {
-      const cartProduct = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        img: product.img || '',
-        quantity: 1,
-      };
-      setCartItems((prev) => [...prev, cartProduct]);
+  // Cart 아이템 추가 수정 - sc 24.12.05.
+  const handleAddToCart = async (product) => {
+    // const handleAddToCart = (product) => {
+    //   const existingItem = cartItems.find((item) => item.id === product.id);
+    
+    //   if (existingItem) {
+    //     setCartItems((prev) =>
+    //       prev.map((item) =>
+    //         item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+    //       )
+    //     );
+    //   } else {
+    //     const cartProduct = {
+    //       id: product.id,
+    //       name: product.name,
+    //       price: product.price,
+    //       img: product.img || '',
+    //       quantity: 1,
+    //     };
+    //     setCartItems((prev) => [...prev, cartProduct]);
+    //   }
+    //   setIsCartModalOpen(true);
+    try {
+      if(id != null) {
+        const response = await axios.post(
+          `${PATH.SERVER}/api/user/cart/add`,
+          {
+            productId: product.id,
+            count: 1
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              userid: id
+            }
+          }
+        );
+
+        if (response.status === 200) {
+          console.log(`장바구니에 상품(${product.id}) 추가 성공`);
+          getWishCartCount('cart'); // 장바구니 개수 업데이트
+          setIsCartModalOpen(true);
+        }
+      } else {
+        alert("로그인 후에 이용해주세요.");
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        console.error("인증 오류:", error);
+        alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+      } else {
+        console.error("장바구니에 추가하는 중 오류가 발생했습니다:", error);
+        alert("장바구니 추가에 실패했습니다.");
+      }
     }
-    setIsCartModalOpen(true);
   };
   
   // Cart 아이템 제거
@@ -443,15 +502,13 @@ const ProductList = () => {
 
         {/* 모달 (장바구니) */}
         <ListModal
-        isOpen={isCartModalOpen}
-        onClose={closeCartModal}
-        title="장바구니"
-        items={cartItem}
-        onRemove={removeFromCart}
-        onQuantityChange={updateCartQuantity}
-        isLoggedIn={isLoggedIn}
-        navigate={navigate}
-      />
+          isOpen={isCartModalOpen}
+          onClose={closeCartModal}
+          title="장바구니"
+          items={cartItem}
+          isLoggedIn={isLoggedIn}
+          navigate={navigate}
+        />
 
         <LoadingModal isOpen={isLoading} />
       </div>
