@@ -28,6 +28,8 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1); // 수량
   const [activeTab, setActiveTab] = useState('details'); // 활성화된 탭
   const navigate = useNavigate();
+  const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const fetchProductDetail = async () => { //상품 상세정보 불러오기
     setLoading(true);
@@ -145,8 +147,23 @@ const ProductDetail = () => {
     fetchProductDetail();
   }, [productId, token]);
 
-  const handleThumbnailClick = (imgUrl) => { // 썸네일 이미지 클릭 시 메인 이미지 변경
+  const handleThumbnailClick = (imgUrl, index) => {
     setMainImage(imgUrl);
+    setCurrentThumbnailIndex(index);
+  };
+
+  const handleThumbnailSlide = (direction) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    
+    const newIndex = direction === 'next'
+      ? (currentThumbnailIndex + 1) % thumbnailImages.length
+      : (currentThumbnailIndex - 1 + thumbnailImages.length) % thumbnailImages.length;
+    
+    setCurrentThumbnailIndex(newIndex);
+    setMainImage(thumbnailImages[newIndex].fileName);
+    
+    setTimeout(() => setIsAnimating(false), 300);
   };
 
   const handleSizeSelect = (size, count) => { // 사이즈 선택 시 선택한 상품 정보 설정
@@ -182,7 +199,6 @@ const ProductDetail = () => {
     }
     if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      // navigate('/user');
       return;
     }
 
@@ -202,7 +218,6 @@ const ProductDetail = () => {
   const handleAddToWishlist = async () => {
     if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      // navigate('/user');
       return;
     }
 
@@ -247,7 +262,6 @@ const ProductDetail = () => {
     }
     if (!isAuthenticated || !token) {
       alert('로그인이 필요한 서비스입니다.');
-      // navigate('/user');
       return;
     }
 
@@ -333,20 +347,46 @@ const ProductDetail = () => {
                 src={mainImage} 
                 alt={product.name} 
                 className={styles.mainImage}
+                onClick={() => handleThumbnailSlide('next')}
               />
             </motion.div>
-            <div className={styles.thumbnailContainer}>
-              {thumbnailImages.map((img) => (
-                <motion.img
-                  key={img.id}
-                  src={img.fileName}
-                  alt={`${product.name} 썸네일`}
-                  className={`${styles.thumbnail} ${mainImage === img.fileName ? styles.active : ''}`}
-                  onClick={() => handleThumbnailClick(img.fileName)}
-                  whileHover={{ y: -5 }}
-                  transition={{ duration: 0.2 }}
-                />
-              ))}
+            <div className={styles.thumbnailSliderContainer}>
+              <motion.button
+                className={`${styles.sliderButton} ${styles.prevButton}`}
+                onClick={() => handleThumbnailSlide('prev')}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                &#8249;
+              </motion.button>
+              <motion.div 
+                className={styles.thumbnailContainer}
+                initial={false}
+                animate={{
+                  x: `${-currentThumbnailIndex * 100}%`
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                {thumbnailImages.map((img, index) => (
+                  <motion.img
+                    key={img.id}
+                    src={img.fileName}
+                    alt={`${product.name} 썸네일`}
+                    className={`${styles.thumbnail} ${mainImage === img.fileName ? styles.active : ''}`}
+                    onClick={() => handleThumbnailClick(img.fileName, index)}
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                ))}
+              </motion.div>
+              <motion.button
+                className={`${styles.sliderButton} ${styles.nextButton}`}
+                onClick={() => handleThumbnailSlide('next')}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                &#8250;
+              </motion.button>
             </div>
           </div>
 
@@ -673,7 +713,7 @@ const ProductDetail = () => {
                     <h3>교환/반품이 불가능한 경우</h3>
                     <ul>
                       <li>상품 수령 후 7일이 경과한 경우</li>
-                      <li>착용한 흔적이 있거나 상품이 훼손된 경우</li>
+                      <li>착용 흔적이 있거나 상품이 훼손된 경우</li>
                       <li>상품의 택이나 라벨이 제거된 경우</li>
                       <li>고객의 부주의로 인해 상품이 훼손된 경우</li>
                     </ul>
