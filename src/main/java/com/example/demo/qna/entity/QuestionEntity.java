@@ -32,6 +32,9 @@ public class QuestionEntity {
     @JoinColumn(name = "userid", nullable = false)
     private UserEntity userEntity; // 문의 작성
 
+    @Column(name = "title", nullable = false)
+    private String title; // 문의 제목
+
     @Column(name = "content", nullable = false)
     private String content; // 문의 내용
 
@@ -43,4 +46,10 @@ public class QuestionEntity {
 
     @Column(name = "responsedate")
     private LocalDateTime responseDate; // 응답 일시 (NULL이면 미응답)
+
+    @Column(name = "secret")
+    private String secret; // 비밀 글 (비밀글이 아닐 경우, Null)
+
+    @Column(name = "fixquestion", nullable = false)
+    private Boolean fixQuestion = false; // 고정 글일 경우, True
 }
