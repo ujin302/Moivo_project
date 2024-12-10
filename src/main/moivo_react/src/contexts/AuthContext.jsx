@@ -165,7 +165,7 @@ export const AuthProvider = ({ children }) => {
                     if (!accessToken) {
                         removeTokens();
                         setIsAuthenticated(false);
-                        navigate('/login');
+                        navigate('/user');
                         return Promise.reject(error);
                     }
 
