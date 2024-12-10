@@ -37,13 +37,10 @@ public class MypageServiceImpl implements MypageService {
     //private AttendanceRepository attendanceRepository; // 출석
 
     @Override
-    public UserDTO getUserInfo(int id) { 
-        UserEntity userEntity = userRepository.findById(id);
-        if (userEntity == null) {
-            throw new RuntimeException("User not found");
-        }
-                                              
-        /*
+    public UserDTO getUserInfo(int id) {
+        UserEntity userEntity = userRepository.findById(id)
+                                              .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
+        
     // 쿠폰 정보 가져오기
         List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(id)
             .stream()
@@ -60,10 +57,10 @@ public class MypageServiceImpl implements MypageService {
                 );
             })
             .collect(Collectors.toList());
- */
+
         // UserDTO로 변환
         UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
-        //userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
+        userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
 
         return userDTO;
     }
