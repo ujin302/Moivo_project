@@ -44,6 +44,7 @@ const MypageMain = () => {
       .then((data) => {
         setUserInfo(data); // 사용자 정보 상태에 저장
         console.log("사용자 정보:" + data);
+        console.log("사용자 정보:", JSON.stringify(data, null, 2));
       })
       .catch((error) => {
         console.error("Error fetching user info:", error);

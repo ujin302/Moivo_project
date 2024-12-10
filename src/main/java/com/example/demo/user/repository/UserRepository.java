@@ -12,6 +12,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     Optional<UserEntity> findByUserId(String userId); // 사용자 계정 Userid
 
-    UserEntity findById(int id);
-
 }

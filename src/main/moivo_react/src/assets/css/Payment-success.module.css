@@ -1,0 +1,142 @@
+.title {
+    font-family: 'Italiana', sans-serif;
+    font-size: 36px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+.main_container{
+    margin-top: 100px;
+    padding-top: 2%;
+    margin-bottom: 100px;
+}
+
+.payment_container {
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    width: 70%;
+    margin: 50px auto;
+    padding: 20px;
+    background: #F6F2EE;
+    border: 1px solid #988C73;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.payment_container p {
+    font-size: 12pt;
+}
+
+.menuItem{
+    font-family: 'Italiana', serif;
+    font-size: 23px;
+    text-align: center;
+    color: #2f2e2c; /* 기본 색상 */
+    padding: 15px;
+    background: #F6F2EE;
+    border: 1px solid #988C73;
+    width: 30%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* 밑줄 제거 */
+    transition: color 0.3s ease; /* 색상 변경 효과 */
+}
+
+.payment-success {
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .banner {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    width: 100%;
+    padding: 10px 0;
+  }
+  
+  .main_container {
+    margin-top: 100px;
+    padding-top: 2%;
+    margin-bottom: 100px;
+  }
+  
+  .payment_container {
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    width: 70%;
+    margin: 50px auto;
+    padding: 20px;
+    background: #F6F2EE;
+    border: 1px solid #988C73;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .payment_container h2 {
+    font-family: 'Italiana', sans-serif;
+    font-size: 36px;
+    text-align: center;
+    color: #2f2e2c;
+    margin-bottom: -5px;
+    padding-bottom: 10px;
+  }
+  
+  .payment_container p {
+    font-size: 12pt;
+  }
+  
+  .payment_table {
+    width: 80%;
+    border-collapse: collapse;
+  }
+  
+  .payment_table th,
+  .payment_table td {
+    border: 1px solid #988C73;
+    padding: 40px;
+    text-align: left;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+  
+  .payment_table th {
+    background-color: #F6F2EE;
+    color: #2f2e2c;
+  }
+  
+  .menuItem {
+    font-family: 'Italiana', serif;
+    font-size: 23px;
+    text-align: center;
+    color: #2f2e2c;
+    padding: 15px;
+    background: #F6F2EE;
+    border: 1px solid #988C73;
+    width: 30%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  

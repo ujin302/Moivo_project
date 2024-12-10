@@ -7,9 +7,6 @@ import User_signup from './containers/user/user_signup';
 import ProductBoard from './containers/product/product_board'; 
 import ProductList from './containers/product/product_list';
 import ProductDetail from './containers/product/product_detail';
-import ProductOrder from './containers/product/product_order';
-import SuccessPage from './containers/product/product_order_success';
-import FailPage from './containers/product/product_order_fail';
 import Qna_faqboard from './containers/qna/qna_faqboard';
 import Qna_board from './containers/qna/qna_board';
 import Qna_boardlist from './containers/qna/qna_bardlist';
@@ -24,6 +21,9 @@ import MypageOrderDetails from './containers/mypage/mypage_orderDetails';
 import MypageProfile from './containers/mypage/mypage_profile';
 import Cart from './containers/cart/cart';
 import Payment from './containers/pay/payment';
+import PaymentMethod from './containers/pay/payment-method';
+import SuccessPage from './containers/pay/payment-success';
+import FailPage from './containers/pay/payment-fail';
 import Dashboard from './containers/admin/admins_dashboard';
 
 const routeConfig = [
@@ -33,9 +33,6 @@ const routeConfig = [
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
   { path: "/product-detail/:productId", element: <ProductDetail /> },
-  { path: "/product-order", element: <ProductOrder /> },
-  { path: "/product-order-success", element: <SuccessPage /> },
-  { path: "/product-order-fail", element: <FailPage /> },
   { path: "/upload", element: <Upload /> },
   { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },
@@ -49,6 +46,9 @@ const routeConfig = [
   { path: "/qna_boardlist", element: <Qna_boardlist /> },
   { path: "/cart", element: <Cart /> },
   { path: "/payment", element: <Payment /> },
+  { path: "/payment-method", element: <PaymentMethod /> },
+  { path: "/payment-success", element: <SuccessPage /> },
+  { path: "/payment-fail", element: <FailPage /> },
   { path : "/admins_dashboard", element: <Dashboard/>}
 ];
 
