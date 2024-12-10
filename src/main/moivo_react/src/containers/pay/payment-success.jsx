@@ -1,5 +1,8 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import Banner from "../../components/Banner/banner";
+import Footer from "../../components/Footer/Footer";
+import styles from "../../assets/css/Payment-success.module.css";
 
 const SuccessPage = () => {
   const [searchParams] = useSearchParams();
@@ -15,12 +18,47 @@ const SuccessPage = () => {
 
   return (
     <div>
-      <h2>결제가 완료되었습니다!</h2>
-      <p>결제자: {customerName}</p>
-      <p>상품 이름: {orderName}</p>
-      <p>결제 금액: {amount}</p>
-      <p>주문 번호: {orderId}</p>
-      <p>결제 키: {paymentKey}</p>
+      <Banner />
+      <div className={styles.main_container}>
+        <div className={styles.payment_container}>
+          <h2 className={styles.title}>결제 완료</h2>
+          <table className={styles.payment_table}>
+            <thead>
+              <tr>
+                <th className={styles.column2}>결제 정보</th>
+                <th className={styles.column2}>내용</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className={styles.column2}>주문 번호</td>
+                <td className={styles.column2}>{orderId}</td>
+              </tr>
+              <tr>
+                <td className={styles.column2}>결제자</td>
+                <td className={styles.column2}>{customerName}</td>
+              </tr>
+              <tr>
+                <td className={styles.column2}>상품 이름</td>
+                <td className={styles.column2}>{orderName}</td>
+              </tr>
+              <tr>
+                <td className={styles.column2}>결제 금액</td>
+                <td className={styles.column2}>{amount} 원</td>
+              </tr>
+              <tr>
+                <td className={styles.column2}>결제 키</td>
+                <td className={styles.column2}>{paymentKey}</td>
+              </tr>
+            </tbody>
+          </table>
+          <Link to="/mypage/order" className={styles.menuItem}>
+            <span>ORDER</span>
+          </Link>
+        </div>
+
+      </div>
+      <Footer />
     </div>
   );
 };
