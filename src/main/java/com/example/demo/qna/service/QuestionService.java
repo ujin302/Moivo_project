@@ -1,5 +1,14 @@
 package com.example.demo.qna.service;
 
-public interface QuestionService {
+import com.example.demo.qna.dto.QuestionDTO;
+import com.example.demo.qna.entity.QuestionEntity;
 
+import java.util.Map;
+
+public interface QuestionService {
+    public void addQuestion(QuestionDTO questionDTO);
+
+    public void updateQuestion(int id, QuestionDTO questionDTO);
+
+    public Map<String, Object> getQuestionList(Map<String, Object> datemap);
 }
