@@ -9,6 +9,7 @@ import com.example.demo.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.qna.service.QuestionService;
@@ -16,6 +17,7 @@ import com.example.demo.qna.service.QuestionService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,25 +64,53 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.save(questionEntity);
     }
 
-    //문의 리스트
+    //문의사항 삭제
+    @Override
+    public void deleteQuestion(int id) {
+        QuestionEntity questionEntity = questionRepository.findById(id).orElseThrow(() ->
+                new NoSuchElementException("해당 id의 문의가 없습니다" + id));
+        questionRepository.delete(questionEntity);
+        System.out.println("문의사항 삭제 완료");
+    }
+
+
+    //문의 리스트, 검색, 정렬
     @Override
     public Map<String, Object> getQuestionList(Map<String, Object> datemap) {
         Map<String, Object> map = new HashMap<>();
 
         Pageable pageable = (Pageable) datemap.get("pageable");
         int block = Integer.parseInt(datemap.get("block").toString());
-        //리스트, 검색 한번에 하려면 다시
-        //Integer categoryid = Integer.parseInt(datemap.get("categoryid").toString());
+        String sortby = datemap.get("sortby").toString();
+        String title = null;
+        String keyword = null;
 
-//        if (categoryid != null) {
-//            pageQuestionList = questionRepository.findByCategoryEntityId(categoryid, pageable);
-//        } else {
-//            pageQuestionList = questionRepository.findAll(pageable);
-//        }
+        if (datemap.get("keyword") != null) {
+            keyword = datemap.get("keyword").toString();
+        }
+        if (datemap.get("title") != null) {
+            title = datemap.get("title").toString();
+        }
 
+        Sort sort = pageable.getSort();
+        if (sortby.equals("questiondate")) {
+            sort = Sort.by(Sort.Direction.DESC, "questionDate");
+        } else if (sortby.equals("title")) {
+            sort = Sort.by(Sort.Direction.DESC, "title");
+        }
 
         Page<QuestionEntity> pageQuestionList = null;
-        pageQuestionList = questionRepository.findAll(pageable); //전체 DB 추출
+
+        if (title == null & keyword == null) { //전체검색
+            pageQuestionList = questionRepository.findAll(pageable); //전체 DB 추출
+        }
+        else if (title != null && keyword == null) {
+            pageQuestionList = questionRepository.findByTitleContainingIgnoreCase(title, pageable);
+        }
+//        else if (title == null && keyword != null) {
+//            pageQuestionList = questionRepository.findByNameContainingIgnoreCase(keyword, pageable);
+//        }
+
 
         // 4. Entity -> DTO 변환
         List<QuestionDTO> dtoList = pageQuestionList.getContent() // Java8 이상 사용시 Entity -> DTO 변환하는 방법

@@ -26,6 +26,5 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     public List<QuestionEntity> findAll();
 
     //문의 카테고리 검색시
-    Page<QuestionEntity> findByCategoryEntityId(Integer categoryid, Pageable pageable);
-
+    Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }
