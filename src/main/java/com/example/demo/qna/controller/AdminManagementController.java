@@ -42,4 +42,20 @@ public class AdminManagementController {
     public ResponseEntity<List<QuestionDTO>> getAllQuestionsIncludingSecret() {
         return ResponseEntity.ok(adminManagementService.getAllQuestionsIncludingSecret());
     }
+
+    // 문의 수정
+    @PutMapping("/questions/{id}")
+    public ResponseEntity<String> updateQuestion(@PathVariable Integer id, @RequestBody QuestionDTO questionDTO) {
+        adminManagementService.updateQuestion(id, questionDTO);
+        return ResponseEntity.ok("문의가 성공적으로 수정되었습니다.");
+    }
+
+    // 문의 삭제
+    @DeleteMapping("/questions/{id}")
+    public ResponseEntity<String> deleteQuestion(@PathVariable Integer id) {
+        adminManagementService.deleteQuestion(id);
+        return ResponseEntity.ok("문의가 성공적으로 삭제되었습니다.");
+    }
+
+
 }

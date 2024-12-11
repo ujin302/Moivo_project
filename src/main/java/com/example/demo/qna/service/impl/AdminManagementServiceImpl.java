@@ -77,4 +77,16 @@ public class AdminManagementServiceImpl implements AdminManagementService {
             ))
             .collect(Collectors.toList());
     }
+
+    @Override
+    public void updateQuestion(Integer id, QuestionDTO questionDTO) {
+        questionRepository.updateQuestion(id, questionDTO.getTitle(), questionDTO.getContent());
+    }
+
+    @Override
+    public void deleteQuestion(Integer id) {
+        questionRepository.deleteById(id);
+    }
+
+
 }
