@@ -136,7 +136,7 @@ const Cart = () => {
                   type="checkbox"
                   id={`${item.usercartId}`}
                   checked={selectedItems.includes(item.usercartId)}
-                  
+                  disabled={item.soldOut} // 품절 상태일 때 체크박스를 비활성화
                   onChange={() =>
                     setSelectedItems((prev) =>
                       prev.includes(item.usercartId)

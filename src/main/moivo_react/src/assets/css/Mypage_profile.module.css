@@ -308,6 +308,13 @@
     font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 */
 }
 
+.error {
+    color: red; /* 에러 메시지 텍스트 색상 */
+    font-size: 12px; /* 글자 크기 */
+    margin-left: 150px; /* 왼쪽 여백 */
+    margin-bottom: 10px; /* 아래 여백 */
+  }
+
 /* 전화번호, 우편번호 같은 입력칸 */
 .phoneRow input,
 .addressContainer input {
@@ -427,7 +434,6 @@ button, label {
 
 .modal {
     background-color: #fff;
-    border-radius: 8px;
     padding: 20px;
     width: 400px;
     margin: 0 auto;
@@ -453,11 +459,10 @@ button, label {
     margin-top: 20px;
 }
 
-.confirmButton, .cancelButton {
+.confirmButton, .cancelButton2 {
     padding: 10px 20px;
     margin: 10px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -466,8 +471,8 @@ button, label {
     color: white;
 }
 
-.cancelButton {
-    background-color: #007aff;
+.cancelButton2 {
+    background-color: #beb9b8;
     color: white;
 }
  

@@ -26,7 +26,13 @@ const MypageProfile = () => {
         coupon: "",
         birth: "",
     });
+    const [passwordError, setPasswordError] = useState("");
+
     const navigate = useNavigate();
+
+    const handleDeletePasswordChange = (e) => {
+        setDeletePassword(e.target.value);
+    };
 
     const handleOpenModal = () => {
         setShowModal(true); // 모달 열기
@@ -36,6 +42,12 @@ const MypageProfile = () => {
         setShowModal(false); // 모달 닫기
     };
 
+    // 비밀번호 확인 함수
+    const handleBlurConfirmPassword = () => {
+        if (formData.confirmPassword && formData.pwd !== formData.confirmPassword) {
+            alert("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+        }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
@@ -90,15 +102,23 @@ const MypageProfile = () => {
             ...formData,
             [name]: value,
         });
+
+        // 실시간으로 비밀번호와 확인 비밀번호 일치 확인
+        if (name === "confirmPassword" || name === "pwd") {
+            if (name === "confirmPassword" && value && formData.pwd !== value) {
+                setPasswordError("비밀번호가 일치하지 않습니다.");
+            } else if (name === "pwd" && formData.confirmPassword && value !== formData.confirmPassword) {
+                setPasswordError("비밀번호가 일치하지 않습니다.");
+            } else {
+                setPasswordError("");
+            }
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        if (formData.pwd !== formData.confirmPassword) {
-            alert("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
-            return;
-        }
+
     
         const token = localStorage.getItem("accessToken");
     
@@ -266,7 +286,7 @@ const MypageProfile = () => {
                                     <button onClick={handleDeleteAccount} className={styles.confirmButton}>
                                         탈퇴
                                     </button>
-                                    <button onClick={handleCloseModal} className={styles.cancelButton}>
+                                    <button onClick={handleCloseModal} className={styles.cancelButton2}>
                                         취소
                                     </button>
                                 </div>
@@ -317,6 +337,13 @@ const MypageProfile = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                             />
+                        </div>
+                        <div>
+                            {passwordError && (
+                                <div className={styles.error}>
+                                    {passwordError}
+                                </div>
+                            )}
                         </div>
                         <div className={styles.formRow}>
                             <label>NAME</label>
