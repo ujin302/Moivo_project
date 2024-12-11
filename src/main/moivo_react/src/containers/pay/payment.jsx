@@ -11,7 +11,7 @@ const Payment = () => {
   const navigate = useNavigate();
 
   const cartItems = location.state?.cartItems || [];
-  const totalAmount = cartItems.reduce(
+  const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.count,
     0
   );
@@ -72,17 +72,17 @@ const Payment = () => {
 
   // 결제 금액 계산 함수 (할인 반영)
   const getDiscountedTotal = () => {
-    if (!formData.coupon) return totalAmount;
+    if (!formData.coupon) return totalPrice;
 
     // 선택한 쿠폰을 찾고, 할인 적용
     const selectedCoupon = coupons.find(coupon => coupon.name === formData.coupon);
     if (selectedCoupon) {
-      const discountAmount = (totalAmount * selectedCoupon.discountValue) / 100;
+      const discountAmount = (totalPrice * selectedCoupon.discountValue) / 100;
       console.log(selectedCoupon);
       console.log(selectedCoupon.discountValue);
-      return totalAmount - discountAmount;
+      return totalPrice - discountAmount;
     }
-    return totalAmount;
+    return totalPrice;
   };
 
   // 상품별 할인된 가격 계산
@@ -107,7 +107,7 @@ const Payment = () => {
       state: {
         userInfo: formData, // 결제자 정보(고객명 + 아이디 + 이메일 + 전화번호(추후결정) )
         cartItems: cartItems, // 상품 정보
-        totalAmount: getDiscountedTotal(), // 할인된 금액으로 결제
+        totalPrice: getDiscountedTotal(), // 할인된 금액으로 결제
       },
     });
   };
