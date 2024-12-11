@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuestionCategoryDTO {
     private Integer id; // 카테고리 고유 키
-    private QuestionCategory name = QuestionCategory.DELIVERY; // 카테고리 이름
+    private QuestionCategory name = QuestionCategory.BASIC; // 카테고리 이름
 }
