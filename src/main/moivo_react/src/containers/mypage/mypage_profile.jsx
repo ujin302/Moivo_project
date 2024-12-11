@@ -12,7 +12,7 @@ const MypageProfile = () => {
         pwd: "",
         confirmPassword: "",
         name: "",
-        gender: "male",
+        gender: "M",
         postalCode: "",
         addr1: "",
         addr2: "",
@@ -94,7 +94,7 @@ const MypageProfile = () => {
             pwd: userInfo?.pwd || "",
             confirmPassword: userInfo?.pwd || "",
             name: userInfo?.name || "",
-            gender: userInfo?.gender || "male",
+            gender: userInfo?.gender || "M",
             zipcode: userInfo?.zipcode || "",
             addr1: userInfo?.addr1 || "",
             addr2: userInfo?.addr2 || "",
@@ -227,7 +227,7 @@ const MypageProfile = () => {
                                         type="radio"
                                         name="gender"
                                         value="male"
-                                        checked={formData.gender === "male"}
+                                        checked={formData.gender === "M"}
                                         onChange={handleChange}
                                     />
                                     남성
@@ -238,7 +238,7 @@ const MypageProfile = () => {
                                         type="radio"
                                         name="gender"
                                         value="female"
-                                        checked={formData.gender === "female"}
+                                        checked={formData.gender === "F"}
                                         onChange={handleChange}
                                     />
                                     여성
@@ -324,6 +324,7 @@ const MypageProfile = () => {
                                     type="number"
                                     id="weight"
                                     name="weight"
+                                    value={formData.weight}
                                     placeholder="예: 100"
                                     onChange={handleChange}
                                 />
