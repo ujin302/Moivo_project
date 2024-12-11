@@ -1,5 +1,7 @@
 package com.example.demo.store.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +30,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 
     public int countByNameContainingIgnoreCaseAndCategoryEntity_id(String keyword, int categoryid);
 
+    public List<ProductEntity> findTop6ByGenderOrderByIdDesc(ProductEntity.Gender gender);
+    public List<ProductEntity> findTop6ByGenderNotOrderByIdDesc(ProductEntity.Gender gender);
 }

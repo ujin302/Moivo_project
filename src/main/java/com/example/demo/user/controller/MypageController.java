@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.MypageService;
@@ -29,9 +30,17 @@ public class MypageController {
     // 회원 정보 (포스트맨 테스트 성공)
     @GetMapping("/info/{id}")
     public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) { 
+
         UserDTO userInfo = mypageService.getUserInfo(id);
         System.out.println(userInfo);
         return ResponseEntity.ok(userInfo);
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<List<ProductDTO>> getProductList(@PathVariable(name = "id") int id) {
+        System.out.println("dddd");
+        List<ProductDTO> productList = mypageService.getProductList(id);
+        return ResponseEntity.ok(productList);
     }
 
     // // 쿠폰 정보 조회
