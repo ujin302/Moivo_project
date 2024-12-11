@@ -343,6 +343,13 @@ button, label {
     margin-left: 10px;
 }
 
+.formRow input[type="date"] {
+    width: 20%;
+    padding: 10px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    color: #333;
+}
 
 /* 기본 주소와 상세 주소가 화면 너비에 맞게 차지하도록 설정 */
 .addressContainer input[name="address"],
@@ -604,6 +611,11 @@ button, label {
 
     .formRow .addressContainer .zipcode input[type="text"] {
         width: 25%;
+        margin-right: 15px;
+    }
+
+    .formRow input[type="date"]  {
+        width: 50%;
         margin-right: 15px;
     }
 
