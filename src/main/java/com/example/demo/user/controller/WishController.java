@@ -24,11 +24,14 @@ public class WishController {
     private WishService wishService;
 
     // wish에 상품 추가
-    @PostMapping("/{productId}")
-    public ResponseEntity<?> addProduct(@PathVariable int productId, @RequestParam(name = "userid") int userId) {
-        System.out.println("wish 컨트롤러 호출");
+    @GetMapping("/{productId}/{userid}")
+    public ResponseEntity<?> addProduct(@PathVariable(name = "productId") String productId, 
+                                        @PathVariable(name = "userid") int userId) {
+        System.out.println("productId = " + productId);
+        System.out.println("userId = " + userId);
+        
         try {
-            wishService.addProduct(productId, userId);
+            wishService.addProduct(Integer.parseInt(productId), userId);
             return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 Internal Server Error

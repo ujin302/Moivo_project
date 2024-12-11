@@ -225,23 +225,21 @@ const ProductDetail = () => {
   };
 
   const handleAddToWishlist = async () => {
-    const userid = parseInt(localStorage.getItem("id"));
+    const userid = localStorage.getItem("id");
     const token = localStorage.getItem("accessToken");
+
     try {
       console.log("위시리스트 추가 요청 데이터:", {
         productId: productId,
         userid: userid
       });
-
-      const response = await axios.post(
-        `${PATH.SERVER}/api/user/wish/${productId}`,
-        null, // POST 요청에서는 body를 보내므로, 여기서 null을 보내는 방식으로 처리
+      
+      const response = await axios.get(
+        `${PATH.SERVER}/api/user/wish/${productId}/${userid}`,  // URL 경로에 userid 포함
         {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          params: { userid }, // 쿼리 파라미터로 userId를 전달
-          responseType: 'json' // 응답 타입을 JSON으로 설정
         }
       );
 
