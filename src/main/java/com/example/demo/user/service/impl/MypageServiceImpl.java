@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import com.example.demo.coupon.dto.CouponDTO;
 import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
+import com.example.demo.store.dto.ProductDTO;
+import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.store.repository.ProductRepository;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.entity.UserEntity;
@@ -29,6 +32,9 @@ public class MypageServiceImpl implements MypageService {
     // private CouponRepository couponRepository;
     @Autowired
     private WishRepository wishRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private UserCouponRepository userCouponRepository;
@@ -63,6 +69,39 @@ public class MypageServiceImpl implements MypageService {
         userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
 
         return userDTO;
+    }
+    
+    @Override
+    public List<ProductDTO> getProductList(int userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        String gender = userEntity.getGender(); // 사용자 성별 정보
+    
+        ProductEntity.Gender productGender;
+        if ("M".equals(gender)) {
+            productGender = ProductEntity.Gender.MAN;
+        } else if ("F".equals(gender)) {
+            productGender = ProductEntity.Gender.WOMAN;
+        } else {
+            productGender = ProductEntity.Gender.ALL; // 성별이 없거나 ALL인 경우
+        }
+    
+        List<ProductEntity> productEntities;
+        
+        // 성별에 맞는 상품 목록을 가져오기
+        if (productGender == ProductEntity.Gender.ALL) {
+            productEntities = productRepository.findTop6ByGenderNotOrderByIdDesc(ProductEntity.Gender.ALL); // 최신 상품 6개
+        } else {
+            productEntities = productRepository.findTop6ByGenderOrderByIdDesc(productGender); // 성별에 맞는 최신 상품 6개
+        }
+    
+        // ProductEntity -> ProductDTO 변환
+        List<ProductDTO> productDTOList = productEntities.stream()
+            .map(ProductDTO::new) // ProductEntity를 ProductDTO로 변환
+            .collect(Collectors.toList());
+    
+        return productDTOList;
     }
 
     // @Override

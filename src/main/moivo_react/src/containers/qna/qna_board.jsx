@@ -47,6 +47,7 @@ const qna_board = () => {
                 <option value="일반 문의">일반 문의</option>
                 <option value="비밀 문의">비밀 문의</option>
                 <option value="기타 문의">기타 문의</option>
+                <option value="사이즈 문의">사이즈 문의</option>
               </select>
             </div>
 

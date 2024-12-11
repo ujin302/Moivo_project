@@ -7,5 +7,5 @@ import com.example.demo.qna.entity.QuestionCategoryEntity;
 
 @Repository
 public interface QuestionCategoryRepository extends JpaRepository<QuestionCategoryEntity, Integer> {
-
+    
 }

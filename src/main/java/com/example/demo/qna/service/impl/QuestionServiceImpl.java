@@ -29,7 +29,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     UserRepository userRepository;
-    
+
     //문의사항 추가
     @Override
     public void addQuestion(QuestionDTO questionDTO) {
@@ -46,7 +46,7 @@ public class QuestionServiceImpl implements QuestionService {
         System.out.println(questionEntity);
         questionRepository.save(questionEntity);
     }
-    
+
     //문의사항 수정
     @Override
     public void updateQuestion(int id, QuestionDTO questionDTO) {
@@ -113,7 +113,7 @@ public class QuestionServiceImpl implements QuestionService {
         System.out.println("dtoList = " + dtoList);
         return map;
     }
-    
+
     //문의사항 검색
 
 }

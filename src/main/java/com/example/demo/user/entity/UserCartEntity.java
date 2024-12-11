@@ -1,11 +1,9 @@
 package com.example.demo.user.entity;
 
-import com.example.demo.user.entity.Size;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductStockEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

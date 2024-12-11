@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.user.dto.UserCartDTO;
 import com.example.demo.user.service.CartService;
 
 import java.util.Map;
@@ -15,14 +16,31 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    // 장바구니에 상품 추가  11.26 - yjy    (포스트맨 성공)
+    // 장바구니에 상품 추가  11.26 - yjy    (포스트맨 성공) ,, 12.11 - sc 수정
     @PostMapping("/add/{productId}")
-    public ResponseEntity<?> addProductCart(@PathVariable int productId,
-                                            @RequestParam(name = "userid") int userId,
-                                            @RequestParam(name = "count") int count,
-                                            @RequestParam(name = "size") String size) {
-        cartService.addProductCart(productId, userId, count, size);
-        return ResponseEntity.ok(null);
+    public ResponseEntity<?> addProductCart(
+        @PathVariable(name = "productId") int productId,
+        @RequestParam(name = "userid") int userid,    
+        @RequestParam(name = "count") int count,
+        @RequestParam(name = "size") String size) {
+        
+        try {
+            System.out.println("장바구니 추가 요청 - productId: " + productId 
+                    + ", userId: " + userid 
+                    + ", count: " + count 
+                    + ", size: " + size);
+
+            UserCartDTO cartItem = cartService.addProductCart(productId, userid, count, size);
+            
+            if (cartItem != null) {
+                return ResponseEntity.ok(cartItem);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("장바구니 추가 실패");
+            }
+        } catch (Exception e) {
+            System.err.println("장바구니 추가 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+        }
     }
 
     //장바구니 출력 11.26 - yjy    (포스트맨 성공)

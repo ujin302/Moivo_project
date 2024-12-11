@@ -65,9 +65,8 @@ dependencies {
    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-   //OAuth2 관련
-   implementation 'org.springframework.security:spring-security-oauth2-authorization-server:1.1.2'
-
+   implementation 'com.google.code.gson:gson:2.10.1'
+   implementation 'org.json:json:20231013'
 
 }
 
@@ -83,5 +82,5 @@ tasks.named('test') {
 }
 
 compileJava {
-    options.compilerArgs += ['-parameters']
+   options.compilerArgs += ['-parameters']
 }

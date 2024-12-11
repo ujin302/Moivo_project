@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import com.example.demo.user.dto.UserDTO;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -163,8 +162,8 @@ public class UserEntity { // 사용자 & 관리자
     }
 
 
-    // Kakao 사용자 데이터 저장
-    public static UserEntity toSaveKakaoUserEntity(String userId, String nickname) {
+     // Kakao 사용자 데이터 저장
+     public static UserEntity toSaveKakaoUserEntity(String userId, String nickname) {
         UserEntity entity = new UserEntity();
 
         entity.setUserId(userId); // userid
@@ -175,6 +174,7 @@ public class UserEntity { // 사용자 & 관리자
 
         return entity;
     }
+
 
 
 }

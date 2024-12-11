@@ -6,14 +6,13 @@ spring:
       client:
         registration:
           kakao:
-            client-id: "6f5bc792a0f0199fd3df6a7dd153f1d7"
-            client-secret: "KWJn3264i3Tf7Ald26x5wqMox9aXMEEQ"
-            redirect-uri: "http://localhost:5173/api/user/oauth2/callback/kakao"
+            client-id: 83db4b3f69e1d7de967105642986e1d4
+            client-secret: ee0f816c5bb48075beef1e3953bc5f79
+            redirect-uri: http://localhost:5173/oauth/callback/kakao
             authorization-grant-type: authorization_code
-            client-authentication-method: post
-            scope: # 동의 항목들 다시 체크 필요
+            client-authentication-method: POST
+            scope:
               - profile_nickname    # 닉네임
-              - profile_image       # 프로필 사진
               - account_email       # 이메일
             client-name: Kakao
             provider: kakao
@@ -21,7 +20,7 @@ spring:
           naver:
             client-id: "rkLzelLLwohrsT5K3PzP"
             client-secret: "oc5jSCKdG5"
-            redirect-uri: "http://localhost:8080/api/user/oauth2/callback/naver"
+            redirect-uri: "http://localhost:5173/api/user/oauth2/callback/naver"
             authorization-grant-type: authorization_code
             client-authentication-method: post
             scope:

@@ -77,4 +77,8 @@ public class QuestionController {
         // 값 존재 O
         return ResponseEntity.ok(map);
     }
+
+    // 문의 삭제 기능
+
+
 }

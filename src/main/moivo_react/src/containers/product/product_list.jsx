@@ -7,13 +7,11 @@ import { PATH } from "../../../scripts/path";
 import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import ListModal from "./pro_components/list_modal";
 import LoadingModal from "./LoadingModal";
 
 const ProductList = () => {
-  const { isLoggedIn, token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const id = localStorage.getItem("id"); // 사용자 pk
-
   const [products, setProducts] = useState([]); // 상품 List
   const [currentPage, setCurrentPage] = useState(0);
   const [pageInfo, setPageInfo] = useState({ // 페이징 정보
@@ -27,24 +25,15 @@ const ProductList = () => {
   });
   const pageBlock = 3;
   const itemsPerPage = 15; // 화면에 보여지는 상품 개수 
-
   const [sortBy, setSortBy] = useState("newest"); 
-  // const categories = ["All", "Outer", "Top", "Bottom"]; // 카테고리
   const [categories, setCategories] = useState([{ id: 0, name: '전체' }]); // 카테고리 List
   const [activeCategory, setActiveCategory] = useState({ id: 0, name: '전체' });
-  
   const [cartItem, setCartItem] = useState(0);
   const [wishItem, setWishItem] = useState(0);
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  
   const [isLoading, setIsLoading] = useState(false);
-  
   const navigate = useNavigate();
-  
-  const [selectedProduct, setSelectedProduct] = useState(null); // 선택된 상품 상태 추가 - sc
   
   // 24.11.28 - uj (수정)
   // 필요 Data 요청 & 저장
@@ -164,115 +153,6 @@ const ProductList = () => {
     fetchProducts(0);
   }, [sortBy, searchTerm, activeCategory]);
 
-  // 11.28 - uj
-  // Wish 아이템 추가 & 렌더링
-  const handleAddToWish = async (product) => {
-    try {
-      if(id != null) {
-        await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}?userid=${id}`);
-        console.log(`위시리스트에 상품(${product.id}) 추가 성공`);
-        setWishItem(prev => prev + 1); // 플로팅 버튼 카운터 업데이트 추가 - sc
-        getWishCartCount('wish'); // 사용자 Wish Data 요청 호출
-      } else {
-        alert("로그인 후에 이용해주세요.");
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        console.error("인증 오류:", error);
-      } else {
-        console.error("위시리스트에 추가하는 중 오류가 발생했습니다:", error);
-      }
-    }
-  };
-  
-  // Cart 아이템 추가
-  // const handleAddToCart = (product) => {
-  //   const existingItem = cartItem.find((item) => item.id === product.id);
-  
-  //   if (existingItem) {
-  //     setCartItem((prev) =>
-  //       prev.map((item) =>
-  //         item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-  //       )
-  //     );
-  //   } else {
-  //     const cartProduct = {
-  //       id: product.id,
-  //       name: product.name,
-  //       price: product.price,
-  //       img: product.img || '',
-  //       quantity: 1,
-  //     };
-  //     setCartItem((prev) => [...prev, cartProduct]);
-  //   }
-  //   setIsCartModalOpen(true);
-  const handleAddToCart = async (product) => {
-    try {
-      if(id != null) {
-        const response = await axios.post(
-          `${PATH.SERVER}/api/user/cart/add`,
-          {
-            productId: product.id,
-            count: 1
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            params: {
-              userid: id
-            }
-          }
-        );
-
-        if (response.status === 200) {
-          console.log(`장바구니에 상품(${product.id}) 추가 성공`);
-          setSelectedProduct(product); // 선택된 상품 저장
-          getWishCartCount('cart'); // 장바구니 개수 업데이트
-          setIsCartModalOpen(true);
-        }
-      } else {
-        alert("로그인 후에 이용해주세요.");
-      }
-    } catch (error) {
-      if (error.response?.status === 401) {
-        console.error("인증 오류:", error);
-      } else {
-        console.error("장바구니에 추가하는 중 오류가 발생했습니다:", error);
-      }
-    }
-  };
-  
-  // Cart 아이템 제거
-  const removeFromCart = () => {
-    try {
-      if(id != null) {
-        setCartItem(prev => Math.max(0, prev - 1));
-        getWishCartCount('cart');
-        setSelectedProduct(null); // 선택된 상품 초기화
-      }
-    } catch (error) {
-      console.error("장바구니 아이템 제거 실패:", error);
-    }
-  };
-
-  // Cart 아이템 수정
-  const updateCartQuantity = (_, quantity) => {
-    try {
-      if(id != null && quantity > 0) {
-        setCartItem(quantity);
-        getWishCartCount('cart');
-      }
-    } catch (error) {
-      console.error("장바구니 수량 수정 실패:", error);
-    }
-  };
-
-  const closeCartModal = () => {
-    setIsCartModalOpen(false);
-  };
-  
   // 상품 상세 화면 이동
   const handleProductClick = (productId) => {
     navigate(`/product-detail/${productId}`);
@@ -337,7 +217,6 @@ const ProductList = () => {
                   className={`${styles.categoryItem} ${
                     activeCategory === category ? styles.active : ''
                   }`}
-                  // onClick={() => setActiveCategory(category)}
                   onClick={() => setActiveCategory(category)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.85 }}
@@ -389,30 +268,6 @@ const ProductList = () => {
                     className={styles.productOverlay}
                     onClick={() => handleProductClick(product.id)}
                   >
-                    <div className={styles.actionButtons}>
-                      <motion.button
-                        className={styles.actionButton}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToCart(product);
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <i className="fas fa-shopping-cart" />
-                      </motion.button>
-                      <motion.button
-                        className={styles.actionButton}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToWish(product);
-                        }}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <i className="fas fa-heart" />
-                      </motion.button>
-                    </div>
                   </div>
                   <div className={styles.productInfo}>
                     <h3 className={styles.productTitle}>{product.name}</h3>
@@ -492,25 +347,6 @@ const ProductList = () => {
             <i className="fas fa-shopping-cart"></i>
           </motion.div>
         </div>
-
-        {/* 모달 (장바구니) */}
-        <ListModal
-          isOpen={isCartModalOpen}
-          onClose={closeCartModal}
-          title="장바구니"
-          items={selectedProduct ? [{
-            id: selectedProduct.id,
-            name: selectedProduct.name,
-            price: selectedProduct.price,
-            img: selectedProduct.img,
-            quantity: 1
-          }] : []}
-          onRemove={removeFromCart}
-          onQuantityChange={updateCartQuantity}
-          isLoggedIn={isLoggedIn}
-          navigate={navigate}
-        />
-
         <LoadingModal isOpen={isLoading} />
       </div>
       <Footer />

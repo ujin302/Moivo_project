@@ -33,4 +33,7 @@ public interface UserService {
 
     // 사용자 정보 조회 메소드 추가
     public UserDTO findUserById(String userId);
+
+    // 카카오 로그인을 위한 메소드 추가 _ 241210_yjy
+    public Map<String, Object> kakaoLogin(String userId);
 }

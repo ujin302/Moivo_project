@@ -9,8 +9,7 @@ import ProductList from './containers/product/product_list';
 import ProductDetail from './containers/product/product_detail';
 import Qna_faqboard from './containers/qna/qna_faqboard';
 import Qna_board from './containers/qna/qna_board';
-import Qna_boardlist from './containers/qna/qna_bardlist';
-import MainProvider from './contexts/MainContext';
+import Qna_boardlist from './containers/qna/qna_boardlist';
 import Upload from './containers/test/upload';
 import Update from './containers/test/update';
 import MypageMain from './containers/mypage/mypage_main';
@@ -25,6 +24,7 @@ import PaymentMethod from './containers/pay/payment-method';
 import SuccessPage from './containers/pay/payment-success';
 import FailPage from './containers/pay/payment-fail';
 import Dashboard from './containers/admin/admins_dashboard';
+import KakaoCallback from './components/kakao/KakaoCallback';
 
 const routeConfig = [
   { path: "/", element: <Main_index /> },
@@ -49,19 +49,20 @@ const routeConfig = [
   { path: "/payment-method", element: <PaymentMethod /> },
   { path: "/payment-success", element: <SuccessPage /> },
   { path: "/payment-fail", element: <FailPage /> },
-  { path : "/admins_dashboard", element: <Dashboard/>}
+  { path : "/admins_dashboard", element: <Dashboard/>},
+  { path: "/oauth/callback/kakao", element: <KakaoCallback /> }
 ];
 
 const App = () => {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
+        <AuthProvider>
+          <Routes>
           {routeConfig.map(({ path, element }, index) => (
             <Route key={index} path={path} element={element} />
           ))}
         </Routes>
-      </AuthProvider>
+        </AuthProvider>
     </Router>
   );
 };

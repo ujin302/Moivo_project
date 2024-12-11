@@ -13,11 +13,21 @@
 }
 
 /* 기본 입력 필드 스타일 */
-.paymentFrame .userForm .formRow2 input,
+.paymentFrame .userForm,
 .paymentFrame .couponContainer input {
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ddd;
+  background-color: #988c73;
+  color: #333;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.formRow2 input{
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  background-color: #f0e8da;
   color: #333;
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
@@ -338,14 +348,7 @@
     gap: 5px;
   }
   
-  .formRow2 label {
-    font-size: 14px;
-    font-weight: bold;
-    color: #555;
-  }
-  
   .formRow2 input {
-    width: 100%;
     padding: 10px;
     font-size: 14px;
     color: #333;
@@ -434,4 +437,53 @@
   margin-left: 8px; /* 원하는 간격으로 조정 */
   font-size: 16px; 
   vertical-align: middle; /* 텍스트가 수직 정렬되도록 */
+}
+
+.productSize {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+@media screen and (max-width: 576px) {
+  .paymentFrame{
+    padding: 0px 0px;
+    margin-top: 110px;
+  }
+  
+  .title{
+    margin-bottom: 5px;
+    font-size: 36px;
+  }
+
+  .paymentFrame .formRow2 label{
+    font-size: 17px;
+  }
+
+  .paymentFrame .addressRow2 button {
+    font-size: 15px;
+  }
+
+  .formRow2 input{
+    font-size: 15px;
+  }
+
+  .productSize{
+    font-size: 16px;
+  }
+
+  .summaryValue{
+    font-size: 22px;
+  }
+
+  .payButton{
+    font-size: 19px;
+    margin-bottom: 15px;
+  }
+
+  .backLink{
+    font-size: 27px;
+    margin-bottom: 20px;
+  }
+  
 }
