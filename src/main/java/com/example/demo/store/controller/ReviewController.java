@@ -18,7 +18,7 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    // 리뷰 작성
+    // 리뷰 작성 -> 주문상세 페이지에서 모달 또는 페이지를 따로 띄워서 리뷰 작성 진행.
     @PostMapping("")
     public ResponseEntity<String> insertReview(@ModelAttribute ReviewDTO reviewDTO,
             @RequestParam(name = "userid") int userid,

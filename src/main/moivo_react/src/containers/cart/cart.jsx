@@ -17,30 +17,38 @@ const Cart = () => {
   // 장바구니 데이터 가져오기
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    const storedUserid = localStorage.getItem("id"); // localStorage에서 가져옴
-    console.log(storedUserid);
-    setUserid(storedUserid); // 상태로 설정
-
+    const storedUserid = localStorage.getItem("id");
+    
     const fetchCartItems = async () => {
-      if (!userid) return;
-      try {
-        const response = await axios.get(`${PATH.SERVER}/api/user/cart/list`, {
-          params: { userid },
-        });
-        const fetchedItems = response.data.cartItems || [];
-        const mappedItems = fetchedItems.map((item) => ({
-          ...item,
-          ...item.productDTO, // productDTO 데이터 병합
-          usercartId: item.id, // usercart의 id를 별도로 저장
-        }));
-        setCartItems(mappedItems);
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
-      } finally {
-        setLoading(false);
-      }
+        try {
+            const response = await axios({
+                method: 'get',
+                url: `${PATH.SERVER}/api/user/cart/list`,
+                params: { 
+                    userid: storedUserid 
+                },
+                headers: token ? {
+                    'Authorization': `Bearer ${token}`
+                } : {}
+            });
+            
+            const fetchedItems = response.data.cartItems || [];
+            const mappedItems = fetchedItems.map((item) => ({
+                ...item,
+                ...item.productDTO,
+                usercartId: item.id,
+            }));
+            setCartItems(mappedItems);
+        } catch (error) {
+            console.error("Error fetching cart items:", error);
+        } finally {
+            setLoading(false);
+        }
     };
-    fetchCartItems();
+
+    if (storedUserid) {
+        fetchCartItems();
+    }
   }, [userid]);
 
   // 상품 제거
