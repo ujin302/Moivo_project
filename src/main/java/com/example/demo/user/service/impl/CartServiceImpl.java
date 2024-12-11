@@ -14,6 +14,7 @@ import com.example.demo.user.entity.UserCartEntity;
 import com.example.demo.user.repository.CartRepository;
 import com.example.demo.user.repository.UserCartRepository;
 import com.example.demo.user.service.CartService;
+// import com.example.demo.user.entity.Size;
 
 
 import jakarta.transaction.Transactional;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
