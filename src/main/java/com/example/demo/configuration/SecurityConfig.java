@@ -84,7 +84,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**", "/favicon.ico").permitAll() // OPTIONS 요청 허용
-                        .requestMatchers("/api/user/login", "/api/user/join", "/api/auth/token/refresh", "/api/user/kakao", "/api/user/oauth2/callback/**").permitAll()
+                        .requestMatchers("/api/user/login", "/api/user/join", "/api/auth/token/refresh", "/api/admin/**", "/api/user/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
