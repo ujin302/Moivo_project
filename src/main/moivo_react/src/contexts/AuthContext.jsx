@@ -109,39 +109,67 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-    // 로그인 함수
+    // 일반 로그인 함수
     const login = async (userId, pwd) => {
         try {
             const response = await axios.post(`${PATH.SERVER}/api/user/login`, {
                 userId,
                 pwd
             }, {
-                withCredentials: true  // 쿠키 전송을 위해 작성함
+                withCredentials: true  //쿠키 전송을 위해 작성한거임
             });
-
-            const { accessToken } = response.data;
-            if (!accessToken) {
-                throw new Error('로그인에 실패했습니다.');
-            }
-            
-            // localStorage에 저장
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('userId', response.data.userId);
-            localStorage.setItem('id', response.data.id);
-            localStorage.setItem('cartId', response.data.cartId);
-            localStorage.setItem('wishId', response.data.wishId);
-            localStorage.setItem('isAdmin', response.data.isAdmin);
-
-            // 상태 업데이트
-            setIsAuthenticated(true);
-
-            // axios 헤더 설정
-            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-            return true;
-
+            return await handleLoginSuccess(response);
         } catch (error) {
             throw error.response?.data?.error || error.message;
         }
+    };
+
+    // 카카오 로그인 함수
+    const kakaoLogin = async (loginData) => {
+        try {
+            console.log("로그인 데이터:", loginData);
+            if (!loginData.accessToken) {
+                throw new Error('토큰이 없습니다');
+            }
+            
+            // 직접 처리
+            setAccessToken(loginData.accessToken);
+            localStorage.setItem('userId', loginData.userId);
+            localStorage.setItem('id', loginData.id);
+            localStorage.setItem('cartId', loginData.cartId);
+            localStorage.setItem('wishId', loginData.wishId);
+            localStorage.setItem('isAdmin', loginData.isAdmin);
+            
+            setIsAuthenticated(true);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${loginData.accessToken}`;
+            return true;
+        } catch (error) {
+            console.error('카카오 로그인 실패:' + error);
+            throw new Error('로그인에 실패했습니다.');
+        }
+    };
+
+    //일반, 카카오 로그인 성공 시 공통 함수 _ 241210_yjy
+    const handleLoginSuccess = async (response) => {
+        const { accessToken } = response.data;
+        if (!accessToken) {
+            throw new Error('로그인에 실패했습니다.');
+        }
+        
+        // localStorage에 저장
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('id', response.data.id);
+        localStorage.setItem('cartId', response.data.cartId);
+        localStorage.setItem('wishId', response.data.wishId);
+        localStorage.setItem('isAdmin', response.data.isAdmin);
+
+        // 상태 업데이트
+        setIsAuthenticated(true);
+
+        // axios 헤더 설정
+        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        return true;
     };
 
     // axios 인터셉터 설정
@@ -187,7 +215,8 @@ export const AuthProvider = ({ children }) => {
     const value = {
         isAuthenticated,
         setIsAuthenticated,
-        login,  // login 함수 추가
+        login,
+        kakaoLogin,
         logout,
         setAccessToken,
         setRefreshToken,

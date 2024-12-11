@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import com.example.demo.user.dto.UserDTO;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

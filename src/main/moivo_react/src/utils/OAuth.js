@@ -1,4 +1,6 @@
-const CLIENT_ID = "	83db4b3f69e1d7de967105642986e1d4";
+const CLIENT_ID = "f7a7c7e3336c98e0e10ec97636ac08fa";
 const REDIRECT_URI = "http://localhost:5173/oauth/callback/kakao";
 
-export const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=83db4b3f69e1d7de967105642986e1d4&redirect_uri=http://localhost:5173/oauth/callback/kakao&response_type=code`;
+export const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
+//_ 241210_yjy

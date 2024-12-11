@@ -337,4 +337,37 @@ public class UserServiceImpl implements UserService {
         return UserEntity.toGetUserDTO(userEntity);
     }
 
+    // 카카오 로그인을 위한 메소드  -  241210_yjy
+    @Override
+    public Map<String, Object> kakaoLogin(String userId) {
+        // 카카오 사용자 조회 또는 생성
+        UserEntity user = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("(카카오) 사용자를 찾을 수 없습니다."));
+        
+        int cartId = getCartIdById(user.getId());
+        int wishId = getWishIdById(user.getId());
+
+        // JWT 토큰 생성
+        String accessToken = jwtUtil.generateAccessToken(
+            user.getUserId(), 
+            user.getId(), 
+            wishId, 
+            cartId, 
+            user.isAdmin()
+        );
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getId());
+
+        // 응답 데이터 구성
+        Map<String, Object> result = new HashMap<>();
+        result.put("accessToken", accessToken);
+        result.put("refreshToken", refreshToken);
+        result.put("userId", user.getUserId());
+        result.put("id", user.getId());
+        result.put("cartId", cartId);
+        result.put("wishId", wishId);
+        result.put("isAdmin", user.isAdmin());
+
+        return result;
+    }
+
 }
