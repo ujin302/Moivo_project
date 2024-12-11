@@ -1,5 +1,6 @@
 package com.example.demo.jwt.security;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,12 +20,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
-                return org.springframework.security.core.userdetails.User.builder()
-                .username(String.valueOf(userEntity.getId()))
-                .password(userEntity.getPwd())
-                .roles(userEntity.isAdmin() ? "ADMIN" : "USER")
-                .build();
+        UserEntity user = userRepository.findByUserId(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        // - 241211_yjy
+        String password = (UserEntity.LoginType.KAKAO.equals(user.getLoginType())) ? 
+            "{noop}KAKAO_USER" : 
+            user.getPwd();
+
+        return User.builder()
+            .username(user.getUserId())
+            .password(password)
+            .roles(user.isAdmin() ? "ADMIN" : "USER")
+            .build();
     }
 }
