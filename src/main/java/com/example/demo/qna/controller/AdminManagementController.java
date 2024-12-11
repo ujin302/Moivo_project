@@ -50,7 +50,7 @@ public class AdminManagementController {
         return ResponseEntity.ok("문의가 성공적으로 수정되었습니다.");
     }
 
-    // 문의 삭제
+    // 문의 삭제 !!
     @DeleteMapping("/questions/{id}")
     public ResponseEntity<String> deleteQuestion(@PathVariable Integer id) {
         adminManagementService.deleteQuestion(id);
