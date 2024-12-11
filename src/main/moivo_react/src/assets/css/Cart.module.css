@@ -133,13 +133,12 @@
     font-size: 12px;
     align-self: flex-start;
   }
-
-  
   
   .removeButton:hover {
     background: #f2dede;
     color: #c0392b;
   }
+
 /* 품절 메시지 */
 .soldOutMessage {
   color: red;
@@ -154,12 +153,10 @@
   font-weight: bold;
 }
 
-/* 품절된 상품의 제거 버튼 비활성화 */
 .cartItem.soldOut .removeButton {
-  background: #f5f5f5;
-  color: #ccc;
-  border: 1px solid #ddd;
-  cursor: not-allowed;
+  cursor: pointer;
+  background: #f5f5f5; /* 기본 버튼 스타일 */
+  color: #988c73;
 }
 
 /* 총 금액 섹션 */
@@ -239,3 +236,16 @@
   .cartItem input[type="checkbox"] + label:hover {
     border-color: #2f2e2c;
   }
+
+  /* 비활성화된 체크박스 스타일 */
+.cartItem input[type="checkbox"]:disabled + label {
+  background-color: #e0e0e0; /* 비활성화된 상태의 배경 색 */
+  border-color: #bbb; /* 비활성화된 상태의 테두리 색 */
+  cursor: not-allowed; /* 커서 변경 */
+}
+
+/* 비활성화된 체크박스에서 체크된 상태 */
+.cartItem input[type="checkbox"]:disabled:checked + label {
+  background-color: #bbb;
+  border-color: #bbb;
+}
