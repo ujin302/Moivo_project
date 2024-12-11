@@ -6,14 +6,16 @@ import styles from "../../assets/css/Payment-success.module.css";
 
 const SuccessPage = () => {
   const [searchParams] = useSearchParams();
+  const cartItems = searchParams.get("cartItems");
   const customerName = searchParams.get("customerName");
   const orderName = searchParams.get("orderName");
   const paymentKey = searchParams.get("paymentKey");
   const orderId = searchParams.get("orderId");
   const amount = searchParams.get("amount");
   const addr = searchParams.get("addr");
+  const tel = searchParams.get("tel");
 
-  if (!paymentKey || !orderId || !amount) {
+  if (!paymentKey || !orderId) {
     return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
   }
 
