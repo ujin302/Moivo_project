@@ -133,13 +133,12 @@
     font-size: 12px;
     align-self: flex-start;
   }
-
-  
   
   .removeButton:hover {
     background: #f2dede;
     color: #c0392b;
   }
+
 /* 품절 메시지 */
 .soldOutMessage {
   color: red;
@@ -154,12 +153,10 @@
   font-weight: bold;
 }
 
-/* 품절된 상품의 제거 버튼 비활성화 */
 .cartItem.soldOut .removeButton {
-  background: #f5f5f5;
-  color: #ccc;
-  border: 1px solid #ddd;
-  cursor: not-allowed;
+  cursor: pointer;
+  background: #f5f5f5; /* 기본 버튼 스타일 */
+  color: #988c73;
 }
 
 /* 총 금액 섹션 */

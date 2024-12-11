@@ -11,12 +11,18 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const userid = 3; 하드코딩 주석처리_성찬
-  const userid = localStorage.getItem("id"); // AuthContext에서 저장한 id 사용
+  const [userid, setUserid] = useState(null);
+  console.log(userid);
 
   // 장바구니 데이터 가져오기
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const storedUserid = localStorage.getItem("id"); // localStorage에서 가져옴
+    console.log(storedUserid);
+    setUserid(storedUserid); // 상태로 설정
+
     const fetchCartItems = async () => {
+      if (!userid) return;
       try {
         const response = await axios.get(`${PATH.SERVER}/api/user/cart/list`, {
           params: { userid },
@@ -40,6 +46,8 @@ const Cart = () => {
   // 상품 제거
   const handleRemoveItem = async (id) => {
     const token = localStorage.getItem("accessToken");
+    console.log(id);
+    if (!userid) return;
     try {
       await axios.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
         headers: {
@@ -62,6 +70,7 @@ const Cart = () => {
   // 상품 업데이트
   const handleUpdateItem = async (id, newCount, newSize) => {
     const token = localStorage.getItem("accessToken");
+    if (!userid) return;
     const item = cartItems.find((item) => item.usercartId === id);
     if (newCount > item.stockCount) {
       alert("재고를 초과할 수 없습니다.");
@@ -127,7 +136,7 @@ const Cart = () => {
                   type="checkbox"
                   id={`${item.usercartId}`}
                   checked={selectedItems.includes(item.usercartId)}
-                  disabled={item.soldOut}
+                  
                   onChange={() =>
                     setSelectedItems((prev) =>
                       prev.includes(item.usercartId)
@@ -188,7 +197,6 @@ const Cart = () => {
                   <button
                     className={styles.removeButton}
                     onClick={() => handleRemoveItem(item.id)}
-                    disabled={item.soldOut}
                   >
                     REMOVE
                   </button>
