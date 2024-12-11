@@ -11,6 +11,7 @@ const Payment = () => {
   const navigate = useNavigate();
 
   const cartItems = location.state?.cartItems || [];
+  console.log(cartItems);
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.count,
     0
@@ -210,30 +211,35 @@ const Payment = () => {
                           alt={item.name}
                           className={styles.productImage}
                         />
-                        <div className={styles.productDetails}>
-                          <div className={styles.productName}>{item.name}</div>
-                          <div className={styles.productPrice}>
-                            {discountedPrice !== item.price ? (
-                              <>
-                                <span className={styles.originalPrice}>
-                                  KRW {item.price.toLocaleString()}
-                                </span>
-                                <span className={styles.itemCount}> x {item.count}</span>
-                                <br />
-                                <span className={styles.discountedPrice}>
-                                  KRW {discountedPrice.toLocaleString()}
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <span className={styles.finalPrice}>
-                                  KRW {item.price.toLocaleString()}
-                                </span>
-                                <span className={styles.itemCount}> x {item.count}</span>
-                              </>
-                            )}
+                       <div className={styles.productDetails}>
+                        <div className={styles.productName}>{item.name}</div>
+                        {item.size && (
+                          <div className={styles.productSize}>
+                            <span>Size: {item.size}</span>
                           </div>
+                        )}
+                        <div className={styles.productPrice}>
+                          {discountedPrice !== item.price ? (
+                            <>
+                              <span className={styles.originalPrice}>
+                                KRW {item.price.toLocaleString()}
+                              </span>
+                              <span className={styles.itemCount}> x {item.count}</span>
+                              <br />
+                              <span className={styles.discountedPrice}>
+                                KRW {discountedPrice.toLocaleString()}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className={styles.finalPrice}>
+                                KRW {item.price.toLocaleString()}
+                              </span>
+                              <span className={styles.itemCount}> x {item.count}</span>
+                            </>
+                          )}
                         </div>
+                      </div>
                       </div>
                     );
                   })}
