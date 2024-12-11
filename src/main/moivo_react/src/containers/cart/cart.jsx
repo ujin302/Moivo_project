@@ -11,7 +11,8 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userid = 3;
+  // const userid = 3; 하드코딩 주석처리_성찬
+  const userid = localStorage.getItem("id"); // AuthContext에서 저장한 id 사용
 
   // 장바구니 데이터 가져오기
   useEffect(() => {

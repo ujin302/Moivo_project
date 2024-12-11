@@ -8,7 +8,8 @@ import { PATH } from '../../../scripts/path';
 
 const MypageWish = () => {
   const [wishlistItems, setWishlistItems] = useState([]); // 상태로 찜 목록 관리
-  const userid = 1; // 임시 userId
+  // const userid = 1; // 임시 userId
+  const userid = parseInt(localStorage.getItem("id")); // AuthContext에서 저장한 id 사용_성찬
 
   // 찜 목록 가져오기
   useEffect(() => {

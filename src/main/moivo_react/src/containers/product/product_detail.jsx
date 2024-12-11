@@ -12,9 +12,7 @@ import LoadingModal from './LoadingModal';
 
 const ProductDetail = () => {
   const { productId } = useParams(); // 받아온 상품 ID
-  const { isAuthenticated } = useContext(AuthContext);
   const token = localStorage.getItem('accessToken');
-  const userId = localStorage.getItem('userId');
   const [product, setProduct] = useState(null); // 상품 정보
   const [mainImage, setMainImage] = useState(''); // 메인 이미지
   const [thumbnailImages, setThumbnailImages] = useState([]); // 썸네일 이미지
@@ -146,6 +144,17 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const id = localStorage.getItem("id");
+    
+    if (!token || !id) {
+      alert("로그인이 필요한 서비스입니다.");
+      navigate("/user");
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
     fetchProductDetail();
   }, [productId, token]);
 
@@ -199,80 +208,37 @@ const ProductDetail = () => {
   };
 
   const handlePurchase = () => {
-    if (!selectedProduct) {
-      alert('사이즈를 선택해주세요.');
-      return;
+    if(window.confirm("선택하신 상품을 구매하시겠습니까?")) {
+      navigate('/payment', {
+        state: {
+          cartItems: [{
+            productId: product.id,
+            size: selectedProduct.size,
+            count: quantity,
+            price: product.price,
+            name: product.name,
+            img: product.img
+          }]
+        }
+      });
     }
-    if (!isAuthenticated || !token) {
-      alert('로그인이 필요한 서비스입니다.');
-      return;
-    }
-
-    // 선택한 상품 정보를 포함하여 payment 페이지로 이동
-    const paymentItem = {
-      ...product,
-      size: selectedProduct.size,
-      count: quantity,
-      totalPrice: product.price * quantity,
-      img: mainImage // 메인 이미지 추가
-    };
-
-    navigate('/payment', {
-      state: { cartItems: [paymentItem] }
-    });
   };
 
   const handleAddToWishlist = async () => {
-    if (!isAuthenticated || !token) {
-      alert('로그인이 필요한 서비스입니다.');
-      return;
-    }
-
     try {
-      const response = await axios.get(`${PATH.SERVER}/api/user/wish/${product.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        params: { userid: userId }
+      const userId = parseInt(localStorage.getItem("id"));
+      const token = localStorage.getItem("accessToken");
+
+      console.log("위시리스트 추가 요청 데이터:", {
+        productId: product.id,
+        userId: userId
       });
 
-      if (response.status === 200 || response.status === 201) {
-        const confirmWish = window.confirm('위시리스트에 추가되었습니다. 위시리스트로 이동하시겠습니까?');
-        if (confirmWish) {
-          navigate('/mypage/wish');
-        }
-      }
-    } catch (error) {
-      console.error('위시리스트 추가 실패:', error);
-      if (error.response?.status === 401) {
-        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-      } else {
-        alert('위시리스트 추가에 실패했습니다.');
-      }
-    }
-  };
-
-  const handleAddToCart = async () => {
-    if (!selectedProduct) {
-      alert('사이즈를 선택해주세요.');
-      return;
-    }
-    if (!isAuthenticated || !token) {
-      alert('로그인이 필요한 서비스입니다.');
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
-        {
-          count: quantity,
-          size: selectedProduct.size
-        },
+      const response = await axios.get(
+        `${PATH.SERVER}/api/user/wish/${product.id}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${token}`
           },
           params: {
             userid: userId
@@ -280,18 +246,70 @@ const ProductDetail = () => {
         }
       );
 
+      console.log("위시리스트 응답:", response);
+
+      if (response.status === 201) {
+        if(window.confirm("찜 목록에 추가되었습니다. 찜 목록으로 이동하시겠습니까?")) {
+          navigate('/mypage/wish');
+        }
+      }
+    } catch (error) {
+      console.error("위시리스트 추가 실패:", error);
+      if (error.response?.status === 401) {
+        alert("로그인이 필요한 서비스입니다.");
+        navigate('/user');
+      } else {
+        alert("찜하기에 실패했습니다.");
+      }
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!selectedSize) {
+      alert("사이즈를 선택해주세요.");
+      return;
+    }
+
+    try {
+      const userId = parseInt(localStorage.getItem("id"));
+      const token = localStorage.getItem("accessToken");
+
+      console.log("장바구니 추가 요청 데이터:", {
+        productId: product.id,
+        userId: userId,
+        count: quantity,
+        size: selectedSize
+      });
+
+      const response = await axios.post(
+        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params: {
+            userid: userId,
+            count: quantity,
+            size: selectedSize
+          }
+        }
+      );
+
+      console.log("장바구니 응답:", response);
+
       if (response.status === 200) {
-        const confirmCart = window.confirm('장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?');
-        if (confirmCart) {
+        if(window.confirm("장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?")) {
           navigate('/cart');
         }
       }
     } catch (error) {
-      console.error('장바구니 추가 실패:', error);
+      console.error("장바구니 추가 실패:", error);
       if (error.response?.status === 401) {
-        alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        alert("로그인이 필요한 서비스입니다.");
+        navigate('/user');
       } else {
-        alert('장바구니 추가에 실패했습니다.');
+        alert("장바구니 추가에 실패했습니다.");
       }
     }
   };
