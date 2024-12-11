@@ -18,43 +18,43 @@ const Cart = () => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const storedUserid = localStorage.getItem("id");
-    
-    const fetchCartItems = async () => {
-        try {
-            const response = await axios({
-                method: 'get',
-                url: `${PATH.SERVER}/api/user/cart/list`,
-                params: { 
-                    userid: storedUserid 
-                },
-                headers: token ? {
-                    'Authorization': `Bearer ${token}`
-                } : {}
-            });
-            
-            const fetchedItems = response.data.cartItems || [];
-            const mappedItems = fetchedItems.map((item) => ({
-                ...item,
-                ...item.productDTO,
-                usercartId: item.id,
-            }));
-            setCartItems(mappedItems);
-        } catch (error) {
-            console.error("Error fetching cart items:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    console.log(token);
+    console.log(storedUserid);
 
-    if (storedUserid) {
-        fetchCartItems();
-    }
-  }, [userid]);
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios({
+          method: 'get',
+          url: `${PATH.SERVER}/api/user/cart/list`,
+          params: { 
+              userid: storedUserid 
+          },
+          headers: token ? {
+              'Authorization': `Bearer ${token}`
+          } : {}
+      });
+
+        const fetchedItems = response.data.cartItems || [];
+        const mappedItems = fetchedItems.map((item) => ({
+          ...item,
+          ...item.productDTO, // productDTO 데이터 병합
+          usercartId: item.id, // usercart의 id를 별도로 저장
+        }));
+        setCartItems(mappedItems);
+        console.log(cartItems);
+        
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCartItems();
+  }, []);
 
   // 상품 제거
   const handleRemoveItem = async (id) => {
     const token = localStorage.getItem("accessToken");
-    console.log(id);
     if (!userid) return;
     try {
       await axios.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
@@ -78,6 +78,7 @@ const Cart = () => {
   // 상품 업데이트
   const handleUpdateItem = async (id, newCount, newSize) => {
     const token = localStorage.getItem("accessToken");
+    console.log(token);
     if (!userid) return;
     const item = cartItems.find((item) => item.usercartId === id);
     if (newCount > item.stockCount) {
@@ -205,6 +206,7 @@ const Cart = () => {
                   <button
                     className={styles.removeButton}
                     onClick={() => handleRemoveItem(item.id)}
+                    disabled={item.soldOut}
                   >
                     REMOVE
                   </button>
