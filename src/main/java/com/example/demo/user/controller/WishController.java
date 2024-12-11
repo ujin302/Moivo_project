@@ -25,6 +25,7 @@ public class WishController {
     // wish에 상품 추가
     @GetMapping("/{productId}")
     public ResponseEntity<?> addProduct(@PathVariable int productId, @RequestParam(name = "userid") int userId) {
+        System.out.println("wish 컨트롤러 호출");
         try {
             wishService.addProduct(productId, userId);
             return ResponseEntity.status(HttpStatus.CREATED).build(); // 201 Created

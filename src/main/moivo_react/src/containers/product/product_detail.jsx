@@ -231,11 +231,11 @@ const ProductDetail = () => {
 
       console.log("위시리스트 추가 요청 데이터:", {
         productId: product.id,
-        userId: userId
+        userid: userId
       });
 
       const response = await axios.get(
-        `${PATH.SERVER}/api/user/wish/${product.id}`,
+        `${PATH.SERVER}/api/user/wish/${productId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -250,7 +250,7 @@ const ProductDetail = () => {
 
       if (response.status === 201) {
         if(window.confirm("찜 목록에 추가되었습니다. 찜 목록으로 이동하시겠습니까?")) {
-          navigate('/mypage/wish');
+          navigate('/mypage_wish');
         }
       }
     } catch (error) {
