@@ -53,20 +53,27 @@ public class SecurityConfig {
         http
             //OAuth2 소셜로그인 설정
             .oauth2Login(oauth2 -> oauth2
-            .clientRegistrationRepository((clientRegistrationRepository)) //OAuth2 공급자 설정 ex Kakao or Google
-            .authorizedClientRepository(authorizedClientRepository()) //인증된 클라이언트 정보를 저장하는 레포지토리
-            .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService)) // Spring Security. 참조해서 사용자 정보 API 호출 (Kakao의 경우 사용자 정보 URL은 https://kapi.kakao.com/v2/user/me)
-                                                                                    // oAuth2UserService를 사용해서 사용자 정보를 매핑하고 로드함.
-            .redirectionEndpoint(endpoint -> endpoint.baseUri("http://localhost:5173/api/user/oauth2/callback/kakao"))
-            .successHandler(successHandler())) //로그인 후, success handler로 Security Context에 저장 해야하는데 안먹힘ㅜ 1 리다이렉트하면서 날라가거나, 2 저장로직이 제대로 안되거나
-            //////
-            /// 
+            .clientRegistrationRepository(clientRegistrationRepository)
+            .authorizedClientRepository(authorizedClientRepository())
+            .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+            .successHandler(successHandler()))
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 추가
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // OPTIONS 요청 허용
-                .requestMatchers("/api/user/login", "/api/user/join", "/api/auth/token/refresh", "api/store/**").permitAll()
-                .anyRequest().authenticated()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            // 카카오 로그인 관련 엔드포인트 추가
+            .requestMatchers(
+                "/api/user/login", 
+                "/api/user/join", 
+                "/api/auth/token/refresh",
+                "/login/oauth2/code/**",
+                "/oauth2/authorization/**",
+                "/oauth/callback/**",
+                "/api/oauth/kakao/**",
+                "/api/user/kakao-login",
+                "/api/store/**"
+            ).permitAll()
+            .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
             .sessionManagement(session -> session
@@ -80,12 +87,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:5173",
+            "https://kauth.kakao.com",
+            "https://kapi.kakao.com",
+            "http://localhost:8080"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        configuration.addExposedHeader("Authorization");
-        configuration.setAllowCredentials(true); // 쿠키 허용
-
+        configuration.setAllowedHeaders(Arrays.asList("*"));  // 모든 헤더 허용
+        configuration.setAllowCredentials(true);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
