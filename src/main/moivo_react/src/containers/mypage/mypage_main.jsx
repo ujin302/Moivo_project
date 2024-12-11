@@ -8,7 +8,9 @@ import { PATH } from '../../../scripts/path';
 
 const MypageMain = () => {
   const [userInfo, setUserInfo] = useState(null); // 사용자 정보 저장
+  const [productList, setProductList] = useState([]); // 상품 목록 저장
   const navigate = useNavigate();
+  console.log(productList);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -26,7 +28,7 @@ const MypageMain = () => {
     const id = decodedPayload.id;  //토큰에 있는 id 추출
     console.log("User ID:", id);
 
-    // API 호출
+    // 사용자 정보 가져오기
     fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
         method: 'GET',
         headers: {
@@ -43,13 +45,38 @@ const MypageMain = () => {
       })
       .then((data) => {
         setUserInfo(data); // 사용자 정보 상태에 저장
-        console.log("사용자 정보:" + data);
+        console.log("사용자 정보:", data);
         console.log("사용자 정보:", JSON.stringify(data, null, 2));
       })
       .catch((error) => {
         console.error("Error fetching user info:", error);
         alert("사용자 정보를 가져오는 중 오류가 발생했습니다.");
       });
+
+    // 상품 목록 가져오기
+    fetch(`${PATH.SERVER}/api/user/mypage/products/${id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error("상품 목록을 가져오지 못했습니다.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setProductList(data); // 상품 목록 상태에 저장
+        console.log("상품 목록:", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching product list:", error);
+        alert("상품 목록을 가져오는 중 오류가 발생했습니다.");
+      });
+
   }, [navigate]);
 
   const [startIndex, setStartIndex] = useState(0);
@@ -81,14 +108,6 @@ const MypageMain = () => {
   };
 
 
-  const productList = [
-    { image: "../image/only1.jpg", name: "Angel wing tee", price: "KRW 62,000" },
-    { image: "../image/only2.jpg", name: "Ruffle baggy jeans", price: "KRW 129,000" },
-    { image: "../image/only3.jpg", name: "Hailey cardigan", price: "KRW 105,000" },
-    { image: "../image/only4.jpg", name: "Olive flared skirt", price: "KRW 73,000" },
-    { image: "../image/only5.jpg", name: "Classic pink logo top", price: "KRW 78,000" },
-    { image: "../image/only6.jpg", name: "Lace up cargo pants", price: "KRW 78,000" },
-  ];
 
   const maxIndex = productList.length - 3; // 화면에 3개씩 표시
 
@@ -141,7 +160,6 @@ const MypageMain = () => {
                 )}
               </div>
             <div className={styles.couponSection}>
-              <div className={styles.point}>POINT: <strong>5000</strong></div>
                 <div className={styles.coupon}>
                     COUPON: &nbsp;
                     {userInfo && userInfo.coupons ? (
@@ -199,7 +217,7 @@ const MypageMain = () => {
             {productList.slice(startIndex, startIndex + 3).map((product, index) => (
               <div key={index} className={styles.product}>
                 <div className={styles.productImage}>
-                  <img src={product.image} alt={product.name} />
+                  <img src={product.img} alt={product.name} />
                 </div>
                 <div className={styles.productText}>
                   {product.name} <br />
