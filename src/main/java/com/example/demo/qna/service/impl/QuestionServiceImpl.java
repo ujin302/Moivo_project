@@ -24,12 +24,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private UserRepository userRepository;
 
+    // 문의글 작성
     @Override
-    public void deleteQuestion(Integer id) {
-        questionRepository.deleteById(id);
-    }
-
-     @Override
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
         QuestionEntity entity = new QuestionEntity();
         // 문의 제목
@@ -53,6 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
         return convertToDTO(savedEntity);
     }
 
+    // 문의글 수정 
     @Override
     public QuestionDTO updateQuestion(Integer id, QuestionDTO questionDTO) {
         QuestionEntity entity = questionRepository.findById(id)
@@ -72,6 +69,16 @@ public class QuestionServiceImpl implements QuestionService {
         return convertToDTO(updatedEntity);
     }
 
+    // 문의글 삭제
+    @Override
+    public void deleteQuestion(Integer id) {
+        if (!questionRepository.existsById(id)) {
+            throw new RuntimeException("문의를 찾을 수 없습니다.");
+        }
+        questionRepository.deleteById(id);
+    }
+
+    // 문의글 엔티티를 DTO로 변환
     private QuestionDTO convertToDTO(QuestionEntity entity) {
         QuestionDTO dto = new QuestionDTO();
         // 문의 고유 키
@@ -96,6 +103,4 @@ public class QuestionServiceImpl implements QuestionService {
         dto.setFixQuestion(entity.getFixQuestion());
         return dto;
     }
-
-
 }
