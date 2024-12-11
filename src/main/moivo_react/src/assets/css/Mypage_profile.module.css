@@ -424,6 +424,53 @@ button, label {
     background-color: #beb9b8; /* 마우스 오버 시 색상 변경 */
 }
 
+
+.modal {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    width: 400px;
+    margin: 0 auto;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    text-align: center;
+}
+
+.modalButtons {
+    margin-top: 20px;
+}
+
+.confirmButton, .cancelButton {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirmButton {
+    background-color: #ff3b30;
+    color: white;
+}
+
+.cancelButton {
+    background-color: #007aff;
+    color: white;
+}
+ 
 /* Footer */
 .mainFooter {
     background: #2F2E2C;

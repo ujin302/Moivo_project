@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/api/user/wish")
@@ -23,7 +24,7 @@ public class WishController {
     private WishService wishService;
 
     // wish에 상품 추가
-    @GetMapping("/{productId}")
+    @PostMapping("/{productId}")
     public ResponseEntity<?> addProduct(@PathVariable int productId, @RequestParam(name = "userid") int userId) {
         System.out.println("wish 컨트롤러 호출");
         try {

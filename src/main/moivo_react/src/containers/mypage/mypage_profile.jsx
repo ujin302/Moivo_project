@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Modal from "react-modal";
 import styles from "../../assets/css/Mypage_profile.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -7,6 +8,8 @@ import { PATH } from '../../../scripts/path';
 
 const MypageProfile = () => {
     const [userInfo, setUserInfo] = useState(null); // 사용자 정보 저장
+    const [deletePassword, setDeletePassword] = useState("");
+    const [showModal, setShowModal] = useState(false); 
     const [formData, setFormData] = useState({
         userId: "",
         pwd: "",
@@ -25,7 +28,15 @@ const MypageProfile = () => {
     });
     const navigate = useNavigate();
 
-    // Fetch user info when the component mounts
+    const handleOpenModal = () => {
+        setShowModal(true); // 모달 열기
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false); // 모달 닫기
+    };
+
+
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         const id = localStorage.getItem("id");
@@ -83,11 +94,39 @@ const MypageProfile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
+        
+        if (formData.pwd !== formData.confirmPassword) {
             alert("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
             return;
         }
-        alert("회원정보가 수정되었습니다.");
+    
+        const token = localStorage.getItem("accessToken");
+    
+        fetch(`${PATH.SERVER}/api/user/mypage/update`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                userId: userInfo.userId, // ID는 수정되지 않으므로 그대로 전달
+                ...formData, // 수정된 데이터
+            }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("회원정보 수정에 실패했습니다.");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                alert("회원정보가 성공적으로 수정되었습니다!");
+                navigate("/mypage"); // 수정 후 마이페이지로 이동
+            })
+            .catch((error) => {
+                console.error(error);
+                alert("회원정보 수정 중 오류가 발생했습니다.");
+            });
     };
 
     const handleCancel = () => {
@@ -109,7 +148,40 @@ const MypageProfile = () => {
     };
 
     const handleDeleteAccount = () => {
-        alert("회원 탈퇴가 완료되었습니다.");
+        if (!deletePassword) {
+            alert("비밀번호를 입력해주세요.");
+            return;
+        }
+
+        const token = localStorage.getItem("accessToken");
+        const id = localStorage.getItem("id");
+
+        fetch(`${PATH.SERVER}/api/mypage/delete`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ 
+                id: id, // 사용자 ID
+                password: deletePassword, // 입력된 비밀번호
+            }),
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("비밀번호가 틀렸거나 탈퇴에 실패했습니다.");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            alert("회원 탈퇴가 완료되었습니다.");
+            localStorage.clear(); // 로그아웃 처리
+            navigate("/"); // 홈으로 이동
+        })
+        .catch((error) => {
+            console.error("Error during account deletion:", error);
+            alert("비밀번호가 틀렸거나 오류가 발생했습니다.");
+        });
     };
 
     const handleFindPostalCode = () => {
@@ -134,7 +206,7 @@ const MypageProfile = () => {
                     
                     <div className={styles.pageName}>PROFILE</div>
 
-                    <button className={styles.deleteButton} onClick={handleDeleteAccount}>
+                    <button className={styles.deleteButton} onClick={handleOpenModal}>
                         회원 탈퇴
                     </button>
                            {/* 멤버십 박스 */}
@@ -171,6 +243,36 @@ const MypageProfile = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* 모달 창 */}
+                        <Modal 
+                            isOpen={showModal} 
+                            onRequestClose={handleCloseModal}
+                            contentLabel="회원 탈퇴 확인"
+                            className={styles.modal}
+                            overlayClassName={styles.overlay}
+                        >
+                            <div className={styles.modalContent}>
+                                <h2>회원 탈퇴</h2>
+                                <p>회원 탈퇴를 위해 비밀번호를 입력해 주세요.</p>
+                                <input 
+                                    type="password" 
+                                    value={deletePassword} 
+                                    onChange={handleDeletePasswordChange} 
+                                    placeholder="비밀번호" 
+                                    className={styles.inputtext}
+                                />
+                                <div className={styles.modalButtons}>
+                                    <button onClick={handleDeleteAccount} className={styles.confirmButton}>
+                                        탈퇴
+                                    </button>
+                                    <button onClick={handleCloseModal} className={styles.cancelButton}>
+                                        취소
+                                    </button>
+                                </div>
+                            </div>
+                        </Modal>
+
                         </div>
                         {/* 아이콘 영역 (우측 상단에 배치) */}
                         <div 
