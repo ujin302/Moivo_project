@@ -209,7 +209,6 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
 // PropTypes 정의 추가
 AuthProvider.propTypes = {
     children: PropTypes.node.isRequired

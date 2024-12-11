@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard } from 'react-icons/fa';
-import { AuthContext } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext'
 import { PATH } from '../../../scripts/path';
 import styles from '../../assets/css/product_detail.module.css';
 import Banner from '../../components/Banner/banner';
@@ -28,6 +28,26 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const { isLoggedIn } = useAuth();
+  const [stockInfo, setStockInfo] = useState([]); // 재고 정보 상태 추가
+
+  // 재고 정보와 사이즈 정보를 가져오는 useEffect
+  useEffect(() => {
+    if (stocks && stocks.length > 0) {
+      setStockInfo(stocks);
+      console.log("현재 재고 정보:", stocks);
+    }
+  }, [stocks]);
+
+  // 선택된 사이즈와 수량 변경 감지하는 useEffect
+  useEffect(() => {
+    if (selectedSize) {
+      const currentStock = stockInfo.find(stock => stock.size === selectedSize);
+      console.log("선택된 사이즈:", selectedSize);
+      console.log("선택된 사이즈의 재고:", currentStock?.count);
+      console.log("현재 선택된 수량:", quantity);
+    }
+  }, [selectedSize, quantity, stockInfo]);
 
   const fetchProductDetail = async () => { //상품 상세정보 불러오기
     setLoading(true);
@@ -187,6 +207,7 @@ const ProductDetail = () => {
       return;
     }
     setSelectedSize(size);
+    setQuantity(1); // 사이즈 변경시 수량 1로 초기화
     setSelectedProduct({
       id: product.id,
       size: size,
@@ -195,15 +216,17 @@ const ProductDetail = () => {
   };
 
   const handleQuantityChange = (change) => { // 수량 변경 시 수량 업데이트
+    const selectedStock = stockInfo.find(stock => stock.size === selectedSize);
+    if (!selectedStock) {
+      alert('사이즈를 먼저 선택해주세요.');
+      return;
+    }
+
     const newQuantity = quantity + change;
-    if (newQuantity >= 1) {
+    if (newQuantity >= 1 && newQuantity <= selectedStock.count) {
       setQuantity(newQuantity);
-      if (selectedProduct) {
-        setSelectedProduct({
-          ...selectedProduct,
-          count: newQuantity
-        });
-      }
+    } else if (newQuantity > selectedStock.count) {
+      alert('재고 수량을 초과할 수 없습니다.');
     }
   };
 
@@ -226,91 +249,41 @@ const ProductDetail = () => {
 
   const handleAddToWishlist = async () => {
     try {
-      const userId = parseInt(localStorage.getItem("id"));
-      const token = localStorage.getItem("accessToken");
-
-      console.log("위시리스트 추가 요청 데이터:", {
-        productId: product.id,
-        userid: userId
-      });
-
-      const response = await axios.get(
-        `${PATH.SERVER}/api/user/wish/${productId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            userid: userId
-          }
-        }
-      );
-
-      console.log("위시리스트 응답:", response);
-
-      if (response.status === 201) {
-        if(window.confirm("찜 목록에 추가되었습니다. 찜 목록으로 이동하시겠습니까?")) {
-          navigate('/mypage_wish');
-        }
-      }
+      const userId = localStorage.getItem('id');
+      await axios.get(`${PATH.SERVER}/api/user/wish/${productId}/${userId}`);
+      alert('위시리스트에 추가되었습니다.');
+      navigate('/mypage/wish');
     } catch (error) {
-      console.error("위시리스트 추가 실패:", error);
-      if (error.response?.status === 401) {
-        alert("로그인이 필요한 서비스입니다.");
-        navigate('/user');
-      } else {
-        alert("찜하기에 실패했습니다.");
-      }
+      console.error('위시리스트 추가 실패:', error);
+      alert('위시리스트 추가에 실패했습니다.');
     }
   };
 
   const handleAddToCart = async () => {
+    if (!isLoggedIn) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     if (!selectedSize) {
-      alert("사이즈를 선택해주세요.");
+      alert('사이즈를 선택해주세요.');
       return;
     }
 
     try {
-      const userId = parseInt(localStorage.getItem("id"));
-      const token = localStorage.getItem("accessToken");
-
-      console.log("장바구니 추가 요청 데이터:", {
-        productId: product.id,
-        userId: userId,
-        count: quantity,
-        size: selectedSize
+      const userId = localStorage.getItem('id');
+      await axios.post(`${PATH.SERVER}/api/user/cart/add/${productId}`, null, {
+        params: {
+          userid: userId,
+          count: quantity,
+          size: selectedSize
+        }
       });
-
-      const response = await axios.post(
-        `${PATH.SERVER}/api/user/cart/add/${product.id}`,
-        null,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          params: {
-            userid: userId,
-            count: quantity,
-            size: selectedSize
-          }
-        }
-      );
-
-      console.log("장바구니 응답:", response);
-
-      if (response.status === 200) {
-        if(window.confirm("장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?")) {
-          navigate('/cart');
-        }
-      }
+      alert('장바구니에 추가되었습니다.');
+      navigate('/cart');
     } catch (error) {
-      console.error("장바구니 추가 실패:", error);
-      if (error.response?.status === 401) {
-        alert("로그인이 필요한 서비스입니다.");
-        navigate('/user');
-      } else {
-        alert("장바구니 추가에 실패했습니다.");
-      }
+      console.error('장바구니 추가 실패:', error);
+      alert('장바구니 추가에 실패했습니다.');
     }
   };
 
@@ -500,7 +473,11 @@ const ProductDetail = () => {
                   >
                     {stock.size}
                     <span className={styles.stock}>
-                      {stock.count <= 0 ? '품절' : `(${stock.count})`}
+                      {stock.count <= 0 ? (
+                        <span className={styles.soldOutText}>품절</span>
+                      ) : (
+                        `(${stock.count})`
+                      )}
                     </span>
                   </motion.button>
                 ))}
@@ -520,8 +497,7 @@ const ProductDetail = () => {
                   <motion.button 
                     className={styles.quantityButton}
                     onClick={() => handleQuantityChange(-1)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    disabled={!selectedSize || quantity <= 1}
                   >
                     <FaMinus />
                   </motion.button>
@@ -529,8 +505,7 @@ const ProductDetail = () => {
                   <motion.button 
                     className={styles.quantityButton}
                     onClick={() => handleQuantityChange(1)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    disabled={!selectedSize || quantity >= (stockInfo.find(s => s.size === selectedSize)?.count || 0)}
                   >
                     <FaPlus />
                   </motion.button>
@@ -551,7 +526,7 @@ const ProductDetail = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                바로 구매하기
+                <FaCreditCard /> 바로 구매하기
               </motion.button>
               <motion.button
                 className={`${styles.actionButton} ${styles.cartButton}`}
