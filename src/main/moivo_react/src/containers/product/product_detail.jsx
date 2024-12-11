@@ -28,7 +28,6 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const { isLoggedIn } = useAuth();
   const [stockInfo, setStockInfo] = useState([]); // 재고 정보 상태 추가
 
   // 재고 정보와 사이즈 정보를 가져오는 useEffect
@@ -260,30 +259,42 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!isLoggedIn) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-
     if (!selectedSize) {
-      alert('사이즈를 선택해주세요.');
-      return;
+        alert('사이즈를 선택해주세요.');
+        return;
     }
 
     try {
-      const userId = localStorage.getItem('id');
-      await axios.post(`${PATH.SERVER}/api/user/cart/add/${productId}`, null, {
-        params: {
-          userid: userId,
-          count: quantity,
-          size: selectedSize
+        const userId = localStorage.getItem('id');
+        const token = localStorage.getItem('accessToken');
+        
+        // URL에 직접 파라미터 추가
+        const url = `${PATH.SERVER}/api/user/cart/add/${productId}?userid=${userId}&count=${quantity}&size=${selectedSize}`;
+        console.log('요청 URL:', url);
+
+        const response = await axios({
+            method: 'post',
+            url: url,
+            headers: token ? {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            } : {}
+        });
+
+        console.log('장바구니 응답:', response);
+
+        if (response.status === 200) {
+            if(window.confirm('장바구니에 추가되었습니다.\n장바구니로 이동하시겠습니까?')) {
+                navigate('/cart');
+            }
         }
-      });
-      alert('장바구니에 추가되었습니다.');
-      navigate('/cart');
     } catch (error) {
-      console.error('장바구니 추가 실패:', error);
-      alert('장바구니 추가에 실패했습니다.');
+        console.error('장바구니 추가 실패:', error.response || error);
+        if (error.response?.status === 401) {
+            alert('로그인이 필요합니다.');
+        } else {
+            alert(error.response?.data?.message || '장바구니 추가에 실패했습니다.');
+        }
     }
   };
 

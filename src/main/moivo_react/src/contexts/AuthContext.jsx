@@ -153,7 +153,22 @@ export const AuthProvider = ({ children }) => {
 
     // axios 인터셉터 설정
     useEffect(() => {
-        const interceptor = axios.interceptors.response.use(
+        // 요청 인터셉터 추가
+        const requestInterceptor = axios.interceptors.request.use(
+            config => {
+                const token = localStorage.getItem('accessToken');
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
+                return config;
+            },
+            error => {
+                return Promise.reject(error);
+            }
+        );
+
+        // 응답 인터셉터
+        const responseInterceptor = axios.interceptors.response.use(
             response => response,
             async error => {
                 const originalRequest = error.config;
@@ -161,24 +176,31 @@ export const AuthProvider = ({ children }) => {
                 if (error.response?.status === 401 && !originalRequest._retry) {
                     originalRequest._retry = true;
                     
-                    const accessToken = getAccessToken();
-                    if (!accessToken) {
+                    try {
+                        const success = await refreshAccessToken();
+                        if (success) {
+                            const newToken = localStorage.getItem('accessToken');
+                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                            return axios(originalRequest);
+                        }
+                    } catch (refreshError) {
                         removeTokens();
                         setIsAuthenticated(false);
                         navigate('/user');
-                        return Promise.reject(error);
+                        return Promise.reject(refreshError);
                     }
 
                     // 토큰 재설정
-                    originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
-                    return axios(originalRequest);
+                    // originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+                    // return axios(originalRequest);
                 }
                 return Promise.reject(error);
             }
         );
 
         return () => {
-            axios.interceptors.response.eject(interceptor);
+            axios.interceptors.request.eject(requestInterceptor);
+            axios.interceptors.response.eject(responseInterceptor);
         };
     }, [navigate]);
 
