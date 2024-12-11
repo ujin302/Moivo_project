@@ -11,7 +11,7 @@ import { KAKAO_AUTH_URL } from '../../utils/OAuth';
 const user_login = () => {
 
   const navigate = useNavigate();
-  const { login} = useContext(AuthContext);
+  const {login} = useContext(AuthContext);
   const [formData, setFormData] = useState({ userId: '', pwd: '' });
   const [error, setError] = useState('');
 
