@@ -435,3 +435,9 @@
   font-size: 16px; 
   vertical-align: middle; /* 텍스트가 수직 정렬되도록 */
 }
+
+.productSize {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
