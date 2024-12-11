@@ -8,12 +8,18 @@ import { PATH } from '../../../scripts/path';
 
 const MypageWish = () => {
   const [wishlistItems, setWishlistItems] = useState([]); // 상태로 찜 목록 관리
-  const userid = 1; // 임시 userId
+  const [userid, setUserid] = useState(null);
+  console.log(userid);
 
   // 찜 목록 가져오기
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    const storedUserid = localStorage.getItem("id"); // localStorage에서 가져옴
+    console.log(storedUserid);
+    setUserid(storedUserid); // 상태로 설정
+
     const fetchWishlist = async () => {
+      if (!storedUserid) return;
       try {
         const response = await axios.get(`${PATH.SERVER}/api/user/wish/list`, {
           headers: {
@@ -31,12 +37,13 @@ const MypageWish = () => {
       }
     };
     fetchWishlist();
-  }, [userid]); //userid가 변경될 때마다 함수 호출
+  }, [userid]); 
   console.log(wishlistItems);
 
 
    // 찜 목록에서 삭제
    const handleRemove = async (productId) => {
+    if (!userid) return;
     console.log("productId = " + productId);
     console.log("userId = " + userid);
 
