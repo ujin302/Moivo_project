@@ -199,33 +199,6 @@
 }
 
 /* =========================================
-   6. 액션 버튼
-========================================= */
-.actionButtons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.actionButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.actionButton:hover {
-  background: #4a90e2;
-  color: white;
-}
-
-/* =========================================
    7. 페이지네이션
 ========================================= */
 .paginationContainer {
@@ -289,7 +262,6 @@
   position: absolute;
   top: -10px;
   right: -10px;
-  background: #e63946;
   color: white;
   border-radius: 50%;
   padding: 5px 8px;
@@ -360,4 +332,3 @@
     width: 100%;
   }
 }
-

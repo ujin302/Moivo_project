@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../assets/css/Cart.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -8,40 +9,70 @@ import { PATH } from "../../../scripts/path";
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, getAccessToken } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userid, setUserid] = useState(null);
-  console.log(userid);
 
-  // 장바구니 데이터 가져오기
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const storedUserid = localStorage.getItem("id"); // localStorage에서 가져옴
-    console.log(storedUserid);
-    setUserid(storedUserid); // 상태로 설정
-
     const fetchCartItems = async () => {
-      if (!userid) return;
       try {
-        const response = await axios.get(`${PATH.SERVER}/api/user/cart/list`, {
-          params: { userid },
+        const token = getAccessToken();
+        const storedUserid = localStorage.getItem("id");
+        
+        console.log("요청 전 확인 - userId:", storedUserid, "token:", token);
+        
+        const response = await axios({
+          method: 'get',
+          url: `${PATH.SERVER}/api/user/cart/list`,
+          params: { 
+            userid: storedUserid 
+          },
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
-        const fetchedItems = response.data.cartItems || [];
-        const mappedItems = fetchedItems.map((item) => ({
-          ...item,
-          ...item.productDTO, // productDTO 데이터 병합
-          usercartId: item.id, // usercart의 id를 별도로 저장
-        }));
+        
+        console.log("전체 응답:", response);
+        console.log("응답 데이터:", response.data);
+        console.log("장바구니 아이템:", response.data.cartItems);
+        
+        if (!response.data.cartItems) {
+          console.log("장바구니 아이템이 없거나 형식이 잘못되었습니다.");
+          setCartItems([]);
+          return;
+        }
+        
+        const mappedItems = response.data.cartItems.map(item => {
+          console.log("매핑 중인 아이템:", item);
+          return {
+            usercartId: item.id,
+            id: item.productDTO.id,
+            name: item.productDTO.name,
+            price: item.productDTO.price,
+            img: item.productDTO.img,
+            content: item.productDTO.content,
+            size: item.size,
+            count: item.count,
+            stockCount: item.stockCount,
+            soldOut: item.soldOut
+          };
+        });
+        
+        console.log("매핑된 아이템:", mappedItems);
         setCartItems(mappedItems);
+        setUserid(storedUserid);
       } catch (error) {
-        console.error("Error fetching cart items:", error);
+        console.error("장바구니 조회 에러:", error);
+        console.error("에러 상세:", error.response || error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchCartItems();
-  }, [userid]);
+  }, [isAuthenticated, navigate, getAccessToken]);
 
   // 상품 제거
   const handleRemoveItem = async (id) => {
@@ -136,7 +167,7 @@ const Cart = () => {
                   type="checkbox"
                   id={`${item.usercartId}`}
                   checked={selectedItems.includes(item.usercartId)}
-                  
+                  disabled={item.soldOut} // 품절 상태일 때 체크박스를 비활성화
                   onChange={() =>
                     setSelectedItems((prev) =>
                       prev.includes(item.usercartId)

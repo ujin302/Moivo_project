@@ -5,6 +5,8 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from "../../../scripts/path";
 import signin from '../../assets/css/user_login.module.css';
 import apiClient from '../../utils/apiClient';
+import kakaoLoginImage from '../../assets/image/kakao_login.png';
+import { KAKAO_AUTH_URL } from '../../utils/OAuth';
 
 const user_login = () => {
 
@@ -30,21 +32,16 @@ const user_login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        
         try {
             const success = await login(formData.userId, formData.pwd);
             if (success) {
                 await fetchUserData();
                 navigate('/');
-            } else {
-                setError('로그인에 실패했습니다.');
             }
         } catch (error) {
-            if (error.response) {
-                setError(error.response.data?.error || '아이디 또는 비밀번호가 올바르지 않습니다.');
-            } else {
-                setError('서버와의 통신 중 오류가 발생했습니다.');
-            }
-            console.error('로그인 오류:', error);
+            setError(error);
         }
     };
 
@@ -53,6 +50,10 @@ const user_login = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleKakaoLogin = () => {
+        window.location.href = KAKAO_AUTH_URL;
     };
 
     return (
@@ -64,7 +65,18 @@ const user_login = () => {
                             <h1>Moivo</h1>
                         </Link>
                         <div className={signin['social-container']}>
-                            <a href="http://localhost:5173/api/user/kakao" className={signin.social}><i className="fab fa-facebook-f"></i></a>
+                            <a href="#" onClick={handleKakaoLogin}>
+                                <img 
+                                    src={kakaoLoginImage} 
+                                    alt="카카오 로그인" 
+                                    style={{ 
+                                        width: '300px',
+                                        height: '45px',
+                                        cursor: 'pointer',
+                                        marginBottom: '10px'
+                                    }} 
+                                />
+                            </a>
                             <a href="#" className={signin.social}><i className="fab fa-google-plus-g"></i></a>
                             <a href="#" className={signin.social}><i className="fab fa-linkedin-in"></i></a>
                         </div>
