@@ -130,8 +130,8 @@ const Payment = () => {
           <p>로딩 중...</p>
         ) : (
           <>
-            <form className={styles.userForm}>
-              <div className={styles.formRow}>
+            <form className={styles.userForm2}>
+              <div className={styles.formRow2}>
                 <label>이름</label>
                 <input
                   type="text"
@@ -141,7 +141,7 @@ const Payment = () => {
                   required
                 />
               </div>
-              <div className={styles.formRow}>
+              <div className={styles.formRow2}>
                 <label>전화번호</label>
                 <input
                   type="text"
@@ -151,9 +151,9 @@ const Payment = () => {
                   required
                 />
               </div>
-              <div className={styles.formRow}>
+              <div className={styles.formRow2}>
                 <label>우편번호</label>
-                <div className={styles.addressRow}>
+                <div className={styles.addressRow2}>
                   <input
                     type="text"
                     name="zipcode"
@@ -164,7 +164,7 @@ const Payment = () => {
                   <button type="button">우편번호 찾기</button>
                 </div>
               </div>
-              <div className={styles.formRow}>
+              <div className={styles.formRow2}>
                 <label>주소</label>
                 <input
                   type="text"
@@ -182,7 +182,7 @@ const Payment = () => {
                   placeholder="상세 주소"
                 />
               </div>
-              <div className={styles.formRow}>
+              <div className={styles.formRow2}>
                 <label>쿠폰</label>
                 <select
                   name="coupon"
