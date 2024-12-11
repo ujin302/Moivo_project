@@ -26,12 +26,12 @@ public class PaymentEntity {
 
     public enum PaymentStatus { // 결제 상태
         // 대기, 성공. 실패
-        WAITING, SUCCESS, FAIL 
+        WAITING, SUCCESS, FAIL
     }
-    
+
     public enum DeliveryStatus { // 배송 상태
         // 준비중, 배송중, 구매 확정
-        READY, DELIVERY, CONFIRMED 
+        READY, DELIVERY, CONFIRMED
     }
 
     @Id
@@ -49,26 +49,26 @@ public class PaymentEntity {
     @Column(name = "discount", nullable = false)
     private int discount = 0; // 할인 금액
 
-    @Column(name = "recipientname", length = 30, nullable = false)
-    private String recipientName; // 수령인 이름
+    @Column(name = "name", length = 30, nullable = false)
+    private String name; // 수령인 이름
 
-    @Column(name = "recipienttel", length = 13, nullable = false)
-    private String recipientTel; // 수령인 전화번호 010-0000-0000
+    @Column(name = "tel", length = 13, nullable = false)
+    private String tel; // 수령인 전화번호 010-0000-0000
 
-    @Column(name = "recipientaddr1", length = 100, nullable = false)
-    private String recipientAddr1; // 수령인 주소 1
+    @Column(name = "addr1", length = 100, nullable = false)
+    private String addr1; // 수령인 주소 1
 
-    @Column(name = "recipientaddr2", length = 100, nullable = false)
-    private String recipientAddr2; // 수령인 주소 2
+    @Column(name = "addr2", length = 100, nullable = false)
+    private String addr2; // 수령인 주소 2
 
-    @Column(name = "recipientaddrzipcode", length = 100)
-    private String recipientAddrZipcode; // 수령인 우편번호
+    @Column(name = "zipcode", length = 100)
+    private String zipcode; // 수령인 우편번호
 
     @Column(name = "deliverymsg", length = 100)
     private String deliveryMsg; // 배송 메시지
 
-    @Column(name = "productcount", nullable = false)
-    private int productCount; // 총 주문 상품 개수
+    @Column(name = "count", nullable = false)
+    private int count; // 총 주문 상품 개수
 
     @Column(name = "paymentdate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime paymentDate; // 결제 요청 일시

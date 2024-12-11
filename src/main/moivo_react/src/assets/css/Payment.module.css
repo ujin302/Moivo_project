@@ -13,7 +13,7 @@
 }
 
 /* 기본 입력 필드 스타일 */
-.paymentFrame .userForm .formRow input,
+.paymentFrame .userForm .formRow2 input,
 .paymentFrame .couponContainer input {
   padding: 10px;
   font-size: 14px;
@@ -23,7 +23,7 @@
 }
 
 /* 입력 필드에 포커스되었을 때 스타일 */
-.paymentFrame .userForm .formRow input:focus,
+.paymentFrame .userForm .formRow2 input:focus,
 .paymentFrame .couponContainer input:focus {
   outline: none;
   border-color: #988c73;  /* 포커스 색상 */
@@ -31,14 +31,14 @@
 }
 
 /* 입력 필드에 마우스를 올렸을 때 스타일 */
-.paymentFrame .userForm .formRow input:hover,
+.paymentFrame .userForm .formRow2 input:hover,
 .paymentFrame .couponContainer input:hover {
   background-color: #f9f6f3;  /* 호버시 배경색 */
   border-color: #988c73; /* 호버시 테두리 색상 */
 }
 
 /* 쿠폰 선택 스타일 */
-.paymentFrame .formRow select {
+.paymentFrame .formRow2 select {
   width: 100%;
   padding: 10px;
   font-size: 14px;
@@ -49,27 +49,27 @@
 }
 
 /* 쿠폰 선택시 포커스 스타일 */
-.paymentFrame .formRow select:focus {
+.paymentFrame .formRow2 select:focus {
   outline: none;
   border-color: #988c73; /* 포커스 색상 */
 }
 
 /* 쿠폰 레이블 스타일 */
-.paymentFrame .formRow label {
+.paymentFrame .formRow2 label {
   font-size: 14px;
   font-weight: bold;
   color: #555;
 }
 
 /* 옵션 (선택 목록) 스타일 */
-.paymentFrame .formRow select option {
+.paymentFrame .formRow2 select option {
   padding: 10px;
   font-size: 14px;
   color: #333;
 }
 
 /* 선택된 쿠폰 텍스트 강조 */
-.paymentFrame .formRow select option:checked {
+.paymentFrame .formRow2 select option:checked {
   background-color: #f0f0f0;
 }
 
@@ -83,7 +83,7 @@
 }
 
 /* Payment 페이지에서만 적용되는 스타일 */
-.paymentFrame .addressRow input[type="text"] {
+.paymentFrame .addressRow2 input[type="text"] {
   height: 40px; /* 높이 맞추기 */
   padding: 0 10px; /* 좌우 여백 설정 */
   font-size: 14px; /* 글자 크기 조정 */
@@ -91,7 +91,7 @@
 }
 
 /* 우편번호 검색 버튼 */
-.paymentFrame .addressRow button {
+.paymentFrame .addressRow2 button {
     font-size: 12px;
     background-color: #333;
     color: #fff;
@@ -101,7 +101,7 @@
     transition: background-color 0.3s ease;
   }
   
-  .paymentFrame .addressRow button:hover {
+  .paymentFrame .addressRow2 button:hover {
     background-color: #555;
   }
 
@@ -150,12 +150,12 @@
     font-weight: bold;
 }
 
-.addressRow {
+.addressRow2 {
     display: flex;
     gap: 10px;
   }
   
-  .addressRow button {
+  .addressRow2 button {
     padding: 8px 16px;
     background-color: #333;
     color: white;
@@ -164,7 +164,7 @@
     transition: background-color 0.3s;
   }
   
-  .addressRow button:hover {
+  .addressRow2 button:hover {
     background-color: #555;
   }
 
@@ -311,7 +311,7 @@
     font-size: 16px;
 }
 /* 사용자 정보 입력 섹션 */
-.userForm {
+.userForm2 {
     width: 90%;
     max-width: 800px;
     margin: 20px auto;
@@ -324,7 +324,7 @@
     gap: 15px;
   }
   
-  .userForm h3 {
+  .userForm2 h3 {
     font-family: "Italiana", serif;
     font-size: 20px;
     color: #333;
@@ -332,19 +332,19 @@
     text-align: center;
   }
   
-  .formRow {
+  .formRow2 {
     display: flex;
     flex-direction: column;
     gap: 5px;
   }
   
-  .formRow label {
+  .formRow2 label {
     font-size: 14px;
     font-weight: bold;
     color: #555;
   }
   
-  .formRow input {
+  .formRow2 input {
     width: 100%;
     padding: 10px;
     font-size: 14px;
@@ -353,11 +353,11 @@
     transition: border-color 0.3s ease;
   }
   
-  .formRow input:focus {
+  .formRow2 input:focus {
     outline: none;
   }
   
-  .formRow input::placeholder {
+  .formRow2 input::placeholder {
     color: #aaa;
     font-size: 12px;
   }
