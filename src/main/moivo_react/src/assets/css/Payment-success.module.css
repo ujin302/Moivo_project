@@ -139,4 +139,19 @@
     transition: color 0.3s ease;
   }
   
-  
+  @media screen and (max-width: 576px) {
+    .payment_container{
+      width: 90%;
+      padding: 0;
+    }
+
+    .payment_table th, .payment_table td{
+      padding: 2px;
+      padding-bottom: 20px;
+      padding-top: 20px;
+      font-size: 12pt;
+      padding-right: 16px;
+    }
+
+
+  }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -18,6 +18,10 @@ const SuccessPage = () => {
   if (!paymentKey || !orderId) {
     return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
   }
+
+  useEffect(()=>{
+    
+  },[])
 
   return (
     <div>
