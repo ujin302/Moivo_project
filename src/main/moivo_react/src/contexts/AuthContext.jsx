@@ -18,16 +18,17 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false); // 2024-12-11 isAdmin 상태 추가 장훈
     const navigate = useNavigate();
 
-  // 토큰 관리 함수들
-  const setAccessToken = (token) => {
-    localStorage.setItem('accessToken', token);
-  };
+    // 토큰 관리 함수들
+    const setAccessToken = (token) => {
+        localStorage.setItem('accessToken', token);
+    };
 
-  const setRefreshToken = (token) => {
-    localStorage.setItem('refreshToken', token);
-  };
+    const setRefreshToken = (token) => {
+        localStorage.setItem('refreshToken', token);
+    };
 
     const getAccessToken = () => {
         return localStorage.getItem('accessToken');
@@ -67,47 +68,48 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-  // 로그아웃 함수
-  const logout = async () => {
-    try {
-      const accessToken = getAccessToken();
-      const refreshToken = getRefreshToken();
-      
-      // 토큰이 있는 경우에만 로그아웃 요청
-      if (accessToken) {
-        await axios.post(`${PATH.SERVER}/api/user/logout`, 
-            { refreshToken },
-            {
-                withCredentials: true,
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
+    // 로그아웃 함수
+    const logout = async () => {
+        try {
+            const accessToken = getAccessToken();
+            const refreshToken = getRefreshToken();
+            
+            // 토큰이 있는 경우에만 로그아웃 요청
+            if (accessToken) {
+                await axios.post(`${PATH.SERVER}/api/user/logout`, 
+                    { refreshToken },
+                    {
+                        withCredentials: true,
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    }
+                );
             }
-        );
-    }
-    removeTokens();
-    setIsAuthenticated(false);
-    setIsAuthenticated(false);
-    
-    // 사용자 정보 제거
-    localStorage.removeItem('userId');
-    localStorage.removeItem('id');
-    localStorage.removeItem('cartId');
-    localStorage.removeItem('wishId');
+            removeTokens();
+            setIsAuthenticated(false);
+            setIsAdmin(false); // 2024-12-11 로그아웃 시 isAdmin 상태 초기화 장훈
+            
+            // 사용자 정보 제거
+            localStorage.removeItem('userId');
+            localStorage.removeItem('id');
+            localStorage.removeItem('cartId');
+            localStorage.removeItem('wishId');
 
-    // 로컬 스토리지 토큰 제거
-    localStorage.removeItem('accessToken');
-    setIsAuthenticated(false);
-    navigate('/');
-    } catch (error) {
-      console.error('로그아웃 요청 실패:', error);
+            // 로컬 스토리지 토큰 제거
+            localStorage.removeItem('accessToken');
+            setIsAuthenticated(false);
+            navigate('/');
+        } catch (error) {
+            console.error('로그아웃 요청 실패:', error);
 
-      // 에러가 발생하더라도 로컬의 토큰은 제거
-      localStorage.removeItem("accessToken");
-      setIsAuthenticated(false);
-      navigate('/');
-    }
-  };
+            // 에러가 발생하더라도 로컬의 토큰은 제거
+            localStorage.removeItem("accessToken");
+            setIsAuthenticated(false);
+            setIsAdmin(false); // 2024-12-11 로그아웃 시 isAdmin 상태 초기화 장훈
+            navigate('/');
+        }
+    };
 
     // 일반 로그인 함수
     const login = async (userId, pwd) => {
@@ -116,7 +118,7 @@ export const AuthProvider = ({ children }) => {
                 userId,
                 pwd
             }, {
-                withCredentials: true  //쿠키 전송을 위해 작성한거임
+                withCredentials: true  // 쿠키 전송을 위해 작성한거임
             });
             return await handleLoginSuccess(response);
         } catch (error) {
@@ -141,6 +143,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('isAdmin', loginData.isAdmin);
             
             setIsAuthenticated(true);
+            setIsAdmin(loginData.isAdmin); // 2024-12-11 카카오 로그인 후 isAdmin 상태 설정 장훈
             axios.defaults.headers.common['Authorization'] = `Bearer ${loginData.accessToken}`;
             return true;
         } catch (error) {
@@ -149,9 +152,9 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    //일반, 카카오 로그인 성공 시 공통 함수 _ 241210_yjy
+    // 일반, 카카오 로그인 성공 시 공통 함수
     const handleLoginSuccess = async (response) => {
-        const { accessToken } = response.data;
+        const { accessToken, isAdmin } = response.data; //2024-12-11 idAdmin 추가 장훈
         if (!accessToken) {
             throw new Error('로그인에 실패했습니다.');
         }
@@ -162,10 +165,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('id', response.data.id);
         localStorage.setItem('cartId', response.data.cartId);
         localStorage.setItem('wishId', response.data.wishId);
-        localStorage.setItem('isAdmin', response.data.isAdmin);
+        localStorage.setItem('isAdmin', isAdmin); // 2024-12-11 isAdmin 값을 localStorage에 저장 장훈
 
         // 상태 업데이트
         setIsAuthenticated(true);
+        setIsAdmin(isAdmin); // 2024-12-11 isAdmin 상태 업데이트 장훈
 
         // axios 헤더 설정
         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
@@ -221,18 +225,22 @@ export const AuthProvider = ({ children }) => {
         };
     }, [navigate]);
 
-  // 초기 인증 상태 확인 (새로고침해도 로그인 상태 유지)
-  useEffect(() => {
-    const token = getAccessToken();
-    if (token) {
-        setIsAuthenticated(true);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+    // 초기 인증 상태 확인 (새로고침해도 로그인 상태 유지)
+    useEffect(() => {
+        const token = getAccessToken();
+        const storedIsAdmin = localStorage.getItem('isAdmin') === 'true'; // 2024-12-11 isAdmin 값을 가져옴 장훈
+        if (token) {
+            setIsAuthenticated(true);
+            setIsAdmin(storedIsAdmin); // 2024-12-11 isAdmin 상태 설정 장훈
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
     }, []);
 
     const value = {
         isAuthenticated,
+        isAdmin, // 2024-12-11 isAdmin 값을 Context에서 제공 장훈
         setIsAuthenticated,
+        setIsAdmin, // 2024-12-11 isAdmin 값을 변경할 수 있는 함수 제공 장훈
         login,
         kakaoLogin,
         logout,
@@ -249,6 +257,7 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
 // PropTypes 정의 추가
 AuthProvider.propTypes = {
     children: PropTypes.node.isRequired
