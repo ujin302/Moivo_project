@@ -210,10 +210,6 @@ export const AuthProvider = ({ children }) => {
                         navigate('/user');
                         return Promise.reject(refreshError);
                     }
-
-                    // 토큰 재설정
-                    // originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
-                    // return axios(originalRequest);
                 }
                 return Promise.reject(error);
             }

@@ -1,5 +1,5 @@
 package com.example.demo.user.service.impl;
-//이 파일 자체 생성 _ 241210_yjy
+
 
 import com.example.demo.jwt.util.JwtUtil;
 import com.example.demo.user.entity.CartEntity;
@@ -132,4 +132,4 @@ public class KakaoServiceImpl implements KakaoService {
                 return userRepository.save(newUser);
             });
     }
-}
+}    //이 파일 자체 생성 _ 241210_yjy
