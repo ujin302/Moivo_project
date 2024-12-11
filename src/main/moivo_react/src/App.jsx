@@ -10,7 +10,7 @@ import ProductDetail from './containers/product/product_detail';
 import Qna_faqboard from './containers/qna/qna_faqboard';
 import Qna_board from './containers/qna/qna_board';
 import Qna_boardlist from './containers/qna/qna_bardlist';
-import MainProvider from './contexts/MainContext';
+// import MainProvider from './contexts/MainContext';
 import Upload from './containers/test/upload';
 import Update from './containers/test/update';
 import MypageMain from './containers/mypage/mypage_main';
@@ -57,13 +57,13 @@ const routeConfig = [
 const App = () => {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
+        <AuthProvider>
+          <Routes>
           {routeConfig.map(({ path, element }, index) => (
             <Route key={index} path={path} element={element} />
           ))}
         </Routes>
-      </AuthProvider>
+        </AuthProvider>
     </Router>
   );
 };

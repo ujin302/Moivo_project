@@ -12,7 +12,7 @@ const MypageProfile = () => {
         pwd: "",
         confirmPassword: "",
         name: "",
-        gender: "male",
+        gender: "M",
         postalCode: "",
         addr1: "",
         addr2: "",
@@ -21,6 +21,7 @@ const MypageProfile = () => {
         height: "",
         weight: "",
         coupon: "",
+        birth: "",
     });
     const navigate = useNavigate();
 
@@ -62,7 +63,8 @@ const MypageProfile = () => {
                     email: data.email,
                     height: data.height,
                     weight: data.weight,
-                    coupon: data.coupons
+                    coupon: data.coupons,
+                    birth: data.birth
                 });
             })
             .catch((error) => {
@@ -94,7 +96,7 @@ const MypageProfile = () => {
             pwd: userInfo?.pwd || "",
             confirmPassword: userInfo?.pwd || "",
             name: userInfo?.name || "",
-            gender: userInfo?.gender || "male",
+            gender: userInfo?.gender || "M",
             zipcode: userInfo?.zipcode || "",
             addr1: userInfo?.addr1 || "",
             addr2: userInfo?.addr2 || "",
@@ -227,7 +229,7 @@ const MypageProfile = () => {
                                         type="radio"
                                         name="gender"
                                         value="male"
-                                        checked={formData.gender === "male"}
+                                        checked={formData.gender === "M"}
                                         onChange={handleChange}
                                     />
                                     남성
@@ -238,7 +240,7 @@ const MypageProfile = () => {
                                         type="radio"
                                         name="gender"
                                         value="female"
-                                        checked={formData.gender === "female"}
+                                        checked={formData.gender === "F"}
                                         onChange={handleChange}
                                     />
                                     여성
@@ -306,28 +308,39 @@ const MypageProfile = () => {
                                 style={{ color: "#2f2e2c" }}
                             />
                         </div>
-                            <div className={styles.heightWeightRow}>
-                                <label htmlFor="height">HEIGHT (cm):</label>
-                                <input 
-                                    className={styles.height}
-                                    type="number"
-                                    id="height"
-                                    name="height"
-                                    value={formData.height}
-                                    placeholder="예: 170"
-                                    onChange={handleChange}
-                                />
-                                <br/>
-                                <label htmlFor="weight">WEIGHT (kg):</label>
-                                <input
-                                    className={styles.weight}
-                                    type="number"
-                                    id="weight"
-                                    name="weight"
-                                    placeholder="예: 100"
-                                    onChange={handleChange}
-                                />
-                            </div>            
+                        <div className={styles.formRow}>
+                            <label>BIRTH</label>
+                            <input
+                                className={styles.inputtext}
+                                type="date"
+                                name="birth"
+                                value={formData.birth}
+                                onChange={handleChange}
+                            />
+                        </div>;
+                        <div className={styles.heightWeightRow}>
+                            <label htmlFor="height">HEIGHT (cm):</label>
+                            <input 
+                                className={styles.height}
+                                type="number"
+                                id="height"
+                                name="height"
+                                value={formData.height}
+                                placeholder="예: 170"
+                                onChange={handleChange}
+                            />
+                            <br/>
+                            <label htmlFor="weight">WEIGHT (kg):</label>
+                            <input
+                                className={styles.weight}
+                                type="number"
+                                id="weight"
+                                name="weight"
+                                value={formData.weight}
+                                placeholder="예: 100"
+                                onChange={handleChange}
+                            />
+                        </div>            
                         <div className={styles.buttonRow}>
                             <button type="submit" className={styles.submitButton}>
                                 회원정보 수정

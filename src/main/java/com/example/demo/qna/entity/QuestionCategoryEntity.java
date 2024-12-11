@@ -12,19 +12,19 @@ import lombok.ToString;
 public class QuestionCategoryEntity {
 
     public enum QuestionCategory {
-        DELIVERY, // 배송
-        PRODUCT, // 상품
-        RETURN, // 반품
-        REFUND, // 환불
-        OTHER // 기타
+        BASIC, // 일반
+        PRIVATE, // 비밀
+        OTHER, // 기타
+        SIZE // 사이즈
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; // 카테고리 고유 키
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, unique = true, length = 50)
-    private QuestionCategory name = QuestionCategory.DELIVERY; // 카테고리 이름
+    private QuestionCategory name = QuestionCategory.BASIC; // 카테고리 이름
 
     @OneToMany(mappedBy = "categoryEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

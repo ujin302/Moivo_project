@@ -93,9 +93,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Map<String, Object> printCart(int userId) {
+        System.out.println("userId: " + userId); // 로그 추가
         // 사용자 장바구니 가져오기
         CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                 .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
+
+                System.out.println("cartEntity: " + cartEntity); // 로그 추가
     
         // 장바구니 상품 목록 가져오기
         List<UserCartEntity> userCartEntities = userCartRepository.findByCartEntity_Id(cartEntity.getId());
