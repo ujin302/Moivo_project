@@ -1,95 +1,90 @@
-.dashboardMain{
-    height: 100%;
-    background-color: #fff;
-}
-
-.dashboardheader{
-    height: 110px;
-}
-
-.dashboardContainer {
-    padding: 20px;
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f7fa;
-}
-
-.dashboardTitle {
-    text-align: center;
-    font-size: 36px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    color: #333;
-}
-
-.statsContainer {
+/* 컨테이너 영역 */
+.container {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
+    height: 100vh;
+    font-family: 'Titillium Web', sans-serif;
 }
-
-.statCard {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 23%;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-.statCard:hover {
-    transform: translateY(-10px);
-}
-
-.statTitle {
-    font-size: 18px;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 10px;
-}
-
-.statValue {
-    font-size: 24px;
+  
+  /* 사이드 영역 스타일링 */
+  .sidebar {
+    width: 60px;
+    height: 100%;
+    overflow: auto;
+  }
+  
+  /* 메인 영역 스타일링 */
+  .mainContent {
+    flex-grow: 1;
+    padding: 50px;
+    background: #f4f4f4;
+    overflow: auto;
+  }
+  
+  /* 카드 컨테이너 영역 */
+  .cardContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  /* 카드 타이틀 영역 */
+  .cardTitle{
+    margin-left: 15px;
+    width: 100%;
     font-weight: bold;
-    color: #00aaff;
-}
+  }
 
-.notificationsContainer,
-.recentActivitiesContainer {
-    margin-top: 30px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
-
-.notificationsTitle,
-.recentActivitiesTitle {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.notificationsList,
-.recentActivitiesList {
-    list-style: none;
-    padding-left: 0;
-}
-
-.notificationItem,
-.recentActivityItem {
-    background-color: #f8f9fa;
+  /* 개별 카드 영역 */
+  .card {
+    background: #fff;
     padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    flex: 1 1 calc(25% - 20px);
+    height: 400px;
+  }
+  
+  /* 리스트 스타일링 대신 div 스타일 적용 */
+  .cardList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: 10px;
+    margin-top: 40px;
+  }
+  
+  /* 각 아이템 스타일 */
+  .cardItem {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: calc(33.33% - 10px);
+    height: 120px;
+    padding: 10px;
+    border: 1px solid #ddd; 
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+  
+  /* 호버 효과 */
+  .cardItem:hover {
+    border-color: #555;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* 숫자 강조 스타일 */
+  .cardNumber {
+    font-weight: bold;
     color: #555;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+    margin-bottom: 5px;
+    font-size: 20px;
+  }
 
-.notificationItem:hover,
-.recentActivityItem:hover {
-    background-color: #e9ecef;
-}
+  .section2{
+    border: 1px solid red;
+  }
+  
