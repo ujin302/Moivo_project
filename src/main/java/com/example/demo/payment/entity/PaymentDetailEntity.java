@@ -1,9 +1,12 @@
 package com.example.demo.payment.entity;
 
 import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.store.entity.ProductStockEntity.Size;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,4 +38,8 @@ public class PaymentDetailEntity {
 
     @Column(name = "count", nullable = false)
     private int count; // 상품 수량
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "size", nullable = false)
+    private Size size; // 상품 사이즈
 }

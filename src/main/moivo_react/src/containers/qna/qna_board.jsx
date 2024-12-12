@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
-const qna_board = () => {
+const Qna_board = () => {
   const [type, setType] = useState('');
   const [title, setTitle] = useState('');
   const [question, setQuestion] = useState('');
@@ -78,4 +78,4 @@ const qna_board = () => {
   );
 };
 
-export default qna_board;
+export default Qna_board;
