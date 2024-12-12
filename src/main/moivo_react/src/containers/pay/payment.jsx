@@ -71,6 +71,41 @@ const Payment = () => {
     }
   };
 
+  const updateFormData = (key, value) => {
+    setFormData((prevData) => ({ ...prevData, [key]: value }));
+  };
+
+    const loadDaumPostcodeScript = () => {
+      return new Promise((resolve) => {
+          if (document.getElementById("daum-postcode-script")) {
+              resolve();
+              return;
+          }
+
+          const script = document.createElement("script");
+          script.id = "daum-postcode-script";
+          script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+          script.onload = resolve;
+          document.body.appendChild(script);
+      });
+  };
+
+  const handleFindPostalCode = async () => {
+      try {
+          await loadDaumPostcodeScript();
+
+          new window.daum.Postcode({
+              oncomplete: function (data) {
+                  updateFormData("zipcode", data.zonecode);
+                  updateFormData("addr1", data.roadAddress);
+              },
+          }).open();
+      } catch (error) {
+          console.error("우편번호 찾기 스크립트 로드 실패:", error);
+          alert("우편번호 찾기 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요.");
+      }
+  };
+
   // 결제 금액 계산 함수 (할인 반영)
   const getDiscountedTotal = () => {
     if (!formData.coupon) return totalPrice;
@@ -162,7 +197,7 @@ const Payment = () => {
                     onChange={handleChange}
                     required
                   />
-                  <button type="button">우편번호 찾기</button>
+                  <button type="button" onClick={handleFindPostalCode}>우편번호 찾기</button>
                 </div>
               </div>
               <div className={styles.formRow2}>

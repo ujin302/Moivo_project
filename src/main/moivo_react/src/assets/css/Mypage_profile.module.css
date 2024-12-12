@@ -3,6 +3,7 @@
 /* 멤버십 박스 */
 .membershipBox {
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
@@ -11,7 +12,8 @@
     background: #F6F2EE;
     border: 1px solid #988C73;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
+    position: relative; /* 상대 위치 기준 설정 */
+    margin-top: 50px;
 }
 
 .membershipImage {
@@ -77,16 +79,14 @@
 
 
 .couponSection {
-    display: flex; /* 가로로 배치 */
-    align-items: center; /* 수직 정렬 */
-    gap: 20px; /* POINT와 COUPON 간 간격 */
+    display: flex; /* 가로 정렬 */
+    gap: 10px; /* 간격 */
     font-family: 'Italiana', serif;
     font-size: 14px;
 }
   
   .pointCouponSection {
     display: flex;
-    align-items: center; /* 수직 가운데 정렬 */
     gap: 20px; /* POINT와 COUPON 간 간격 */
   }
   
@@ -98,16 +98,14 @@
 .coupon {
     font-family: 'GmarketSans', sans-serif;
     font-size: 14px;
-    position: relative; /* 툴팁 위치를 조정하기 위한 기준 */
+    width: 100%; /* 쿠폰 텍스트가 상위 flex의 중심에 배치되도록 */
 }
-  
   .couponTooltip {
     position: absolute;
     top: 100%; /* COUPON 아래에 표시 */
     left: 0;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 4px;
     padding: 10px;
     z-index: 10;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -123,91 +121,6 @@
     margin-bottom: 0; /* 마지막 항목 간격 제거 */
   }
 
-
-.postalCodeContainer {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* 버튼과 입력란 간격을 좁게 */
-}
-
-/* 우편번호 입력란 */
-.addressContainer input[name="postalCode"] {
-    width: 100px; /* 적절한 너비로 설정 */
-    padding: 8px;
-    border: 1px solid #988C73;
-    font-size: 14px;
-}
-
-.postalCodeInput {
-    width: 120px;  /* 원하는 크기로 수정 */
-    padding: 8px;
-    font-size: 14px; /* 텍스트 크기 조정 */
-    margin-right: 10px; /* 우편번호 찾기 버튼과의 간격 조정 */
-}
-
-/* 우편번호 찾기 버튼 */
-.postalCodeButton {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 5px 10px; /* 버튼 크기를 조정 */
-    font-size: 12px; /* 버튼 글자 크기를 줄이기 */
-    cursor: pointer;
-    transition: background-color 0.3s;
-    height: 38px; /* 입력창과 높이를 맞추기 */
-}
-
-.postalCodeButton:hover {
-    background-color: #e0e0e0;
-}
-
-
-.formRow.heightWeightRow {
-    display: flex; /* 가로 정렬 */
-    align-items: center; /* 수직 중앙 정렬 */
-    gap: 10px; /* 입력창 간 간격 */
-    margin-bottom: 15px; /* 하단 여백 */
-}
-
-.formRow.heightWeightRow label {
-    font-size: 14px; /* 라벨 폰트 크기 */
-    color: #333; /* 텍스트 색상 */
-}
-
-.formRow.heightWeightRow input {
-    width: 30px; /* 입력창 너비 조정 */
-    padding: 5px; /* 내부 여백 */
-    border: 1px solid #988C73; /* 테두리 */
-    font-size: 14px; /* 폰트 크기 */
-    text-align: center; /* 텍스트 가운데 정렬 */
-    background-color: transparent; /* 배경 투명 */
-    margin-bottom: 20px;
-}
-
-.heightWeightRow input[type="number"] {
-    font-family: 'GmarketSans', sans-serif; /* 폰트 적용 */
-    color: #2f2e2c; /* 텍스트 색상 */
-    background-color: transparent; /* 배경 투명 */
-    padding: 8px; /* 입력창 여백 */
-    border: 1px solid #988C73; /* 테두리 스타일 */
-    font-size: 14px; /* 글자 크기 */
-    width: 20%; /* 키와 몸무게 입력 필드 크기 조정 */
-    text-align: left; /* 입력 값 가운데 정렬 */
-    margin-left: 60px;
-    margin-bottom: 20px;
-}
-
-/* 라벨 위치 조정 */
-.heightWeightRow label {
-    width: auto; /* 라벨 크기 자동 조정 */
-    margin-right: 10px; /* 입력 필드와의 간격 */
-    font-weight: bold; /* 강조 */
-    color: #333;
-}
-
-.formRow .addressContainer .zipcode input[type="text"] {
-    width: 20%;
-    margin-right: 10px;
-}
 
 .membershipImage {
     width: 50px;
@@ -270,129 +183,159 @@
     color: #333;
   }
   
-  .profileForm {
-    background-color: #f6f2ee;
-    padding: 20px;
+ 
+.modalContent {
+    text-align: center;
+}
+
+.modalButtons {
+    margin-top: 20px;
+}
+
+
+.signupContainer {
+    background-color: #F6F2EE;
+    font-family: "Italiana", sans-serif;
+    font-style: normal;
+  }
+  
+  .signheader{
+    height: 110px;
+  }
+  
+  .pageName {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    height: 100px;
+  }
+  
+  .signupline {
+    border: none;
+    border-top: 1px dashed black;
+  }
+  
+  .signupDiv {
+    margin: 30px;
     border: 1px solid #988C73;
+    padding: 10px;
+    margin-bottom: 100px;
   }
   
   .formRow {
+    position: relative;
     display: flex;
-    align-items: center; /* 수직 중앙 정렬 */
-    margin-bottom: 15px;
-}
-
-.formRow label {
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  .formRow span {
+    margin-left: 2%;
     font-weight: bold;
     color: #333;
-    width: 150px; /* 레이블의 너비 고정 */
-    margin-bottom: 0; /* 하단 마진 제거 */
-    padding-right: 20px; /* 입력창과의 간격 조정 */
-}
-
-
-.inputtext {
-    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 적용 */
-    color: #2f2e2c; /* 텍스트 색상 */
-    background-color: transparent; /* 배경 투명 */
+    width: 200px;
+  }
+  
+  .formRow input {
+    width: 50%;
     padding: 10px;
     border: 1px solid #988C73;
     font-size: 14px;
-    width: 100%; /* 입력칸 기본 너비 */
-}
-
-/* 폼의 개별 입력 필드 */
-.profileForm input[type="text"],
-.profileForm input[type="email"],
-.profileForm input[type="password"] {
-    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 */
-}
-
-.error {
-    color: red; /* 에러 메시지 텍스트 색상 */
-    font-size: 12px; /* 글자 크기 */
-    margin-left: 150px; /* 왼쪽 여백 */
-    margin-bottom: 10px; /* 아래 여백 */
+    outline: none;
+    background-color: transparent;
   }
 
-/* 전화번호, 우편번호 같은 입력칸 */
-.phoneRow input,
-.addressContainer input {
-    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 */
-}
-
-/* 버튼 및 기타 텍스트에 영향 주지 않도록 제한 */
-button, label {
-    font-family: inherit; /* 기본 상속 */
-}
-
-
-.formRow input {
-    padding: 10px;
-    border: 1px solid #988C73;
-    font-size: 14px;
-    background-color: transparent;
-    width: 70%; /* 입력창 너비를 70%로 설정 */
-}
-/* 주소 입력란을 세로로 배치하면서, 상하 정렬을 맞추는 방법 */
-.addressContainer {
+  .addressContainer {
     display: flex;
-    flex-direction: column; /* 세로로 배치 */
+    flex-direction: column;
     gap: 10px;
-    width: 100%; /* 전체 너비 사용 */
-    align-items: stretch; /* 모든 입력창의 너비를 동일하게 맞추기 */
-}
-.addressContainer input {
-    padding: 8px;
+    width: 50%;
+  }
+  
+  .addressContainer .postalRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 300px;
+  }
+  
+  .addressContainer .postalRow input {
+    flex: 2;
     border: 1px solid #988C73;
+  }
+  
+  .addressContainer .postalRow button {
+    width: 150px;
+    height: 40px;
+    padding: 10px;
+    background-color: #aaa6a294;
+    color: #2F2E2C;
+    border: none;
+    cursor: pointer;
     font-size: 14px;
+  }
+  
+  .addressContainer .postalRow button:hover {
+    background-color: #b4a59bc5;
+  }
+  
+  .detailedAddress input{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #988c7338;
+    font-size: 14px;
+    outline: none;
     background-color: transparent;
-    margin-left: 10px;
-}
-
-.formRow input[type="date"] {
+  }
+  
+  .radioContainer {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    height: 40px;
+  }
+  
+  .radioContainer input[type="radio"] {
+    margin-right: 5px;
+  }
+  
+  .exception {
+    color: red;
+    font-size: 12px;
+    margin-left: 50px;
+    flex: 1;
+  }
+  
+  .phoneRow {
+    display: flex;
+    height: 40px;
+    width: 50%;
+  }
+  
+  .phoneRow p {
+    font-size: 40px;
+    margin-top: 10px;
+    width: 30px;
+    font-weight: bold;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .phoneRow input {
     width: 20%;
     padding: 10px;
     border: 1px solid #988C73;
     font-size: 14px;
-    color: #333;
-}
-
-/* 기본 주소와 상세 주소가 화면 너비에 맞게 차지하도록 설정 */
-.addressContainer input[name="address"],
-.addressContainer input[name="detailedAddress"] {
-    flex-grow: 1; /* 입력창들이 여유 공간을 차지하도록 설정 */
-    width: 78%; /* 100% 너비 차지 */
-}
-
-/* 우편번호 입력란은 좁게 설정 */
-.addressContainer input[name="postalCode"] {
-    width: 80px; /* 우편번호 입력란의 너비 좁게 설정 */
-}
-
-.phoneRow {
-    display: flex;
-    width: 50%;
-}
-
-.phoneRow input {
-    text-align: left;
-}
-
-.genderContainer {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.genderContainer label {
-    font-size: 14px;
-    color: #333;
-    display: flex;
-    align-items: center;
-}
-
-.buttonRow {
+    text-align: center;
+    height: 40px;
+  }
+  
+  .buttonRow {
     display: flex;
     justify-content: center; /* 버튼 중앙 정렬 */
     gap: 10px; /* 버튼 간격 설정 */
@@ -412,25 +355,99 @@ button, label {
 .cancelButton:hover {
     background-color: #B4A59B;
 }
-
-
-.deleteButton {
+  
+.errorText {
     position: absolute;
-    top: 180px; /* 삭제 버튼을 멤버십 박스 바로 위에 배치 */
-    right: 10px; 
+    margin-left: 230px;
+    color: red;
+    font-size: 0.9em;
+}
+
+.birthRow {
+  display: flex;
+  height: 40px;
+  width: 50%;
+}
+
+.weightRow {
+  display: flex;
+  height: 40px;
+  width: 20%;
+}
+
+.heightRow {
+  display: flex;
+  height: 40px;
+  width: 20%;
+}
+
+  /* 하단 바 */
+.bottomBar {
+    width: 70%;
+    height: 0.9px;
+    background-color: #988c73;
+    margin: 20px auto;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .bottomBar:hover {
+    background-color: #2f2e2c;
+  }
+  
+  /* 뒤로 가기 링크 */
+  .backLink {
+    display: block;
+    font-family: 'Italiana', serif;
+    font-size: 16px;
+    text-align: center;
+    color: #988c73;
+    text-decoration: none;
+    margin-top: 20px;
+    transition: color 0.3s ease;
+  }
+  
+  .backLink:hover {
+    color: #2f2e2c;
+  }
+
+  .deleteButton {
+    position: absolute; /* 절대 위치 설정 */
+    top: 150px; /* 멤버십 박스의 위쪽 여백 */
+    right: 22px; /* 멤버십 박스의 오른쪽 여백 */
     padding: 8px 18px;
-    background-color: #E6E3E2; 
+    background-color: #E6E3E2;
     color: black;
     border: none;
     cursor: pointer;
-    margin-right: 13px;
     font-size: 13px;
+    text-align: center;
 }
 
 .deleteButton:hover {
     background-color: #beb9b8; /* 마우스 오버 시 색상 변경 */
 }
 
+
+
+.modal {
+    background-color: #fff;
+    padding: 20px;
+    width: 400px;
+    margin: 0 auto;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .modal {
     background-color: #fff;
@@ -471,101 +488,145 @@ button, label {
     color: white;
 }
 
-.cancelButton2 {
+.cancelButton {
     background-color: #beb9b8;
     color: white;
 }
- 
-/* Footer */
-.mainFooter {
-    background: #2F2E2C;
-    font-family: 'Italiana', sans-serif;
-    position: relative;
-    width: 100%;
-    padding: 2rem 0;
-    margin-top: 50px;
-    min-height: 200px;  /* 푸터의 최소 높이 설정 */
-    margin-top: auto;    /* 푸터를 화면 하단에 고정 */
-    color: #F6F2EE;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;  /* 내용 세로 중앙 정렬 */
+
+.inputtext {
+    font-family: 'GmarketSans', sans-serif; /* GmarketSans 폰트 적용 */
+    color: #2f2e2c; /* 텍스트 색상 */
+    background-color: transparent; /* 배경 투명 */
+    padding: 10px;
+    border: 1px solid #988C73;
+    font-size: 14px;
+    width: 100%; /* 입력칸 기본 너비 */
 }
 
-.footerGridContainer {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-gap: 1.5rem;
-}
-
-.footerGridContainer div {
-    padding: 1rem;
-}
-
-.mainFooter .nav-logo {
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.mainFooter ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.mainFooter ul li {
-    padding: 0.3rem 0;
-}
-
-.mainFooter ul li a {
-    text-decoration: none;
-    color: #F6F2EE;
-}
-
-.mainFooter input[type="email"] {
-    width: 90%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.mainFooter .btn {
-    background-color: #333;
-    color: #F6F2EE;
-    padding: 0.5rem 1rem;
-    border: none;
-    cursor: pointer;
-}
-
-/* 하단 바 */
-.bottomBar {
-    width: 70%;
-    height: 0.9px;
-    background-color: #988c73;
-    margin: 20px auto;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
+  /* --- 반응형 미디어 쿼리 --- */
   
-  .bottomBar:hover {
-    background-color: #2f2e2c;
-  }
+  @media (max-width: 700px) {
+    .signbanner{
+      display: none;
+    }
+    .signheader{
+      height: 0px;
+    }
   
-  /* 뒤로 가기 링크 */
-  .backLink {
-    display: block;
-    font-family: 'Italiana', serif;
-    font-size: 16px;
-    text-align: center;
-    color: #988c73;
-    text-decoration: none;
-    margin-top: 20px;
-    transition: color 0.3s ease;
-  }
+    .signupDiv {
+      margin: 15px;
+      padding: 15px;
+    }
   
-  .backLink:hover {
-    color: #2f2e2c;
-  }
+    .formRow {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
   
-/* 미디어 쿼리 */
+    .formRow span {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+  
+    .formRow input {
+      width: 100%;
+    }
+  
+    .addressContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+  
+    .addressContainer .postalRow {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+  
+    .addressContainer .postalRow input {
+      flex: 1;
+      max-width: 70%;
+    }
+  
+    .addressContainer .postalRow button {
+      width: 25%;
+      min-width: 100px;
+      height: 40px;
+      padding: 10px;
+      background-color: #aaa6a2;
+      color: #2F2E2C;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+    }
+  
+    .addressContainer .postalRow button:hover {
+      background-color: #B4A59B;
+    }
+  
+    .detailedAddress input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #988C73;
+      font-size: 14px;
+      outline: none;
+      background-color: transparent;
+    }
+  
+    .phoneRow {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      gap: 5px;
+    }
+  
+    .phoneRow input {
+      flex: 1;
+      max-width: 90px;
+      min-width: 50px; 
+      padding: 8px;
+      border: 1px solid #988C73;
+      font-size: 14px;
+      text-align: center;
+      height: 40px;
+      margin: 0;
+    }
+  
+    .phoneRow p {
+      font-size: 28px;
+      margin: 0 2px;
+      font-weight: bold;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  
+    .emaildetail {
+      width: 100%;
+    }
+  
+    .submitButton {
+      width: 100px;
+      font-size: 12px;
+      padding: 8px 20px;
+    }
+  
+    .signupbtn {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  /* 미디어 쿼리 */
 @media (max-width: 768px) {
     .heightWeightRow {
         flex-direction: column; 
@@ -577,12 +638,19 @@ button, label {
     }
 
     .membershipBox {
-        flex-direction: column; 
-        align-items: center; 
+        flex-direction: column; /* 세로 정렬로 변경 */
+        align-items: center;
+        text-align: center; /* 텍스트 정렬 추가 */
     }
 
     .membershipImage {
-        margin: 0 auto 20px auto; 
+        margin: 0 0 15px 0; /* 이미지 간격 조정 */
+    }
+
+    .membershipInfo, 
+    .pointCoupon {
+        font-size: 13px; /* 글자 크기 조정 */
+        margin: 10px 0;
     }
 
     .formRow {
@@ -600,14 +668,15 @@ button, label {
     }
 
     .buttonRow {
-        flex-direction: column; 
-        gap: 15px; 
+        flex-direction: column; /* 세로 정렬 */
+        gap: 10px;
     }
 
     .submitButton,
     .cancelButton {
         width: 100%;
-        padding: 12px; 
+        padding: 12px;
+        font-size: 14px;
     }
 }
 
@@ -683,4 +752,25 @@ button, label {
         background-color: #b5a79d;
     }
 
+}
+
+@media (max-width: 768px) {
+    .couponSection {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .coupon {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .errorText {
+        position: relative; 
+        margin-top: 5px; 
+        margin-left: 0; 
+        font-size: 12px; 
+    }
 }

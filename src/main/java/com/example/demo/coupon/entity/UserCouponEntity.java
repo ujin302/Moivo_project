@@ -23,9 +23,9 @@ public class UserCouponEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // 사용자 쿠폰 고유 ID
+    private Integer id; // 사용자 쿠폰 고유 ID  
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userid") // 사용자 정보와 연결
     private UserEntity userEntity; // 한 명의 사용자는 자신의 등급에 맞는 하나의 쿠폰만 가질 수 있음 (근데 일단은 ManyToOne으로 함.)
 
