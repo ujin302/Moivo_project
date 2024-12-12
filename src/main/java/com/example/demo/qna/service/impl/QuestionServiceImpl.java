@@ -36,16 +36,17 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void addQuestion(QuestionDTO questionDTO) {
 
-        //아이디, 제목, 내용, 작성일시, 비밀글 여부, 관리자 응답여부
         QuestionEntity questionEntity = new QuestionEntity();
-
+        //여기서 로그인한 아이디를 받아오는 방법?
+        //아이디, 제목, 내용, 작성일시, 비밀글 여부, 관리자 응답여부
+//        QuestionEntity questionEntity = new QuestionEntity();
         questionEntity.setContent(questionDTO.getContent()); //내용
         questionEntity.setQuestionDate(questionDTO.getQuestionDate()); //시간
         questionEntity.setTitle(questionDTO.getTitle()); //제목
         questionEntity.setSecret(questionDTO.getSecret()); //비밀글 여부
-        questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId()).get());
-        questionEntity.setUserEntity(userRepository.findById(questionDTO.getUserId()).get());
-        System.out.println(questionEntity);
+        questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId()).get()); //문의 카테고리
+        questionEntity.setUserEntity(userRepository.findById(questionDTO.getUserId()).get()); //userId 받아온거로 userRepository에서 찾아서 questionEntity의 UserEntity에 셋팅
+        System.out.println("questionEntity = " + questionEntity);
         questionRepository.save(questionEntity);
     }
 
@@ -66,9 +67,14 @@ public class QuestionServiceImpl implements QuestionService {
 
     //문의사항 삭제
     @Override
-    public void deleteQuestion(int id) {
+    public void deleteQuestion(int id, int userId) {
         QuestionEntity questionEntity = questionRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException("해당 id의 문의가 없습니다" + id));
+                new NoSuchElementException("해당 번호의 문의가 없습니다" + id));
+
+        // 게시글 작성자와 로그인한 사용자 비교
+        if (!questionEntity.getUserEntity().getId().equals(userId)) {
+            throw new IllegalArgumentException("작성자가 아닙니다.");
+        }
         questionRepository.delete(questionEntity);
         System.out.println("문의사항 삭제 완료");
     }
@@ -83,11 +89,7 @@ public class QuestionServiceImpl implements QuestionService {
         int block = Integer.parseInt(datemap.get("block").toString());
         String sortby = datemap.get("sortby").toString();
         String title = null;
-        String keyword = null;
 
-        if (datemap.get("keyword") != null) {
-            keyword = datemap.get("keyword").toString();
-        }
         if (datemap.get("title") != null) {
             title = datemap.get("title").toString();
         }
@@ -101,12 +103,15 @@ public class QuestionServiceImpl implements QuestionService {
 
         Page<QuestionEntity> pageQuestionList = null;
 
-        if (title == null & keyword == null) { //전체검색
+        if (title == null || title.isEmpty()) { //전체검색
+            System.out.println("여기 안와?");
             pageQuestionList = questionRepository.findAll(pageable); //전체 DB 추출
         }
-        else if (title != null && keyword == null) {
+        if (title != null) {
+            System.out.println("title" + title);
             pageQuestionList = questionRepository.findByTitleContainingIgnoreCase(title, pageable);
         }
+        System.out.println("어딜 들어가?");
 //        else if (title == null && keyword != null) {
 //            pageQuestionList = questionRepository.findByNameContainingIgnoreCase(keyword, pageable);
 //        }
@@ -140,7 +145,9 @@ public class QuestionServiceImpl implements QuestionService {
         //문의 관련 정보
         map.put("QuestionList", dtoList);
 
-        System.out.println("dtoList = " + dtoList);
+        System.out.println("sortby" + sortby);
+        System.out.println("검색 내역 : " + title);
+//        System.out.println("dtoList = " + dtoList);
         return map;
     }
 

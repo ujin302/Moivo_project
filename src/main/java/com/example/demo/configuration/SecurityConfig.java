@@ -71,9 +71,7 @@ public class SecurityConfig {
                                 "/oauth2/authorization/**",
                                 "/oauth/callback/**",
                                 "/api/oauth/kakao/**",
-                                "/api/user/kakao-login",
-                                "/api/store/**",
-                                "/api/user/**"
+                                "/api/user/kakao-login"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

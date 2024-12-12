@@ -10,7 +10,7 @@ public interface QuestionService {
 
     public void updateQuestion(int id, QuestionDTO questionDTO);
 
-    public void deleteQuestion(int id);
+    public void deleteQuestion(int id, int userId);
 
     public Map<String, Object> getQuestionList(Map<String, Object> datemap);
 
