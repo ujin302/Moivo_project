@@ -72,7 +72,8 @@ public class SecurityConfig {
                                 "/oauth/callback/**",
                                 "/api/oauth/kakao/**",
                                 "/api/user/kakao-login",
-                                "/api/store/**")
+                                "/api/store/**",
+                                "/api/mail/success")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가

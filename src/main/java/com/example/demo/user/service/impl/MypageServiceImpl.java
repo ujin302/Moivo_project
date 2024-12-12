@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import com.example.demo.coupon.dto.CouponDTO;
 import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
+import com.example.demo.store.dto.ProductDTO;
+import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.store.repository.ProductRepository;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.entity.UserEntity;
@@ -31,17 +34,21 @@ public class MypageServiceImpl implements MypageService {
     private WishRepository wishRepository;
 
     @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
     private UserCouponRepository userCouponRepository;
     
     // @Autowired
     //private AttendanceRepository attendanceRepository; // 출석
 
+    // 마이페이지 사용자 정보 가져오기
     @Override
     public UserDTO getUserInfo(int id) {
         UserEntity userEntity = userRepository.findById(id)
                                               .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
         
-    // 쿠폰 정보 가져오기
+        // 쿠폰 정보 가져오기
         List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(id)
             .stream()
             .map(userCoupon -> {
@@ -63,6 +70,40 @@ public class MypageServiceImpl implements MypageService {
         userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
 
         return userDTO;
+    }
+    
+    // 성별에따른 상품 추천 리스트 가져오기 
+    @Override
+    public List<ProductDTO> getProductList(int userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        String gender = userEntity.getGender(); // 사용자 성별 정보
+    
+        ProductEntity.Gender productGender;
+        if ("M".equals(gender)) {
+            productGender = ProductEntity.Gender.MAN; // 성별이 MAN인 경우
+        } else if ("F".equals(gender)) {
+            productGender = ProductEntity.Gender.WOMAN; // 성별이 WOMAN인 경우
+        } else {
+            productGender = ProductEntity.Gender.ALL; // 성별이 없거나 ALL인 경우
+        }
+    
+        List<ProductEntity> productEntity;
+
+        // 성별에 맞는 상품 목록을 가져오기 (삭제되지 않은 상품만 조회)
+        if (productGender == ProductEntity.Gender.ALL) {
+            productEntity = productRepository.findTop6ByGenderNotAndDeleteFalseOrderByIdDesc(ProductEntity.Gender.ALL); // 최신 상품 6개
+        } else {
+            productEntity = productRepository.findTop6ByGenderAndDeleteFalseOrderByIdDesc(productGender); // 성별에 맞는 최신 상품 6개
+        }
+    
+        // ProductEntity -> ProductDTO 변환
+        List<ProductDTO> productDTOList = productEntity.stream()
+            .map(ProductDTO::new) // ProductEntity를 ProductDTO로 변환
+            .collect(Collectors.toList());
+    
+        return productDTOList;
     }
 
     // @Override

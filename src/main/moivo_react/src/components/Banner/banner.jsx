@@ -9,6 +9,8 @@ import cartIcon from '../../assets/image/cart.png';
 const Banner = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout, tokenExpiration, isAdmin } = useContext(AuthContext);
+  //2024-12-11 디버그 확인 장훈
+  console.log('isAdmin:', isAdmin);
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const Banner = () => {
       submenu: [
         { name: '파일업로드(임시)', navigateTo: '/upload' },
         { name: '파일수정(임시)', navigateTo: '/update' },
+        { name: '상품복구', navigateTo: '/admin/admin_productTrash' },
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
       ]

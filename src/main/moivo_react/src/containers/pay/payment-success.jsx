@@ -9,20 +9,21 @@ import { PATH } from "../../../scripts/path";
 const SuccessPage = () => {
   const { token } = localStorage.getItem("accessToken");
   const [searchParams] = useSearchParams();
-  const paymentData = JSON.parse(decodeURIComponent(searchParams.get("paymentData"))); // 결제 정보
+  const paymentData = JSON.parse(decodeURIComponent(searchParams.get("paymentData"))); // 결제 정보 (payment Table에 저장해야 하는 데이터)
   const paymentDetailList = JSON.parse(decodeURIComponent(searchParams.get("paymentDetailList"))); // 결제 상품
   const isCartItem = searchParams.get("isCartItem"); // 장바구니 상품 여부
   const orderName = searchParams.get("orderName"); // 상품 이름
   const paymentKey = searchParams.get("paymentKey"); // 결제 확인용
-  const orderId = searchParams.get("orderId");
-  const [payment, setPayment] = useState(paymentData);
+  const orderId = searchParams.get("orderId"); // toss 고유 번호
+  const [payment, setPayment] = useState(paymentData); // 결제 정보 설정 (orderId 설정 시, 필요)
+  const [emailSent, setEmailSent] = useState(false); // 이메일 전송 여부 상태 추가
+  const addr = "(" + paymentData.zipcode + ")" + paymentData.addr1 + " " + paymentData.addr2;
 
   const paymentInfo = async () => {
     try {
       const headers = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
-        // headers['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1amluIiwidXNlcklkIjoidWppbiIsImlkIjoxOCwid2lzaElkIjo1LCJjYXJ0SWQiOjQsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3MzM5NzA3NDQsImV4cCI6MTczMzk3MTY0NH0.sb7odEe0DiYdhNaOSZsu4G2ZCZ_rQDaOaB1ZCdtdPh8`;
       }
 
       // 토스 코드 저장
@@ -40,10 +41,11 @@ const SuccessPage = () => {
           isCartItem: isCartItem.toString // 장바구니 상품
         }
       });
-
-      console.log('결제 내역 저장 성공');
       
-
+      console.log(payment);
+      console.log(paymentDetailList);
+      console.log(isCartItem.toString);
+      console.log('결제 내역 저장 성공');
     } catch (error) {
       if (error.response?.status === 401) {
         console.error("인증 오류:", error);
@@ -57,15 +59,47 @@ const SuccessPage = () => {
     if (!paymentKey || !orderId) {
       return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
     }
-    console.log(payment);
-    console.log(paymentDetailList);
-    console.log(isCartItem+'');
-    console.log(orderName);
-    console.log(searchParams.get("orderName"));
 
-    // 서버에 데이터 전송
+    // 서버에 결제 데이터 전송
     paymentInfo();
   }, [])
+
+  useEffect(() => {
+    if (!emailSent) { // 이메일이 이미 전송되지 않은 경우에만 실행
+      const sendEmail = async () => {
+        try {
+          const response = await fetch(`${PATH.SERVER}/api/mail/success`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: "jomin5151@gmail.com", // 수신자의 이메일
+              subject: "결제가 완료되었습니다!",
+              message: `
+                주문 번호: ${orderId}\n
+                결제자: ${payment.name}\n
+                상품 이름: ${orderName}\n
+                결제 금액: ${payment.totalPrice} 원\n
+                배송지: ${addr}
+              `,
+            }),
+          });
+
+          if (response.ok) {
+            console.log("이메일 발송 성공");
+            setEmailSent(true); // 이메일 전송 성공 시 상태 업데이트
+          } else {
+            console.error("이메일 발송 실패");
+          }
+        } catch (error) {
+          console.error("이메일 발송 중 오류 발생", error);
+        }
+      };
+
+      sendEmail();
+    }
+  }, [emailSent, orderId, orderName, addr]);
 
   return (
     <div>
@@ -99,7 +133,7 @@ const SuccessPage = () => {
               </tr>
               <tr>
                 <td className={styles.column2}>배송지</td>
-                <td className={styles.column2}>{"(" + paymentData.zipcode + ")" + paymentData.addr1 + " " + paymentData.addr2}</td>
+                <td className={styles.column2}>{addr}</td>
               </tr>
             </tbody>
           </table>
