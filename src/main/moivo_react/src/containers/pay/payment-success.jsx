@@ -18,6 +18,8 @@ const SuccessPage = () => {
   const [payment, setPayment] = useState(paymentData); // 결제 정보 설정 (orderId 설정 시, 필요)
   const [emailSent, setEmailSent] = useState(false); // 이메일 전송 여부 상태 추가
   const addr = "(" + paymentData.zipcode + ")" + paymentData.addr1 + " " + paymentData.addr2;
+  const recipientEmail = paymentData.email; // 배송시킨 고객 이메일 주소
+  const deliverystatus = "결제완료";
 
   const paymentInfo = async () => {
     try {
@@ -76,9 +78,9 @@ const SuccessPage = () => {
             body: JSON.stringify({
               toAddress: recipientEmail, // 받는 사람 이메일
               orderId: orderId, // 주문번호
-              customerName: customerName, // 결제자
+              customerName: paymentData.name, // 결제자
               orderName: orderName, // 상품 이름
-              amount: amount, // 결제 금액
+              amount: paymentData.totalPrice, // 결제 금액
               addr: addr, // 배송지
               deliverystatus: deliverystatus, //배송현황
             }),
