@@ -49,20 +49,20 @@ const admins_side = () => {
     
               {/* Reviews */}
               <li>
-                <a href="#">
+                <Link to="/admins_qnaboard">
                   <i className="fa fa-star fa-2x"></i>
                   <span className={admin_sidebar.navText}>Reviews</span>
-                </a>
+                </Link>
               </li>
             </ul>
     
-            {/* Logout */}
+            {/* home */}
             <ul className={admin_sidebar.logout}>
               <li>
-                <a href="#">
-                  <i className="fa fa-power-off fa-2x"></i>
-                  <span className={admin_sidebar.navText}>Logout</span>
-                </a>
+                <Link to="/">
+                  <i className="fa fa-home fa-2x"></i>
+                  <span className={admin_sidebar.navText}>home</span>
+                </Link>
               </li>
             </ul>
           </nav>
