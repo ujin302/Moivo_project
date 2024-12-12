@@ -3,8 +3,9 @@ import admin_product from "../../assets/css/admins_product.module.css";
 import axios from "axios";
 import { PATH } from "../../../scripts/path";
 import Admins_side from '../../components/admin_sidebar/admins_side';
+import { Link } from 'react-router-dom';
 
-const AdminsProduct = () => {
+const Admins_ProductAdd = () => {
   const [product, setProduct] = useState({
     name: "",
     price: "",
@@ -160,91 +161,74 @@ const AdminsProduct = () => {
     <div className={admin_product.uploadContainer}>
       <Admins_side/>
       <div className={admin_product.uploadWrapper}>
-
-        <h1 className={admin_product.uploadTitle}>상품 업로드</h1>
+        <h1 className={admin_product.uploadTitle}>상품 추가</h1>
         <div className={admin_product.form}>
-          <div className={admin_product.inputGroup}>
+          
+           {/* 버튼 */}
+          <div className={admin_product.Navi}>
+            <Link to="/admins_productadd">
+              <button className={admin_product.UploadBtn}>상품 추가</button>
+            </Link>
+            <Link to="/admins_productUpdate">
+              <button className={admin_product.UpdateBtn}>상품 수정</button>
+            </Link>
+          </div>
+          
+          <div className={admin_product.basicsection}>
+            {/* 상품명 */}
+            <div className={admin_product.inputGroup}>
+              <label className={admin_product.label}>상품명</label>
+              <input className={admin_product.input} type="text" name="name" value={product.name} onChange={handleInputChange} placeholder="상품명을 입력하세요" />
+            </div>
+
+            {/* 가격 */}
+            <div className={admin_product.inputGroup}>
+              <label className={admin_product.label}>가격</label>
+              <input className={admin_product.input} type="number" name="price" value={product.price} onChange={handleInputChange} placeholder="가격을 입력하세요" />
+            </div>
+
+            {/* 카테고리 */}
+            <div className={admin_product.inputGroup}>
+              <label className={admin_product.label}>카테고리</label>
+              <select className={admin_product.select} name="categoryId" value={product.categoryId} onChange={handleInputChange} >
+                <option value="">카테고리 선택</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             
-            <label className={admin_product.label}>상품명</label>
-            <input
-              className={admin_product.input}
-              type="text"
-              name="name"
-              value={product.name}
-              onChange={handleInputChange}
-              placeholder="상품명을 입력하세요"
-            />
+            {/* 성별 */}
+            <div className={admin_product.inputGroup}>
+              <label className={admin_product.label}>성별</label>
+              <select className={admin_product.select} name="gender" value={product.gender} onChange={handleInputChange} >
+                <option value="">성별 선택</option>
+                {genders.map((gender, index) => (
+                  <option key={index} value={gender}>
+                    {gender}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className={admin_product.inputGroup}>
-            <label className={admin_product.label}>가격</label>
-            <input
-              className={admin_product.input}
-              type="number"
-              name="price"
-              value={product.price}
-              onChange={handleInputChange}
-              placeholder="가격을 입력하세요"
-            />
+          <div className={admin_product.accounSection}>
+            {/* 상품 설명 */}
+            <div className={admin_product.inputGroup}>
+            <h2 className={admin_product.sectionTitle}>상품 설명</h2>
+              <textarea className={admin_product.textarea} name="content" value={product.content} onChange={handleInputChange} placeholder="상품 설명을 입력하세요" />
+            </div>
           </div>
 
-          <div className={admin_product.inputGroup}>
-            <label className={admin_product.label}>상품 설명</label>
-            <textarea
-              className={admin_product.textarea}
-              name="content"
-              value={product.content}
-              onChange={handleInputChange}
-              placeholder="상품 설명을 입력하세요"
-            />
-          </div>
-
-          <div className={admin_product.inputGroup}>
-            <label className={admin_product.label}>카테고리</label>
-            <select
-              className={admin_product.select}
-              name="categoryId"
-              value={product.categoryId}
-              onChange={handleInputChange}
-            >
-              <option value="">카테고리 선택</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={admin_product.inputGroup}>
-            <label className={admin_product.label}>성별</label>
-            <select
-              className={admin_product.select}
-              name="gender"
-              value={product.gender}
-              onChange={handleInputChange}
-            >
-              <option value="">성별 선택</option>
-              {genders.map((gender, index) => (
-                <option key={index} value={gender}>
-                  {gender}
-                </option>
-              ))}
-            </select>
-          </div>
-              
           <div className={admin_product.stockSection}>
             <h2 className={admin_product.sectionTitle}>재고 수량</h2>
             <div className={admin_product.stockGrid}>
               {Object.entries(stock).map(([size, count]) => (
                 <div key={size} className={admin_product.stockItem}>
                   <label className={admin_product.label}>{size} 사이즈</label>
-                  <input
-                    className={admin_product.input}
-                    type="number"
-                    value={count}
-                    onChange={(e) => handleStockChange(size, e.target.value)}
-                  />
+                  <input className={admin_product.input} type="number" value={count} onChange={(e) => handleStockChange(size, e.target.value)} />
                 </div>
               ))}
             </div>
@@ -254,59 +238,39 @@ const AdminsProduct = () => {
             <h2 className={admin_product.sectionTitle}>이미지 업로드</h2>
 
             <div className={admin_product.inputGroup}>
-              <label className={admin_product.label}>Layer 1 (대표 이미지)</label>
-              <input
-                className={admin_product.fileInput}
-                type="file"
-                onChange={(e) => handleSingleFileChange(e, "layer1")}
-              />
-            </div>
+              <div className={admin_product.layerWrapper}>
+                <div className={admin_product.layer}>
+                  <label className={admin_product.label}>Layer 1 (대표 이미지)</label>
+                  <input className={admin_product.fileInput} type="file" onChange={(e) => handleSingleFileChange(e, "layer1")} />
+                </div>
 
-            <div className={admin_product.inputGroup}>
-              <label className={admin_product.label}>Layer 2 (상세 이미지)</label>
-              <div
-                className={admin_product.dropzone}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, "layer2")}
-              >
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => handleMultipleFileChange(e, "layer2")}
-                />
-                <p className={admin_product.dropzoneText}>
-                  파일을 선택하거나 드래그해주세요
-                </p>
+                <div className={admin_product.layer}>
+                  <label className={admin_product.label}>Layer 2 (상세 이미지)</label>
+                  <div className={admin_product.dropzone} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, "layer2")}>
+                    <input type="file" multiple onChange={(e) => handleMultipleFileChange(e, "layer2")} />
+                    <p className={admin_product.dropzoneText}>파일을 선택하거나 드래그해주세요</p>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className={admin_product.inputGroup}>
-              <label className={admin_product.label}>Layer 3 (추가 상세 이미지)</label>
-              <div
-                className={admin_product.dropzone}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, "layer3")}
-              >
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => handleMultipleFileChange(e, "layer3")}
-                />
-                <p className={admin_product.dropzoneText}>
-                  파일을 선택하거나 드래그해주세요
-                </p>
+              <div className={admin_product.layerWrapper}>
+                <div className={admin_product.layer}>
+                  <label className={admin_product.label}>Layer 3 (추가 상세 이미지)</label>
+                  <div className={admin_product.dropzone} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, "layer3")}>
+                    <input type="file" multiple onChange={(e) => handleMultipleFileChange(e, "layer3")} />
+                    <p className={admin_product.dropzoneText}>파일을 선택하거나 드래그해주세요</p>
+                  </div>
+                </div>
+
+                <div className={admin_product.layer}>
+                  <label className={admin_product.label}>Layer 4 (상품 정보 이미지)</label>
+                  <input className={admin_product.fileInput} type="file" onChange={(e) => handleSingleFileChange(e, "layer4")} />
+                </div>
               </div>
             </div>
-
-            <div className={admin_product.inputGroup}>
-              <label className={admin_product.label}>Layer 4 (상품 정보 이미지)</label>
-              <input
-                className={admin_product.fileInput}
-                type="file"
-                onChange={(e) => handleSingleFileChange(e, "layer4")}
-              />
             </div>
-          </div>
 
           <button className={admin_product.uploadButton} onClick={handleUpload}>
             상품 등록하기
@@ -314,10 +278,7 @@ const AdminsProduct = () => {
 
           {progress > 0 && (
             <div className={admin_product.progressBar}>
-              <div
-                className={admin_product.progressFill}
-                style={{ width: `${progress}%` }}
-              />
+              <div className={admin_product.progressFill} style={{ width: `${progress}%` }} />
             </div>
           )}
         </div>
@@ -326,4 +287,4 @@ const AdminsProduct = () => {
   );
 };
 
-export default AdminsProduct;
+export default Admins_ProductAdd;
