@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
-const qna_boardlist = () => {
+const Qna_boardlist = () => {
     const [activeIndex, setActiveIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
@@ -234,4 +234,4 @@ const qna_boardlist = () => {
     );
 };
 
-export default qna_boardlist;
+export default Qna_boardlist;

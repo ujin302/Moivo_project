@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import admin_qnaboard from '../../assets/css/admins_qnaboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 
-const admins_qnaboard = () => {
+const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
@@ -220,4 +220,4 @@ const admins_qnaboard = () => {
     );
 };
 
-export default admins_qnaboard;
+export default Admins_qnaboard;
