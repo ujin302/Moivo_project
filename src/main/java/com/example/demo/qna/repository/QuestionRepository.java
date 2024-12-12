@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.example.demo.qna.entity.QuestionEntity;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.demo.qna.entity.QuestionCategoryEntity;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Integer> {
@@ -30,6 +31,10 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Modifying
     @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
     @Transactional
-    void updateResponse(@Param("id") Integer id, @Param("response") String response, @Param("responseDate") LocalDateTime responseDate);
+    public void updateResponse(@Param("id") Integer id, @Param("response") String response, @Param("responseDate") LocalDateTime responseDate);
+
+    public List<QuestionEntity> findByCategoryEntity_NameAndSecret(QuestionCategoryEntity.QuestionCategory name, String secret);
+
+    public List<QuestionEntity> findBySecret(String secret);
 
 }

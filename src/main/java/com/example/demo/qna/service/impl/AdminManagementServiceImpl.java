@@ -1,9 +1,12 @@
 package com.example.demo.qna.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.qna.dto.QuestionDTO;
+import com.example.demo.qna.entity.QuestionCategoryEntity;
 import com.example.demo.qna.entity.QuestionEntity;
 import com.example.demo.qna.repository.QuestionRepository;
 import com.example.demo.qna.service.AdminManagementService;
@@ -22,51 +25,65 @@ public class AdminManagementServiceImpl implements AdminManagementService {
     @Autowired
     private QuestionCategoryRepository questionCategoryRepository;
 
+    // 관리자 상태 조회
+    @Override
+    public boolean checkAdminStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<QuestionDTO> getAllQuestions(String category, String secret) {
+        List<QuestionEntity> questions;
+        if (category != null && secret != null) {
+            QuestionCategoryEntity.QuestionCategory questionCategory = QuestionCategoryEntity.QuestionCategory.valueOf(category);
+            questions = questionRepository.findByCategoryEntity_NameAndSecret(questionCategory, secret);
+        } else if (secret != null) {
+            questions = questionRepository.findBySecret(secret);
+        } else {
+            questions = questionRepository.findAll();
+        }
+        return questions.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
     @Override
     public void respondToQuestion(QuestionDTO questionDTO) {
-        QuestionEntity question = questionRepository.findById(questionDTO.getId())
-                .orElseThrow(() -> new RuntimeException("문의를 찾을 수 없습니다."));
-        
+        QuestionEntity question = questionRepository.findById(questionDTO.getId()).orElseThrow();
         question.setResponse(questionDTO.getResponse());
-        question.setResponseDate(LocalDateTime.now());
-        
+        question.setResponseDate(questionDTO.getResponseDate());
         questionRepository.save(question);
     }
 
     @Override
     public void updateResponse(QuestionDTO questionDTO) {
-        questionRepository.updateResponse(questionDTO.getId(), questionDTO.getResponse(), questionDTO.getResponseDate());
+        respondToQuestion(questionDTO);
     }
 
     @Override
     public void deleteResponse(Integer id) {
-        questionRepository.updateResponse(id, null, null);
+        QuestionEntity question = questionRepository.findById(id).orElseThrow();
+        question.setResponse(null);
+        question.setResponseDate(null);
+        questionRepository.save(question);
     }
 
-    @Override
-    public List<QuestionDTO> getAllQuestionsIncludingSecret() {
-        return questionRepository.findAll().stream()
-            .map(question -> new QuestionDTO(
-                question.getId(),
-                question.getCategoryEntity().getId(),
-                question.getUserEntity().getId(),
-                question.getTitle(),
-                question.getContent(),
-                question.getQuestionDate(),
-                question.getResponse(),
-                question.getResponseDate(),
-                question.getSecret(),
-                question.getFixQuestion()
-            ))
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean checkAdminStatus() {
-        // 여기에 관리자 상태를 확인하는 로직을 구현
-        // 예를 들어, 세션이나 토큰에서 관리자 정보를 확인가능.
-        // 현재는 임시로 true를 반환.
-        return true;
+    private QuestionDTO convertToDTO(QuestionEntity question) {
+        return new QuestionDTO(
+            question.getId(),
+            question.getCategoryEntity().getId(), 
+            question.getUserEntity().getId(),
+            question.getTitle(),
+            question.getContent(),
+            question.getQuestionDate(),
+            question.getResponse(),
+            question.getResponseDate(),
+            question.getSecret(),
+            question.getFixQuestion()
+        );
     }
 
 }
