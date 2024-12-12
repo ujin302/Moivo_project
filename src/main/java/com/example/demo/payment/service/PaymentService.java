@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface PaymentService {
 
-    void savePaymentInfo(Map<String, Object> map);
+    public void savePaymentInfo(Map<String, Object> map);
 
 }
