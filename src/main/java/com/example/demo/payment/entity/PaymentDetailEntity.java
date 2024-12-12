@@ -1,5 +1,6 @@
 package com.example.demo.payment.entity;
 
+import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductStockEntity.Size;
 
@@ -42,4 +43,18 @@ public class PaymentDetailEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "size", nullable = false)
     private Size size; // 상품 사이즈
+
+    // DTO -> Entity
+
+    // 결제 정보 저장
+    public static PaymentDetailEntity toSavePaymentEntity(PaymentDetailDTO dto, PaymentEntity paymentEntity) {
+        // 결제 정보 저장이기 때문에 seq 존재하지 않음.
+        PaymentDetailEntity entity = new PaymentDetailEntity();
+        entity.setPaymentEntity(paymentEntity);
+        entity.setPrice(dto.getPrice());
+        entity.setCount(dto.getCount());
+        entity.setSize(dto.getSize());
+
+        return entity;
+    }
 }
