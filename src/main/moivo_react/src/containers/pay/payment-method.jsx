@@ -46,6 +46,18 @@ const PaymentMethod = () => {
       }));
 
       setPaymentDetail(transformedDetails); // 새로운 리스트 상태에 저장
+    } else {
+      const transformedDetails = paymentDetailList.map((item) => ({
+        id: null, // 백엔드에서 자동 생성
+        paymentId: null, // 결제 완료 후 백엔드에서 연관된 ID를 추가
+        productId: item.productId, // 원본 데이터에서 productId 추출
+        usercartId: null, // 원본 데이터에서 usercartId 추출
+        price: item.price * item.count, // 가격 계산 (단가 * 수량)
+        count: item.count, // 수량 그대로 사용
+        size: item.size // 사이즈 그대로 사용
+      }));
+
+      setPaymentDetail(transformedDetails);
     }
     console.log(mainItemName);
     console.log(otherItemsCount);
@@ -55,6 +67,7 @@ const PaymentMethod = () => {
     console.log(paymentData);
     console.log(orderName);
     console.log(location.state);
+    console.log(localStorage.getItem("accessToken"));
     
   },[]);
 

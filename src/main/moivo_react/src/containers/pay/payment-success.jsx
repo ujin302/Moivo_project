@@ -27,26 +27,34 @@ const SuccessPage = () => {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-
-      // 토스 코드 저장
-      setPayment(prevState => ({
-        ...prevState,  // 기존 상태를 복사 (discount 값 유지)
-        tosscode: orderId
-      }));
       
+      console.log(localStorage.getItem("accessToken"));
+      console.log(localStorage.getItem("id"));
+      console.log(payment.tosscode);
+      // // 토스 코드 저장
+      // setPayment(prevState => ({
+      //   ...prevState,  // 기존 상태를 복사 (discount 값 유지)
+      //   tosscode: orderId,
+      //   userId: localStorage.getItem("id")
+      // }));
+      // console.log("Updated Payment Data:", payment);
+
       // 결제 내역 저장
-      await axios.post(`${PATH.SERVER}/api/user/payment`, {
+      const response = await axios.post(`${PATH.SERVER}/api/user/payment`, {
         headers,
         params: {
+          tosscode: orderId,
+          userId: localStorage.getItem("id"),
           payment: JSON.stringify(payment), // 결제 정보
           paymentDetail: JSON.stringify(paymentDetailList), // 결제 품목
-          isCartItem: isCartItem.toString // 장바구니 상품
+          isCartItem: isCartItem // 장바구니 상품
         }
       });
-      
+
+      console.log(response.data);
       console.log(payment);
       console.log(paymentDetailList);
-      console.log(isCartItem.toString);
+      console.log(isCartItem);
       console.log('결제 내역 저장 성공');
     } catch (error) {
       if (error.response?.status === 401) {
@@ -62,43 +70,51 @@ const SuccessPage = () => {
       return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
     }
 
-    // 서버에 결제 데이터 전송
-    paymentInfo();
+    // 토스 코드 저장
+    setPayment(prevState => ({
+      ...prevState,  // 기존 상태를 복사 (discount 값 유지)
+      tosscode: orderId,
+      userId: localStorage.getItem("id")
+    }));
+    console.log("Updated Payment Data:", payment);
+
   }, [])
 
   useEffect(() => {
-    if (!emailSent) { // 이메일이 이미 전송되지 않은 경우에만 실행
-      const sendEmail = async () => {
-        try {
-          const response = await fetch(`${PATH.SERVER}/api/mail/success`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              toAddress: recipientEmail, // 받는 사람 이메일
-              orderId: orderId, // 주문번호
-              customerName: paymentData.name, // 결제자
-              orderName: orderName, // 상품 이름
-              amount: paymentData.totalPrice, // 결제 금액
-              addr: addr, // 배송지
-              deliverystatus: deliverystatus, //배송현황
-            }),
-          });
+    paymentInfo();
 
-          if (response.ok) {
-            console.log("이메일 발송 성공");
-            setEmailSent(true); // 이메일 전송 성공 시 상태 업데이트
-          } else {
-            console.error("이메일 발송 실패");
-          }
-        } catch (error) {
-          console.error("이메일 발송 중 오류 발생", error);
-        }
-      };
+    // if (!emailSent) { // 이메일이 이미 전송되지 않은 경우에만 실행
+    //   const sendEmail = async () => {
+    //     try {
+    //       const response = await fetch(`${PATH.SERVER}/api/mail/success`, {
+    //         method: "POST",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //         body: JSON.stringify({
+    //           toAddress: recipientEmail, // 받는 사람 이메일
+    //           orderId: orderId, // 주문번호
+    //           customerName: paymentData.name, // 결제자
+    //           orderName: orderName, // 상품 이름
+    //           amount: paymentData.totalPrice, // 결제 금액
+    //           addr: addr, // 배송지
+    //           deliverystatus: deliverystatus, //배송현황
+    //         }),
+    //       });
 
-      sendEmail();
-    }
+    //       if (response.ok) {
+    //         console.log("이메일 발송 성공");
+    //         setEmailSent(true); // 이메일 전송 성공 시 상태 업데이트
+    //       } else {
+    //         console.error("이메일 발송 실패");
+    //       }
+    //     } catch (error) {
+    //       console.error("이메일 발송 중 오류 발생", error);
+    //     }
+    //   };
+
+    //   sendEmail();
+    // }
   }, [emailSent, orderId, orderName, addr]);
 
   return (
