@@ -24,7 +24,10 @@ import PaymentMethod from './containers/pay/payment-method';
 import SuccessPage from './containers/pay/payment-success';
 import FailPage from './containers/pay/payment-fail';
 import Dashboard from './containers/admin/admins_dashboard';
+import ProductTrash from './containers/admin/admin_productTrash';
+
 import KakaoCallback from './components/kakao/KakaoCallback';
+
 
 const routeConfig = [
   { path: "/", element: <Main_index /> },
@@ -50,6 +53,7 @@ const routeConfig = [
   { path: "/payment-success", element: <SuccessPage /> },
   { path: "/payment-fail", element: <FailPage /> },
   { path : "/admins_dashboard", element: <Dashboard/>},
+  { path : "/admin/admin_productTrash", element: <ProductTrash/>},
   { path: "/oauth/callback/kakao", element: <KakaoCallback /> }
 ];
 
