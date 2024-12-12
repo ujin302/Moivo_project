@@ -64,16 +64,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // 카카오 로그인 관련 엔드포인트 추가
                         .requestMatchers(
-                                "/api/user/login",
-                                "/api/user/join",
-                                "/api/auth/token/refresh",
-                                "/login/oauth2/code/**",
-                                "/oauth2/authorization/**",
-                                "/oauth/callback/**",
-                                "/api/oauth/kakao/**",
-                                "/api/user/kakao-login",
-                                "/api/store/**",
-                                "/api/mail/success")
+//                                "/api/user/login",
+//                                "/api/user/join",
+//                                "/api/auth/token/refresh",
+//                                "/login/oauth2/code/**",
+//                                "/oauth2/authorization/**",
+//                                "/oauth/callback/**",
+//                                "/api/oauth/kakao/**",
+//                                "/api/user/kakao-login",
+//                                "/api/store/**",
+//                                "/api/mail/success",
+                                "/api/user/question/add")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가

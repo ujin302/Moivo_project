@@ -6,9 +6,9 @@ import com.example.demo.qna.entity.QuestionEntity;
 import java.util.Map;
 
 public interface QuestionService {
-    public void addQuestion(QuestionDTO questionDTO, int id);
+    public void addQuestion(QuestionDTO questionDTO);
 
-    public void updateQuestion(int id, QuestionDTO questionDTO);
+    public void updateQuestion(QuestionDTO questionDTO);
 
     public void deleteQuestion(int id, int userId);
 

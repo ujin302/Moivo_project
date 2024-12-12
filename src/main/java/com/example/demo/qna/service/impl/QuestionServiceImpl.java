@@ -8,6 +8,7 @@ import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -34,13 +35,13 @@ public class QuestionServiceImpl implements QuestionService {
 
     //문의사항 추가
     @Override
-    public void addQuestion(QuestionDTO questionDTO, int id) {
+    public void addQuestion(QuestionDTO questionDTO) {
 
         QuestionEntity questionEntity = new QuestionEntity();
         //여기서 로그인한 아이디를 받아오는 방법?
         //아이디, 제목, 내용, 작성일시, 비밀글 여부, 관리자 응답여부
 //        questionEntity.setQuestionDate(questionDTO.getQuestionDate()); //시간은 자동으로 등록되므로 필요 X
-        System.out.println("프론트에서 가져온 id = " + id);
+        System.out.println("프론트에서 가져온 id = " + questionDTO.getUserId()); //현재 QuestionDTO에 userid가 user테이블 id 값임
 //        questionEntity.setId(id); 가져오면 셋팅
         questionEntity.setContent(questionDTO.getContent()); //내용
         questionEntity.setTitle(questionDTO.getTitle()); //제목
@@ -53,8 +54,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     //문의사항 수정
     @Override
-    public void updateQuestion(int id, QuestionDTO questionDTO) {
-        QuestionEntity questionEntity = questionRepository.findById(id).get();
+    public void updateQuestion(QuestionDTO questionDTO) {
+        QuestionEntity questionEntity = questionRepository.findById(questionDTO.getUserId()).get();
 
         questionEntity.setContent(questionDTO.getContent());
         questionEntity.setQuestionDate(questionDTO.getQuestionDate());
@@ -101,6 +102,7 @@ public class QuestionServiceImpl implements QuestionService {
         } else if (sortby.equals("title")) {
             sort = Sort.by(Sort.Direction.DESC, "title");
         }
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
         Page<QuestionEntity> pageQuestionList = null;
 

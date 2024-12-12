@@ -30,7 +30,7 @@ public class QuestionController {
 
     //문의 작성 로그인한 사용자 정보 받아오기 필요
     @PostMapping("/add")
-    public ResponseEntity<String> createQuestion(@RequestBody QuestionDTO questionDTO, @PathVariable(name = "id") int id) {
+    public ResponseEntity<String> createQuestion(@RequestBody QuestionDTO questionDTO) {
         // JWT 파싱
 //        Long userId = Jwts.parser()
 //                .setSigningKey("your-secret-key") // 비밀키로 서명 검증
@@ -39,23 +39,14 @@ public class QuestionController {
 //                .get("userId", Long.class); // userId 추출
 //        System.out.println("로그인한 userId" + userId);
 
-        questionsService.addQuestion(questionDTO, id);
+        questionsService.addQuestion(questionDTO);
         return ResponseEntity.ok("200 Ok");
     }
 
-//    @PostMapping("/add")
-//    public ResponseEntity<String> createQuestion(@RequestBody QuestionDTO questionDTO, Authentication auth) {
-//        //JWT로 로그인한 사용자 정보 어떻게 받아와?
-//        Long userId = (Long) auth.getDetails();
-//        String username = auth.getName();
-//        questionsService.addQuestion(questionDTO);
-//        return ResponseEntity.ok("200 Ok");
-//    }
-
     //문의 수정
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateQuestion(@RequestBody QuestionDTO questionDTO, @PathVariable int id) {
-        questionsService.updateQuestion(id, questionDTO);
+    public ResponseEntity<String> updateQuestion(@RequestBody QuestionDTO questionDTO) {
+        questionsService.updateQuestion(questionDTO);
         return ResponseEntity.ok("200 Ok");
     }
 
@@ -84,22 +75,29 @@ public class QuestionController {
     }
 
     // 문의 삭제
-//    @DeleteMapping("/delete/{id}") //게시글 id
-//    public ResponseEntity<String> deleteQuestion(@PathVariable int id, @PathVariable int userId) {
-//     questionsService.deleteQuestion(id, userId);
-//     return ResponseEntity.ok("200 Ok");
-//    }
+    @DeleteMapping("/delete/{id}") //게시글 id
+    public ResponseEntity<String> deleteQuestion(@PathVariable int id, @PathVariable int userId) {
+     questionsService.deleteQuestion(id, userId);
+     return ResponseEntity.ok("200 Ok");
+    }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteQuestion(@PathVariable int id, Authentication authentication) {
-        // 로그인한 사용자 정보 가져오기
-        String userid = authentication.getName();
-        UserEntity user = userRepository.findByUserId(userid)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
-        // 삭제 서비스 호출
-        questionsService.deleteQuestion(id, user.getId());
+    // 문의 삭제
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteQuestion(QuestionDTO questionDTO) {
+        questionsService.deleteQuestion(questionDTO.getId(), questionDTO.getUserId());
         return ResponseEntity.ok("200 Ok");
     }
+
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<String> deleteQuestion(@PathVariable int id, Authentication authentication) {
+//        // 로그인한 사용자 정보 가져오기
+//        String userid = authentication.getName();
+//        UserEntity user = userRepository.findByUserId(userid)
+//                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+//
+//        // 삭제 서비스 호출
+//        questionsService.deleteQuestion(id, user.getId());
+//        return ResponseEntity.ok("200 Ok");
+//    }
 
 }
