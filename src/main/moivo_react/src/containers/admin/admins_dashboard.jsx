@@ -144,6 +144,11 @@ const Admins_dashboard = () => {
                 </div>
               </div>
             </div>
+            <div className={admin_dashboard.pie} data-start="0" data-value="30"></div>
+            <div className={admin_dashboard.pie_highlight} data-start="30" data-value="30"></div>
+            <div className={admin_dashboard.pie} data-start="60" data-value="40"></div>
+            <div className={admin_dashboard.pie_big} data-start="100" data-value="260"></div>
+
           </div>
         </section>
       </div>
