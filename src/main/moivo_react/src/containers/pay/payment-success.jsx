@@ -16,6 +16,8 @@ const SuccessPage = () => {
   const addr = searchParams.get("addr");
   const tel = searchParams.get("tel");
   const [emailSent, setEmailSent] = useState(false); // 이메일 전송 여부 상태 추가
+  const recipientEmail = "jomin5151@gmail.com"; // 배송시킨 고객 이메일 주소
+  const deliverystatus = "결제완료";
 
   if (!paymentKey || !orderId) {
     return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
@@ -31,15 +33,13 @@ const SuccessPage = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              email: "jomin5151@gmail.com", // 수신자의 이메일
-              subject: "결제가 완료되었습니다!",
-              message: `
-                주문 번호: ${orderId}\n
-                결제자: ${customerName}\n
-                상품 이름: ${orderName}\n
-                결제 금액: ${amount} 원\n
-                배송지: ${addr}
-              `,
+              toAddress: recipientEmail, // 받는 사람 이메일
+              orderId: orderId, // 주문번호
+              customerName: customerName, // 결제자
+              orderName: orderName, // 상품 이름
+              amount: amount, // 결제 금액
+              addr: addr, // 배송지
+              deliverystatus: deliverystatus, //배송현황
             }),
           });
 
