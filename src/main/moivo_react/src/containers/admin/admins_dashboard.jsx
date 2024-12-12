@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 
-const admins_dashboard = () => {
+const Admins_dashboard = () => {
   // 더미 데이터
   const statusData = {
     paymentCompleted: 1500,
@@ -151,4 +151,4 @@ const admins_dashboard = () => {
   );
 };
 
-export default admins_dashboard;
+export default Admins_dashboard;

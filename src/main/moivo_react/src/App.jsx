@@ -24,8 +24,9 @@ import PaymentMethod from './containers/pay/payment-method';
 import SuccessPage from './containers/pay/payment-success';
 import FailPage from './containers/pay/payment-fail';
 import Dashboard from './containers/admin/admins_dashboard';
-import ProductTrash from './containers/admin/admin_productTrash';
 import Admins_qna from './containers/admin/admins_qnaboard';
+import Admins_product from './containers/admin/admins_product';
+import ProductTrash from './containers/admin/admin_productTrash';
 import KakaoCallback from './components/kakao/KakaoCallback';
 
 
@@ -53,8 +54,9 @@ const routeConfig = [
   { path: "/payment-success", element: <SuccessPage /> },
   { path: "/payment-fail", element: <FailPage /> },
   { path : "/admins_dashboard", element: <Dashboard/>},
-  { path : "/admin/admin_productTrash", element: <ProductTrash/>},
   { path : "/admins_qnaboard", element: <Admins_qna/>},
+  { path : "/admins_product", element: <Admins_product/>},
+  { path : "/admin/admin_productTrash", element: <ProductTrash/>},
   { path: "/oauth/callback/kakao", element: <KakaoCallback /> }
 ];
 

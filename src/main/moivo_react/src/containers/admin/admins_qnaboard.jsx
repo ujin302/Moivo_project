@@ -4,7 +4,6 @@ import Admins_side from '../../components/admin_sidebar/admins_side';
 import { PATH } from '../../../scripts/path';
 import axios from 'axios';
 
-
 const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -287,3 +286,4 @@ const Admins_qnaboard = () => {
 };
 
 export default Admins_qnaboard;
+
