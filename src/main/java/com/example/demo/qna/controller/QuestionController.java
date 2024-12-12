@@ -1,8 +1,10 @@
 package com.example.demo.qna.controller;
 
 import com.example.demo.qna.dto.QuestionDTO;
+import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -25,17 +27,30 @@ public class QuestionController {
     @Autowired
     private UserRepository userRepository;
 
+
     //문의 작성 로그인한 사용자 정보 받아오기 필요
     @PostMapping("/add")
-    public ResponseEntity<String> createQuestion(@RequestBody QuestionDTO questionDTO) {
-        //JWT로 로그인한 사용자 정보 어떻게 받아와?
-//        String username = auth.getName();
-//        UserEntity user = userRepository.findByUserId(username);
-//        questionDTO.setUserId(user.getId());
-//        System.out.println("user.getId() =" + user.getId());
-        questionsService.addQuestion(questionDTO);
+    public ResponseEntity<String> createQuestion(@RequestBody QuestionDTO questionDTO, @PathVariable(name = "id") int id) {
+        // JWT 파싱
+//        Long userId = Jwts.parser()
+//                .setSigningKey("your-secret-key") // 비밀키로 서명 검증
+//                .parseClaimsJws(token)
+//                .getBody()
+//                .get("userId", Long.class); // userId 추출
+//        System.out.println("로그인한 userId" + userId);
+
+        questionsService.addQuestion(questionDTO, id);
         return ResponseEntity.ok("200 Ok");
     }
+
+//    @PostMapping("/add")
+//    public ResponseEntity<String> createQuestion(@RequestBody QuestionDTO questionDTO, Authentication auth) {
+//        //JWT로 로그인한 사용자 정보 어떻게 받아와?
+//        Long userId = (Long) auth.getDetails();
+//        String username = auth.getName();
+//        questionsService.addQuestion(questionDTO);
+//        return ResponseEntity.ok("200 Ok");
+//    }
 
     //문의 수정
     @PutMapping("/update/{id}")

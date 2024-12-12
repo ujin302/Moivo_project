@@ -34,14 +34,15 @@ public class QuestionServiceImpl implements QuestionService {
 
     //문의사항 추가
     @Override
-    public void addQuestion(QuestionDTO questionDTO) {
+    public void addQuestion(QuestionDTO questionDTO, int id) {
 
         QuestionEntity questionEntity = new QuestionEntity();
         //여기서 로그인한 아이디를 받아오는 방법?
         //아이디, 제목, 내용, 작성일시, 비밀글 여부, 관리자 응답여부
-//        QuestionEntity questionEntity = new QuestionEntity();
+//        questionEntity.setQuestionDate(questionDTO.getQuestionDate()); //시간은 자동으로 등록되므로 필요 X
+        System.out.println("프론트에서 가져온 id = " + id);
+//        questionEntity.setId(id); 가져오면 셋팅
         questionEntity.setContent(questionDTO.getContent()); //내용
-        questionEntity.setQuestionDate(questionDTO.getQuestionDate()); //시간
         questionEntity.setTitle(questionDTO.getTitle()); //제목
         questionEntity.setSecret(questionDTO.getSecret()); //비밀글 여부
         questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId()).get()); //문의 카테고리
@@ -104,7 +105,7 @@ public class QuestionServiceImpl implements QuestionService {
         Page<QuestionEntity> pageQuestionList = null;
 
         if (title == null || title.isEmpty()) { //전체검색
-            System.out.println("여기 안와?");
+            System.out.println("전체 검색");
             pageQuestionList = questionRepository.findAll(pageable); //전체 DB 추출
         }
         if (title != null) {
@@ -147,7 +148,6 @@ public class QuestionServiceImpl implements QuestionService {
 
         System.out.println("sortby" + sortby);
         System.out.println("검색 내역 : " + title);
-//        System.out.println("dtoList = " + dtoList);
         return map;
     }
 
