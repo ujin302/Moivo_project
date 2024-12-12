@@ -64,9 +64,6 @@ public class PaymentEntity {
     @Column(name = "zipcode", length = 100)
     private String zipcode; // 수령인 우편번호
 
-    @Column(name = "deliverymsg", length = 100)
-    private String deliveryMsg; // 배송 메시지
-
     @Column(name = "count", nullable = false)
     private int count; // 총 주문 상품 개수
 
