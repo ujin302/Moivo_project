@@ -11,6 +11,7 @@ import com.example.demo.qna.service.AdminManagementService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/admin/qna/management")
@@ -19,8 +20,14 @@ public class AdminManagementController {
     @Autowired
     private AdminManagementService adminManagementService;
 
+    @GetMapping("/questions")
+    public ResponseEntity<List<QuestionDTO>> getAllQuestionsIncludingSecret() {
+        List<QuestionDTO> questions = adminManagementService.getAllQuestionsIncludingSecret();
+        return ResponseEntity.ok(questions);
+    }
+
     // 문의 답변
-    @PostMapping("/questions/{id}/respond")
+    @PostMapping("/questions/{id}/response")
     public ResponseEntity<String> respondToQuestion(
             @PathVariable Integer id,
             @RequestBody Map<String, String> response) {
@@ -38,7 +45,7 @@ public class AdminManagementController {
         }
     }
      // 문의 답변 수정
-    @PutMapping("/questions/{id}/respond")
+    @PutMapping("/questions/{id}/response")
     public ResponseEntity<String> updateResponse(
             @PathVariable Integer id,
             @RequestBody Map<String, String> response) {
@@ -57,7 +64,7 @@ public class AdminManagementController {
     }
 
     // 문의 답변 삭제
-    @DeleteMapping("/questions/{id}/respond")
+    @DeleteMapping("/questions/{id}/response")
     public ResponseEntity<String> deleteResponse(@PathVariable Integer id) {
         try {
             adminManagementService.deleteResponse(id);
@@ -66,6 +73,15 @@ public class AdminManagementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("답변 삭제에 실패했습니다: " + e.getMessage());
         }
+    }
+
+    // 관리자 상태 확인
+    @GetMapping("/check")
+    public ResponseEntity<Map<String, Boolean>> checkAdminStatus() {
+        boolean isAdmin = adminManagementService.checkAdminStatus();
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isAdmin", isAdmin);
+        return ResponseEntity.ok(response);
     }
 
 }
