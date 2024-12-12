@@ -1,25 +1,20 @@
 package com.example.demo.qna.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import com.example.demo.qna.dto.QuestionDTO;
-import com.example.demo.qna.entity.QuestionCategoryEntity;
-import com.example.demo.qna.entity.QuestionEntity;
-import com.example.demo.qna.repository.QuestionRepository;
-import com.example.demo.qna.service.AdminManagementService;
-import com.example.demo.qna.repository.QuestionCategoryRepository;
-import com.example.demo.qna.dto.QuestionCategoryDTO;
-import com.example.demo.user.entity.UserEntity;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.qna.dto.QuestionCategoryDTO;
+import com.example.demo.qna.dto.QuestionDTO;
+import com.example.demo.qna.entity.QuestionCategoryEntity;
+import com.example.demo.qna.entity.QuestionEntity;
+import com.example.demo.qna.repository.QuestionCategoryRepository;
+import com.example.demo.qna.repository.QuestionRepository;
+import com.example.demo.qna.service.AdminManagementService;
+import com.example.demo.user.entity.UserEntity;
 
 @Service
 public class AdminManagementServiceImpl implements AdminManagementService {
@@ -46,11 +41,12 @@ public class AdminManagementServiceImpl implements AdminManagementService {
         QuestionDTO questionDTO = new QuestionDTO();
         questionDTO.setId(questionEntity.getId());
         
+        // CategoryEntity에서 DTO로 변환
         QuestionCategoryEntity categoryEntity = questionEntity.getCategoryEntity();
         if (categoryEntity != null) {
             QuestionCategoryDTO categoryDTO = new QuestionCategoryDTO();
             categoryDTO.setId(categoryEntity.getId());
-            categoryDTO.setName(categoryEntity.getName());
+            categoryDTO.setName(categoryEntity.getName().name()); // name()으로 Enum을 String으로 변환
             questionDTO.setCategoryDTO(categoryDTO);
         }
         
@@ -63,11 +59,16 @@ public class AdminManagementServiceImpl implements AdminManagementService {
         questionDTO.setContent(questionEntity.getContent());
         questionDTO.setQuestionDate(questionEntity.getQuestionDate());
         questionDTO.setResponse(questionEntity.getResponse());
-        questionDTO.setResponseDate(questionEntity.getResponseDate());
+        questionDTO.setResponseDate(
+            questionEntity.getResponseDate() != null 
+                ? questionEntity.getResponseDate() 
+                : LocalDateTime.of(1970, 1, 1, 0, 0) // 기본값 설정
+        );
         questionDTO.setSecret(questionEntity.getSecret());
         questionDTO.setFixQuestion(questionEntity.getFixQuestion());
         return questionDTO;
     }
+    
 
     // 문의 글에 답변 추가
     @Override
