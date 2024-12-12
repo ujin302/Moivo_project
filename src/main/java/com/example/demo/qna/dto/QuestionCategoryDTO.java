@@ -1,7 +1,5 @@
 package com.example.demo.qna.dto;
 
-import com.example.demo.qna.entity.QuestionCategoryEntity.QuestionCategory;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuestionCategoryDTO {
     private Integer id; // 카테고리 고유 키
-    private QuestionCategory name = QuestionCategory.BASIC; // 카테고리 이름
+    private String name; // 카테고리 이름
 }

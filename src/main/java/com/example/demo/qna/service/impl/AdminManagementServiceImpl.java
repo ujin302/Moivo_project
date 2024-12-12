@@ -1,6 +1,9 @@
 package com.example.demo.qna.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,8 @@ import com.example.demo.qna.entity.QuestionEntity;
 import com.example.demo.qna.repository.QuestionRepository;
 import com.example.demo.qna.service.AdminManagementService;
 import com.example.demo.qna.repository.QuestionCategoryRepository;
+import com.example.demo.qna.dto.QuestionCategoryDTO;
+import com.example.demo.user.entity.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,65 +30,90 @@ public class AdminManagementServiceImpl implements AdminManagementService {
     @Autowired
     private QuestionCategoryRepository questionCategoryRepository;
 
-    // 관리자 상태 조회
+    // 모든 문의 글 가져오기
     @Override
-    public boolean checkAdminStatus() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
-            return true;
+    public List<QuestionDTO> getAllQuestions() {
+        // 관리자 권한으로 모든 문의글 가져오기
+        List<QuestionEntity> questionEntities = questionRepository.findAll();
+        
+        return questionEntities.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 문의 글을 DTO로 변환하는 메서드
+    private QuestionDTO convertToDTO(QuestionEntity questionEntity) {
+        QuestionDTO questionDTO = new QuestionDTO();
+        questionDTO.setId(questionEntity.getId());
+        
+        QuestionCategoryEntity categoryEntity = questionEntity.getCategoryEntity();
+        if (categoryEntity != null) {
+            QuestionCategoryDTO categoryDTO = new QuestionCategoryDTO();
+            categoryDTO.setId(categoryEntity.getId());
+            categoryDTO.setName(categoryEntity.getName());
+            questionDTO.setCategoryDTO(categoryDTO);
         }
-        return false;
-    }
-
-    @Override
-    public List<QuestionDTO> getAllQuestions(String category, String secret) {
-        List<QuestionEntity> questions;
-        if (category != null && secret != null) {
-            QuestionCategoryEntity.QuestionCategory questionCategory = QuestionCategoryEntity.QuestionCategory.valueOf(category);
-            questions = questionRepository.findByCategoryEntity_NameAndSecret(questionCategory, secret);
-        } else if (secret != null) {
-            questions = questionRepository.findBySecret(secret);
-        } else {
-            questions = questionRepository.findAll();
+        
+        UserEntity userEntity = questionEntity.getUserEntity();
+        if (userEntity != null) {
+            questionDTO.setUserId(userEntity.getId());
         }
-        return questions.stream().map(this::convertToDTO).collect(Collectors.toList());
+        
+        questionDTO.setTitle(questionEntity.getTitle());
+        questionDTO.setContent(questionEntity.getContent());
+        questionDTO.setQuestionDate(questionEntity.getQuestionDate());
+        questionDTO.setResponse(questionEntity.getResponse());
+        questionDTO.setResponseDate(questionEntity.getResponseDate());
+        questionDTO.setSecret(questionEntity.getSecret());
+        questionDTO.setFixQuestion(questionEntity.getFixQuestion());
+        return questionDTO;
+    }
+
+    // 문의 글에 답변 추가
+    @Override
+    public void respondToQuestion(Integer questionId, String response) {
+        QuestionEntity questionEntity = questionRepository.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid question ID: " + questionId));
+        
+        questionEntity.setResponse(response);
+        questionEntity.setResponseDate(LocalDateTime.now());
+        questionRepository.save(questionEntity);
+    }
+
+    // 문의 글에 답변 수정
+    @Override
+    public void updateResponse(Integer questionId, String response) {
+        QuestionEntity questionEntity = questionRepository.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid question ID: " + questionId));
+        
+        questionEntity.setResponse(response);
+        questionEntity.setResponseDate(LocalDateTime.now());
+        questionRepository.save(questionEntity);
+    }
+
+    // 문의 글에 답변 삭제
+    @Override
+    public void deleteResponse(Integer questionId) {
+        QuestionEntity questionEntity = questionRepository.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid question ID: " + questionId));
+        
+        questionEntity.setResponse(null);
+        questionEntity.setResponseDate(null);
+        questionRepository.save(questionEntity);
     }
 
     @Override
-    public void respondToQuestion(QuestionDTO questionDTO) {
-        QuestionEntity question = questionRepository.findById(questionDTO.getId()).orElseThrow();
-        question.setResponse(questionDTO.getResponse());
-        question.setResponseDate(questionDTO.getResponseDate());
-        questionRepository.save(question);
+    public List<QuestionCategoryDTO> getQuestionCategories() {
+        List<QuestionCategoryEntity> categoryEntities = questionCategoryRepository.findAll();
+        return categoryEntities.stream()
+                .map(this::convertToCategoryDTO)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public void updateResponse(QuestionDTO questionDTO) {
-        respondToQuestion(questionDTO);
+    private QuestionCategoryDTO convertToCategoryDTO(QuestionCategoryEntity categoryEntity) {
+        QuestionCategoryDTO categoryDTO = new QuestionCategoryDTO();
+        categoryDTO.setId(categoryEntity.getId());
+        categoryDTO.setName(categoryEntity.getName().name());
+        return categoryDTO;
     }
-
-    @Override
-    public void deleteResponse(Integer id) {
-        QuestionEntity question = questionRepository.findById(id).orElseThrow();
-        question.setResponse(null);
-        question.setResponseDate(null);
-        questionRepository.save(question);
-    }
-
-    private QuestionDTO convertToDTO(QuestionEntity question) {
-        return new QuestionDTO(
-            question.getId(),
-            question.getCategoryEntity().getId(), 
-            question.getUserEntity().getId(),
-            question.getTitle(),
-            question.getContent(),
-            question.getQuestionDate(),
-            question.getResponse(),
-            question.getResponseDate(),
-            question.getSecret(),
-            question.getFixQuestion()
-        );
-    }
-
 }

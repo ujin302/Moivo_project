@@ -20,4 +20,6 @@ public class QuestionDTO {
     private LocalDateTime responseDate; // 응답 일시 (NULL이면 미응답)
     private String secret; // 비밀글 (추가)
     private Boolean fixQuestion; // 수정 문의 (추가)
+    private QuestionCategoryDTO categoryDTO;
+
 }
