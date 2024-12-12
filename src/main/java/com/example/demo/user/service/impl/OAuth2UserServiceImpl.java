@@ -49,7 +49,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService implements S
     //private final OAuthProperties oAuthProperties; //추후 Google, Naver 사용시
 
     private final OAuth2AuthorizedClientService authorizedClientService;
-    
+
     @Autowired
     private UserRepository userRepository;
 
