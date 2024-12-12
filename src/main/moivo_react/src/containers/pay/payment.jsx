@@ -11,13 +11,27 @@ const Payment = () => {
   const navigate = useNavigate();
 
   const cartItems = location.state?.cartItems || [];
-  console.log(cartItems);
+  const isCartItem = location.state?.isCartItem;
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.count,
     0
   );
 
-  const [userInfo, setUserInfo] = useState(null);
+  // 결제 정보
+  const [paymentData, setPaymentData] = useState({ 
+    userId: 0, // 사용자 id
+    name: '', // 사용자 이름
+    email: '', // 사용자 이메일
+    tel: '', // 사용자 전화번호
+    addr1: '', // 사용자 주소
+    addr2: '',
+    zipcode: '',
+    totalPrice: 0, // 총 결제 금액
+    discount: 0, // 할인 금액
+    tosscode: '' // 토스 결제 번호
+  });
+
+  // 사용자 정보
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -29,6 +43,9 @@ const Payment = () => {
   });
   const [coupons, setCoupons] = useState([]); // 쿠폰 리스트 상태 추가
   const [loading, setLoading] = useState(true);
+  
+  console.log(location.state);
+  console.log(isCartItem);
 
   const fetchUserInfo = async () => {
     const token = localStorage.getItem("accessToken");
@@ -49,7 +66,7 @@ const Payment = () => {
       if (response.ok) {
         const data = await response.json();
         if (data) {
-          setUserInfo(data);
+          // 서버에 받은 데이터 저장
           setFormData({
             name: data.name || "",
             email: data.email || "",
@@ -59,6 +76,7 @@ const Payment = () => {
             addr2: data.addr2 || "",
             coupon: "",
           });
+
           setCoupons(data.coupons || []); // 쿠폰 정보 설정
         }
         console.log(data);
@@ -116,6 +134,12 @@ const Payment = () => {
       const discountAmount = (totalPrice * selectedCoupon.discountValue) / 100;
       console.log(selectedCoupon);
       console.log(selectedCoupon.discountValue);
+      // 결제 정보의 할인 가격 저장
+      setPaymentData({
+        ...paymentData,
+        discount: discountAmount
+      })
+
       return totalPrice - discountAmount;
     }
     return totalPrice;
@@ -132,18 +156,37 @@ const Payment = () => {
     return price;
   };
 
+  useEffect(() => {
+      console.log("Updated paymentData:", paymentData);
+  }, [paymentData]);
+
+  // 결제 정보 전송
   const handlePayment = () => {
     if (!formData.name || !formData.tel || !formData.zipcode || !formData.addr1) {
       alert("모든 정보를 입력해주세요.");
       return;
     }
   
+    const updatedPaymentData = {
+      ...paymentData,
+      name: formData.name,
+      email: formData.email,
+      tel: formData.tel,
+      addr1: formData.addr1,
+      addr2: formData.addr2,
+      zipcode: formData.zipcode,
+      totalPrice: getDiscountedTotal(),
+    };
+  
+    setPaymentData(updatedPaymentData);
+    console.log(updatedPaymentData);
+
     // 사용자가 입력한 정보와 카트 정보를 state로 전달하면서 payment-method로 이동
     navigate("/payment-method", {
       state: {
-        userInfo: formData, // 결제자 정보(고객명 + 아이디 + 이메일 + 전화번호(추후결정) )
-        cartItems: cartItems, // 상품 정보
-        totalPrice: getDiscountedTotal(), // 할인된 금액으로 결제
+        paymentData: updatedPaymentData, // 결제자 정보(고객명 + 아이디 + 이메일 + 전화번호(추후결정) )
+        paymentDetailList: cartItems, // 상품 정보
+        isCartItem: isCartItem
       },
     });
   };
@@ -154,6 +197,8 @@ const Payment = () => {
   };
 
   useEffect(() => {
+    console.log(isCartItem);
+    
     fetchUserInfo();
   }, []);
 

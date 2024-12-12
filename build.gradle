@@ -68,6 +68,11 @@ dependencies {
    implementation 'com.google.code.gson:gson:2.10.1'
    implementation 'org.json:json:20231013'
 
+   //12/11 16:56 조강민
+   implementation 'org.springframework.boot:spring-boot-starter-mail'
+   // 아래 2개는 thymeleaf를 사용하는 경우에만 추가
+   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+   implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 }
 
 dependencyManagement {
@@ -82,5 +87,5 @@ tasks.named('test') {
 }
 
 compileJava {
-    options.compilerArgs += ['-parameters']
+   options.compilerArgs += ['-parameters']
 }
