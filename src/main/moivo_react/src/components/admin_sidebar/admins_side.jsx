@@ -17,10 +17,10 @@ const admins_side = () => {
     
               {/* Products */}
               <li className={admin_sidebar.hasSubnav}>
-                <a href="#">
+                <Link to="/admins_product">
                   <i className="fa fa-cube fa-2x"></i>
                   <span className={admin_sidebar.navText}>Products</span>
-                </a>
+                </Link>
               </li>
     
               {/* Customers */}
