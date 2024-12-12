@@ -240,7 +240,8 @@ const ProductDetail = () => {
             price: product.price,
             name: product.name,
             img: product.img
-          }]
+          }],
+          isCartItem : false
         }
       });
     }

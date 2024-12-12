@@ -48,7 +48,7 @@ const Cart = () => {
           console.log("매핑 중인 아이템:", item);
           return {
             usercartId: item.id,
-            id: item.productDTO.id,
+            productId: item.productDTO.id,
             name: item.productDTO.name,
             price: item.productDTO.price,
             img: item.productDTO.img,
@@ -148,7 +148,7 @@ const Cart = () => {
     const selectedCartItems = cartItems.filter((item) =>
       selectedItems.includes(item.usercartId)
     );
-    navigate("/payment", { state: { cartItems: selectedCartItems } });
+    navigate("/payment", { state: { cartItems: selectedCartItems, isCartItem: true } });
   };
 
   if (loading) return <div>Loading...</div>;

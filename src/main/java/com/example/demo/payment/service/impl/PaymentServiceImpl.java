@@ -12,7 +12,7 @@ public class PaymentServiceImpl implements PaymentService {
     // 24.12.11 - uj
     @Override
     public void savePaymentInfo(Map<String, Object> map) {
-        //
+        System.out.println("savePaymentInfo");
     }
 
 }
