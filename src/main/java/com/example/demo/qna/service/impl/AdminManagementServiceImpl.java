@@ -10,8 +10,6 @@ import com.example.demo.qna.service.AdminManagementService;
 import com.example.demo.qna.repository.QuestionCategoryRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AdminManagementServiceImpl implements AdminManagementService {
@@ -24,69 +22,23 @@ public class AdminManagementServiceImpl implements AdminManagementService {
 
     @Override
     public void respondToQuestion(QuestionDTO questionDTO) {
-        QuestionEntity questionEntity = questionRepository.findById(questionDTO.getId())
-            .orElseThrow(() -> new RuntimeException("문의가 존재하지 않습니다."));
-        questionEntity.setResponse(questionDTO.getResponse());
-        questionEntity.setResponseDate(LocalDateTime.now());
-        questionRepository.save(questionEntity);
+        QuestionEntity question = questionRepository.findById(questionDTO.getId())
+                .orElseThrow(() -> new RuntimeException("문의를 찾을 수 없습니다."));
+        
+        question.setResponse(questionDTO.getResponse());
+        question.setResponseDate(LocalDateTime.now());
+        
+        questionRepository.save(question);
     }
 
     @Override
-    public void addFAQ(QuestionDTO questionDTO) {
-        QuestionEntity questionEntity = new QuestionEntity();
-        questionEntity.setTitle(questionDTO.getTitle());
-        questionEntity.setContent(questionDTO.getContent());
-        questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId())
-            .orElseThrow(() -> new RuntimeException("카테고리가 존재하지 않습니다.")));
-        questionRepository.save(questionEntity);
+    public void updateResponse(QuestionDTO questionDTO) {
+        questionRepository.updateResponse(questionDTO.getId(), questionDTO.getResponse(), questionDTO.getResponseDate());
     }
 
     @Override
-    public List<QuestionDTO> getAllQuestions() {
-        return questionRepository.findAll().stream()
-            .filter(question -> question.getSecret() == null || !question.getSecret().equals("true"))
-            .map(question -> new QuestionDTO(
-                question.getId(),
-                question.getCategoryEntity().getId(),
-                question.getUserEntity().getId(),
-                question.getTitle(),
-                question.getContent(),
-                question.getQuestionDate(),
-                question.getResponse(),
-                question.getResponseDate(),
-                question.getSecret(),
-                question.getFixQuestion()
-            ))
-            .collect(Collectors.toList());
+    public void deleteResponse(Integer id) {
+        questionRepository.updateResponse(id, null, null);
     }
-
-    @Override
-    public List<QuestionDTO> getAllQuestionsIncludingSecret() {
-        return questionRepository.findAll().stream()
-            .map(question -> new QuestionDTO(
-                question.getId(),
-                question.getCategoryEntity().getId(),
-                question.getUserEntity().getId(),
-                question.getTitle(),
-                question.getContent(),
-                question.getQuestionDate(),
-                question.getResponse(),
-                question.getResponseDate(),
-                question.getSecret(),
-                question.getFixQuestion()
-            ))
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public void updateQuestion(Integer id, QuestionDTO questionDTO) {
-        questionRepository.updateQuestion(id, questionDTO.getTitle(), questionDTO.getContent());
-    }
-
-    @Override
-    public void deleteQuestion(Integer id) {
-        questionRepository.deleteById(id);
-    }
-
 
 }

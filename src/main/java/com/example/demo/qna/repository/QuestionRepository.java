@@ -1,5 +1,6 @@
 package com.example.demo.qna.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,5 +25,11 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     // 모든 문의 조회
     public List<QuestionEntity> findAll();
+
+    // 문의 답변 업데이트
+    @Modifying
+    @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
+    @Transactional
+    void updateResponse(@Param("id") Integer id, @Param("response") String response, @Param("responseDate") LocalDateTime responseDate);
 
 }

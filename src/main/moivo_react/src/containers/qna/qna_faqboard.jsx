@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import QnA from '../../assets/css/qna_faqboard.module.css';
-import Footer from './../../components/Footer/Footer';
+import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 import { Link } from 'react-router-dom';
 
-const qna_faqboard = () => {
+const Qna_faqboard = () => {
   // FAQ 열림 상태 관리
   const [openFAQ, setOpenFAQ] = useState(null);
 
@@ -135,4 +135,4 @@ const qna_faqboard = () => {
         );
 };
 
-export default qna_faqboard;
+export default Qna_faqboard;

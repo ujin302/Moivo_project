@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import QnA_b from '../../assets/css/qna_boardlist.module.css';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
-const qna_boardlist = () => {
+const Qna_boardlist = () => {
     const [activeIndex, setActiveIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
@@ -13,6 +13,42 @@ const qna_boardlist = () => {
     const [selectedType, setSelectedType] = useState(''); // 선택된 문의 유형
     const [isDropdownVisible, setIsDropdownVisible] = useState(false); // 드롭다운 상태
     const itemsPerPage = 6; // 페이지당 항목 수
+    const [isAdmin, setIsAdmin] = useState(false); // 관리자 여부
+    const [accessToken, setAccessToken] = useState(''); // 관리자 토큰
+    const [response, setResponse] = useState(''); // 답변 입력을 위한 상태
+    const [qnaDataAdmin, setQnaDataAdmin] = useState([]); // 관리자 답변 데이터
+
+    const fetchQuestions = async () => {
+        try {
+            const res = await fetch('/api/admin/qna/management/questions', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setQnaDataAdmin(data);
+            }
+        } catch (error) {
+            console.error('질문 목록 가져오기 실패:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (isAdmin) {
+            fetchQuestions();
+        }
+    }, [isAdmin]);
+
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            setAccessToken(token);
+            // 토큰에서 isAdmin 정보 추출
+            const tokenData = JSON.parse(atob(token.split('.')[1]));
+            setIsAdmin(tokenData.isAdmin);
+        }
+    }, []);
 
     const qnaData = [
         {
@@ -74,11 +110,16 @@ const qna_boardlist = () => {
     const currentPageData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
     const handleToggle = (index, isSecret) => {
+        // 관리자인 경우 비밀글도 바로 볼 수 있음
+        if (isAdmin) {
+            setActiveIndex(activeIndex === index ? null : index);
+            return;
+        }
+        
+        // 일반 사용자인 경우 기존 로직 유지
         if (isSecret) {
-            // 비밀글이면 비밀번호 모달을 보여줌
             setPasswordModal({ visible: true, index });
         } else {
-            // 비밀글이 아니면 해당 게시글 펼침
             setActiveIndex(activeIndex === index ? null : index);
         }
     };
@@ -125,6 +166,107 @@ const qna_boardlist = () => {
     const toggleDropdown = () => {
         setIsDropdownVisible(!isDropdownVisible);
     };
+
+    // 답변 제출 핸들러
+    const handleResponseSubmit = async (questionId) => {
+        try {
+            const res = await fetch(`/api/admin/qna/management/questions/${questionId}/respond`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ response })
+            });
+            
+            if (res.ok) {
+                // 답변 등록 후 데이터 새로고침
+                fetchQuestions();
+                setResponse('');
+            }
+        } catch (error) {
+            console.error('답변 등록 실패:', error);
+        }
+    };
+
+    const handleResponseEdit = async (questionId) => {
+        try {
+            const res = await fetch(`/api/admin/qna/management/questions/${questionId}/respond`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ response })
+            });
+            
+            if (res.ok) {
+                fetchQuestions();
+                setResponse('');
+            }
+        } catch (error) {
+            console.error('답변 수정 실패:', error);
+        }
+    };
+
+    const handleResponseDelete = async (questionId) => {
+        if (!window.confirm('답변을 삭제하시겠습니까?')) return;
+        
+        try {
+            const res = await fetch(`/api/admin/qna/management/questions/${questionId}/respond`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            if (res.ok) {
+                fetchQuestions();
+            }
+        } catch (error) {
+            console.error('답변 삭제 실패:', error);
+        }
+    };
+
+    const renderAdminResponseSection = (item) => {
+        if (!isAdmin) return null;
+        
+        return (
+            <div className={QnA_b.adminResponseSection}>
+                <textarea
+                    className={QnA_b.responseTextarea}
+                    value={response}
+                    onChange={(e) => setResponse(e.target.value)}
+                    placeholder="답변을 입력하세요"
+                />
+                <div className={QnA_b.responseButtons}>
+                    <button 
+                        className={QnA_b.responseButton}
+                        onClick={() => handleResponseSubmit(item.id)}
+                    >
+                        답변 등록
+                    </button>
+                    {item.answer && (
+                        <>
+                            <button 
+                                className={QnA_b.responseButton}
+                                onClick={() => handleResponseEdit(item.id)}
+                            >
+                                수정
+                            </button>
+                            <button 
+                                className={`${QnA_b.responseButton} ${QnA_b.deleteButton}`}
+                                onClick={() => handleResponseDelete(item.id)}
+                            >
+                                삭제
+                            </button>
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
 
     return (
         <div className={QnA_b.qnalistMainDiv}>
@@ -192,6 +334,7 @@ const qna_boardlist = () => {
                                         <div className={QnA_b.qnalistUserAnswer}>
                                             {item.answer || '답변 대기 중'}
                                         </div>
+                                        {renderAdminResponseSection(item)}
                                     </div>
                                 )}
                             </div>
@@ -212,7 +355,7 @@ const qna_boardlist = () => {
             {passwordModal.visible && (
                 <div className={QnA_b.modalOverlay}>
                     <div className={QnA_b.modalContent}>
-                        <h3>비밀글 비밀번호 확인</h3>
+                        <h3>비��글 비밀번호 확인</h3>
                         <input
                             type="password"
                             placeholder="비밀번호 입력"
@@ -234,4 +377,4 @@ const qna_boardlist = () => {
     );
 };
 
-export default qna_boardlist;
+export default Qna_boardlist;

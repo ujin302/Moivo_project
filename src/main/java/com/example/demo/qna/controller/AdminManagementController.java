@@ -1,13 +1,16 @@
 package com.example.demo.qna.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.service.AdminManagementService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/qna/management")
@@ -16,46 +19,53 @@ public class AdminManagementController {
     @Autowired
     private AdminManagementService adminManagementService;
 
-    
-    // 문의에 대한 응답 작성
-    @PostMapping("/response")
-    public ResponseEntity<String> respondToQuestion(@RequestBody QuestionDTO questionDTO) {
-        adminManagementService.respondToQuestion(questionDTO);
-        return ResponseEntity.ok("응답이 성공적으로 등록되었습니다.");
+    // 문의 답변
+    @PostMapping("/questions/{id}/respond")
+    public ResponseEntity<String> respondToQuestion(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> response) {
+        try {
+            QuestionDTO questionDTO = new QuestionDTO();
+            questionDTO.setId(id);
+            questionDTO.setResponse(response.get("response"));
+            questionDTO.setResponseDate(LocalDateTime.now());
+            
+            adminManagementService.respondToQuestion(questionDTO);
+            return ResponseEntity.ok("답변이 성공적으로 등록되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("답변 등록에 실패했습니다: " + e.getMessage());
+        }
     }
-    
-    // 자주 묻는 질문 등록
-    @PostMapping("/faq")
-    public ResponseEntity<String> addFAQ(@RequestBody QuestionDTO questionDTO) {
-        adminManagementService.addFAQ(questionDTO);
-        return ResponseEntity.ok("자주 묻는 질문이 성공적으로 등록되었습니다.");
-    }
-    
-    // 모든 문의 조회 (관리자용)
-    @GetMapping("/questions")
-    public ResponseEntity<List<QuestionDTO>> getAllQuestions() {
-        return ResponseEntity.ok(adminManagementService.getAllQuestions());
-    }
-
-    // 비밀글 포함 모든 문의 조회
-    @GetMapping("/questions/all")
-    public ResponseEntity<List<QuestionDTO>> getAllQuestionsIncludingSecret() {
-        return ResponseEntity.ok(adminManagementService.getAllQuestionsIncludingSecret());
-    }
-
-    // 문의 수정
-    @PutMapping("/questions/{id}")
-    public ResponseEntity<String> updateQuestion(@PathVariable Integer id, @RequestBody QuestionDTO questionDTO) {
-        adminManagementService.updateQuestion(id, questionDTO);
-        return ResponseEntity.ok("문의가 성공적으로 수정되었습니다.");
-    }
-
-    // 문의 삭제 !!
-    @DeleteMapping("/questions/{id}")
-    public ResponseEntity<String> deleteQuestion(@PathVariable Integer id) {
-        adminManagementService.deleteQuestion(id);
-        return ResponseEntity.ok("문의가 성공적으로 삭제되었습니다.");
+     // 문의 답변 수정
+    @PutMapping("/questions/{id}/respond")
+    public ResponseEntity<String> updateResponse(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> response) {
+        try {
+            QuestionDTO questionDTO = new QuestionDTO();
+            questionDTO.setId(id);
+            questionDTO.setResponse(response.get("response"));
+            questionDTO.setResponseDate(LocalDateTime.now());
+            
+            adminManagementService.updateResponse(questionDTO);
+            return ResponseEntity.ok("답변이 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("답변 수정에 실패했습니다: " + e.getMessage());
+        }
     }
 
+    // 문의 답변 삭제
+    @DeleteMapping("/questions/{id}/respond")
+    public ResponseEntity<String> deleteResponse(@PathVariable Integer id) {
+        try {
+            adminManagementService.deleteResponse(id);
+            return ResponseEntity.ok("답변이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("답변 삭제에 실패했습니다: " + e.getMessage());
+        }
+    }
 
 }
