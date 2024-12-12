@@ -14,4 +14,6 @@ public class QuestionController {
     // 문의 작성, 문의 수정, 문의 삭제 기능 
     // 고정 문의 & 문의 리스트 출력
     // 문의 사항 검색
+
+
 }

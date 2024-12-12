@@ -95,59 +95,61 @@ public class CartServiceImpl implements CartService {
     @Override
     public Map<String, Object> printCart(int userId) {
         System.out.println("CartService - printCart 호출됨. userId: " + userId);
-        
+    
         Map<String, Object> cartMap = new HashMap<>();
-        
+    
         try {
             // 사용자의 장바구니 조회
             CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                     .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
-            
+    
             System.out.println("CartEntity 조회됨: " + cartEntity.getId());
-            
+    
             // 장바구니에 담긴 상품 목록 조회
             List<UserCartEntity> userCartList = cartEntity.getUserCartList();
             System.out.println("장바구니 상품 수: " + userCartList.size());
-            
+    
+            // 장바구니 상품 필터링 및 DTO 변환
             List<UserCartDTO> cartList = userCartList.stream()
-                .map(userCart -> {
-                    ProductEntity product = userCart.getProductEntity();
-                    ProductDTO productDTO = ProductDTO.toGetProductDTO(product);
-                    
-                    // 재고 확인
-                    ProductStockEntity stock = productStockRepository.findByProductEntityAndSize(
-                        product, 
-                        userCart.getSize()
-                    );
-                    
-                    int stockCount = (stock != null) ? stock.getCount() : 0;
-                    
-                    return new UserCartDTO(
-                        userCart.getId(),
-                        cartEntity.getId(),
-                        productDTO,
-                        userCart.getSize().name(),
-                        userCart.getCount(),
-                        stockCount,
-                        stockCount <= 0
-                    );
-                })
-                .collect(Collectors.toList());
-            
+                    .filter(userCart -> !Boolean.TRUE.equals(userCart.getProductEntity().getDelete())) // 삭제된 상품 제외
+                    .map(userCart -> {
+                        ProductEntity product = userCart.getProductEntity();
+                        ProductDTO productDTO = ProductDTO.toGetProductDTO(product);
+    
+                        // 재고 확인
+                        ProductStockEntity stock = productStockRepository.findByProductEntityAndSize(
+                                product,
+                                userCart.getSize()
+                        );
+    
+                        int stockCount = (stock != null) ? stock.getCount() : 0;
+    
+                        return new UserCartDTO(
+                                userCart.getId(),
+                                cartEntity.getId(),
+                                productDTO,
+                                userCart.getSize().name(),
+                                userCart.getCount(),
+                                stockCount,
+                                stockCount <= 0
+                        );
+                    })
+                    .collect(Collectors.toList());
+    
             cartMap.put("cartItems", cartList);
             cartMap.put("totalItems", cartList.size());
-            
+    
             System.out.println("반환되는 장바구니 아이템 수: " + cartList.size());
-            
+    
         } catch (Exception e) {
             System.err.println("장바구니 조회 중 에러 발생: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("장바구니 조회 중 오류가 발생했습니다.", e);
         }
-        
+    
         return cartMap;
     }
-
+    
     // 장바구니에서 상품 삭제
     @Override
     public void deleteProduct(int productId, int userId) {
