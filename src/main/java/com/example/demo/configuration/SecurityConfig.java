@@ -4,7 +4,7 @@ import com.example.demo.jwt.filter.JwtAuthenticationFilter;
 import com.example.demo.security.handler.CustomAuthenticationSuccessHandler;
 
 import java.util.Arrays;
-
+import com.example.demo.security.handler.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

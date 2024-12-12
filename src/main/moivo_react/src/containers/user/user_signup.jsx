@@ -189,6 +189,8 @@ function UserSignup() {
     }
 
     try {
+      // 2024-12-12 phoneNuber 합치기 장훈  
+      const fullPhoneNumber = `${formData.phone1}-${formData.phone2}-${formData.phone3}`;
       await axios.post(`${PATH.SERVER}/api/user/join`, {
         userId: formData.userId,
         pwd: formData.pwd,
@@ -198,6 +200,7 @@ function UserSignup() {
         zipcode: formData.postalCode,
         addr1: formData.address,
         addr2: formData.detailedAddress,
+        tel: fullPhoneNumber
       });
       alert("회원가입 성공!");
       navigate("/user");
