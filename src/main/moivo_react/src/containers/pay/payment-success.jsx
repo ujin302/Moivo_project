@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import styles from "../../assets/css/Payment-success.module.css";
+import { PATH } from "../../../scripts/path";
 
 const SuccessPage = () => {
   const [searchParams] = useSearchParams();
@@ -14,14 +15,48 @@ const SuccessPage = () => {
   const amount = searchParams.get("amount");
   const addr = searchParams.get("addr");
   const tel = searchParams.get("tel");
+  const [emailSent, setEmailSent] = useState(false); // 이메일 전송 여부 상태 추가
 
   if (!paymentKey || !orderId) {
     return <div>결제 정보가 올바르지 않습니다. 고객센터로 문의해주세요.</div>;
   }
 
-  useEffect(()=>{
-    
-  },[])
+  useEffect(() => {
+    if (!emailSent) { // 이메일이 이미 전송되지 않은 경우에만 실행
+      const sendEmail = async () => {
+        try {
+          const response = await fetch(`${PATH.SERVER}/api/mail/success`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: "jomin5151@gmail.com", // 수신자의 이메일
+              subject: "결제가 완료되었습니다!",
+              message: `
+                주문 번호: ${orderId}\n
+                결제자: ${customerName}\n
+                상품 이름: ${orderName}\n
+                결제 금액: ${amount} 원\n
+                배송지: ${addr}
+              `,
+            }),
+          });
+
+          if (response.ok) {
+            console.log("이메일 발송 성공");
+            setEmailSent(true); // 이메일 전송 성공 시 상태 업데이트
+          } else {
+            console.error("이메일 발송 실패");
+          }
+        } catch (error) {
+          console.error("이메일 발송 중 오류 발생", error);
+        }
+      };
+
+      sendEmail();
+    }
+  }, [emailSent, orderId, customerName, orderName, amount, addr]);
 
   return (
     <div>
