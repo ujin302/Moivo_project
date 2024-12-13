@@ -34,7 +34,7 @@ public class QuestionEntity {
     @Column(name = "questiondate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime questionDate; // 문의 작성 일시
 
-    @Column(name = "response")
+    @Column(name = "response", columnDefinition = "TEXT")
     private String response; // 관리자 응답 (NULL이면 미응답)
 
     @Column(name = "responsedate")
@@ -49,5 +49,21 @@ public class QuestionEntity {
     @PrePersist // JPA에선 자동으로 시간추가가 안됌
     protected void onCreate() {
         this.questionDate = LocalDateTime.now(); // 현재 시간을 설정
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public LocalDateTime getResponseDate() {
+        return responseDate;
+    }
+
+    public void setResponseDate(LocalDateTime responseDate) {
+        this.responseDate = responseDate;
     }
 }

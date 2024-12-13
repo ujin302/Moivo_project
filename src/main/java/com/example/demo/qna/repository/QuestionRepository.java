@@ -1,6 +1,8 @@
 package com.example.demo.qna.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,18 +17,52 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Integer> {
 
-    // 문의 수정
+    // 모든 문의 조회
+    @Query("SELECT q FROM QuestionEntity q ORDER BY q.questionDate DESC")
+    @Override
+    public List<QuestionEntity> findAll();
+
+    // 문의 답변 등록
     @Modifying
-    @Query("UPDATE QuestionEntity q SET q.title = :title, q.content = :content WHERE q.id = :id")
+    @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
     @Transactional
-    public void updateQuestion(@Param("id") Integer id, @Param("title") String title, @Param("content") String content);
+    public int saveResponse(
+        @Param("id") Integer id, 
+        @Param("response") String response, 
+        @Param("responseDate") LocalDateTime responseDate
+    );
+
+    // 선택한 문의 답변 조회
+    @Query("SELECT q FROM QuestionEntity q WHERE q.id = :id")
+    public Optional<QuestionEntity> findResponseById(@Param("id") Integer id);
+
+    // 문의 답변 수정
+    @Modifying
+    @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
+    @Transactional
+    public void updateResponse(
+        @Param("id") Integer id, 
+        @Param("response") String response, 
+        @Param("responseDate") LocalDateTime responseDate
+    );
+
+    // 문의 답변 삭제
+    @Modifying
+    @Query("UPDATE QuestionEntity q SET q.response = NULL, q.responseDate = NULL WHERE q.id = :id")
+    @Transactional
+    public void deleteResponse(@Param("id") Integer id);
 
     // 문의 삭제
     public void deleteById(Integer id);
 
-    // 모든 문의 조회
-    public List<QuestionEntity> findAll();
+    // 문의 카테고리 검색
+    public Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    //문의 카테고리 검색시
-    Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    // 답변 상태로 문의 조회
+    @Query("SELECT q FROM QuestionEntity q WHERE q.response IS NOT NULL")
+    public List<QuestionEntity> findAllWithResponse();
+
+    // 미답변 상태 문의 조회
+    @Query("SELECT q FROM QuestionEntity q WHERE q.response IS NULL")
+    public List<QuestionEntity> findAllWithoutResponse();
 }
