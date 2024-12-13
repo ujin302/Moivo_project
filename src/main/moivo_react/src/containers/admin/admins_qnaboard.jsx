@@ -25,22 +25,37 @@ const Admins_qnaboard = () => {
 
     const fetchQuestions = async () => {
         try {
-            const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
             const response = await axios.get(`${PATH.SERVER}/api/admin/qna/management/questions`, {
                 headers: {
-                    Authorization: `Bearer ${token}` // 헤더에 토큰 추가
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
             console.log('Server response:', response.data);
             setQuestions(response.data);
         } catch (error) {
-            console.error('Failed to fetch questions:', error);
+            console.error('Failed to fetch questions:', error.response?.data || error.message);
         }
     };
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`${PATH.SERVER}/api/admin/qna/management/categories`);
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+            const response = await axios.get(`${PATH.SERVER}/api/admin/qna/management/categories`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             console.log('Server response:', response.data);
             setCategories(response.data);
         } catch (error) {
@@ -75,7 +90,21 @@ const Admins_qnaboard = () => {
 
     const handleRespondToQuestion = async () => {
         try {
-            await axios.post(`${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`, responseInput);
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+            await axios.post(
+                `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
+                responseInput,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
             closeResponseModal();
             fetchQuestions();
         } catch (error) {
@@ -85,7 +114,21 @@ const Admins_qnaboard = () => {
 
     const handleUpdateResponse = async () => {
         try {
-            await axios.put(`${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`, responseInput);
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+            await axios.put(
+                `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`, 
+                responseInput,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
             closeEditResponseModal();
             fetchQuestions();
         } catch (error) {
@@ -95,7 +138,20 @@ const Admins_qnaboard = () => {
 
     const handleDeleteResponse = async (questionId) => {
         try {
-            await axios.delete(`${PATH.SERVER}/api/admin/qna/management/questions/${questionId}/response`);
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+            await axios.delete(
+                `${PATH.SERVER}/api/admin/qna/management/questions/${questionId}/response`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
             fetchQuestions();
         } catch (error) {
             console.error('Failed to delete response:', error);
@@ -197,7 +253,7 @@ const Admins_qnaboard = () => {
                                                     className={admin_qnaboard.responseButton}
                                                     onClick={() => openEditResponseModal(question.id)}
                                                 >
-                                                    답변 수정
+                                                    답변 ���정
                                                 </button>
                                                 <button
                                                     className={`${admin_qnaboard.responseButton} ${admin_qnaboard.deleteButton}`}

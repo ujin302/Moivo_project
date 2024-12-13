@@ -8,13 +8,15 @@ import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.entity.QuestionEntity;
 import com.example.demo.qna.repository.QuestionRepository;
 import com.example.demo.qna.service.AdminManagementService;
+import com.example.demo.user.repository.UserRepository;
 import com.example.demo.qna.repository.QuestionCategoryRepository;
 
+
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminManagementServiceImpl implements AdminManagementService {
@@ -25,6 +27,9 @@ public class AdminManagementServiceImpl implements AdminManagementService {
     @Autowired
     private QuestionCategoryRepository questionCategoryRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public void addFAQ(QuestionDTO questionDTO) {
         QuestionEntity questionEntity = new QuestionEntity();
@@ -32,6 +37,8 @@ public class AdminManagementServiceImpl implements AdminManagementService {
         questionEntity.setContent(questionDTO.getContent());
         questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("카테고리가 존재하지 않습니다.")));
+        questionEntity.setUserEntity(userRepository.findById(questionDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("사용자가 존재하지 않습니다.")));
         questionRepository.save(questionEntity);
     }
 
@@ -44,11 +51,13 @@ public class AdminManagementServiceImpl implements AdminManagementService {
                 return new ArrayList<>();
             }
             return entities.stream()
+                .filter(entity -> entity != null && entity.getUserEntity() != null && entity.getCategoryEntity() != null)
                 .map(entity -> {
                     try {
                         return QuestionDTO.toGetQuestionDTO(entity);
                     } catch (Exception e) {
                         System.out.println("Error mapping entity: " + entity.getId() + ", Error: " + e.getMessage());
+                        e.printStackTrace();
                         return null;
                     }
                 })
@@ -56,6 +65,7 @@ public class AdminManagementServiceImpl implements AdminManagementService {
                 .collect(Collectors.toList());
         } catch (Exception e) {
             System.out.println("Error fetching questions: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to fetch questions", e);
         }
     }
