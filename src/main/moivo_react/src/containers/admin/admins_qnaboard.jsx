@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import QnA_b from '../../assets/css/qna_boardlist.module.css';
-import { Link } from 'react-router-dom';
-import Footer from './../../components/Footer/Footer';
-import Banner from '../../components/Banner/banner';
+import admin_qnaboard from '../../assets/css/admins_qnaboard.module.css';
+import Admins_side from '../../components/admin_sidebar/admins_side';
 
-const qna_boardlist = () => {
+const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
@@ -127,40 +125,30 @@ const qna_boardlist = () => {
     };
 
     return (
-        <div className={QnA_b.qnalistMainDiv}>
-            <div><Banner /></div>
-            <div className={QnA_b.qnalistheader}></div>
+        <div className={admin_qnaboard.qnalistMainDiv}>
+            <div className={admin_qnaboard.qnalistheader}></div>
 
-            <div className={QnA_b.qnalistTitle}>고객센터</div>
-
+            <div className={admin_qnaboard.qnalistTitle}>고객센터</div>
+            <div className={admin_qnaboard.sidebar}>
+            <Admins_side />
+            </div>
             {/* 네비게이션 */}
-            <div className={QnA_b.qnalistNavi}>
-                <Link to="/qna_faqboard">
-                    <button className={QnA_b.qnalistNaviBtn}>자주 묻는 질문</button>
-                </Link>
-
-                <Link to="/qna_board">
-                    <button className={QnA_b.qnalistNaviBtn}>문의 작성하기</button>
-                </Link>
-
-                <Link to="/qna_boardlist">
-                    <button className={QnA_b.qnalistNaviBtn}>문의 게시글</button>
-                </Link>
+            <div className={admin_qnaboard.qnalistNavi}>
             </div>
        
             {/* QnA 리스트 */}
-            <div className={QnA_b.qnalist}>
-                <div className={QnA_b.qnalistContainer}>
+            <div className={admin_qnaboard.qnalist}>
+                <div className={admin_qnaboard.qnalistContainer}>
                      
                      {/* 문의 유형 드롭다운 버튼 */}
-                    <div className={QnA_b.dropdownContainer}>
-                        <button className={QnA_b.dropdownBtn} onClick={toggleDropdown}>
+                    <div className={admin_qnaboard.dropdownContainer}>
+                        <button className={admin_qnaboard.dropdownBtn} onClick={toggleDropdown}>
                             전체 문의 {isDropdownVisible ? <i className="fas fa-chevron-up"></i> : <i className="fas fa-chevron-down"></i>}
                         </button>
 
                         {/* 드롭다운 목록 */}
                         {isDropdownVisible && (
-                            <ul className={QnA_b.filterList}>
+                            <ul className={admin_qnaboard.filterList}>
                                 <li onClick={() => { setSelectedType(''); setIsDropdownVisible(false); setActiveIndex(null); }}>전체</li>
                                 <li onClick={() => { setSelectedType('일반문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>일반문의</li>
                                 <li onClick={() => { setSelectedType('비밀문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>비밀문의</li>
@@ -173,23 +161,23 @@ const qna_boardlist = () => {
                         <div>등록된 문의가 없습니다.</div>
                     ) : (
                         currentPageData.map((item, index) => (
-                            <div key={index} className={QnA_b.qnalistItem}>
-                                <div className={QnA_b.qnalistHeader} onClick={() => handleToggle(index + startIndex, item.secret)}>
-                                    <span className={QnA_b.qnalistQuestionType}>
+                            <div key={index} className={admin_qnaboard.qnalistItem}>
+                                <div className={admin_qnaboard.qnalistHeader} onClick={() => handleToggle(index + startIndex, item.secret)}>
+                                    <span className={admin_qnaboard.qnalistQuestionType}>
                                         {getIconForType(item.type)}
                                     </span>
-                                    <span className={QnA_b.qnalistQuestionTitle}>
+                                    <span className={admin_qnaboard.qnalistQuestionTitle}>
                                         {item.secret ? '비밀글입니다.' : item.title}
                                     </span>
                                 </div>
                                 {activeIndex === index + startIndex && (
-                                    <div className={QnA_b.qnalistDetails}>
-                                        <div className={QnA_b.qnalistUserInfo}>
+                                    <div className={admin_qnaboard.qnalistDetails}>
+                                        <div className={admin_qnaboard.qnalistUserInfo}>
                                             <span>{item.userId}</span> | <span>{item.date}</span>
                                         </div>
-                                        <div className={QnA_b.qnalistUserQuestion}>{item.question}</div>
-                                        <div className={QnA_b.qnalistDivider}></div>
-                                        <div className={QnA_b.qnalistUserAnswer}>
+                                        <div className={admin_qnaboard.qnalistUserQuestion}>{item.question}</div>
+                                        <div className={admin_qnaboard.qnalistDivider}></div>
+                                        <div className={admin_qnaboard.qnalistUserAnswer}>
                                             {item.answer || '답변 대기 중'}
                                         </div>
                                     </div>
@@ -199,9 +187,9 @@ const qna_boardlist = () => {
                     )}
                 </div>
                 {/* 페이징 버튼 */}
-                <div className={QnA_b.pagination}>
+                <div className={admin_qnaboard.pagination}>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)}>
+                        <button key={page} className={`${admin_qnaboard.paginationBtn} ${currentPage === page ? admin_qnaboard.active : ''}`} onClick={() => handlePageChange(page)}>
                             {page}
                         </button>
                     ))}
@@ -210,28 +198,26 @@ const qna_boardlist = () => {
 
             {/* 비밀번호 확인 모달 */}
             {passwordModal.visible && (
-                <div className={QnA_b.modalOverlay}>
-                    <div className={QnA_b.modalContent}>
+                <div className={admin_qnaboard.modalOverlay}>
+                    <div className={admin_qnaboard.modalContent}>
                         <h3>비밀글 비밀번호 확인</h3>
                         <input
                             type="password"
                             placeholder="비밀번호 입력"
                             value={enteredPassword}
                             onChange={(e) => setEnteredPassword(e.target.value)}
-                            className={QnA_b.modalInput}
+                            className={admin_qnaboard.modalInput}
                         />
-                        {passwordError && <p className={QnA_b.errorText}>{passwordError}</p>}
-                        <div className={QnA_b.modalButtons}>
+                        {passwordError && <p className={admin_qnaboard.errorText}>{passwordError}</p>}
+                        <div className={admin_qnaboard.modalButtons}>
                             <button onClick={handlePasswordCheck}>확인</button>
                             <button onClick={closePasswordModal}>취소</button>
                         </div>
                     </div>
                 </div>
             )}
-
-            <Footer />
         </div>
     );
 };
 
-export default qna_boardlist;
+export default Admins_qnaboard;

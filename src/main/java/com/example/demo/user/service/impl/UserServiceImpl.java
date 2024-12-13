@@ -1,22 +1,30 @@
 package com.example.demo.user.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.jwt.prop.JwtProps;
 import com.example.demo.jwt.service.BlacklistService;
 import com.example.demo.jwt.service.RefreshTokenService;
 import com.example.demo.jwt.util.JwtUtil;
+import com.example.demo.payment.entity.PaymentEntity;
+import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.CartEntity;
 import com.example.demo.user.entity.UserEntity;
@@ -43,6 +51,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private PaymentRepository paymentRepository;
+    
+    @Autowired
+    private UserCouponRepository userCouponRepository;
+    @Autowired
     private WishRepository wishRepository;
     @Autowired
     private CartRepository cartRepository;
@@ -59,7 +72,7 @@ public class UserServiceImpl implements UserService {
     private JwtProps jwtProps;
 
     @Override
-    public String insert(UserDTO userDTO) {
+    public int insert(UserDTO userDTO) {
         // DTO -> Entity 변환
         UserEntity userEntity = UserEntity.toGetUserEntity(userDTO);
         userEntity.setPwd(passwordEncoder.encode(userDTO.getPwd()));
@@ -78,7 +91,7 @@ public class UserServiceImpl implements UserService {
         UserEntity savedUser = userRepository.save(userEntity);
 
         // 저장된 사용자 ID 반환
-        return savedUser.getUserId();
+        return savedUser.getId();
     }
 /*
     @Override
@@ -176,26 +189,25 @@ public class UserServiceImpl implements UserService {
                 .map(UserEntity::toGetUserDTO)
                 .collect(Collectors.toList());
     }
-    /*
+
     @Override
-    public void updateUserGrade(String userId, String grade) {
-        UserEntity userEntity = userRepository.findByUserId(userId)
+    public void updateUserGrade(int userId, String grade) {
+        UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         userEntity.setGrade(UserEntity.Grade.valueOf(grade)); // 등급 업데이트
         userRepository.save(userEntity);
     }
-     */
+
     // 결제 후 등급 업데이트
     //userService.updateUserGradeBasedOnPurchase(paymentEntity.getUserEntity().getId());
     // 추후 결제 시스템 코드 구현 후 추가하기
     
     // 결제에 따른 등급 업데이트
     
-    /*
     @Override
     public void updateUserGradeBasedOnPurchase(int userId) {
         // 사용자 정보 조회
-        UserEntity userEntity = userRepository.findByUserId(userId)
+        UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     
         // 현재 날짜를 기준으로 해당 월의 결제 금액을 계산
@@ -232,7 +244,7 @@ public class UserServiceImpl implements UserService {
             return UserEntity.Grade.LV1; // LV1: 일반회원
         }
     }
- */
+
 
     // 토큰 검사 _241126_sc
     @Override
@@ -441,5 +453,72 @@ public class UserServiceImpl implements UserService {
         
         return userRepository.save(user);
     }
+
+    // 회원정보 수정 - sumin (2024.12.12)
+    @Override
+    public void updateUserInfo(UserDTO userDTO) {
+        UserEntity userEntity = userRepository.findByUserId(userDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 업데이트할 필드들 설정
+        userEntity.setName(userDTO.getName());
+        userEntity.setGender(userDTO.getGender());
+        userEntity.setAddr1(userDTO.getAddr1());
+        userEntity.setAddr2(userDTO.getAddr2());
+        userEntity.setZipcode(userDTO.getZipcode());
+        userEntity.setTel(userDTO.getTel());
+        userEntity.setEmail(userDTO.getEmail());
+        userEntity.setHeight(userDTO.getHeight());
+        userEntity.setWeight(userDTO.getWeight());
+        
+        // 비밀번호 변경 (옵션)
+        if (userDTO.getPwd() != null && !userDTO.getPwd().isEmpty()) {
+            userEntity.setPwd(passwordEncoder.encode(userDTO.getPwd()));
+        }
+
+        // 변경사항 저장
+        userRepository.save(userEntity);
+    }
+
+
+    public boolean checkPassword(int userId, String password) {
+        // 사용자 정보 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        
+        // 비밀번호가 일치하는지 확인 (BCrypt 비밀번호 암호화 확인)
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("mySecretPassword");
+        System.out.println("Encoded password: " + encodedPassword);
+        if (!passwordEncoder.matches(password, userEntity.getPwd())) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    public void deleteUser(int userId) {
+        // 사용자 정보 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    
+        // 연관된 데이터 삭제
+        // 1. UserEntity와 관련된 DB 삭제
+        if (userEntity.getWishEntity() != null) {
+            // WishEntity 삭제
+            userEntity.getWishEntity().setUserEntity(null); // 양방향 관계 해제
+        }
+        if (userEntity.getCartEntity() != null) {
+            // CartEntity 삭제
+            userEntity.getCartEntity().setUserEntity(null); // 양방향 관계 해제
+        }
+    
+        // UserCouponEntity 삭제 
+        userCouponRepository.deleteByUserEntity_Id(userId);
+
+        // 3. 사용자 삭제
+        userRepository.delete(userEntity);
+    }
+    
 
 }

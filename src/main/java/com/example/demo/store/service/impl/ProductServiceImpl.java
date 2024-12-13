@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.demo.store.dto.*;
@@ -181,17 +182,17 @@ public class ProductServiceImpl implements ProductService {
 
         // 3. 조건 별 상품 목록 가져오기( 컨트롤러에서 설정한 기본 개수는 15개)
         Page<ProductEntity> pageProductList = null;
-        if (categoryid == 0 & keyword == null) { // 전체
-            // categoryid는 all, keyword는 받지 않았을 때, 전체 DB 개수 추출
-            pageProductList = productRepository.findAll(pageable); // 카테고리
+        if (categoryid == 0 && keyword == null) {
+            // 전체 상품 중 delete = false
+            pageProductList = productRepository.findByDeleteFalse(pageable);
         } else if (categoryid != 0 && keyword == null) {
-            // categoryid로 검색한 DB 개수 추출
-            pageProductList = productRepository.findBycategoryid(categoryid, pageable); // 키워드
+            // 특정 카테고리에서 delete = false
+            pageProductList = productRepository.findBycategoryid(categoryid, pageable);
         } else if (categoryid == 0 && keyword != null) {
-            // keyword로 검색한 DB 개수 추출
-            pageProductList = productRepository.findByNameContainingIgnoreCase(keyword, pageable); // 카테고리 + 키워드
+            // 키워드 검색에서 delete = false
+            pageProductList = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
         } else if (categoryid != 0 && keyword != null) {
-            // categoryid + keyword로 검색한 DB 개수 추출
+            // 키워드 + 카테고리 검색에서 delete = false
             pageProductList = productRepository.findByNameContainingIgnoreCaseAndCategoryEntity_id(keyword, categoryid,
                     pageable);
         }
@@ -338,20 +339,50 @@ public class ProductServiceImpl implements ProductService {
         return Arrays.asList(Gender.values());
     }
 
-    // 24.11.27 - 상품 삭제 - uj
+    // 24.12.11 - 상품 삭제 - sumin
     @Override
     public void deleteProduct(int productId) {
-        // 1. 상품 정보 삭제
+        // productId에 해당하는 상품 조회
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("해당 상품이 존재하지 않습니다."));
+        System.out.println("여기와 ?? " + productId);
+        // delete 변수 true로 설정
+        product.setDelete(true);
 
-        // 2. 상품 이미지 삭제
+        // 변경 사항 저장
+        productRepository.save(product);
 
-        // 3. 상품 재고 삭제
-
-        // 4. 상품 리뷰 삭제
-
-        // 5. 장바구니에서 상품 삭제
-
-        // 6.
+        System.out.println("상품 삭제 완료 상품 ID: " + productId);
     }
 
+    // 24.12.11 - 삭제된 상품들 가져오기 - sumin
+    @Override
+    public List<ProductDTO> getDeletedProducts() {
+        List<ProductEntity> deletedProducts = productRepository.findByDeleteTrue(); // 삭제된 상품들 조회
+
+        // Entity -> DTO 변환
+        List<ProductDTO> productList = deletedProducts.stream()
+                .map(productEntity -> ProductDTO.toGetProductDTO(productEntity))
+                .collect(Collectors.toList());
+        System.out.println("productList = " + productList);
+        return productList;
+    }
+
+    @Override
+    public boolean restoreProduct(int productId) {
+        Optional<ProductEntity> productEntity = productRepository.findById(productId);
+
+        if (productEntity.isPresent()) {
+            ProductEntity product = productEntity.get();
+
+            // 이미 삭제 상태인 경우만 복구
+            if (product.getDelete()) {
+                product.setDelete(false);
+                productRepository.save(product);
+                return true; // 복구 성공
+            }
+        }
+
+        return false; // 복구 실패
+    }
 }

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
-const qna_board = () => {
+const Qna_board = () => {
   const [type, setType] = useState('');
   const [title, setTitle] = useState('');
   const [question, setQuestion] = useState('');
@@ -47,6 +47,7 @@ const qna_board = () => {
                 <option value="일반 문의">일반 문의</option>
                 <option value="비밀 문의">비밀 문의</option>
                 <option value="기타 문의">기타 문의</option>
+                <option value="사이즈 문의">사이즈 문의</option>
               </select>
             </div>
 
@@ -77,4 +78,4 @@ const qna_board = () => {
   );
 };
 
-export default qna_board;
+export default Qna_board;

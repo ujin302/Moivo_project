@@ -3,6 +3,7 @@ package com.example.demo.payment.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.user.entity.UserEntity;
 
 import jakarta.persistence.CascadeType;
@@ -24,14 +25,9 @@ import lombok.Data;
 @Table(name = "payment")
 public class PaymentEntity {
 
-    public enum PaymentStatus { // 결제 상태
-        // 대기, 성공. 실패
-        WAITING, SUCCESS, FAIL
-    }
-
     public enum DeliveryStatus { // 배송 상태
-        // 준비중, 배송중, 구매 확정
-        READY, DELIVERY, CONFIRMED
+        // 결제 완료, 준비중, 배송중, 구매 확정
+        PAYMENT_COMPLETED, READY, DELIVERY, CONFIRMED
     }
 
     @Id
@@ -64,28 +60,41 @@ public class PaymentEntity {
     @Column(name = "zipcode", length = 100)
     private String zipcode; // 수령인 우편번호
 
-    @Column(name = "deliverymsg", length = 100)
-    private String deliveryMsg; // 배송 메시지
-
     @Column(name = "count", nullable = false)
     private int count; // 총 주문 상품 개수
 
     @Column(name = "paymentdate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime paymentDate; // 결제 요청 일시
+    private LocalDateTime paymentDate = LocalDateTime.now(); // 결제 요청 일시
 
     @Column(name = "tosscode", length = 100, nullable = false)
     private String tossCode; // 토스 고유 주문 번호 (예시: MC44MjA2MjI3OTQwNjI5)
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "paymentstatus", length = 20, nullable = false)
-    private PaymentStatus paymentStatus; // 결제 상태 (PENDING, COMPLETED, CANCELED 등)
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "deliverystatus", length = 20)
-    private DeliveryStatus deliveryStatus; // 배송 상태 (READY, IN_TRANSIT, DELIVERED)
+    @Column(name = "deliverystatus", length = 30)
+    private DeliveryStatus deliveryStatus = DeliveryStatus.PAYMENT_COMPLETED; // 배송 상태 (READY, IN_TRANSIT, DELIVERED)
 
     // 주문 1건 : 상품 n개
     @OneToMany(mappedBy = "paymentEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PaymentDetailEntity> paymentDetailList; // 결제 상세
+
+    // DTO -> Entity
+
+    // 결제 정보 저장
+    public static PaymentEntity toSavePaymentEntity(PaymentDTO dto, UserEntity userEntity) {
+        // 결제 정보 저장이기 때문에 seq 존재하지 않음.
+        PaymentEntity entity = new PaymentEntity();
+        entity.setUserEntity(userEntity);
+        entity.setTotalPrice(dto.getTotalPrice());
+        entity.setDiscount(dto.getDiscount());
+        entity.setName(dto.getName());
+        entity.setTel(dto.getTel());
+        entity.setAddr1(dto.getAddr1());
+        entity.setAddr2(dto.getAddr2());
+        entity.setZipcode(dto.getZipcode());
+        entity.setCount(dto.getCount());
+        entity.setTossCode(dto.getTosscode());
+
+        return entity;
+    }
 
 }

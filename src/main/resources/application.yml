@@ -98,6 +98,21 @@ spring:
       max-file-size: -1 # 파일당 최대 크기 (-1은 무제한)
       max-request-size: -1 # 요청 전체 최대 크기 (-1은 무제한)
 
+  mail:
+    host: smtp.gmail.com # 12/11 16:57 조강민
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+          ssl:
+            enable: false
+
 ncp:
   storage:
     access-key: 6A890BBDD2150DF9BDC5
@@ -127,4 +142,3 @@ logging:
 #.gitignore에
 ###인증정보 제외
 #/src/main/resources/google or naver.yml 추가
-

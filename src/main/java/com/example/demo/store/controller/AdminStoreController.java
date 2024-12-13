@@ -121,15 +121,37 @@ public class AdminStoreController {
     }
 
     // 상품 삭제 - 24.11.27 - uj
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable int productId) {
-
+    @DeleteMapping("delete/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable(name = "productId") int productId) {
         try {
             productService.deleteProduct(productId);
+            return ResponseEntity.ok("상품 삭제가 완료되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok(null);
+    }
+
+    // 삭제된 상품 리스트 가져오기 - 12.11 sumin
+    @GetMapping("/trash")
+    public ResponseEntity<List<ProductDTO>> getDeletedProducts() {
+        List<ProductDTO> deletedProducts = productService.getDeletedProducts();
+        System.out.println("deletedProducts = " + deletedProducts);
+        return ResponseEntity.ok(deletedProducts);
+    }
+
+    //삭제된 상품 복구 - 12.11 sumin
+    @PostMapping("/restore/{productId}")
+    public ResponseEntity<Void> restoreProduct(@PathVariable(name = "productId") int productId) {
+        System.out.println("productId = " + productId);
+
+        boolean result = productService.restoreProduct(productId);
+        System.out.println("result = " + result);
+        
+        if (result) {
+            return ResponseEntity.ok().build(); // 성공 시 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); // 실패 시 404 Not Found
+        }
     }
 }

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaShoppingCart, FaMinus, FaPlus, FaTruck, FaExchangeAlt, FaCreditCard } from 'react-icons/fa';
-import { useAuth } from '../../contexts/AuthContext'
+// import { useAuth } from '../../contexts/AuthContext'
 import { PATH } from '../../../scripts/path';
 import styles from '../../assets/css/product_detail.module.css';
 import Banner from '../../components/Banner/banner';
@@ -240,7 +240,8 @@ const ProductDetail = () => {
             price: product.price,
             name: product.name,
             img: product.img
-          }]
+          }],
+          isCartItem : false
         }
       });
     }
@@ -701,6 +702,18 @@ const ProductDetail = () => {
                         <span className={styles.qnaAuthor}>- 판매자</span>
                       </div>
                     </div>
+                    <div className={styles.qnaItem}>
+                      <div className={styles.question}>
+                        <span className={styles.qnaLabel}>Q.</span>
+                        <p>상품 교환 및 환불이 가능한가요?</p>
+                        <span className={styles.qnaAuthor}>- 구매자</span>
+                      </div>
+                      <div className={styles.answer}>
+                        <span className={styles.qnaLabel}>A.</span>
+                        <p>죄송하지만, 우리 사이트는 상품 교환, 환불, 반품이 불가능합니다.</p>
+                        <span className={styles.qnaAuthor}>- 판매자</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -708,26 +721,20 @@ const ProductDetail = () => {
               {activeTab === 'policy' && (
                 <div className={styles.policySection}>
                   <h2 className={styles.sectionHeading}>환불/교환 정책</h2>
+                  <br/>
                   <div className={styles.policyContent}>
                     <h3>교환/반품 안내</h3>
                     <ul>
-                      <li>상품 수령 후 7일 이내에 교환/반품이 가능합니다.</li>
-                      <li>제품에 하자가 있는 경우 무상으로 교환/반품 가능합니다.</li>
+                      <li>상품 수령 후 교환/반품이 불가능합니다.</li>
                       <li>고객의 단순 변심으로 인한 교환/반품의 경우 배송비는 고객 부담입니다.</li>
                     </ul>
                     
                     <h3>교환/반품이 불가능한 경우</h3>
                     <ul>
-                      <li>상품 수령 후 7일이 경과한 경우</li>
+                      <li>상품 수령한 경우</li>
                       <li>착용 흔적이 있거나 상품이 훼손된 경우</li>
                       <li>상품의 택이나 라벨이 제거된 경우</li>
                       <li>고객의 부주의로 인해 상품이 훼손된 경우</li>
-                    </ul>
-
-                    <h3>환불 안내</h3>
-                    <ul>
-                      <li>상품 회수 확인 후 3영업일 이내에 환불이 진행됩니다.</li>
-                      <li>카드 결제의 경우 카드사에 따라 환불 처리 기간이 다소 차이가 있을  있습니다.</li>
                     </ul>
                   </div>
                 </div>

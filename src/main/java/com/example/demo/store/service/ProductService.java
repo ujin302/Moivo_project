@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.demo.store.dto.ProductCategoryDTO;
+import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.entity.ProductEntity.Gender;
 
 public interface ProductService {
@@ -23,4 +24,7 @@ public interface ProductService {
 
     public void deleteProduct(int productId);
 
+    public List<ProductDTO> getDeletedProducts();
+
+    public boolean restoreProduct(int productId);
 }
