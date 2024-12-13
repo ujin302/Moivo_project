@@ -29,4 +29,5 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     //문의 카테고리 검색시
     Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
 }

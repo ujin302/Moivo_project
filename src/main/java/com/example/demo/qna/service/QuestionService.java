@@ -6,11 +6,11 @@ import com.example.demo.qna.entity.QuestionEntity;
 import java.util.Map;
 
 public interface QuestionService {
-    public void addQuestion(QuestionDTO questionDTO);
+    public QuestionEntity addQuestion(QuestionDTO questionDTO);
 
     public void updateQuestion(QuestionDTO questionDTO);
 
-    public void deleteQuestion(int id, int userId);
+    public void deleteQuestion(QuestionDTO questionDTO);
 
     public Map<String, Object> getQuestionList(Map<String, Object> datemap);
 
