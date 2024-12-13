@@ -27,9 +27,9 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
     @Transactional
     public int saveResponse(
-        @Param("id") Integer id, 
-        @Param("response") String response, 
-        @Param("responseDate") LocalDateTime responseDate
+            @Param("id") Integer id,
+            @Param("response") String response,
+            @Param("responseDate") LocalDateTime responseDate
     );
 
     // 선택한 문의 답변 조회
@@ -41,9 +41,9 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
     @Transactional
     public void updateResponse(
-        @Param("id") Integer id, 
-        @Param("response") String response, 
-        @Param("responseDate") LocalDateTime responseDate
+            @Param("id") Integer id,
+            @Param("response") String response,
+            @Param("responseDate") LocalDateTime responseDate
     );
 
     // 문의 답변 삭제
