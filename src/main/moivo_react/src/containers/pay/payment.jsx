@@ -132,14 +132,6 @@ const Payment = () => {
     const selectedCoupon = coupons.find(coupon => coupon.name === formData.coupon);
     if (selectedCoupon) {
       const discountAmount = (totalPrice * selectedCoupon.discountValue) / 100;
-      console.log(selectedCoupon);
-      console.log(selectedCoupon.discountValue);
-      // 결제 정보의 할인 가격 저장
-      setPaymentData({
-        ...paymentData,
-        discount: discountAmount
-      })
-
       return totalPrice - discountAmount;
     }
     return totalPrice;

@@ -47,10 +47,14 @@ public class PaymentDetailEntity {
     // DTO -> Entity
 
     // 결제 정보 저장
-    public static PaymentDetailEntity toSavePaymentEntity(PaymentDetailDTO dto, PaymentEntity paymentEntity) {
+    public static PaymentDetailEntity toSavePaymentEntity(
+            PaymentDetailDTO dto,
+            PaymentEntity paymentEntity,
+            ProductEntity productEntity) {
         // 결제 정보 저장이기 때문에 seq 존재하지 않음.
         PaymentDetailEntity entity = new PaymentDetailEntity();
         entity.setPaymentEntity(paymentEntity);
+        entity.setProductEntity(productEntity);
         entity.setPrice(dto.getPrice());
         entity.setCount(dto.getCount());
         entity.setSize(dto.getSize());

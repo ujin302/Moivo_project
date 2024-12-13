@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import QnA from '../../assets/css/qna_faqboard.module.css';
-import Footer from './../../components/Footer/Footer';
+import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 import { Link } from 'react-router-dom';
 

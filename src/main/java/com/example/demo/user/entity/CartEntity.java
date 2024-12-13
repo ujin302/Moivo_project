@@ -29,7 +29,7 @@ public class CartEntity { // 장바구니
     private UserEntity userEntity;
 
     // 장바구니 1개 : 상품 n개
-    @OneToMany(mappedBy = "cartEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cartEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UserCartEntity> userCartList;
 
 }

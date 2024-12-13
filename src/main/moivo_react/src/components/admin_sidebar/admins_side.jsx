@@ -4,7 +4,7 @@ import admin_sidebar from '../../assets/css/admin_side.module.css';
 
 const admins_side = () => {
     return (
-        <div className={admin_sidebar.area}>
+        <div className={`${admin_sidebar.area}`}>
           <nav className={admin_sidebar.mainMenu}>
             <ul>
               {/* Dashboard */}

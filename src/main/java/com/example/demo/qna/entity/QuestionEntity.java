@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import com.example.demo.user.entity.UserEntity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,7 +18,6 @@ public class QuestionEntity {
     // 문의 n개 : 카테고리 1개
     @ManyToOne
     @JoinColumn(name = "categoryid", nullable = false) // 카테고리와 연결
-    @JsonIgnore // CategoryEntity의 직렬화를 무시
     private QuestionCategoryEntity categoryEntity; // 문의 카테고리
 
     // 문의 n개 : 사용자 1개
@@ -36,7 +34,7 @@ public class QuestionEntity {
     @Column(name = "questiondate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime questionDate = LocalDateTime.now(); // 문의 작성 일시
 
-    @Column(name = "response")
+    @Column(name = "response", columnDefinition = "TEXT")
     private String response; // 관리자 응답 (NULL이면 미응답)
 
     @Column(name = "responsedate")
@@ -47,9 +45,25 @@ public class QuestionEntity {
 
     @Column(name = "fixquestion", nullable = false)
     private Boolean fixQuestion = false; // 고정 글일 경우, True
-    
-//    @PrePersist //JPA에선 자동으로 시간추가가 안됌 = LocalDateTime.now(); 넣어줘도 됌
+
+//    @PrePersist // JPA에선 자동으로 시간추가가 안됌 /  2안으로는 questionDate = LocalDateTime.now(); 넣어줘도 됌
 //    protected void onCreate() {
 //        this.questionDate = LocalDateTime.now(); // 현재 시간을 설정
 //    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public LocalDateTime getResponseDate() {
+        return responseDate;
+    }
+
+    public void setResponseDate(LocalDateTime responseDate) {
+        this.responseDate = responseDate;
+    }
 }
