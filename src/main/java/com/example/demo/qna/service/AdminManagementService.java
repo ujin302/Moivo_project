@@ -15,4 +15,10 @@ public interface AdminManagementService {
     public void respondToQuestion(Integer questionId, String response); // 문의에 대한 답변 등록 메서드 
     public void updateResponse(Integer questionId, String response); // 문의 답변 수정 메서드
     public void deleteResponse(Integer questionId); // 문의 답변 삭제 메서드
+
+    // 답변된 문의 조회
+    public List<QuestionDTO> getAnsweredQuestions();
+    
+    // 미답변 문의 조회
+    public List<QuestionDTO> getUnansweredQuestions();
 }

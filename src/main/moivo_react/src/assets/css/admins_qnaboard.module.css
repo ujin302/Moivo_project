@@ -498,10 +498,6 @@
   background-color: #FF5252;
 }
 
-.deleteButton::before {
-  content: '\\f2ed';
-}
-
 .noResponseMessage {
   color: #777;
   font-style: italic;

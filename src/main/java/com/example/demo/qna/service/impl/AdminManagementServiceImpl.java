@@ -97,25 +97,21 @@ public class AdminManagementServiceImpl implements AdminManagementService {
     @Transactional
     public void respondToQuestion(Integer questionId, String response) {
         try {
-            // 1. 문의글 존재 여부 확인
             QuestionEntity question = questionRepository.findById(questionId)
-                    .orElseThrow(() -> new RuntimeException("Question not found"));
+                .orElseThrow(() -> new RuntimeException("문의를 찾을 수 없습니다."));
             
-            // 2. 답변과 답변 시간 설정
+            System.out.println("Question found: " + question.getId());
+            System.out.println("Setting response: " + response);
+            
             question.setResponse(response);
             question.setResponseDate(LocalDateTime.now());
-            // 3. 저장
+            
             QuestionEntity savedQuestion = questionRepository.save(question);
-            
-            System.out.println("Response saved successfully");
-            System.out.println("Question ID: " + savedQuestion.getId());
-            System.out.println("Response: " + savedQuestion.getResponse());
-            System.out.println("Response Date: " + savedQuestion.getResponseDate());
-            
+            System.out.println("Response saved: " + savedQuestion.getResponse());
         } catch (Exception e) {
             System.err.println("Error in respondToQuestion: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Failed to save response", e);
+            throw e;
         }
     }
 
@@ -144,6 +140,20 @@ public class AdminManagementServiceImpl implements AdminManagementService {
         return questionCategoryRepository.findAll().stream()
                 .map(category -> new QuestionCategoryDTO(category.getId(), category.getName().toString()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QuestionDTO> getAnsweredQuestions() {
+        return questionRepository.findAllWithResponse().stream()
+            .map(QuestionDTO::toGetQuestionDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QuestionDTO> getUnansweredQuestions() {
+        return questionRepository.findAllWithoutResponse().stream()
+            .map(QuestionDTO::toGetQuestionDTO)
+            .collect(Collectors.toList());
     }
 
 }

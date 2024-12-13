@@ -46,22 +46,24 @@ public class AdminManagementController {
     @PostMapping("/questions/{questionId}/response")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> respondToQuestion(
-        @PathVariable Integer questionId, 
+        @PathVariable("questionId") Integer questionId,
         @RequestBody Map<String, String> requestBody
     ) {
         try {
             String response = requestBody.get("response");
             System.out.println("Received response in controller: " + response);
+            
             if (response == null) {
                 return ResponseEntity.badRequest().body("Response cannot be null");
             }
+            
             adminManagementService.respondToQuestion(questionId, response);
-            return new ResponseEntity<>("Response saved successfully", HttpStatus.OK);
+            return ResponseEntity.ok("Response saved successfully");
         } catch (Exception e) {
             System.err.println("Error in controller: " + e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity<>("Failed to save response: " + e.getMessage(), 
-                HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to save response: " + e.getMessage());
         }
     }
 
@@ -87,6 +89,20 @@ public class AdminManagementController {
     public ResponseEntity<List<QuestionCategoryDTO>> getAllCategories() {
         List<QuestionCategoryDTO> categories = adminManagementService.getAllCategories();
         return ResponseEntity.ok().body(categories);
+    }
+
+    // 답변된 문의 조회
+    @GetMapping("/questions/answered")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<QuestionDTO>> getAnsweredQuestions() {
+        return ResponseEntity.ok(adminManagementService.getAnsweredQuestions());
+    }
+
+    // 미답변 문의 조회
+    @GetMapping("/questions/unanswered")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<QuestionDTO>> getUnansweredQuestions() {
+        return ResponseEntity.ok(adminManagementService.getUnansweredQuestions());
     }
 
 }
