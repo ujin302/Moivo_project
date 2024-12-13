@@ -64,7 +64,7 @@ public class PaymentEntity {
     private int count; // 총 주문 상품 개수
 
     @Column(name = "paymentdate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime paymentDate; // 결제 요청 일시
+    private LocalDateTime paymentDate = LocalDateTime.now(); // 결제 요청 일시
 
     @Column(name = "tosscode", length = 100, nullable = false)
     private String tossCode; // 토스 고유 주문 번호 (예시: MC44MjA2MjI3OTQwNjI5)

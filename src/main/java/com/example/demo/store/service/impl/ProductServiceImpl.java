@@ -193,7 +193,8 @@ public class ProductServiceImpl implements ProductService {
             pageProductList = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
         } else if (categoryid != 0 && keyword != null) {
             // 키워드 + 카테고리 검색에서 delete = false
-            pageProductList = productRepository.findByNameContainingIgnoreCaseAndCategoryEntity_id(keyword, categoryid, pageable);
+            pageProductList = productRepository.findByNameContainingIgnoreCaseAndCategoryEntity_id(keyword, categoryid,
+                    pageable);
         }
 
         // 4. Entity -> DTO 변환
@@ -347,10 +348,10 @@ public class ProductServiceImpl implements ProductService {
         System.out.println("여기와 ?? " + productId);
         // delete 변수 true로 설정
         product.setDelete(true);
-    
+
         // 변경 사항 저장
         productRepository.save(product);
-    
+
         System.out.println("상품 삭제 완료 상품 ID: " + productId);
     }
 
@@ -358,7 +359,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDTO> getDeletedProducts() {
         List<ProductEntity> deletedProducts = productRepository.findByDeleteTrue(); // 삭제된 상품들 조회
-    
+
         // Entity -> DTO 변환
         List<ProductDTO> productList = deletedProducts.stream()
                 .map(productEntity -> ProductDTO.toGetProductDTO(productEntity))
@@ -370,10 +371,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean restoreProduct(int productId) {
         Optional<ProductEntity> productEntity = productRepository.findById(productId);
-        
+
         if (productEntity.isPresent()) {
             ProductEntity product = productEntity.get();
-            
+
             // 이미 삭제 상태인 경우만 복구
             if (product.getDelete()) {
                 product.setDelete(false);
@@ -381,7 +382,7 @@ public class ProductServiceImpl implements ProductService {
                 return true; // 복구 성공
             }
         }
-        
+
         return false; // 복구 실패
     }
 }

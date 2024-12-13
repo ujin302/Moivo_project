@@ -73,8 +73,6 @@ public class SecurityConfig {
                                 "/api/oauth/kakao/**",
                                 "/api/user/kakao-login",
                                 "/api/store/**",
-                                "/api/user/payment",
-                                "/api/user/payment",
                                 "/api/mail/success")
                         .permitAll()
                         .anyRequest().authenticated())
