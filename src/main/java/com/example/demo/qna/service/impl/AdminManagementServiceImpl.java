@@ -97,24 +97,18 @@ public class AdminManagementServiceImpl implements AdminManagementService {
     @Transactional
     public void respondToQuestion(Integer questionId, String response) {
         try {
+            // 문의글 존재 여부 확인
             QuestionEntity question = questionRepository.findById(questionId)
                     .orElseThrow(() -> new RuntimeException("Question not found"));
             
-            System.out.println("Question found: " + question.getId());
-            System.out.println("Current response: " + question.getResponse());
-            System.out.println("Setting new response: " + response);
-            
-            question.setResponse(response.trim());
+            // 직접 엔티티 수정 방식으로 변경
+            question.setResponse(response);
             question.setResponseDate(LocalDateTime.now());
+            questionRepository.save(question);
             
-            System.out.println("Before save - Response: " + question.getResponse());
-            System.out.println("Before save - ResponseDate: " + question.getResponseDate());
-            
-            questionRepository.saveAndFlush(question);
-            
-            QuestionEntity savedQuestion = questionRepository.findById(questionId).orElseThrow();
-            System.out.println("After save - Response: " + savedQuestion.getResponse());
-            System.out.println("After save - ResponseDate: " + savedQuestion.getResponseDate());
+            System.out.println("Question updated: " + question.getId());
+            System.out.println("Response: " + question.getResponse());
+            System.out.println("Response date: " + question.getResponseDate());
             
         } catch (Exception e) {
             System.err.println("Error in respondToQuestion: " + e.getMessage());

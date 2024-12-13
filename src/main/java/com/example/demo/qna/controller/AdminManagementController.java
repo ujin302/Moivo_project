@@ -11,6 +11,7 @@ import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.service.AdminManagementService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/qna/management")
@@ -46,8 +47,9 @@ public class AdminManagementController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> respondToQuestion(
         @PathVariable Integer questionId, 
-        @RequestBody String response) {
+        @RequestBody Map<String, String> requestBody) {
         try {
+            String response = requestBody.get("response");
             System.out.println("Received response in controller: " + response);
             adminManagementService.respondToQuestion(questionId, response);
             return ResponseEntity.ok().build();
