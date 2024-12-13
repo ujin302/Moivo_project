@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.jwt.prop.JwtProps;
 import com.example.demo.jwt.service.BlacklistService;
@@ -337,37 +341,105 @@ public class UserServiceImpl implements UserService {
         return UserEntity.toGetUserDTO(userEntity);
     }
 
-    // 카카오 로그인을 위한 메소드  -  241210_yjy
-    @Override
-    public Map<String, Object> kakaoLogin(String userId) {
-        // 카카오 사용자 조회 또는 생성
-        UserEntity user = userRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("(카카오) 사용자를 찾을 수 없습니다."));
+
+    private String getKakaoAccessToken(String code) {
+        try {
+            String tokenUrl = "https://kauth.kakao.com/oauth/token";
+            
+            // 요청 파라미터 설정
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("grant_type", "authorization_code");
+            params.add("client_id", "f7a7c7e3336c98e0e10ec97636ac08fa");  // 본인의 REST API 키
+            params.add("redirect_uri", "http://localhost:8080/api/oauth/kakao/callback");
+            params.add("code", code);
+
+            // HTTP 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<MultiValueMap<String, String>> requestEntity = 
+                new HttpEntity<>(params, headers);
+
+            // RestTemplate으로 카카오 서버에 토큰 요청
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.exchange(
+                tokenUrl,
+                HttpMethod.POST,
+                requestEntity,
+                Map.class
+            );
+
+            // 응답에서 액세스 토큰 추출
+            Map<String, Object> responseBody = response.getBody();
+            return (String) responseBody.get("access_token");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get Kakao access token: " + e.getMessage());
+        }
+    }
+
+    // 카카오 사용자 정보 가져오기
+    private Map<String, Object> getKakaoUserInfo(String accessToken) {
+        try {
+            String userInfoUrl = "https://kapi.kakao.com/v2/user/me";
+
+            // HTTP 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
+            // RestTemplate으로 카카오 서버에 사용자 정보 요청
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.exchange(
+                userInfoUrl,
+                HttpMethod.GET,
+                requestEntity,
+                Map.class
+            );
+
+            // 응답에서 필요한 사용자 정보 추출
+            Map<String, Object> userInfo = new HashMap<>();
+            Map<String, Object> kakaoAccount = (Map<String, Object>) response.getBody().get("kakao_account");
+            Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+
+            userInfo.put("id", response.getBody().get("id"));
+            userInfo.put("email", kakaoAccount.get("email"));
+            userInfo.put("nickname", profile.get("nickname"));
+
+            return userInfo;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get Kakao user info: " + e.getMessage());
+        }
+    }
+
+    // 카카오 사용자 생성
+    private UserEntity createKakaoUser(Map<String, Object> kakaoUserInfo) {
+        String kakaoId = String.valueOf(kakaoUserInfo.get("id"));
+        String email = (String) kakaoUserInfo.get("email");
+        String nickname = (String) kakaoUserInfo.get("nickname");
+
+        UserEntity user = new UserEntity();
+        user.setUserId("KAKAO_" + kakaoId);
+        user.setEmail(email);
+        user.setName(nickname);
+        user.setAdmin(false);  // 카카오 로그인 사용자는 기본적으로 일반 사용자
         
-        int cartId = getCartIdById(user.getId());
-        int wishId = getWishIdById(user.getId());
-
-        // JWT 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(
-            user.getUserId(), 
-            user.getId(), 
-            wishId, 
-            cartId, 
-            user.isAdmin()
-        );
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getId());
-
-        // 응답 데이터 구성
-        Map<String, Object> result = new HashMap<>();
-        result.put("accessToken", accessToken);
-        result.put("refreshToken", refreshToken);
-        result.put("userId", user.getUserId());
-        result.put("id", user.getId());
-        result.put("cartId", cartId);
-        result.put("wishId", wishId);
-        result.put("isAdmin", user.isAdmin());
-
-        return result;
+        // Cart 엔티티 생성 및 연관관계 설정
+        CartEntity cartEntity = new CartEntity();
+        cartEntity.setUserEntity(user);
+        user.setCartEntity(cartEntity);
+        
+        // Wish 엔티티 생성 및 연관관계 설정
+        WishEntity wishEntity = new WishEntity();
+        wishEntity.setUserEntity(user);
+        user.setWishEntity(wishEntity);
+        
+        return userRepository.save(user);
     }
 
 }

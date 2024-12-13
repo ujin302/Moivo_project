@@ -52,8 +52,17 @@ const user_login = () => {
         });
     };
 
-    const handleKakaoLogin = () => {
-        window.location.href = KAKAO_AUTH_URL;
+    const handleKakaoLogin = (e) => {
+        e.preventDefault();
+        console.log("카카오 로그인 시도");
+        
+        try {
+            console.log("카카오 인증 URL:", KAKAO_AUTH_URL);
+            window.location.href = KAKAO_AUTH_URL;
+        } catch (error) {
+            console.error("카카오 로그인 중 에러:", error);
+            setError("카카오 로그인 처리 중 오류가 발생했습니다.");
+        }
     };
 
     return (
@@ -65,18 +74,26 @@ const user_login = () => {
                             <h1>Moivo</h1>
                         </Link>
                         <div className={signin['social-container']}>
-                            <a href="#" onClick={handleKakaoLogin}>
+                            <button 
+                                type="button"
+                                onClick={handleKakaoLogin}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    padding: 0,
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 <img 
                                     src={kakaoLoginImage} 
                                     alt="카카오 로그인" 
                                     style={{ 
-                                        width: '300px',
-                                        height: '45px',
-                                        cursor: 'pointer',
-                                        marginBottom: '10px'
+                                        width: '100%',
+                                        height: '100%',
+                                        cursor: 'pointer'
                                     }} 
                                 />
-                            </a>
+                            </button>
                             <a href="#" className={signin.social}><i className="fab fa-google-plus-g"></i></a>
                             <a href="#" className={signin.social}><i className="fab fa-linkedin-in"></i></a>
                         </div>
