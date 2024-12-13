@@ -45,18 +45,23 @@ public class AdminManagementController {
     // 문의 답변 등록
     @PostMapping("/questions/{questionId}/response")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> respondToQuestion(
+    public ResponseEntity<?> respondToQuestion(
         @PathVariable Integer questionId, 
-        @RequestBody Map<String, String> requestBody) {
+        @RequestBody Map<String, String> requestBody
+    ) {
         try {
             String response = requestBody.get("response");
             System.out.println("Received response in controller: " + response);
+            if (response == null) {
+                return ResponseEntity.badRequest().body("Response cannot be null");
+            }
             adminManagementService.respondToQuestion(questionId, response);
-            return ResponseEntity.ok().build();
+            return new ResponseEntity<>("Response saved successfully", HttpStatus.OK);
         } catch (Exception e) {
             System.err.println("Error in controller: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return new ResponseEntity<>("Failed to save response: " + e.getMessage(), 
+                HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -90,7 +90,6 @@ const Admins_qnaboard = () => {
 
     const handleRespondToQuestion = async (e) => {
         e.preventDefault();
-        
         try {
             const token = localStorage.getItem('accessToken');
             if (!token) {
@@ -98,26 +97,32 @@ const Admins_qnaboard = () => {
                 return;
             }
 
-            console.log('Sending response:', responseInput);
-            
-            const response = await axios.post(
-                `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
-                responseInput,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'text/plain'
-                    }
+            console.log('Sending response:', responseInput); // 요청 데이터 로깅
+
+            const response = await axios({
+                method: 'post',
+                url: `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
+                data: { response: responseInput },
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                validateStatus: function (status) {
+                    return status >= 200 && status < 500; // 302를 포함한 모든 2xx, 3xx, 4xx 상태 허용
                 }
-            );
+            });
+
+            console.log('Server response:', response); // 서버 응답 로깅
 
             if (response.status === 200) {
-                console.log('Response saved successfully');
                 await fetchQuestions();
                 closeResponseModal();
+                setResponseInput('');
+            } else {
+                console.error('Failed to submit response:', response.data);
             }
         } catch (error) {
-            console.error('Failed to respond to question:', error);
+            console.error('Error details:', error.response || error);
         }
     };
 
@@ -135,7 +140,7 @@ const Admins_qnaboard = () => {
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'text/plain'
+                        'Content-Type': 'application/json'
                     }
                 }
             );
@@ -181,7 +186,7 @@ const Admins_qnaboard = () => {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        setActiveIndex(null); // ��이지 변경 시 열려있는 아이템 초기화
+        setActiveIndex(null); // 페이지 변경 시 열려있는 아이템 초기화
     };
 
     // 각 문의 카테고리에 맞는 아이콘을 반환하는 함수
