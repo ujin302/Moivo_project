@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import QnA_b from '../../assets/css/qna_boardlist.module.css';
 import { Link } from 'react-router-dom';
-import Footer from '../../components/Footer/Footer';
+import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
 const Qna_boardlist = () => {
@@ -235,3 +235,4 @@ const Qna_boardlist = () => {
 };
 
 export default Qna_boardlist;
+

@@ -6,7 +6,6 @@ import com.example.demo.qna.entity.QuestionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
 
 @Data
 @AllArgsConstructor
@@ -34,7 +33,8 @@ public class QuestionDTO {
         dto.setTitle(entity.getTitle());
         dto.setUserId(entity.getUserEntity().getId());
         dto.setCategoryId(entity.getCategoryEntity().getId());
-
+        dto.setSecret(entity.getSecret());
+        dto.setFixQuestion(entity.getFixQuestion());
         return dto;
     }
 

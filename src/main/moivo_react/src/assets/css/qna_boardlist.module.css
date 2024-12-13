@@ -335,3 +335,61 @@
     height: 700px;
   }
 }
+
+/*  관리자 답변 섹션  */
+.adminResponseSection {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.responseTextarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    background-color: #333;
+    color: #fff;
+}
+
+.responseButtons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.responseButton {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.responseButton:hover {
+    background-color: #555;
+}
+
+.deleteButton {
+    background-color: #dc3545;
+}
+
+.deleteButton:hover {
+    background-color: #c82333;
+}
+
+@media (max-width: 700px) {
+    .responseButton {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .responseTextarea {
+        min-height: 80px;
+    }
+}

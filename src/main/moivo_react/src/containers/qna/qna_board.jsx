@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import QnA_w from '../../assets/css/qna_board.module.css'; 
 import { Link } from 'react-router-dom';
-import Footer from './../../components/Footer/Footer';
+import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
 const Qna_board = () => {
