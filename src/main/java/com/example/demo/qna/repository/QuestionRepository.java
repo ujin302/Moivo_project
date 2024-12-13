@@ -25,6 +25,8 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     public void deleteById(Integer id);
 
     // 모든 문의 조회
+    @Query("SELECT q FROM QuestionEntity q ORDER BY q.questionDate DESC")
+    @Override
     public List<QuestionEntity> findAll();
 
     //문의 카테고리 검색시
