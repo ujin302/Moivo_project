@@ -17,7 +17,9 @@ import com.example.demo.qna.repository.QuestionCategoryRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -154,6 +156,25 @@ public class AdminManagementServiceImpl implements AdminManagementService {
         return questionRepository.findAllWithoutResponse().stream()
             .map(QuestionDTO::toGetQuestionDTO)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Integer> getQuestionStatus() {
+        Map<String, Integer> status = new HashMap<>();
+        
+        // 전체 문의 수 조회
+        int totalQuestions = (int) questionRepository.count();
+        status.put("totalQuestions", totalQuestions);
+        
+        // 미답변 문의 수 조회
+        int unansweredQuestions = questionRepository.countByResponseIsNull();
+        status.put("unansweredQuestions", unansweredQuestions);
+        
+        // 답변 완료 문의 수 조회
+        int answeredQuestions = questionRepository.countByResponseIsNotNull();
+        status.put("answeredQuestions", answeredQuestions);
+        
+        return status;
     }
 
 }

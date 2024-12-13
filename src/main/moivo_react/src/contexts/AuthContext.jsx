@@ -127,28 +127,22 @@ export const AuthProvider = ({ children }) => {
     };
 
     // 카카오 로그인 함수
-    const kakaoLogin = async (loginData) => {
+    const kakaoLogin = async (code) => {
         try {
-            console.log("로그인 데이터:", loginData);
-            if (!loginData.accessToken) {
-                throw new Error('토큰이 없습니다');
+            const response = await axios.get(`${PATH.SERVER}/api/oauth/kakao/callback`, {
+                params: { code },
+                withCredentials: true
+            });
+            
+            const success = await handleLoginSuccess(response.data);
+            if (success) {
+                setIsAuthenticated(true);
+                return true;
             }
-            
-            // 직접 처리
-            setAccessToken(loginData.accessToken);
-            localStorage.setItem('userId', loginData.userId);
-            localStorage.setItem('id', loginData.id);
-            localStorage.setItem('cartId', loginData.cartId);
-            localStorage.setItem('wishId', loginData.wishId);
-            localStorage.setItem('isAdmin', loginData.isAdmin);
-            
-            setIsAuthenticated(true);
-            setIsAdmin(loginData.isAdmin); // 2024-12-11 카카오 로그인 후 isAdmin 상태 설정 장훈
-            axios.defaults.headers.common['Authorization'] = `Bearer ${loginData.accessToken}`;
-            return true;
+            return false;
         } catch (error) {
-            console.error('카카오 로그인 실패:' + error);
-            throw new Error('로그인에 실패했습니다.');
+            console.error('카카오 로그인 실패:', error);
+            throw error.response?.data?.error || error.message;
         }
     };
 
@@ -242,10 +236,9 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated,
         setIsAdmin, // 2024-12-11 isAdmin 값을 변경할 수 있는 함수 제공 장훈
         login,
-        kakaoLogin,
         logout,
-        setAccessToken,
-        setRefreshToken,
+        kakaoLogin,
+        handleLoginSuccess,
         getAccessToken,
         getRefreshToken,
         refreshAccessToken

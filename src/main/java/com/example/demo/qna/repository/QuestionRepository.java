@@ -65,4 +65,14 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 미답변 상태 문의 조회
     @Query("SELECT q FROM QuestionEntity q WHERE q.response IS NULL")
     public List<QuestionEntity> findAllWithoutResponse();
+
+    // 24.12.13 - yjy
+    // 미답변 문의 수 조회
+    int countByResponseIsNull();
+
+    // 24.12.13 - yjy
+    // 답변 완료 문의 수 조회
+    int countByResponseIsNotNull();
+
+    
 }
