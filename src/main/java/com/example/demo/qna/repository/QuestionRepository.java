@@ -1,8 +1,9 @@
 package com.example.demo.qna.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.example.demo.qna.entity.QuestionEntity;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.demo.qna.entity.QuestionCategoryEntity;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Integer> {
@@ -27,14 +27,6 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 모든 문의 조회
     public List<QuestionEntity> findAll();
 
-    // 문의 답변 업데이트
-    @Modifying
-    @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
-    @Transactional
-    public void updateResponse(@Param("id") Integer id, @Param("response") String response, @Param("responseDate") LocalDateTime responseDate);
-
-    public List<QuestionEntity> findByCategoryEntity_NameAndSecret(QuestionCategoryEntity.QuestionCategory name, String secret);
-
-    public List<QuestionEntity> findBySecret(String secret);
-
+    //문의 카테고리 검색시
+    Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

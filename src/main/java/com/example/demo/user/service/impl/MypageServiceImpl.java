@@ -45,6 +45,7 @@ public class MypageServiceImpl implements MypageService {
     // 마이페이지 사용자 정보 가져오기
     @Override
     public UserDTO getUserInfo(int id) {
+        System.out.println("유저 아이디 = " + id);
         UserEntity userEntity = userRepository.findById(id)
                                               .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
         
@@ -68,7 +69,7 @@ public class MypageServiceImpl implements MypageService {
         // UserDTO로 변환
         UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
         userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
-
+        System.out.println("쿠폰 : " + userDTO.getCoupons());
         return userDTO;
     }
     

@@ -8,7 +8,7 @@ import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.UserEntity;
 
 public interface UserService {
-    public String insert(UserDTO user);
+    public int insert(UserDTO user);
 
     public Map<String, Object> login(String userId, String pwd);
 
@@ -19,9 +19,9 @@ public interface UserService {
     public void logout(String accesstoken, String refreshToken);
 
     public List<UserDTO> findAllUsers(); // 모든 사용자 조회
-    //public void updateUserGrade(int userId, String newGrade); // 사용자 등급 업데이트
+    public void updateUserGrade(int userId, String newGrade); // 사용자 등급 업데이트
 
-    //public void updateUserGradeBasedOnPurchase(int userId);
+    public void updateUserGradeBasedOnPurchase(int userId);
 
     public boolean validateToken(String token); // 토큰 검사 _241126_sc
     public Map<String, Object> getUserDataFromToken(String token); // 토큰에서 사용자 데이터 추출 _241127_sc
@@ -36,4 +36,10 @@ public interface UserService {
 
     // 카카오 로그인을 위한 메소드 추가 _ 241210_yjy
     public Map<String, Object> kakaoLogin(String userId);
+
+     // 회원정보 수정 - sumin (2024.12.12)
+    public void updateUserInfo(UserDTO userDTO);
+
+    public boolean checkPassword(int userId, String password);
+    public void deleteUser(int userId);
 }
