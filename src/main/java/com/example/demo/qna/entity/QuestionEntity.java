@@ -34,10 +34,10 @@ public class QuestionEntity {
     @Column(name = "questiondate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime questionDate; // 문의 작성 일시
 
-    @Column(name = "response")
+    @Column(name = "response", columnDefinition = "TEXT")
     private String response; // 관리자 응답 (NULL이면 미응답)
 
-    @Column(name = "responsedate")
+    @Column(name = "responsedate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime responseDate; // 응답 일시 (NULL이면 미응답)
 
     @Column(name = "secret")

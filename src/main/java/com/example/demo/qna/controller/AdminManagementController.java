@@ -43,10 +43,19 @@ public class AdminManagementController {
 
     // 문의 답변 등록
     @PostMapping("/questions/{questionId}/response")
-    // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> respondToQuestion(@PathVariable Integer questionId, @RequestBody String response) {
-        adminManagementService.respondToQuestion(questionId, response);
-        return ResponseEntity.ok().build();
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> respondToQuestion(
+        @PathVariable Integer questionId, 
+        @RequestBody String response) {
+        try {
+            System.out.println("Received response in controller: " + response);
+            adminManagementService.respondToQuestion(questionId, response);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.err.println("Error in controller: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // 문의 답변 수정

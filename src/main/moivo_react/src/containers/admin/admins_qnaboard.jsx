@@ -88,31 +88,41 @@ const Admins_qnaboard = () => {
         setResponseInput('');
     };
 
-    const handleRespondToQuestion = async () => {
+    const handleRespondToQuestion = async (e) => {
+        e.preventDefault();
+        
         try {
             const token = localStorage.getItem('accessToken');
             if (!token) {
                 console.error('No token found');
                 return;
             }
-            await axios.post(
+
+            console.log('Sending response:', responseInput);
+            
+            const response = await axios.post(
                 `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
                 responseInput,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'text/plain'
                     }
                 }
             );
-            closeResponseModal();
-            fetchQuestions();
+
+            if (response.status === 200) {
+                console.log('Response saved successfully');
+                await fetchQuestions();
+                closeResponseModal();
+            }
         } catch (error) {
             console.error('Failed to respond to question:', error);
         }
     };
 
-    const handleUpdateResponse = async () => {
+    const handleUpdateResponse = async (e) => {
+        e.preventDefault();
         try {
             const token = localStorage.getItem('accessToken');
             if (!token) {
@@ -125,7 +135,7 @@ const Admins_qnaboard = () => {
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'text/plain'
                     }
                 }
             );
@@ -171,7 +181,7 @@ const Admins_qnaboard = () => {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-        setActiveIndex(null); // 페이지 변경 시 열려있는 아이템 초기화
+        setActiveIndex(null); // ��이지 변경 시 열려있는 아이템 초기화
     };
 
     // 각 문의 카테고리에 맞는 아이콘을 반환하는 함수
@@ -203,21 +213,42 @@ const Admins_qnaboard = () => {
             <div className={admin_qnaboard.sidebar}>
                 <Admins_side />
             </div>
+            
             <div className={admin_qnaboard.qnalistContainer}>
-                <div className={admin_qnaboard.dropdownContainer}>
-                    <button className={admin_qnaboard.dropdownBtn} onClick={toggleDropdown}>
-                        문의 카테고리 {isDropdownVisible ? '▲' : '▼'}
-                    </button>
-                    {isDropdownVisible && (
-                        <ul className={admin_qnaboard.filterList}>
-                            <li onClick={() => setSelectedCategory('')}>전체</li>
-                            {categories.map((category) => (
-                                <li key={category.id} onClick={() => setSelectedCategory(category.id)}>
-                                    {category.name}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                <div className={admin_qnaboard.filterSection}>
+                    <div className={admin_qnaboard.dropdownContainer}>
+                        <button 
+                            className={admin_qnaboard.dropdownBtn} 
+                            onClick={toggleDropdown}
+                        >
+                            <span>
+                                {selectedCategory 
+                                    ? categories.find(c => c.id === selectedCategory)?.name 
+                                    : '전체 카테고리'
+                                }
+                            </span>
+                            <i className={`fas fa-chevron-${isDropdownVisible ? 'up' : 'down'}`}></i>
+                        </button>
+                        {isDropdownVisible && (
+                            <ul className={admin_qnaboard.filterList}>
+                                <li onClick={() => {
+                                    setSelectedCategory('');
+                                    toggleDropdown();
+                                }}>전체</li>
+                                {categories.map((category) => (
+                                    <li 
+                                        key={category.id} 
+                                        onClick={() => {
+                                            setSelectedCategory(category.id);
+                                            toggleDropdown();
+                                        }}
+                                    >
+                                        {category.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
 
                 {currentPageQuestions.map((question) => (
@@ -229,50 +260,64 @@ const Admins_qnaboard = () => {
                             <span className={admin_qnaboard.qnalistQuestionType}>
                                 {getIconForCategory(question.categoryId)}
                             </span>
-                            <span className={admin_qnaboard.qnalistQuestionTitle}>{question.title}</span>
+                            <span className={admin_qnaboard.qnalistQuestionTitle}>
+                                {question.title}
+                            </span>
                             {question.secret === "true" && (
-                                <span className={admin_qnaboard.qnalistSecretLabel}>[비밀글]</span>
+                                <span className={admin_qnaboard.qnalistSecretLabel}>
+                                    <i className="fas fa-lock"></i> 비밀글
+                                </span>
                             )}
                         </div>
+                        
                         {activeIndex === question.id && (
                             <div className={admin_qnaboard.qnalistDetails}>
-                                <p className={admin_qnaboard.qnalistUserInfo}>
-                                    작성자: {question.userId} | 작성일: {new Date(question.questionDate).toLocaleString()}
-                                </p>
-                                <p className={admin_qnaboard.qnalistUserQuestion}>{question.content}</p>
+                                <div className={admin_qnaboard.qnalistUserInfo}>
+                                    <i className="fas fa-user"></i> {question.userId} 
+                                    <span className={admin_qnaboard.dateDivider}>|</span>
+                                    <i className="far fa-clock"></i> {new Date(question.questionDate).toLocaleString()}
+                                </div>
+                                <div className={admin_qnaboard.qnalistUserQuestion}>
+                                    {question.content}
+                                </div>
                                 
                                 <div className={admin_qnaboard.adminResponseSection}>
                                     {question.response ? (
                                         <>
-                                            <p className={admin_qnaboard.qnalistUserAnswer}>
-                                                <strong>관리자 답변:</strong> {question.response}
-                                            </p>
-                                            <p>답변일: {new Date(question.responseDate).toLocaleString()}</p>
+                                            <div className={admin_qnaboard.responseContent}>
+                                                <h4><i className="fas fa-comment-dots"></i> 관리자 답변</h4>
+                                                <p>{question.response}</p>
+                                                <div className={admin_qnaboard.responseDate}>
+                                                    <i className="far fa-clock"></i> {new Date(question.responseDate).toLocaleString()}
+                                                </div>
+                                            </div>
                                             <div className={admin_qnaboard.responseButtons}>
                                                 <button 
                                                     className={admin_qnaboard.responseButton}
                                                     onClick={() => openEditResponseModal(question.id)}
                                                 >
-                                                    답변 ���정
+                                                    <i className="fas fa-edit"></i> 답변 수정
                                                 </button>
                                                 <button
                                                     className={`${admin_qnaboard.responseButton} ${admin_qnaboard.deleteButton}`}
                                                     onClick={() => handleDeleteResponse(question.id)}
                                                 >
-                                                    답변 삭제
+                                                    <i className="fas fa-trash-alt"></i> 답변 삭제
                                                 </button>
                                             </div>
                                         </>
                                     ) : (
-                                        <>
-                                            <p className={admin_qnaboard.noResponseMessage}>아직 답변이 등록되지 않았습니다.</p>
+                                        <div className={admin_qnaboard.noResponseWrapper}>
+                                            <p className={admin_qnaboard.noResponseMessage}>
+                                                <i className="fas fa-info-circle"></i> 아직 답변이 등록되지 않았습니다.
+                                            </p>
                                             <button 
                                                 className={admin_qnaboard.responseButton}
                                                 onClick={() => openResponseModal(question.id)}
                                             >
-                                                답변 등록
+                                                <i className="fas fa-plus-circle"></i> 답변 등록
                                             </button>
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -298,18 +343,21 @@ const Admins_qnaboard = () => {
             {responseModalOpen && (
                 <div className={admin_qnaboard.modalOverlay}>
                     <div className={admin_qnaboard.modalContent}>
-                        <h3>답변 등록</h3>
+                        <h3><i className="fas fa-plus-circle"></i> 답변 등록</h3>
                         <form onSubmit={handleRespondToQuestion}>
                             <textarea
                                 className={admin_qnaboard.modalInput}
                                 value={responseInput}
                                 onChange={(e) => setResponseInput(e.target.value)}
+                                placeholder="답변을 입력해주세요..."
                                 required
                             ></textarea>
                             <div className={admin_qnaboard.modalButtons}>
-                                <button type="submit">등록</button>
+                                <button type="submit">
+                                    <i className="fas fa-check"></i> 등록
+                                </button>
                                 <button type="button" onClick={closeResponseModal}>
-                                    취소
+                                    <i className="fas fa-times"></i> 취소
                                 </button>
                             </div>
                         </form>
@@ -320,18 +368,21 @@ const Admins_qnaboard = () => {
             {editResponseModalOpen && (
                 <div className={admin_qnaboard.modalOverlay}>
                     <div className={admin_qnaboard.modalContent}>
-                        <h3>답변 수정</h3>
+                        <h3><i className="fas fa-edit"></i> 답변 수정</h3>
                         <form onSubmit={handleUpdateResponse}>
                             <textarea
                                 className={admin_qnaboard.modalInput}
                                 value={responseInput}
                                 onChange={(e) => setResponseInput(e.target.value)}
+                                placeholder="수정할 답변을 입력해주세요..."
                                 required
                             ></textarea>
                             <div className={admin_qnaboard.modalButtons}>
-                                <button type="submit">수정</button>
+                                <button type="submit">
+                                    <i className="fas fa-save"></i> 수정
+                                </button>
                                 <button type="button" onClick={closeEditResponseModal}>
-                                    취소
+                                    <i className="fas fa-times"></i> 취소
                                 </button>
                             </div>
                         </form>

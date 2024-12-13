@@ -1,5 +1,6 @@
 package com.example.demo.qna.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -31,4 +32,10 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     //문의 카테고리 검색시
     Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    // 문의 답변 수정
+    @Modifying
+    @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
+    @Transactional
+    public void updateResponse(@Param("id") Integer id, @Param("response") String response, @Param("responseDate") LocalDateTime responseDate);
 }

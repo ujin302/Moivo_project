@@ -9,6 +9,9 @@ import com.example.demo.qna.entity.QuestionEntity;
 import com.example.demo.qna.repository.QuestionRepository;
 import com.example.demo.qna.service.AdminManagementService;
 import com.example.demo.user.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.example.demo.qna.repository.QuestionCategoryRepository;
 
 
@@ -91,13 +94,33 @@ public class AdminManagementServiceImpl implements AdminManagementService {
 
 
     @Override
+    @Transactional
     public void respondToQuestion(Integer questionId, String response) {
-        QuestionEntity question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
-        
-        question.setResponse(response);
-        question.setResponseDate(LocalDateTime.now());
-        questionRepository.save(question);
+        try {
+            QuestionEntity question = questionRepository.findById(questionId)
+                    .orElseThrow(() -> new RuntimeException("Question not found"));
+            
+            System.out.println("Question found: " + question.getId());
+            System.out.println("Current response: " + question.getResponse());
+            System.out.println("Setting new response: " + response);
+            
+            question.setResponse(response.trim());
+            question.setResponseDate(LocalDateTime.now());
+            
+            System.out.println("Before save - Response: " + question.getResponse());
+            System.out.println("Before save - ResponseDate: " + question.getResponseDate());
+            
+            questionRepository.saveAndFlush(question);
+            
+            QuestionEntity savedQuestion = questionRepository.findById(questionId).orElseThrow();
+            System.out.println("After save - Response: " + savedQuestion.getResponse());
+            System.out.println("After save - ResponseDate: " + savedQuestion.getResponseDate());
+            
+        } catch (Exception e) {
+            System.err.println("Error in respondToQuestion: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save response", e);
+        }
     }
 
     @Override
