@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
@@ -14,15 +15,26 @@ import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.repository.PaymentDetailRepository;
 import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.payment.service.PaymentService;
+import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.store.entity.ProductStockEntity;
+import com.example.demo.store.repository.ProductRepository;
+import com.example.demo.user.entity.CartEntity;
 import com.example.demo.user.entity.UserCartEntity;
 import com.example.demo.user.entity.UserEntity;
+import com.example.demo.user.repository.CartRepository;
 import com.example.demo.user.repository.UserCartRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @Service
 public class PaymentServiceImpl implements PaymentService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -34,11 +46,15 @@ public class PaymentServiceImpl implements PaymentService {
     private UserRepository userRepository;
 
     @Autowired
-    private UserCartRepository cartRepository;
+    private CartRepository cartRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // 24.12.12 - uj
     // 결제 정보 저장
     @Override
+    @Transactional
     public void savePaymentInfo(Map<String, Object> map) {
 
         // 0. Data 추출
@@ -57,25 +73,48 @@ public class PaymentServiceImpl implements PaymentService {
         Boolean isCartItem = Boolean.parseBoolean(map.get("isCartItem").toString());
         System.out.println("Json -> isCartItem: " + isCartItem);
 
-        // 1. payment 저장
+        // 1, 필요한 Entity 추출
         UserEntity userEntity = userRepository.findById(paymentDTO.getUserId()).orElseThrow();
+        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId()).orElseThrow();
+
+        // 2. payment 저장
         paymentDTO.setCount(detailDTOList.size());
         PaymentEntity paymentEntity = paymentRepository.save(PaymentEntity.toSavePaymentEntity(paymentDTO,
                 userEntity));
 
-        // 2. paymentDetail 저장 & 장바구니에서 아이템 삭제
+        // 3. paymentDetail 저장 & 장바구니에서 아이템 삭제 & 재고 수정
         for (PaymentDetailDTO detailDTO : detailDTOList) {
-            // 2-1. paymentDetail 저장
-            PaymentDetailEntity detailEntity = PaymentDetailEntity.toSavePaymentEntity(detailDTO, paymentEntity);
+            // 3-1. paymentDetail 저장
+            ProductEntity productEntity = productRepository.findById(detailDTO.getProductId()).orElseThrow();
+            PaymentDetailEntity detailEntity = PaymentDetailEntity.toSavePaymentEntity(
+                    detailDTO,
+                    paymentEntity,
+                    productEntity);
             detailRepository.save(detailEntity);
 
-            // 2-2. 장바구니에서 아이템 삭제
-            if (isCartItem) {
-                UserCartEntity cartEntity = cartRepository.findById(detailDTO.getUsercartId()).orElseThrow();
-                cartRepository.delete(cartEntity);
+            // 3-2. 재고 수정
+            List<ProductStockEntity> stockEntiyList = productEntity.getStockList();
+            for (ProductStockEntity stockEntity : stockEntiyList) {
+                if (stockEntity.getSize() == detailDTO.getSize()) {
+                    stockEntity.setCount(stockEntity.getCount() - detailDTO.getCount()); // 재고 수정
+                }
             }
+            // 3-3. 재고 DB 반영
+            productRepository.save(productEntity);
         }
 
+        // 4. 장바구니에서 상품 삭제
+        if (isCartItem) {
+            cartEntity.getUserCartList() // 상품 리스트 가져오기
+                    // removeIf : True인 원소 제거
+                    .removeIf(userCartEntity -> detailDTOList.stream() // Stream : 데이터 읽기만 함.
+                            // List에서 원소가 제거되어도 끝까지 읽음.
+                            // anyMatch(조건) : 조건에 해당하면 True
+                            .anyMatch(detailDTO -> userCartEntity.getId() == detailDTO.getUsercartId()));
+        }
+
+        // 4-1. 장바구니 DB에 반영
+        cartRepository.save(cartEntity);
     }
 
     // Json -> PaymentDTO
