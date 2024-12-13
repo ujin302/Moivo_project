@@ -125,7 +125,7 @@ const Admins_qnaboard = () => {
             console.error('Error details:', error.response || error);
         }
     };
-
+    // 답변 수정 _axios 에러 수정 필요
     const handleUpdateResponse = async (e) => {
         e.preventDefault();
         try {
