@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from "../../scripts/path";
@@ -46,17 +46,13 @@ export const AuthProvider = ({ children }) => {
     // 토큰 갱신 함수
     const refreshAccessToken = async () => {
         try {
-            const refreshToken = getRefreshToken();
-            if (!refreshToken) throw new Error('No refresh token');
-    
-            const response = await axios.post(`${PATH.SERVER}/api/auth/token/refresh`, 
-                refreshToken ,
-                { withCredentials: true }
-            );
+            const response = await axiosInstance.post('/api/auth/refresh', {}, {
+                withCredentials: true // 쿠키 전송을 위해 필요
+            });
             
             if (response.data?.accessToken) {
                 setAccessToken(response.data.accessToken);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
                 return true;
             }
             return false;
@@ -76,7 +72,7 @@ export const AuthProvider = ({ children }) => {
             
             // 토큰이 있는 경우에만 로그아웃 요청
             if (accessToken) {
-                await axios.post(`${PATH.SERVER}/api/user/logout`, 
+                await axiosInstance.post(`/api/user/logout`, 
                     { refreshToken },
                     {
                         withCredentials: true,
@@ -114,7 +110,7 @@ export const AuthProvider = ({ children }) => {
     // 일반 로그인 함수
     const login = async (userId, pwd) => {
         try {
-            const response = await axios.post(`${PATH.SERVER}/api/user/login`, {
+            const response = await axiosInstance.post(`/api/user/login`, {
                 userId,
                 pwd
             }, {
@@ -129,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     // 카카오 로그인 함수
     const kakaoLogin = async (code) => {
         try {
-            const response = await axios.get(`${PATH.SERVER}/api/oauth/kakao/callback`, {
+            const response = await axiosInstance.get(`/api/oauth/kakao/callback`, {
                 params: { code },
                 withCredentials: true
             });
@@ -166,46 +162,52 @@ export const AuthProvider = ({ children }) => {
         setIsAdmin(isAdmin); // 2024-12-11 isAdmin 상태 업데이트 장훈
 
         // axios 헤더 설정
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         return true;
     };
 
     // axios 인터셉터 설정
     useEffect(() => {
         // 요청 인터셉터 추가
-        const requestInterceptor = axios.interceptors.request.use(
-            config => {
+        const requestInterceptor = axiosInstance.interceptors.request.use(
+            (config) => {
                 const token = localStorage.getItem('accessToken');
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }
                 return config;
             },
-            error => {
+            (error) => {
                 return Promise.reject(error);
             }
         );
 
         // 응답 인터셉터
-        const responseInterceptor = axios.interceptors.response.use(
-            response => response,
-            async error => {
+        const responseInterceptor = axiosInstance.interceptors.response.use(
+            (response) => response,
+            async (error) => {
                 const originalRequest = error.config;
-                
-                if (error.response?.status === 401 && !originalRequest._retry) {
+
+                // access token 만료 에러 && 재시도하지 않은 요청
+                if (error.response.status === 401 && !originalRequest._retry) {
                     originalRequest._retry = true;
-                    
+
                     try {
-                        const success = await refreshAccessToken();
-                        if (success) {
-                            const newToken = localStorage.getItem('accessToken');
-                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                            return axios(originalRequest);
-                        }
+                        // refresh token으로 새로운 access token 발급
+                        const refreshToken = localStorage.getItem('refreshToken');
+                        const response = await axiosInstance.post('/api/auth/refresh', { refreshToken });
+                        
+                        const { accessToken } = response.data;
+                        localStorage.setItem('accessToken', accessToken);
+
+                        // 새로운 토큰으로 원래 요청 재시도
+                        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                        return axiosInstance(originalRequest);
                     } catch (refreshError) {
-                        removeTokens();
+                        // refresh token도 만료된 경우
+                        localStorage.removeItem('accessToken');
                         setIsAuthenticated(false);
-                        navigate('/user');
+                        window.location.href = '/user';
                         return Promise.reject(refreshError);
                     }
                 }
@@ -214,19 +216,19 @@ export const AuthProvider = ({ children }) => {
         );
 
         return () => {
-            axios.interceptors.request.eject(requestInterceptor);
-            axios.interceptors.response.eject(responseInterceptor);
+            axiosInstance.interceptors.request.eject(requestInterceptor);
+            axiosInstance.interceptors.response.eject(responseInterceptor);
         };
-    }, [navigate]);
+    }, []);
 
-    // 초기 인증 상태 확인 (새로고침해도 로그인 상태 유지)
+    // 초기 인증 상태 확인 (새로고침해도 로그인 상�� 유지)
     useEffect(() => {
         const token = getAccessToken();
         const storedIsAdmin = localStorage.getItem('isAdmin') === 'true'; // 2024-12-11 isAdmin 값을 가져옴 장훈
         if (token) {
             setIsAuthenticated(true);
             setIsAdmin(storedIsAdmin); // 2024-12-11 isAdmin 상태 설정 장훈
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
     }, []);
 

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosConfig';
 import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const Admins_dashboard = () => {   // 24.12.13 백, 프론트 연결 - yjy
+const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState({});
   const [deliveryStatus, setDeliveryStatus] = useState({});
   const [productStatus, setProductStatus] = useState({});
@@ -20,46 +24,43 @@ const Admins_dashboard = () => {   // 24.12.13 백, 프론트 연결 - yjy
   });
 
   useEffect(() => {
-    // 판매 현황
-    axios.get('/api/admin/payment')
-      .then(res => setPaymentStatus(res.data))
-      .catch(err => console.error('판매 현황 조회 실패:', err));
+    if (!isAdmin) {
+      navigate('/');
+      return;
+    }
 
-    // 처리 현황
-    axios.get('/api/admin/payment/delivery')
-      .then(res => setDeliveryStatus(res.data))
-      .catch(err => console.error('처리 현황 조회 실패:', err));
+    const fetchDashboardData = async () => {
+      try {
+        const paymentRes = await axiosInstance.get('/api/admin/payment');
+        setPaymentStatus(paymentRes.data);
 
-    // 상품 현황
-    axios.get('/api/admin/store/product/status')
-      .then(res => setProductStatus(res.data))
-      .catch(err => console.error('상품 현황 조회 실패:', err));
+        const deliveryRes = await axiosInstance.get('/api/admin/payment/delivery');
+        setDeliveryStatus(deliveryRes.data);
 
-    // 문의 현황
-    axios.get('/api/admin/qna/management/questions/status')
-      .then(res => setQuestionStatus(res.data))
-      .catch(err => console.error('문의 현황 조회 실패:', err));
+        const productRes = await axiosInstance.get('/api/admin/store/product/status');
+        setProductStatus(productRes.data);
 
-    // 회원 현황
-    axios.get('/api/admin/users/states')
-      .then(res => {
+        const questionRes = await axiosInstance.get('/api/admin/qna/management/questions/status');
+        setQuestionStatus(questionRes.data);
+
+        const userRes = await axiosInstance.get('/api/admin/users/states');
+        const gradeRes = await axiosInstance.get('/api/admin/users/states/grade');
+        
         setUserStatus(prev => ({
-          ...prev,
-          totalUsers: res.data.totalUsers
+          totalUsers: userRes.data.totalUsers,
+          gradeStats: gradeRes.data
         }));
-      })
-      .catch(err => console.error('회원 현황 조회 실패:', err));
 
-    // 등급별 회원 수
-    axios.get('/api/admin/users/states/grade')
-      .then(res => {
-        setUserStatus(prev => ({
-          ...prev,
-          gradeStats: res.data
-        }));
-      })
-      .catch(err => console.error('등급별 회원 수 조회 실패:', err));
-  }, []);
+      } catch (error) {
+        console.error('대시보드 데이터 로딩 실패:', error);
+        if (error.response?.status === 401) {
+          navigate('/user');
+        }
+      }
+    };
+
+    fetchDashboardData();
+  }, [isAdmin, navigate]);
 
   return (
     <div className={admin_dashboard.container}>
