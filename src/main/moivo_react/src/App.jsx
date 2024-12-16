@@ -54,10 +54,11 @@ const routeConfig = [
   { path: "/payment-success", element: <SuccessPage /> },
   { path: "/payment-fail", element: <FailPage /> },
   { path : "/admins_dashboard", element: <Dashboard/>},
+  { path: "/api/oauth/kakao/callback", element: <KakaoCallback /> },
   { path : "/admins_qnaboard", element: <Admins_qna/>},
   { path : "/admins_product", element: <Admins_product/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
-  { path: "/oauth/callback/kakao", element: <KakaoCallback /> }
+
 ];
 
 const App = () => {

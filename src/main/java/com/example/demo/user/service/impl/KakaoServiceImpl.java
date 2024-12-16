@@ -1,6 +1,5 @@
 package com.example.demo.user.service.impl;
 
-
 import com.example.demo.jwt.util.JwtUtil;
 import com.example.demo.user.entity.CartEntity;
 import com.example.demo.user.entity.UserEntity;
@@ -21,7 +20,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class KakaoServiceImpl implements KakaoService {
-
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -37,49 +35,74 @@ public class KakaoServiceImpl implements KakaoService {
 
     @Override
     public Map<String, String> processKakaoLogin(String code) {
-        // 카카오 액세스 토큰 얻기
-        String kakaoAccessToken = getKakaoAccessToken(code);
-        
-        // 카카오 사용자 정보 얻기
-        Map<String, Object> userInfo = getKakaoUserInfo(kakaoAccessToken);
-        
-        // 사용자 정보 저장 또는 업데이트
-        UserEntity user = saveOrUpdateUser(userInfo);
-        
-        // JWT 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getId(), 
-            user.getWishEntity().getId(), user.getCartEntity().getId(), user.isAdmin());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getId());
+        try {
+            String kakaoAccessToken = getKakaoAccessToken(code);
+            Map<String, Object> userInfo = getKakaoUserInfo(kakaoAccessToken);
+            
+            String kakaoId = userInfo.get("id").toString();
+            Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
+            String email = kakaoAccount.get("email").toString();
+            
+            // 사용자 조회 또는 생성
+            UserEntity user = userRepository.findByUserId("KAKAO_" + kakaoId)
+                .orElseGet(() -> createKakaoUser(kakaoId, email, 
+                    ((Map<String, Object>)kakaoAccount.get("profile")).get("nickname").toString()));
 
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-        tokens.put("userId", user.getUserId());
-        
-        return tokens;
+            // JWT 토큰 생성
+            String accessToken = jwtUtil.generateAccessToken(
+                user.getUserId(),
+                user.getId(),
+                user.getWishEntity().getId(),
+                user.getCartEntity().getId(),
+                user.isAdmin()
+            );
+            
+            String refreshToken = jwtUtil.generateRefreshToken(
+                user.getUserId(),
+                user.getId()
+            );
+            
+            // 모든 필요한 정보를 포함하여 반환
+            Map<String, String> response = new HashMap<>();
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
+            response.put("userId", user.getUserId());
+            response.put("id", user.getId().toString());
+            response.put("cartId", user.getCartEntity().getId().toString());
+            response.put("wishId", user.getWishEntity().getId().toString());
+            response.put("isAdmin", String.valueOf(user.isAdmin()));
+            
+            return response;
+        } catch (Exception e) {
+            throw new RuntimeException("카카오 로그인 처리 중 오류 발생: " + e.getMessage());
+        }
     }
 
     @Override
     public String getKakaoAccessToken(String code) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "authorization_code");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
-        body.add("redirect_uri", redirectUri);
-        body.add("code", code);
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("grant_type", "authorization_code");
+            body.add("client_id", clientId);
+            body.add("client_secret", clientSecret);
+            body.add("redirect_uri", redirectUri);
+            body.add("code", code);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-            "https://kauth.kakao.com/oauth/token",
-            request,
-            Map.class
-        );
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                "https://kauth.kakao.com/oauth/token",
+                request,
+                Map.class
+            );
 
-        return (String) response.getBody().get("access_token");
+            return (String) response.getBody().get("access_token");
+        } catch (Exception e) {
+            throw new RuntimeException("카카오 액세스 토큰 획득 중 오류 발생: " + e.getMessage());
+        }
     }
 
     @Override
@@ -99,37 +122,23 @@ public class KakaoServiceImpl implements KakaoService {
         return response.getBody();
     }
 
-    private UserEntity saveOrUpdateUser(Map<String, Object> userInfo) {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
-        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        
-        // 카카오 고유 ID를 문자열로 변환한거임
-        String kakaoId = String.valueOf(userInfo.get("id"));
-        String email = (String) kakaoAccount.get("email");
-        String nickname = (String) profile.get("nickname");
-        
-        // userId를 이메일 대신 카카오 고유 ID로 검색 및 저장
-        return userRepository.findByUserId(kakaoId)
-            .orElseGet(() -> {
-                UserEntity newUser = new UserEntity();
-                newUser.setUserId(kakaoId);    // 카카오 고유 ID를 userId로 저장
-                newUser.setName(nickname);
-                newUser.setLoginType(UserEntity.LoginType.KAKAO);
-                newUser.setEmail(email);       // 이메일은 email 필드에 별도로 저장
-                
-                newUser.setAdmin(false);
-                
-                // Cart 엔티티 생성
-                CartEntity cartEntity = new CartEntity();
-                cartEntity.setUserEntity(newUser);
-                newUser.setCartEntity(cartEntity);
+    private UserEntity createKakaoUser(String kakaoId, String email, String nickname) {
+        UserEntity user = new UserEntity();
+        user.setUserId("KAKAO_" + kakaoId);
+        user.setEmail(email);
+        user.setName(nickname);
+        user.setAdmin(false);
 
-                // Wish 엔티티 생성
-                WishEntity wishEntity = new WishEntity();
-                wishEntity.setUserEntity(newUser);
-                newUser.setWishEntity(wishEntity);
-                
-                return userRepository.save(newUser);
-            });
+        // 장바구니 생성
+        CartEntity cart = new CartEntity();
+        cart.setUserEntity(user);
+        user.setCartEntity(cart);
+
+        // 위시리스트 생성
+        WishEntity wish = new WishEntity();
+        wish.setUserEntity(user);
+        user.setWishEntity(wish);
+
+        return userRepository.save(user);
     }
-}    //이 파일 자체 생성 _ 241210_yjy
+}

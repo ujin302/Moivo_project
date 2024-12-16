@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -52,35 +53,34 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository)
             throws Exception {
         http
-                // OAuth2 소셜로그인 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .clientRegistrationRepository(clientRegistrationRepository)
-                        .authorizedClientRepository(authorizedClientRepository())
-                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
-                        .successHandler(successHandler()))
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 카카오 로그인 관련 엔드포인트 추가
-                        .requestMatchers(
-                                "/api/user/login",
-                                "/api/user/join",
-                                "/api/auth/token/refresh",
-                                "/login/oauth2/code/**",
-                                "/oauth2/authorization/**",
-                                "/oauth/callback/**",
-                                "/api/oauth/kakao/**",
-                                "/api/user/kakao-login",
-                                "/api/store/**",
-                                "/api/user/payment",
-                                "/api/user/mypage/orders/88",
-                                "/api/mail/success")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .oauth2Login(oauth2 -> oauth2
+                .clientRegistrationRepository(clientRegistrationRepository)
+                .authorizedClientRepository(authorizedClientRepository())
+                .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                .successHandler(successHandler()))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(
+                    "/api/user/login", 
+                    "/api/user/join", 
+                    "/api/auth/token/refresh",
+                    "/api/oauth/kakao/callback",
+                    "/api/oauth/kakao/**",
+                    "/api/user/kakao-login",
+                    "/api/store/**",
+                    "/api/oauth/**",
+                    "/api/user/mypage/orders/88",
+                    "/oauth/**",
+                    "/api/mail/success"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
 
         return http.build();
     }
