@@ -65,11 +65,11 @@ const App = () => {
   return (
     <Router>
         <AuthProvider>
-          <Routes>
-          {routeConfig.map(({ path, element }, index) => (
-            <Route key={index} path={path} element={element} />
-          ))}
-        </Routes>
+            <Routes>
+            {routeConfig.map(({ path, element }, index) => (
+              <Route key={index} path={path} element={element} />
+            ))}
+          </Routes>
         </AuthProvider>
     </Router>
   );

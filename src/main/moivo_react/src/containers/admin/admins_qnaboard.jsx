@@ -182,11 +182,11 @@ const Admins_qnaboard = () => {
 
     // 카테고리 매핑 상수 추가
     const CATEGORY_MAPPING = {
-        'ALL': 0,      // 전체문의
-        'BASIC': 1,    // 일반문의 
-        'OTHER': 2,    // 기타문의
-        'SIZE': 3,     // 사이즈문의
-        'PRIVATE': 4   // 비밀문의
+        'ALL': 0,      // 전체문의1
+        'BASIC': 1,    // 일반문의 2
+        'OTHER': 2,    // 기타문의3
+        'SIZE': 3,     // 사이즈문의4
+        'PRIVATE': 4   // 비밀문의5
     };
 
     // 카테고리 이름 매핑 추가
@@ -289,7 +289,7 @@ const Admins_qnaboard = () => {
                 <Admins_side />
             </div>
             
-            <div className={admin_qnaboard.tokenTimerContainer}>
+            <div>
                 <TokenExpiryTimer />
             </div>
             
