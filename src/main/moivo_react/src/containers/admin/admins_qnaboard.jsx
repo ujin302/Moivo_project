@@ -18,6 +18,7 @@ const Admins_qnaboard = () => {
     const [editResponseModalOpen, setEditResponseModalOpen] = useState(false); // 문의리시트 답변수정 모달창 기능
     const [responseInput, setResponseInput] = useState(''); // 문의리시트 답변등록 모달창 기능
     const [searchQuery, setSearchQuery] = useState('');
+    const [filterType, setFilterType] = useState('ALL'); // 'ALL', 'ANSWERED', 'WAITING' 상태 추가
 
     useEffect(() => {
         fetchQuestions();
@@ -208,17 +209,30 @@ const Admins_qnaboard = () => {
         setCurrentPage(1); // 검색 시 첫 페이지로 이동
     };
 
-    // 검색 필터링 로직
+    // 통계 카드 클릭 핸들러
+    const handleStatCardClick = (type) => {
+        setFilterType(type);
+        setCurrentPage(1); // 페이지를 첫 페이지로 리셋
+    };
+
+    // 필터링 로직 수정
     const filteredQuestions = questions.filter(question => {
+        // 카테고리 필터링
         const matchesCategory = selectedCategory === 'ALL' ? true : 
             selectedCategory === 'PRIVATE' ? question.secret === "true" :
             question.categoryId === CATEGORY_MAPPING[selectedCategory];
 
+        // 검색어 필터링
         const matchesSearch = searchQuery.trim() === '' ? true :
             question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             question.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-        return matchesCategory && matchesSearch;
+        // 상태 필터링
+        const matchesStatus = filterType === 'ALL' ? true :
+            filterType === 'ANSWERED' ? question.response :
+            filterType === 'WAITING' ? !question.response : true;
+
+        return matchesCategory && matchesSearch && matchesStatus;
     });
 
     // 페이징 데이터 계산
@@ -318,21 +332,30 @@ const Admins_qnaboard = () => {
                     </div>
                 </div>
 
-                {/* 통계 섹션 추가 */}
+                {/* 통계 섹션 수정 */}
                 <div className={admin_qnaboard.statsContainer}>
-                    <div className={admin_qnaboard.statCard}>
+                    <div 
+                        className={`${admin_qnaboard.statCard} ${filterType === 'ALL' ? admin_qnaboard.active : ''}`}
+                        onClick={() => handleStatCardClick('ALL')}
+                    >
                         <div className={admin_qnaboard.statNumber}>
                             {questions.length}
                         </div>
                         <div className={admin_qnaboard.statLabel}>전체 문의</div>
                     </div>
-                    <div className={admin_qnaboard.statCard}>
+                    <div 
+                        className={`${admin_qnaboard.statCard} ${filterType === 'ANSWERED' ? admin_qnaboard.active : ''}`}
+                        onClick={() => handleStatCardClick('ANSWERED')}
+                    >
                         <div className={admin_qnaboard.statNumber}>
                             {questions.filter(q => q.response).length}
                         </div>
                         <div className={admin_qnaboard.statLabel}>답변 완료</div>
                     </div>
-                    <div className={admin_qnaboard.statCard}>
+                    <div 
+                        className={`${admin_qnaboard.statCard} ${filterType === 'WAITING' ? admin_qnaboard.active : ''}`}
+                        onClick={() => handleStatCardClick('WAITING')}
+                    >
                         <div className={admin_qnaboard.statNumber}>
                             {questions.filter(q => !q.response).length}
                         </div>
