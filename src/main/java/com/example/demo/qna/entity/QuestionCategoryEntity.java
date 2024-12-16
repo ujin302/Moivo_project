@@ -12,10 +12,21 @@ import lombok.ToString;
 public class QuestionCategoryEntity {
 
     public enum QuestionCategory {
-        BASIC, // 일반
-        PRIVATE, // 비밀
-        OTHER, // 기타
-        SIZE // 사이즈
+        ALL("전체문의"),
+        BASIC("일반문의"),
+        PRIVATE("비밀문의"),
+        SIZE("사이즈문의"),
+        OTHER("기타문의");
+
+        private final String displayName;
+
+        QuestionCategory(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
     }
 
     @Id

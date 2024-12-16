@@ -17,4 +17,10 @@ public interface ProductStockRepository extends JpaRepository<ProductStockEntity
     // 상품 ID와 사이즈로 재고를 조회
     ProductStockEntity findByProductEntityAndSize(ProductEntity productEntity, ProductStockEntity.Size size);
 
+    // 재고가 0인 상품 수 조회 - 24.12.13 - yjy
+    public long countByCountEquals(int count);
+
+    // 재고가 특정 수량 이하인 상품 수 조회
+    public long countByCountLessThanEqual(int count);
+
 }

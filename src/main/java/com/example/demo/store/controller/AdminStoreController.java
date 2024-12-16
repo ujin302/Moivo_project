@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.store.dto.ProductCategoryDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.entity.ProductEntity.Gender;
+import com.example.demo.store.service.AdminStoreService;
 import com.example.demo.store.service.ProductService;
 
 import java.util.HashMap;
@@ -31,6 +32,9 @@ public class AdminStoreController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private AdminStoreService adminStoreService;
 
     // 상품 등록
     @PostMapping("/product")
@@ -154,4 +158,17 @@ public class AdminStoreController {
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).build(); // 실패 시 404 Not Found
         }
     }
+
+    //관리자 상품 현황 조회 - 24.12.13 - yjy
+    @GetMapping("/product/status")
+    public ResponseEntity<?> getProductStatus() {
+        try {
+            Map<String, Object> map = adminStoreService.getProductStatus();
+            return ResponseEntity.ok(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
+        }
+    }
+    
 }
