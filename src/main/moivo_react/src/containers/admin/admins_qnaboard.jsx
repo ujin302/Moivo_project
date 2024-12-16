@@ -125,53 +125,57 @@ const Admins_qnaboard = () => {
             console.error('Error details:', error.response || error);
         }
     };
-    // 답변 수정 _axios 에러 수정 필요
-    const handleUpdateResponse = async (e) => {
-        e.preventDefault();
-        try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-            await axios.put(
-                `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`, 
-                responseInput,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-            closeEditResponseModal();
-            fetchQuestions();
-        } catch (error) {
-            console.error('Failed to update response:', error);
-        }
-    };
 
-    const handleDeleteResponse = async (questionId) => {
-        try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-            await axios.delete(
-                `${PATH.SERVER}/api/admin/qna/management/questions/${questionId}/response`,
-                {
+        // 답변 수정
+        const handleUpdateResponse = async (e) => {
+            e.preventDefault();
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    console.error('No token found');
+                    return;
+                }
+                
+                await axios({
+                    method: 'put',
+                    url: `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
+                    data: { response: responseInput },  // 객체 형태로 변경
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
+                });
+                
+                await fetchQuestions();  // 데이터 새로고침
+                closeEditResponseModal();
+            } catch (error) {
+                console.error('Failed to update response:', error);
+            }
+        };
+
+        // 답변 삭제
+        const handleDeleteResponse = async (questionId) => {
+            try {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    console.error('No token found');
+                    return;
                 }
-            );
-            fetchQuestions();
-        } catch (error) {
-            console.error('Failed to delete response:', error);
-        }
-    };
+                
+                await axios({
+                    method: 'delete',
+                    url: `${PATH.SERVER}/api/admin/qna/management/questions/${questionId}/response`,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                await fetchQuestions();  // 데이터 새로고침
+            } catch (error) {
+                console.error('Failed to delete response:', error);
+            }
+        };
 
     // 문의 카테고리에 따라 필터링된 데이터 생성
     const filteredQuestions = selectedCategory
