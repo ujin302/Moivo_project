@@ -22,10 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        // - 241211_yjy
-        String password = (UserEntity.LoginType.KAKAO.equals(user.getLoginType())) ? 
-            "{noop}KAKAO_USER" : 
-            user.getPwd();
+        // - 241212_yjy
+        String password = (user.getPwd() == null) ? "{noop}" : user.getPwd();
 
         return User.builder()
             .username(user.getUserId())

@@ -27,9 +27,9 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
     @Transactional
     public int saveResponse(
-        @Param("id") Integer id, 
-        @Param("response") String response, 
-        @Param("responseDate") LocalDateTime responseDate
+            @Param("id") Integer id,
+            @Param("response") String response,
+            @Param("responseDate") LocalDateTime responseDate
     );
 
     // 선택한 문의 답변 조회
@@ -41,9 +41,9 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Query("UPDATE QuestionEntity q SET q.response = :response, q.responseDate = :responseDate WHERE q.id = :id")
     @Transactional
     public void updateResponse(
-        @Param("id") Integer id, 
-        @Param("response") String response, 
-        @Param("responseDate") LocalDateTime responseDate
+            @Param("id") Integer id,
+            @Param("response") String response,
+            @Param("responseDate") LocalDateTime responseDate
     );
 
     // 문의 답변 삭제
@@ -65,4 +65,14 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 미답변 상태 문의 조회
     @Query("SELECT q FROM QuestionEntity q WHERE q.response IS NULL")
     public List<QuestionEntity> findAllWithoutResponse();
+
+    // 24.12.13 - yjy
+    // 미답변 문의 수 조회
+    int countByResponseIsNull();
+
+    // 24.12.13 - yjy
+    // 답변 완료 문의 수 조회
+    int countByResponseIsNotNull();
+
+    
 }
