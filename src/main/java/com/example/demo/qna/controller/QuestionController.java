@@ -27,7 +27,7 @@ public class QuestionController {
 
     //문의 작성
     @PostMapping("/add")
-    public ResponseEntity<String> addQuestion(@RequestBody QuestionDTO questionDTO) {
+    public ResponseEntity<Map<String, String>> addQuestion(@RequestBody QuestionDTO questionDTO) {
         // JWT 파싱
 //        Long userId = Jwts.parser()
 //                .setSigningKey("your-secret-key") // 비밀키로 서명 검증
@@ -36,7 +36,10 @@ public class QuestionController {
 //                .get("userId", Long.class); // userId 추출
 //        System.out.println("로그인한 userId" + userId);
         questionsService.addQuestion(questionDTO);
-        return ResponseEntity.ok("200 Ok");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "200ok");
+        return ResponseEntity.ok(response);
+//        return ResponseEntity.ok("200 Ok");
     }
 
     //문의 수정
