@@ -93,8 +93,6 @@ export const AuthProvider = ({ children }) => {
             // 사용자 정보 제거
             localStorage.removeItem('userId');
             localStorage.removeItem('id');
-            localStorage.removeItem('cartId');
-            localStorage.removeItem('wishId');
 
             // 로컬 스토리지 토큰 제거
             localStorage.removeItem('accessToken');
@@ -138,8 +136,6 @@ export const AuthProvider = ({ children }) => {
             setAccessToken(loginData.accessToken);
             localStorage.setItem('userId', loginData.userId);
             localStorage.setItem('id', loginData.id);
-            localStorage.setItem('cartId', loginData.cartId);
-            localStorage.setItem('wishId', loginData.wishId);
             localStorage.setItem('isAdmin', loginData.isAdmin);
             
             setIsAuthenticated(true);
@@ -163,8 +159,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('id', response.data.id);
-        localStorage.setItem('cartId', response.data.cartId);
-        localStorage.setItem('wishId', response.data.wishId);
         localStorage.setItem('isAdmin', isAdmin); // 2024-12-11 isAdmin 값을 localStorage에 저장 장훈
 
         // 상태 업데이트

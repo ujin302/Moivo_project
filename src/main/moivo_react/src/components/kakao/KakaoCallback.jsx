@@ -13,10 +13,10 @@ const KakaoCallback = () => {
     console.log(code);
     
     if (code) {
-      axios.get(`${PATH.SERVER}/api/user/social/kakao/callback?code=${code}`)
+      axios.get(`${PATH.SERVER}/api/user/social/kakao/login?code=${code}`)
       .then(response => {
         console.log(response.data);
-        kakaoLogin(loginResponse.data);
+        kakaoLogin(response.data);
         navigate('/');
       }).catch(error => {
         console.error(error);
