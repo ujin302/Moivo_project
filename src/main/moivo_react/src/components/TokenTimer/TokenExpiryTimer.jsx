@@ -126,7 +126,12 @@ const TokenExpiryTimer = () => {
         ${isVisible ? '' : styles.minimized}`;
 
     const handleLoginClick = () => {
-        navigate('/user');
+        if (tokenExpiryTime) {  // 로그인 상태 확인
+            logout();
+            window.location.reload();  // 페이지 새로고침, 로그인 상태라면 이동 안함
+        } else {
+            navigate('/user');  // 비로그인 상태면 로그인 페이지로 이동
+        }
     };
 
     return (
