@@ -6,7 +6,7 @@ import { PATH } from "../../../scripts/path";
 import { Link } from 'react-router-dom';
 
 const Admins_productupdate = () => {
-  const productId = 17; // 수정 상품 Id
+  const productId = 40; // 수정 상품 Id
   const [product, setProduct] = useState({
     id: 0,
     name: "",
@@ -337,7 +337,12 @@ const Admins_productupdate = () => {
                                 </div>
                                 ))}
                             </div>
-                            <input className={admin_productupdate.fileInput} type="file" onChange={(e) => handleSingleFileChange(e, "layer1")} />
+                            <div className={admin_productupdate.dropzone}>
+                                <input type="file" onChange={(e) => handleSingleFileChange(e, "layer1")} />
+                                <p className={admin_productupdate.dropzoneText}>
+                                    파일을 선택해주세요
+                                </p>
+                            </div>
                         </div>
 
                         <div className={admin_productupdate.layer}>
@@ -404,22 +409,16 @@ const Admins_productupdate = () => {
                                     }
                                 </div>
                             </div>
-                            <input className={admin_productupdate.fileInput} type="file" onChange={(e) => handleSingleFileChange(e, "layer4")} />
+                            <div className={admin_productupdate.dropzone}>
+                            <input type="file" onChange={(e) => handleSingleFileChange(e, "layer4")} />
+                            <p className={admin_productupdate.dropzoneText}>
+                            파일을 선택해주세요
+                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
-
-
-
-
-
 
             <button className={admin_productupdate.uploadButton} onClick={handleUpload}>
                 상품 수정하기
