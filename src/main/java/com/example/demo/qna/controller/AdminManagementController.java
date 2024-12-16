@@ -70,17 +70,28 @@ public class AdminManagementController {
     // 문의 답변 수정
     @PutMapping("/questions/{questionId}/response")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> updateResponse(@PathVariable Integer questionId, @RequestBody String response) {
-        adminManagementService.updateResponse(questionId, response);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> updateResponse(
+        @PathVariable("questionId") Integer questionId, 
+        @RequestBody Map<String, String> requestBody) {  // Map으로 변경
+        try {
+            String response = requestBody.get("response");
+            adminManagementService.updateResponse(questionId, response);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // 문의 답변 삭제
     @DeleteMapping("/questions/{questionId}/response")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteResponse(@PathVariable Integer questionId) {
-        adminManagementService.deleteResponse(questionId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deleteResponse(@PathVariable("questionId") Integer questionId) {
+        try {
+            adminManagementService.deleteResponse(questionId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // 카테고리 조회
@@ -107,7 +118,7 @@ public class AdminManagementController {
 
     // 관리자 대시보드 데이터 가져오기
     @GetMapping("/questions/status")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Integer>> getQuestionStatus() {
         Map<String, Integer> status = adminManagementService.getQuestionStatus();
         return ResponseEntity.ok(status);
