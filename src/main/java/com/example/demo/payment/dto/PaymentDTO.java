@@ -1,8 +1,14 @@
 package com.example.demo.payment.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.example.demo.payment.entity.PaymentDetailEntity;
+import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.entity.PaymentEntity.DeliveryStatus;
+import com.example.demo.store.dto.ProductDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,4 +32,26 @@ public class PaymentDTO {
     private LocalDateTime paymentDate; // 결제 요청 일시
     private String tosscode; // 토스 고유 주문 번호 (예시: MC44MjA2MjI3OTQwNjI5)
     private DeliveryStatus deliveryStatus; // 배송 상태 (READY, IN_TRANSIT, DELIVERED)
+    private String productImg;
+    private String productName;
+
+    //order list get - 12/16 14:06 강민 
+    public static PaymentDTO toGetOrderDTO(PaymentEntity paymentEntity) {
+        PaymentDTO dto = new PaymentDTO();
+        dto.setId(paymentEntity.getId());
+        dto.setUserId(paymentEntity.getUserEntity().getId());
+        dto.setTotalPrice(paymentEntity.getTotalPrice());
+        dto.setDiscount(paymentEntity.getDiscount());
+        dto.setName(paymentEntity.getName());
+        dto.setTel(paymentEntity.getTel());
+        dto.setAddr1(paymentEntity.getAddr1());
+        dto.setAddr2(paymentEntity.getAddr2());
+        dto.setZipcode(paymentEntity.getZipcode());
+        dto.setCount(paymentEntity.getCount());
+        dto.setPaymentDate(paymentEntity.getPaymentDate());
+        dto.setTosscode(paymentEntity.getTossCode());
+        dto.setDeliveryStatus(paymentEntity.getDeliveryStatus());
+        
+        return dto;
+    }
 }

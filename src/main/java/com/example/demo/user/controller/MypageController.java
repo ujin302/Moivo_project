@@ -3,10 +3,12 @@ package com.example.demo.user.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
@@ -66,18 +68,19 @@ public class MypageController {
             return ResponseEntity.ok(wishlist);
         
     }
-/*
+
     // 주문 내역 조회
     @GetMapping("/orders/{id}")
-    public ResponseEntity<List<OrderDTO>> getOrders(@PathVariable int userSeq) {
+    public ResponseEntity<List<PaymentDTO>> getOrders(@PathVariable(name = "id") int id) {
         try {
-            List<OrderDTO> orders = mypageService.getOrders(id);
+            List<PaymentDTO> orders = mypageService.getOrders(id);
+            System.out.println("Orders fetched: " + orders);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
+/*
     // 주문 상세 조회
     @GetMapping("/orders/details/{orderId}")
     public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable int orderId) {

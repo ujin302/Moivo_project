@@ -2,6 +2,7 @@ package com.example.demo.user.service;
 
 import java.util.List;
 
+import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
@@ -16,6 +17,6 @@ public interface MypageService {
 
     public List<WishDTO> getWishlist(int id);
 
-    //public List<OrderDTO> getOrders(int id);
+    public List<PaymentDTO> getOrders(int id);
 
 }

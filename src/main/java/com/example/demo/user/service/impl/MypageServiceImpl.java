@@ -10,10 +10,14 @@ import java.util.stream.Collectors;
 import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.coupon.dto.CouponDTO;
 import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
+import com.example.demo.ncp.dto.NCPObjectStorageDTO;
+import com.example.demo.payment.dto.PaymentDTO;
+import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.store.dto.ProductDTO;
@@ -48,7 +52,8 @@ public class MypageServiceImpl implements MypageService {
     
     // @Autowired
     //private AttendanceRepository attendanceRepository; // 출석
-    
+
+    // 마이페이지 사용자 정보 가져오기
     @Override
     public UserDTO getUserInfo(int userId) {
         UserEntity userEntity = userRepository.findById(userId)
@@ -182,5 +187,27 @@ public class MypageServiceImpl implements MypageService {
             wishDTOList.add(wishDTO);
         }
         return wishDTOList;
+    }
+
+    @Transactional
+    @Override
+    public List<PaymentDTO> getOrders(int id) {
+        List<PaymentEntity> orderEntities = paymentRepository.findByUserEntity_Id(id);
+        List<PaymentDTO> list = new ArrayList<>();
+        NCPObjectStorageDTO ncpDTO = new NCPObjectStorageDTO();
+        if (orderEntities == null || orderEntities.isEmpty()) {
+            throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
+        }
+
+        for (PaymentEntity paymentEntity : orderEntities) {
+            ProductEntity productEntity = paymentEntity.getPaymentDetailList().get(0).getProductEntity();
+            PaymentDTO paymentDTO = PaymentDTO.toGetOrderDTO(paymentEntity);
+            paymentDTO.setProductImg(ncpDTO.getURL() + productEntity.getImg());
+            paymentDTO.setProductName(productEntity.getName());
+            list.add(paymentDTO);
+        }
+    
+        // PaymentEntity를 PaymentDTO로 변환
+        return list;
     }
 }    

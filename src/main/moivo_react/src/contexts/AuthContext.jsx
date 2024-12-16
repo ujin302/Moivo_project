@@ -20,10 +20,14 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false); // 2024-12-11 isAdmin 상태 추가 장훈
     const navigate = useNavigate();
+    const [tokenExpiryTime, setTokenExpiryTime] = useState(null);
 
     // 토큰 관리 함수들
     const setAccessToken = (token) => {
         localStorage.setItem('accessToken', token);
+        const expiryTime = getTokenExpiryTime(token);
+        console.log('Token expiry time set to:', new Date(expiryTime)); // 디버깅용 로그
+        setTokenExpiryTime(expiryTime);
     };
 
     const setRefreshToken = (token) => {
@@ -153,6 +157,10 @@ export const AuthProvider = ({ children }) => {
             throw new Error('로그인에 실패했습니다.');
         }
         
+        // 토큰 만료 시간 설정 12.16 성찬
+        const expiryTime = getTokenExpiryTime(accessToken);
+        setTokenExpiryTime(expiryTime);
+        
         // localStorage에 저장
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userId', response.data.userId);
@@ -224,11 +232,28 @@ export const AuthProvider = ({ children }) => {
         const token = getAccessToken();
         const storedIsAdmin = localStorage.getItem('isAdmin') === 'true'; // 2024-12-11 isAdmin 값을 가져옴 장훈
         if (token) {
+            // 토큰이 있을 때 만료 시간도 함께 설정
+            const expiryTime = getTokenExpiryTime(token);
+            setTokenExpiryTime(expiryTime);
             setIsAuthenticated(true);
             setIsAdmin(storedIsAdmin); // 2024-12-11 isAdmin 상태 설정 장훈
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
     }, []);
+
+    // 토큰에서 만료 시간 추출하는 함수
+    const getTokenExpiryTime = (token) => {
+        if (!token) return null;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = payload.exp * 1000; // milliseconds로 변환
+            console.log('Calculated expiry time:', new Date(expiryTime)); // 디버깅용 로그
+            return expiryTime;
+        } catch (e) {
+            console.error('토큰 만료 시간 파싱 실패:', e);
+            return null;
+        }
+    };
 
     const value = {
         isAuthenticated,
@@ -241,7 +266,9 @@ export const AuthProvider = ({ children }) => {
         handleLoginSuccess,
         getAccessToken,
         getRefreshToken,
-        refreshAccessToken
+        refreshAccessToken,
+        tokenExpiryTime,
+        getTokenExpiryTime,
     };
 
     return (
