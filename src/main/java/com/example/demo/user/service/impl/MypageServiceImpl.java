@@ -1,5 +1,7 @@
 package com.example.demo.user.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.example.demo.coupon.dto.CouponDTO;
 import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
+import com.example.demo.payment.entity.PaymentEntity;
+import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.repository.ProductRepository;
@@ -37,20 +41,64 @@ public class MypageServiceImpl implements MypageService {
     private ProductRepository productRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private UserCouponRepository userCouponRepository;
     
     // @Autowired
     //private AttendanceRepository attendanceRepository; // 출석
-
-    // 마이페이지 사용자 정보 가져오기
+    
     @Override
-    public UserDTO getUserInfo(int id) {
-        System.out.println("유저 아이디 = " + id);
-        UserEntity userEntity = userRepository.findById(id)
-                                              .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
-        
+    public UserDTO getUserInfo(int userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                                              .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 현재 날짜를 기준으로 해당 월의 결제 금액을 계산
+        LocalDateTime now = LocalDateTime.now();
+        YearMonth yearMonth = YearMonth.from(now);
+        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();  // 해당 월의 첫날 00:00
+        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59);  // 해당 월의 마지막날 23:59
+    
+        // 해당 월에 해당하는 결제 금액 계산
+        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate, endDate);
+        int totalSpent = payments.stream()
+                .mapToInt(payment -> (int) payment.getTotalPrice())
+                .sum();
+        System.out.println(totalSpent);
+
+        // 등급 계산 로직 
+        UserEntity.Grade grade;
+        int nextLevelTarget;
+        if (totalSpent >= 700000) {
+            grade = UserEntity.Grade.LV5;
+            nextLevelTarget = 0; // 최고 등급
+        } else if (totalSpent >= 500000) {
+            grade = UserEntity.Grade.LV4;
+            nextLevelTarget = 700000 - totalSpent;
+        } else if (totalSpent >= 300000) {
+            grade = UserEntity.Grade.LV3;
+            nextLevelTarget = 500000 - totalSpent;
+        } else if (totalSpent >= 100000) {
+            grade = UserEntity.Grade.LV2;
+            nextLevelTarget = 300000 - totalSpent;
+        } else {
+            grade = UserEntity.Grade.LV1;
+            nextLevelTarget = 100000 - totalSpent;
+        }
+
+        // UserDTO 변환
+        UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
+        userDTO.setTotalSpent(totalSpent);
+        userDTO.setGrade(grade);
+        userDTO.setNextLevelTarget(nextLevelTarget);
+
+        System.out.println(userDTO.getTotalSpent());
+        System.out.println(userDTO.getGrade());
+        System.out.println(userDTO.getNextLevelTarget());
+
         // 쿠폰 정보 가져오기
-        List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(id)
+        List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(userId)
             .stream()
             .map(userCoupon -> {
                 CouponEntity coupon = userCoupon.getCouponEntity();
@@ -66,14 +114,15 @@ public class MypageServiceImpl implements MypageService {
             })
             .collect(Collectors.toList());
 
-        // UserDTO로 변환
-        UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
         userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
+
         System.out.println("쿠폰 : " + userDTO.getCoupons());
+        System.out.println("누적 구매 금액: " + totalSpent);
+        System.out.println("등급: " + grade);
+        System.out.println("다음 등급까지 남은 금액: " + nextLevelTarget);
         return userDTO;
     }
     
-    // 성별에따른 상품 추천 리스트 가져오기 
     @Override
     public List<ProductDTO> getProductList(int userId) {
         UserEntity userEntity = userRepository.findById(userId)
@@ -83,24 +132,24 @@ public class MypageServiceImpl implements MypageService {
     
         ProductEntity.Gender productGender;
         if ("M".equals(gender)) {
-            productGender = ProductEntity.Gender.MAN; // 성별이 MAN인 경우
+            productGender = ProductEntity.Gender.MAN;
         } else if ("F".equals(gender)) {
-            productGender = ProductEntity.Gender.WOMAN; // 성별이 WOMAN인 경우
+            productGender = ProductEntity.Gender.WOMAN;
         } else {
             productGender = ProductEntity.Gender.ALL; // 성별이 없거나 ALL인 경우
         }
     
-        List<ProductEntity> productEntity;
+        List<ProductEntity> productEntities;
 
         // 성별에 맞는 상품 목록을 가져오기 (삭제되지 않은 상품만 조회)
         if (productGender == ProductEntity.Gender.ALL) {
-            productEntity = productRepository.findTop6ByGenderNotAndDeleteFalseOrderByIdDesc(ProductEntity.Gender.ALL); // 최신 상품 6개
+            productEntities = productRepository.findTop6ByGenderNotAndDeleteFalseOrderByIdDesc(ProductEntity.Gender.ALL); // 최신 상품 6개
         } else {
-            productEntity = productRepository.findTop6ByGenderAndDeleteFalseOrderByIdDesc(productGender); // 성별에 맞는 최신 상품 6개
+            productEntities = productRepository.findTop6ByGenderAndDeleteFalseOrderByIdDesc(productGender); // 성별에 맞는 최신 상품 6개
         }
     
         // ProductEntity -> ProductDTO 변환
-        List<ProductDTO> productDTOList = productEntity.stream()
+        List<ProductDTO> productDTOList = productEntities.stream()
             .map(ProductDTO::new) // ProductEntity를 ProductDTO로 변환
             .collect(Collectors.toList());
     
