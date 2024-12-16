@@ -4,6 +4,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import styles from '../../assets/css/banner.module.css';
 import mypageIcon from '../../assets/image/mypage.png'; 
 import cartIcon from '../../assets/image/cart.png';
+import TokenExpiryTimer from './../TokenTimer/TokenExpiryTimer';
 
 
 const Banner = () => {
@@ -62,99 +63,103 @@ const Banner = () => {
   };
 
   return (
-    <header className={styles.banner}>
-      <div className={styles.inner}>
-        <h1 className={styles.logo}>
-          <a className={styles.logoLink} onClick={() => navigate('/')}>
-            Moivo
-          </a>
-        </h1>
+    <>
+      <header className={styles.banner}>
+        <div className={styles.inner}>
+          <h1 className={styles.logo}>
+            <a className={styles.logoLink} onClick={() => navigate('/')}>
+              Moivo
+            </a>
+          </h1>
 
-        <nav className={styles.nav}>
-          <ul className={styles.navList}>
-            {navLinks.map((link, idx) => (
-              <li key={idx} className={styles.navItem}>
-                <button className={styles.navLink} onClick={() => handleToggleMenu(idx)}>
-                  {link.title}
+          <nav className={styles.nav}>
+            <ul className={styles.navList}>
+              {navLinks.map((link, idx) => (
+                <li key={idx} className={styles.navItem}>
+                  <button className={styles.navLink} onClick={() => handleToggleMenu(idx)}>
+                    {link.title}
+                  </button>
+                  {openMenuIndex === idx && (
+                    <div className={styles.subMenu}>
+                      {link.submenu.map((item, subIdx) => (
+                        <a
+                          key={subIdx}
+                          className={styles.subLink}
+                          onClick={() => navigate(item.navigateTo)}>
+                          {item.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className={styles.utility}>
+            {isAuthenticated ? (
+              <>
+                <a 
+                  onClick={(e) => {
+                    e.preventDefault();  // 기본 동작 방지
+                    navigate('/mypage');
+                  }} 
+                  className={styles.utilityLink}
+                >
+                  <span className={styles.text}>My Page</span>
+                  <img src={mypageIcon} className={styles.iconImage} alt="mypage" />
+                </a>
+                <a 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/cart');
+                  }} 
+                  className={styles.utilityLink}
+                >
+                  <span className={styles.text}>Cart</span>
+                  <img src={cartIcon} className={styles.iconImage} alt="cart" />
+                </a>
+                <button onClick={handleLogout} className={styles.logoutButton}>
+                  Logout
                 </button>
-                {openMenuIndex === idx && (
-                  <div className={styles.subMenu}>
-                    {link.submenu.map((item, subIdx) => (
-                      <a
-                        key={subIdx}
-                        className={styles.subLink}
-                        onClick={() => navigate(item.navigateTo)}>
-                        {item.name}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
+              </>
+            ) : (
+              <>
+                <a 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/user');
+                  }} 
+                  className={styles.utilityLink2}
+                >
+                  Login
+                </a>
+                <a 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/user_signup');
+                  }} 
+                  className={styles.utilityLink2}
+                >
+                  Sign Up
+                </a>
+              </>
+            )}
 
-        <div className={styles.utility}>
-          {isAuthenticated ? (
-            <>
-              <a 
-                onClick={(e) => {
-                  e.preventDefault();  // 기본 동작 방지
-                  navigate('/mypage');
-                }} 
-                className={styles.utilityLink}
-              >
-                <span className={styles.text}>My Page</span>
-                <img src={mypageIcon} className={styles.iconImage} alt="mypage" />
-              </a>
-              <a 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/cart');
-                }} 
-                className={styles.utilityLink}
-              >
-                <span className={styles.text}>Cart</span>
-                <img src={cartIcon} className={styles.iconImage} alt="cart" />
-              </a>
-              <button onClick={handleLogout} className={styles.logoutButton}>
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <a 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/user');
-                }} 
-                className={styles.utilityLink2}
-              >
-                Login
-              </a>
-              <a 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/user_signup');
-                }} 
-                className={styles.utilityLink2}
-              >
-                Sign Up
-              </a>
-            </>
-          )}
+            <div className={styles.loginStatus}>
+              <span>
+                <span className={`${styles.status} ${isAuthenticated ? styles.on : styles.off}`}></span>
+                {isAuthenticated ? 'ON' : 'OFF'}
+              </span>
+              {isAuthenticated && ( <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span> )}
+            </div>
 
-          <div className={styles.loginStatus}>
-            <span>
-              <span className={`${styles.status} ${isAuthenticated ? styles.on : styles.off}`}></span>
-              {isAuthenticated ? 'ON' : 'OFF'}
-            </span>
-            {isAuthenticated && ( <span className={styles.expiration}>{formatExpiration(tokenExpiration)}</span> )}
           </div>
-
         </div>
-      </div>
-    </header>
+      </header>
+      <TokenExpiryTimer />
+      {/*  토큰(세션) 만료 타이머 컴포넌트 추가_24.12.16 16:16 성찬 */}
+    </>
   );
 };
 

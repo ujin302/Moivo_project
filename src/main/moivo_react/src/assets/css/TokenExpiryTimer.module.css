@@ -1,9 +1,13 @@
 /* token timer */
 .tokenTimerContainer {
     position: fixed;
-    top: 20px;
-    right: 20px;
     z-index: 1000;
+    cursor: move;
+    user-select: none;
+}
+
+.tokenTimerContainer.dragging {
+    cursor: grabbing;
 }
 
 .tokenTimer {
@@ -66,7 +70,6 @@
 }
 
 .tokenTimer:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -83,7 +86,7 @@
 
 /* 경고 상태 (5분 이하) */
 .tokenTimer.warning {
-    background: linear-gradient(to right, #ecc170, #f7620d);
+    background: linear-gradient(to right, #f09e78, #fd2803);
     color: white;
 }
 

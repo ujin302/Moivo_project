@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import styles from '../../assets/css/TokenExpiryTimer.module.css';
@@ -6,12 +6,78 @@ import styles from '../../assets/css/TokenExpiryTimer.module.css';
 const TokenExpiryTimer = () => {
     const { tokenExpiryTime, logout } = useAuth();
     const navigate = useNavigate();
+    const timerRef = useRef(null);
     const [remainingTime, setRemainingTime] = useState('');
-    // 경고 상태를 관리하는 상태 추가
     const [isWarning, setIsWarning] = useState(false);
-    // 위험 상태를 관리하는 상태 추가
     const [isDanger, setIsDanger] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState(() => ({
+        x: window.innerWidth / 2 - 175,
+        y: window.innerHeight - 120
+    }));
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+    // 드래그 시작
+    const handleMouseDown = (e) => {
+        e.preventDefault();
+        const containerRect = e.currentTarget.getBoundingClientRect();
+        setIsDragging(true);
+        setDragOffset({
+            x: e.clientX - containerRect.left,
+            y: e.clientY - containerRect.top
+        });
+    };
+
+    // 드래그 중
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+
+        const x = e.clientX - dragOffset.x;
+        const y = e.clientY - dragOffset.y;
+
+        // 현재 타이머의 크기를 가져옴
+        const timerWidth = timerRef.current?.offsetWidth || 350;
+        const timerHeight = timerRef.current?.offsetHeight || 100;
+
+        // 화면 경계 체크
+        const maxX = window.innerWidth - timerWidth;
+        const maxY = window.innerHeight - timerHeight;
+
+        setPosition({
+            x: Math.min(Math.max(0, x), maxX),
+            y: Math.min(Math.max(0, y), maxY)
+        });
+    };
+
+    // 드래그 종료
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    useEffect(() => {
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        } else {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging]);
+
+    // 컨테이너 스타일
+    const containerStyle = {
+        position: 'fixed',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        transition: isDragging ? 'none' : 'all 0.3s ease'
+    };
 
     useEffect(() => {
         const updateRemainingTime = () => {
@@ -64,7 +130,12 @@ const TokenExpiryTimer = () => {
     };
 
     return (
-        <div className={styles.tokenTimerContainer}>
+        <div 
+            ref={timerRef}
+            className={`${styles.tokenTimerContainer} ${isDragging ? styles.dragging : ''}`}
+            onMouseDown={handleMouseDown}
+            style={containerStyle}
+        >
             <div className={timerClasses}>
                 <div className={styles.timerContent}>
                     <i className="fas fa-clock"></i>
