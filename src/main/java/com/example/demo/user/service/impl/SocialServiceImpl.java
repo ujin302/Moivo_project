@@ -27,10 +27,10 @@ public class SocialServiceImpl implements SocialService {
     private NaverService naverService;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     // 24.12.16 - uj
     // 카카오 승인 URI 반환
@@ -57,17 +57,19 @@ public class SocialServiceImpl implements SocialService {
 
         // 3. 신규 회원 vs 기존 회원
         Optional<UserEntity> checkUserOptional = userRepository.findByUserId(userKakaoInfoDTO.getUserId());
+        UserEntity userKakaoEntity = new UserEntity();
         if (checkUserOptional == null || checkUserOptional.isEmpty()) {
             // 신규 회원 >> 회원가입 진행
-            userService.insert(userKakaoInfoDTO, false);
+            userKakaoEntity = userService.insertInit(UserEntity.toSaveKakaoUserEntity(userKakaoInfoDTO));
         } else {
             // 기존 회원 >> 로그인 성공
             System.out.println("기존 회원 >> pk: " + checkUserOptional.toString());
+            userKakaoEntity = checkUserOptional.get();
         }
 
         // 4. Moivo JWT Token 발급
-
-        return null;
+        Map<String, Object> loginResult = userService.loginResponseData(userKakaoEntity);
+        return loginResult;
     }
 
 }

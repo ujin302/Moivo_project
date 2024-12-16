@@ -2,10 +2,8 @@ package com.example.demo.user.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.aspectj.internal.lang.annotation.ajcDeclareAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,6 @@ import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.entity.WishEntity;
-import com.example.demo.user.repository.AttendanceRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.repository.WishRepository;
 import com.example.demo.user.service.MypageService;
@@ -38,49 +35,48 @@ public class MypageServiceImpl implements MypageService {
 
     @Autowired
     private UserCouponRepository userCouponRepository;
-    
+
     // @Autowired
-    //private AttendanceRepository attendanceRepository; // 출석
+    // private AttendanceRepository attendanceRepository; // 출석
 
     // 마이페이지 사용자 정보 가져오기
     @Override
     public UserDTO getUserInfo(int id) {
         System.out.println("유저 아이디 = " + id);
         UserEntity userEntity = userRepository.findById(id)
-                                              .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
-        
+                .orElseThrow(() -> new RuntimeException("User not found")); // Optional 처리
+
         // 쿠폰 정보 가져오기
         List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(id)
-            .stream()
-            .map(userCoupon -> {
-                CouponEntity coupon = userCoupon.getCouponEntity();
-                return new CouponDTO(
-                    coupon.getId(),
-                    coupon.getName(),
-                    coupon.getGrade(),
-                    coupon.getDiscountType(),
-                    coupon.getDiscountValue(),
-                    coupon.getMinOrderPrice(),
-                    coupon.getActive()
-                );
-            })
-            .collect(Collectors.toList());
+                .stream()
+                .map(userCoupon -> {
+                    CouponEntity coupon = userCoupon.getCouponEntity();
+                    return new CouponDTO(
+                            coupon.getId(),
+                            coupon.getName(),
+                            coupon.getGrade(),
+                            coupon.getDiscountType(),
+                            coupon.getDiscountValue(),
+                            coupon.getMinOrderPrice(),
+                            coupon.getActive());
+                })
+                .collect(Collectors.toList());
 
         // UserDTO로 변환
-        UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
+        UserDTO userDTO = UserDTO.toGetUserDTO(userEntity);
         userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
         System.out.println("쿠폰 : " + userDTO.getCoupons());
         return userDTO;
     }
-    
-    // 성별에따른 상품 추천 리스트 가져오기 
+
+    // 성별에따른 상품 추천 리스트 가져오기
     @Override
     public List<ProductDTO> getProductList(int userId) {
         UserEntity userEntity = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-    
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         String gender = userEntity.getGender(); // 사용자 성별 정보
-    
+
         ProductEntity.Gender productGender;
         if ("M".equals(gender)) {
             productGender = ProductEntity.Gender.MAN; // 성별이 MAN인 경우
@@ -89,34 +85,37 @@ public class MypageServiceImpl implements MypageService {
         } else {
             productGender = ProductEntity.Gender.ALL; // 성별이 없거나 ALL인 경우
         }
-    
+
         List<ProductEntity> productEntity;
 
         // 성별에 맞는 상품 목록을 가져오기 (삭제되지 않은 상품만 조회)
         if (productGender == ProductEntity.Gender.ALL) {
-            productEntity = productRepository.findTop6ByGenderNotAndDeleteFalseOrderByIdDesc(ProductEntity.Gender.ALL); // 최신 상품 6개
+            productEntity = productRepository.findTop6ByGenderNotAndDeleteFalseOrderByIdDesc(ProductEntity.Gender.ALL); // 최신
+                                                                                                                        // 상품
+                                                                                                                        // 6개
         } else {
-            productEntity = productRepository.findTop6ByGenderAndDeleteFalseOrderByIdDesc(productGender); // 성별에 맞는 최신 상품 6개
+            productEntity = productRepository.findTop6ByGenderAndDeleteFalseOrderByIdDesc(productGender); // 성별에 맞는 최신
+                                                                                                          // 상품 6개
         }
-    
+
         // ProductEntity -> ProductDTO 변환
         List<ProductDTO> productDTOList = productEntity.stream()
-            .map(ProductDTO::new) // ProductEntity를 ProductDTO로 변환
-            .collect(Collectors.toList());
-    
+                .map(ProductDTO::new) // ProductEntity를 ProductDTO로 변환
+                .collect(Collectors.toList());
+
         return productDTOList;
     }
 
     // @Override
     // public List<CouponDTO> getCouponList(int userseq) {
-    //     List<CouponEntity> couponEntities = couponRepository.findByUserId(userseq);
-    //     if (couponEntities.isEmpty()) {
-    //         throw new RuntimeException("No coupons found for the user.");
-    //     }
-    //     // map 내부에서 명시적으로 변환 메서드를 호출
-    //     return couponEntities.stream()
-    //                          .map(entity -> CouponDTO.toGetCouponDTO(entity))
-    //                          .collect(Collectors.toList());
+    // List<CouponEntity> couponEntities = couponRepository.findByUserId(userseq);
+    // if (couponEntities.isEmpty()) {
+    // throw new RuntimeException("No coupons found for the user.");
+    // }
+    // // map 내부에서 명시적으로 변환 메서드를 호출
+    // return couponEntities.stream()
+    // .map(entity -> CouponDTO.toGetCouponDTO(entity))
+    // .collect(Collectors.toList());
     // }
 
     @Override
@@ -134,4 +133,4 @@ public class MypageServiceImpl implements MypageService {
         }
         return wishDTOList;
     }
-}    
+}
