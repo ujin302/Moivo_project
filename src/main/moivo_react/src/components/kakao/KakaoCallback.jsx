@@ -5,49 +5,59 @@ import axios from 'axios';
 import { PATH } from '../../../scripts/path';
 
 const KakaoCallback = () => {
-  const navigate = useNavigate();
-  const { kakaoLogin } = useAuth();
-  
-  useEffect(() => {
-    const code = new URL(window.location.href).searchParams.get("code");
-    
-    if (code) {
-      axios.get(`${PATH.SERVER}/api/oauth/kakao/callback?code=${code}`, {
-        headers: {
-          'Accept': 'application/json'
-        }
-      })
-      .then(response => {
-        console.log("첫 번째 응답:", response.data);
-        const { accessToken, refreshToken, userId } = response.data;
-        
-        return axios.post(`${PATH.SERVER}/api/user/kakao-login`, 
-          { userId },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            }
-          }
-        );
-      })
-      .then(loginResponse => {
-        console.log("두 번째 응답:", loginResponse.data);
-        if (!loginResponse.data || !loginResponse.data.accessToken) {
-          throw new Error('유효하지 않은 응답 데이터');
-        }
-        kakaoLogin(loginResponse.data);
-        navigate('/');
-      })
-      .catch(error => {
-        console.error('카카오 로그인 실패:', error);
-        console.error('에러 응답:', error.response?.data);
-        navigate('/user');
-      });
-    }
-  }, [navigate, kakaoLogin]);
+    const navigate = useNavigate();
+    const { handleLoginSuccess } = useAuth();
 
-  return <div>로그인 처리중...</div>;
+    const fetchUserData = async (token) => {
+        try {
+            const response = await axios.get(`${PATH.SERVER}/api/user/info`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log("사용자 정보:", response.data);
+            return true;
+        } catch (error) {
+            console.error("데이터 요청 실패:", error);
+            return false;
+        }
+    };
+/*
+    useEffect(() => {
+        const processKakaoLogin = async () => {
+            try {
+                const code = new URLSearchParams(window.location.search).get("code");
+                console.log("인증 코드:", code);
+    
+                const response = await axios.get(`${PATH.SERVER}/api/oauth/kakao/callback`, {
+                    params: { code },
+                    withCredentials: true,
+                });
+                console.log("서버 응답:", response.data);
+    
+                // 로그인 성공 처리
+                const success = await handleLoginSuccess(response.data);
+    
+                if (success) {
+                    console.log("메인 페이지로 이동");
+                    navigate("/", { replace: true }); // replace: true로 브라우저 히스토리 교체
+                } else {
+                    console.error("로그인 처리 실패");
+                    alert("로그인 처리 중 오류가 발생했습니다.");
+                    navigate("/user", { replace: true });
+                }
+            } catch (error) {
+                console.error("로그인 오류:", error.response?.data || error.message);
+                alert("로그인 처리 중 오류가 발생했습니다.");
+                navigate("/user", { replace: true });
+            }
+        };   
+    
+        processKakaoLogin();
+    }, [navigate]);
+    */
+
+    return <div>카카오 로그인 처리 중...</div>;
 };
 
-export default KakaoCallback;  //_ 241210_yjy
+export default KakaoCallback;

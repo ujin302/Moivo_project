@@ -35,7 +35,7 @@ public class AdminPaymentController {
     // 24.12.13 - uj
     // 배송송 현황
     @GetMapping("/delivery")
-    public ResponseEntity<?> dResponseEntityeliveryStatus() {
+    public ResponseEntity<?> deliveryStatus() {
         try {
             Map<String, Object> map = adminPaymentService.deliveryStatus();
             return ResponseEntity.ok(map);

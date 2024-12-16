@@ -51,7 +51,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 """)
     Page<ProductStockEntity> findProductStockByKeyword(
             @Param("keyword") String keyword, Pageable pageable);
-    
+
     //검색한 categoryid의 상품 재고 가져오기
     @Query("""
     SELECT s
@@ -72,4 +72,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
       AND p.delete = false
 """)
     Page<ProductStockEntity> findProductStockByCategoryidAndKeyword(@Param("keyword") String keyword, @Param("categoryid") int categoryid, Pageable pageable);
+
+    // 삭제되지 않은 상품(판매 중인 상품) 수 조회 - 24.12.13 - yjy
+    public long countByDeleteFalse();
 }
