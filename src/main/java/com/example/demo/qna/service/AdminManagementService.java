@@ -1,9 +1,14 @@
 package com.example.demo.qna.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.dto.QuestionCategoryDTO;
+import com.example.demo.store.dto.ProductCategoryDTO;
+import com.example.demo.store.dto.ProductDTO;
+import com.example.demo.store.dto.ProductStockDTO;
+import com.example.demo.store.entity.ProductStockEntity;
 
 public interface AdminManagementService {
     public void addFAQ(QuestionDTO questionDTO); // 자주 묻는 질문 추가 메서드
@@ -21,4 +26,10 @@ public interface AdminManagementService {
     
     // 미답변 문의 조회
     public List<QuestionDTO> getUnansweredQuestions();
+
+    // 상품 전체 가져오기
+    public Map<String, Object> getAllProductList(Map<String, Object> dataMap);
+
+    List<ProductCategoryDTO> getCategory();
+
 }

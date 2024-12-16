@@ -2,6 +2,7 @@ package com.example.demo.store.repository;
 
 import java.util.List;
 
+import com.example.demo.store.entity.ProductStockEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,5 +40,36 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
     
     // 삭제된 상품만 가져오기
     List<ProductEntity> findByDeleteTrue();
+
+    //검색한 키워드의 상품 재고 가져오기
+    @Query("""
+    SELECT s
+    FROM ProductStockEntity s
+    JOIN s.productEntity p
+    WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+      AND p.delete = false
+""")
+    Page<ProductStockEntity> findProductStockByKeyword(
+            @Param("keyword") String keyword, Pageable pageable);
     
+    //검색한 categoryid의 상품 재고 가져오기
+    @Query("""
+    SELECT s
+    FROM ProductStockEntity s
+    JOIN s.productEntity p
+    WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :categoryid, '%'))
+      AND p.delete = false
+""")
+    Page<ProductStockEntity> findProductStockBycategoryid(@Param("categoryid") int categoryid, Pageable pageable);
+
+    //검색한 keyword + categoryid의 상품 재고 가져오기
+    @Query("""
+    SELECT s
+    FROM ProductStockEntity s
+    JOIN s.productEntity p
+    WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    AND s.productEntity.categoryEntity.id=:categoryid
+      AND p.delete = false
+""")
+    Page<ProductStockEntity> findProductStockByCategoryidAndKeyword(@Param("keyword") String keyword, @Param("categoryid") int categoryid, Pageable pageable);
 }

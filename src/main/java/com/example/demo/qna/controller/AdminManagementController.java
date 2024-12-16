@@ -1,6 +1,9 @@
 package com.example.demo.qna.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +13,7 @@ import com.example.demo.qna.dto.QuestionCategoryDTO;
 import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.service.AdminManagementService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,6 +107,35 @@ public class AdminManagementController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<QuestionDTO>> getUnansweredQuestions() {
         return ResponseEntity.ok(adminManagementService.getUnansweredQuestions());
+    }
+
+    //관리자 상품목록 가져오기, 카테고리 or 키워드별 검색 후 페이징처리 -12/16
+    @GetMapping("/product")
+    public ResponseEntity<?> getAllProductList(
+            @PageableDefault(page = 0, size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "block", required = false, defaultValue = "3") int block,
+            @RequestParam(name = "sortby", required = false, defaultValue = "newest") String sortby,
+            @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid,
+            @RequestParam(name = "keyword", required = false) String keyword) {
+        Map<String, Object> datamap = new HashMap<>();
+        datamap.put("pageable", pageable); //페이지 처리
+        datamap.put("block", block); //한 페이지당 보여줄 숫자
+        datamap.put("sortby", sortby); //정렬 기준
+        datamap.put("categoryid", categoryid); //카테고리 정렬 기준
+        datamap.put("keyword", keyword); //검색어
+
+        Map<String, Object> map = adminManagementService.getAllProductList(datamap);
+
+
+        // 값 존재 X
+        if (map == null){
+            return ResponseEntity.status(org.apache.http.HttpStatus.SC_NOT_FOUND).body(null);
+        }
+
+        System.out.println("Controller map = " + map);
+
+        //값 존재 O
+        return ResponseEntity.ok(map);
     }
 
 }
