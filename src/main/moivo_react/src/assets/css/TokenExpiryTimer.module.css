@@ -1,0 +1,104 @@
+/* token timer */
+.tokenTimerContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.tokenTimer {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* 기본 상태 호버 효과 */
+.tokenTimer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 시계 아이콘 기본 스타일 */
+.tokenTimer i {
+    color: #4a90e2;
+    font-size: 16px;
+    animation: pulse 2s infinite;
+}
+
+/* 타이머 텍스트 스타일 */
+.timerText {
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 0.5px;
+}
+
+/* 기본 펄스 애니메이션 */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* 경고 상태 (5분 이하) */
+.tokenTimer.warning {
+    background: rgba(255, 166, 0, 0.95);
+    color: white;
+    border-color: rgba(255, 166, 0, 0.5);
+}
+
+.tokenTimer.warning i {
+    color: white;
+    animation: pulse-warning 1.5s infinite;
+}
+
+/* 위험 상태 (1분 이하) */
+.tokenTimer.danger {
+    background: rgba(255, 76, 76, 0.95);
+    color: white;
+    border-color: rgba(255, 76, 76, 0.5);
+    animation: shake 0.5s infinite;
+}
+
+.tokenTimer.danger i {
+    color: white;
+    animation: pulse-danger 1s infinite;
+}
+
+/* 경고 상태 애니메이션 */
+@keyframes pulse-warning {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* 위험 상태 애니메이션 */
+@keyframes pulse-danger {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* 위험 상태 흔들림 애니메이션 */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+    .tokenTimer {
+        background: rgba(40, 40, 40, 0.95);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}

@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import admin_qnaboard from '../../assets/css/admins_qnaboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { PATH } from '../../../scripts/path';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import TokenExpiryTimer from '../../components/TokenTimer/TokenExpiryTimer';
  
 const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null); // 문의리시트 확장기능
@@ -18,62 +17,6 @@ const Admins_qnaboard = () => {
     const [responseModalOpen, setResponseModalOpen] = useState(false); // 문의리시트 답변등록 모달창 기능
     const [editResponseModalOpen, setEditResponseModalOpen] = useState(false); // 문의리시트 답변수정 모달창 기능
     const [responseInput, setResponseInput] = useState(''); // 문의리시트 답변등록 모달창 기능
-
-    // 토큰타이머 2024-12-16 성찬
-const TokenExpiryTimer = () => {
-    const { tokenExpiryTime, logout } = useAuth();
-    const navigate = useNavigate();
-    const [remainingTime, setRemainingTime] = useState('');
-
-    useEffect(() => {
-        const updateRemainingTime = () => {
-            if (!tokenExpiryTime) {
-                console.log('No token expiry time available');
-                return;
-            }
-
-            const now = Date.now();
-            const timeLeft = tokenExpiryTime - now;
-            //console.log('Current time left:', timeLeft); // 2024-12-16 성찬 토큰 만료 시간 표시
-
-            if (timeLeft <= 0) {
-                setRemainingTime('만료됨');
-                logout();
-                navigate('/user');
-                return;
-            }
-
-            // 남은 시간을 분:초 형식으로 변환
-            const minutes = Math.floor(timeLeft / 60000);
-            const seconds = Math.floor((timeLeft % 60000) / 1000);
-            const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            //console.log('Formatted time:', formattedTime); // 2024-12-16 성찬 토큰 만료 시간 표시
-            setRemainingTime(formattedTime);
-        };
-
-        // 1초마다 업데이트
-        updateRemainingTime();
-        const timer = setInterval(updateRemainingTime, 1000);
-
-        return () => clearInterval(timer);
-    }, [tokenExpiryTime, logout, navigate]);
-
-    if (!tokenExpiryTime) {
-        return (
-            <div className={admin_qnaboard.tokenTimer}>
-                <i className="fas fa-clock"></i>
-                <span>로그인 토큰 정보 없음</span>
-            </div>
-        );
-    }
-
-    return (
-        <div className={admin_qnaboard.tokenTimer}>
-            <i className="fas fa-clock"></i>
-            <span>관리자 로그인 토큰 만료까지: {remainingTime}</span>
-        </div>
-    );
-};
 
     useEffect(() => {
         fetchQuestions();
