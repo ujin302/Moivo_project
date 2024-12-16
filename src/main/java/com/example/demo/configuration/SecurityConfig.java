@@ -4,9 +4,7 @@ import com.example.demo.jwt.filter.JwtAuthenticationFilter;
 import com.example.demo.security.handler.CustomAuthenticationSuccessHandler;
 
 import java.util.Arrays;
-import com.example.demo.security.handler.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,11 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
@@ -70,8 +65,8 @@ public class SecurityConfig {
                                 "/login/oauth2/code/**",
                                 "/oauth2/authorization/**",
                                 "/oauth/callback/**",
-                                "/api/oauth/kakao/**",
-                                "/api/user/kakao-login",
+                                "/api/user/social/kakao",
+                                "/api/user/social/kakao/login",
                                 "/api/store/**",
                                 "/api/mail/success")
                         .permitAll()
@@ -88,8 +83,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                "https://kauth.kakao.com",
-                "https://kapi.kakao.com",
+                // "https://kauth.kakao.com",
+                // "https://kapi.kakao.com",
                 "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
@@ -135,11 +130,12 @@ public class SecurityConfig {
     // }
 
     // OAuth2 인증 후 사용자 정보를 저장할 메서드
-    @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(
-            @Qualifier("OAuth2UserServiceImpl") DefaultOAuth2UserService oAuth2UserService) {
-        return new CustomOAuth2UserService();
-    }
+    // @Bean
+    // public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(
+    // @Qualifier("OAuth2UserServiceImpl") DefaultOAuth2UserService
+    // oAuth2UserService) {
+    // return new CustomOAuth2UserService();
+    // }
 
     // 클라이언트 인증 정보를 세션에 저장
     @Bean

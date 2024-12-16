@@ -57,7 +57,7 @@ const routeConfig = [
   { path : "/admins_qnaboard", element: <Admins_qna/>},
   { path : "/admins_product", element: <Admins_product/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
-  { path: "/oauth/callback/kakao", element: <KakaoCallback /> }
+  { path: "/oauth2/callback/kakao", element: <KakaoCallback /> }
 ];
 
 const App = () => {

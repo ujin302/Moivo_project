@@ -6,7 +6,6 @@ import { PATH } from "../../../scripts/path";
 import signin from '../../assets/css/user_login.module.css';
 import apiClient from '../../utils/apiClient';
 import kakaoLoginImage from '../../assets/image/kakao_login.png';
-import { KAKAO_AUTH_URL } from '../../utils/OAuth';
 
 const user_login = () => {
 
@@ -52,8 +51,14 @@ const user_login = () => {
         });
     };
 
-    const handleKakaoLogin = () => {
-        window.location.href = KAKAO_AUTH_URL;
+    const handleKakaoLogin = async () => {
+        try {
+            const response = await axios.get(`${PATH.SERVER}/api/user/social/kakao`);
+            console.log(response.data);
+            window.location.href = response.data;
+        } catch (error) {
+            console.error("인증 오류:", error);
+        }
     };
 
     return (
