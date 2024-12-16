@@ -32,9 +32,6 @@ public interface UserService {
     // 사용자 정보 조회 메소드 추가
     public UserDTO findUserById(String userId);
 
-    // 카카오 로그인을 위한 메소드 추가 _ 241210_yjy
-    public Map<String, Object> kakaoLogin(String userId);
-
     // 회원정보 수정 - sumin (2024.12.12)
     public void updateUserInfo(UserDTO userDTO);
 
@@ -49,4 +46,5 @@ public interface UserService {
     // 24.12.16 - uj
     // JWT 토큰 생성 & 응답 데이터
     public Map<String, Object> loginResponseData(UserEntity user);
+
 }

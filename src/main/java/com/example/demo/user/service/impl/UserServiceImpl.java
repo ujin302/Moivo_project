@@ -10,9 +10,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.coupon.service.UserCouponService;
@@ -364,31 +369,6 @@ public class UserServiceImpl implements UserService {
 
         // Entity -> DTO 변환하여 반환
         return UserDTO.toGetUserDTO(userEntity);
-    }
-
-    // 카카오 로그인을 위한 메소드 - 241210_yjy
-    @Override
-    public Map<String, Object> kakaoLogin(String userId) {
-        // 카카오 사용자 조회 또는 생성
-        UserEntity user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("(카카오) 사용자를 찾을 수 없습니다."));
-
-        // JWT 토큰 생성
-        String accessToken = jwtUtil.generateAccessToken(
-                user.getUserId(),
-                user.getId(),
-                user.isAdmin());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getId());
-
-        // 응답 데이터 구성
-        Map<String, Object> result = new HashMap<>();
-        result.put("accessToken", accessToken);
-        result.put("refreshToken", refreshToken);
-        result.put("userId", user.getUserId());
-        result.put("id", user.getId());
-        result.put("isAdmin", user.isAdmin());
-
-        return result;
     }
 
     // 회원정보 수정 - sumin (2024.12.12)

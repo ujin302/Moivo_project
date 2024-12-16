@@ -49,8 +49,22 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     // 배송 현황
     @Override
     public Map<String, Object> deliveryStatus() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deliveryStatus'");
+        Map<String, Object> map = new HashMap<>();
+        
+        // 배송 준비중 개수
+        long readyCount = paymentRepository.countByDeliveryStatus(PaymentEntity.DeliveryStatus.READY);
+        
+        // 배송중 개수 
+        long inTransitCount = paymentRepository.countByDeliveryStatus(PaymentEntity.DeliveryStatus.DELIVERY);
+        
+        // 배송완료 개수
+        long deliveredCount = paymentRepository.countByDeliveryStatus(PaymentEntity.DeliveryStatus.CONFIRMED);
+
+        map.put("readyDelivery", readyCount);  // 배송 준비중
+        map.put("delivering", inTransitCount);        // 배송중 
+        map.put("delivered", deliveredCount);        // 배송완료
+
+        return map;
     }
 
 }

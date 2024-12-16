@@ -70,18 +70,26 @@ const user_login = () => {
                             <h1>Moivo</h1>
                         </Link>
                         <div className={signin['social-container']}>
-                            <a href="#" onClick={handleKakaoLogin}>
+                            <button 
+                                type="button"
+                                onClick={handleKakaoLogin}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    padding: 0,
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 <img 
                                     src={kakaoLoginImage} 
                                     alt="카카오 로그인" 
                                     style={{ 
-                                        width: '300px',
-                                        height: '45px',
-                                        cursor: 'pointer',
-                                        marginBottom: '10px'
+                                        width: '100%',
+                                        height: '100%',
+                                        cursor: 'pointer'
                                     }} 
                                 />
-                            </a>
+                            </button>
                             <a href="#" className={signin.social}><i className="fab fa-google-plus-g"></i></a>
                             <a href="#" className={signin.social}><i className="fab fa-linkedin-in"></i></a>
                         </div>

@@ -214,6 +214,15 @@
     color: #2F2E2C;
     line-height: 20px; /* 줄 간격 */
     margin-bottom: 5px; /* 아래 간격 */
+    display: flex;
+    justify-content: center;
+}
+
+.productName{
+    white-space: nowrap;
+    overflow: hidden;  
+    text-overflow: ellipsis; 
+    width: 130px;
 }
 
 .totalQuantity {
@@ -230,15 +239,15 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 135px;
+    height: 100%;
     background-color: #988c7325; /* 원하는 배경색 */
     position: relative; /* 가상 요소가 제대로 배치되도록 상대 위치 지정 */
 }
 
 /* 이미지 컬럼 */
 .image img {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: cover; /* 비율 유지 */
     margin: 0 auto; /* 이미지 중앙 정렬 */
 }
@@ -346,8 +355,8 @@
     }
 
     .image {
-        width: 120px;
-        height: 120px;
+        width: 55%;
+        height: 100%;
         margin: 0 auto; /* 이미지 중앙 정렬 */
     }
 
@@ -398,8 +407,9 @@
     }
 
     .column, .column2, .column3 {
-        font-size: 14px; 
+        font-size: 16px; 
         line-height: 1.5; 
+        margin: 0 auto;
     }
 
     .image {
@@ -419,12 +429,18 @@
         font-weight: bold; 
         margin-bottom: 6px; 
         color: #333; 
+        display: block;
+    }
+
+    .productName{
+        margin-bottom: 9px;
+        font-size: 14pt;
     }
 
     .orderLink {
         color: #5d5a23;
         text-decoration: none; 
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .orderLink:hover {
@@ -439,6 +455,7 @@
     .column:nth-child(4), .column:nth-child(5) {
         font-weight: bold; 
         color: #000; 
+        font-size: 12pt;
     }
 
     .column:nth-child(6) {

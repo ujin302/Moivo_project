@@ -1,9 +1,14 @@
 package com.example.demo.qna.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.dto.QuestionCategoryDTO;
+import com.example.demo.store.dto.ProductCategoryDTO;
+import com.example.demo.store.dto.ProductDTO;
+import com.example.demo.store.dto.ProductStockDTO;
+import com.example.demo.store.entity.ProductStockEntity;
 
 public interface AdminManagementService {
     public void addFAQ(QuestionDTO questionDTO); // 자주 묻는 질문 추가 메서드
@@ -16,9 +21,15 @@ public interface AdminManagementService {
     public void updateResponse(Integer questionId, String response); // 문의 답변 수정 메서드
     public void deleteResponse(Integer questionId); // 문의 답변 삭제 메서드
 
-    // 답변된 문의 조회
-    public List<QuestionDTO> getAnsweredQuestions();
-    
-    // 미답변 문의 조회
-    public List<QuestionDTO> getUnansweredQuestions();
+
+
+    // 상품 전체 가져오기
+    public Map<String, Object> getAllProductList(Map<String, Object> dataMap);
+
+    List<ProductCategoryDTO> getCategory();
+
+    // 대시보드
+    public List<QuestionDTO> getAnsweredQuestions();  // 답변된 문의 조회
+    public List<QuestionDTO> getUnansweredQuestions();  // 미답변 문의 조회
+    public Map<String, Integer> getQuestionStatus();  // 관리자 대시보드 데이터 가져옴
 }

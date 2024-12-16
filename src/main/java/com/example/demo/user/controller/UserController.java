@@ -117,33 +117,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/kakao-login") // 카카오 로그인 _ 241210_yjy
-    public ResponseEntity<Map<String, Object>> kakaoLogin(@RequestBody Map<String, String> loginRequest,
-            HttpServletResponse response) {
-        String userId = loginRequest.get("userId");
-        try {
-            Map<String, Object> loginResult = userService.kakaoLogin(userId);
-
-            // Refresh Token을 쿠키에 설정
-            Cookie refreshTokenCookie = new Cookie("refreshToken",
-                    (String) loginResult.get("refreshToken"));
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
-            response.addCookie(refreshTokenCookie);
-
-            UserDTO userInfo = userService.findUserById(userId);
-            loginResult.put("isAdmin", userInfo.isAdmin());
-
-            loginResult.remove("refreshToken");
-
-            return ResponseEntity.ok(loginResult);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
-
     // 회원정보 수정 - sumin (2024.12.12)
     @PostMapping("/mypage/update")
     public ResponseEntity<String> updateUserInfo(@RequestBody UserDTO userDTO,

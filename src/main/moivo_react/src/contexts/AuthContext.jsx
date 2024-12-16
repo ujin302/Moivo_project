@@ -20,10 +20,14 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false); // 2024-12-11 isAdmin 상태 추가 장훈
     const navigate = useNavigate();
+    const [tokenExpiryTime, setTokenExpiryTime] = useState(null);
 
     // 토큰 관리 함수들
     const setAccessToken = (token) => {
         localStorage.setItem('accessToken', token);
+        const expiryTime = getTokenExpiryTime(token);
+        console.log('Token expiry time set to:', new Date(expiryTime)); // 디버깅용 로그
+        setTokenExpiryTime(expiryTime);
     };
 
     const setRefreshToken = (token) => {
@@ -125,11 +129,17 @@ export const AuthProvider = ({ children }) => {
     };
 
     // 카카오 로그인 함수
-    const kakaoLogin = async (loginData) => {
+    const kakaoLogin = async (code) => {
         try {
-            console.log("로그인 데이터:", loginData);
-            if (!loginData.accessToken) {
-                throw new Error('토큰이 없습니다');
+            const response = await axios.get(`${PATH.SERVER}/api/oauth/kakao/callback`, {
+                params: { code },
+                withCredentials: true
+            });
+            
+            const success = await handleLoginSuccess(response.data);
+            if (success) {
+                setIsAuthenticated(true);
+                return true;
             }
             
             // 직접 처리
@@ -143,8 +153,8 @@ export const AuthProvider = ({ children }) => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${loginData.accessToken}`;
             return true;
         } catch (error) {
-            console.error('카카오 로그인 실패:' + error);
-            throw new Error('로그인에 실패했습니다.');
+            console.error('카카오 로그인 실패:', error);
+            throw error.response?.data?.error || error.message;
         }
     };
 
@@ -154,6 +164,10 @@ export const AuthProvider = ({ children }) => {
         if (!accessToken) {
             throw new Error('로그인에 실패했습니다.');
         }
+        
+        // 토큰 만료 시간 설정 12.16 성찬
+        const expiryTime = getTokenExpiryTime(accessToken);
+        setTokenExpiryTime(expiryTime);
         
         // localStorage에 저장
         localStorage.setItem('accessToken', accessToken);
@@ -224,11 +238,28 @@ export const AuthProvider = ({ children }) => {
         const token = getAccessToken();
         const storedIsAdmin = localStorage.getItem('isAdmin') === 'true'; // 2024-12-11 isAdmin 값을 가져옴 장훈
         if (token) {
+            // 토큰이 있을 때 만료 시간도 함께 설정
+            const expiryTime = getTokenExpiryTime(token);
+            setTokenExpiryTime(expiryTime);
             setIsAuthenticated(true);
             setIsAdmin(storedIsAdmin); // 2024-12-11 isAdmin 상태 설정 장훈
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
     }, []);
+
+    // 토큰에서 만료 시간 추출하는 함수
+    const getTokenExpiryTime = (token) => {
+        if (!token) return null;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const expiryTime = payload.exp * 1000; // milliseconds로 변환
+            console.log('Calculated expiry time:', new Date(expiryTime)); // 디버깅용 로그
+            return expiryTime;
+        } catch (e) {
+            console.error('토큰 만료 시간 파싱 실패:', e);
+            return null;
+        }
+    };
 
     const value = {
         isAuthenticated,
@@ -236,13 +267,14 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated,
         setIsAdmin, // 2024-12-11 isAdmin 값을 변경할 수 있는 함수 제공 장훈
         login,
-        kakaoLogin,
         logout,
-        setAccessToken,
-        setRefreshToken,
+        kakaoLogin,
+        handleLoginSuccess,
         getAccessToken,
         getRefreshToken,
-        refreshAccessToken
+        refreshAccessToken,
+        tokenExpiryTime,
+        getTokenExpiryTime,
     };
 
     return (
