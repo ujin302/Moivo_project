@@ -289,7 +289,7 @@ const Admins_qnaboard = () => {
                 <Admins_side />
             </div>
             
-            <div className={admin_qnaboard.tokenTimerContainer}>
+            <div>
                 <TokenExpiryTimer />
             </div>
             
