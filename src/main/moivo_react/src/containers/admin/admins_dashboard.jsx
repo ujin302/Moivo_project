@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
-  const { isAdmin } = useAuth();
+  const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
   const navigate = useNavigate();
   const [paymentStatus, setPaymentStatus] = useState({});
   const [deliveryStatus, setDeliveryStatus] = useState({});
@@ -24,11 +24,6 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   });
 
   useEffect(() => {
-    if (!isAdmin) {
-      navigate('/');
-      return;
-    }
-
     const fetchDashboardData = async () => {
       try {
         const paymentRes = await axiosInstance.get('/api/admin/payment');
@@ -54,13 +49,22 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
       } catch (error) {
         console.error('대시보드 데이터 로딩 실패:', error);
         if (error.response?.status === 401) {
-          navigate('/user');
+          const refreshed = await refreshAccessToken();
+          if (refreshed) {
+            fetchDashboardData();
+          } else {
+            navigate('/user');
+          }
         }
       }
     };
 
-    fetchDashboardData();
-  }, [isAdmin, navigate]);
+    if (isAdmin) {
+      fetchDashboardData();
+    } else {
+      navigate('/login');
+    }
+  }, [isAdmin, navigate, refreshAccessToken]);
 
   return (
     <div className={admin_dashboard.container}>

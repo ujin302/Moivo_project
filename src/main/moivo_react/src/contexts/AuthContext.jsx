@@ -1,3 +1,4 @@
+import axios from 'axios';
 import axiosInstance from '../utils/axiosConfig';
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,14 +23,6 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     // 토큰 관리 함수들
-    const setAccessToken = (token) => {
-        localStorage.setItem('accessToken', token);
-    };
-
-    const setRefreshToken = (token) => {
-        localStorage.setItem('refreshToken', token);
-    };
-
     const getAccessToken = () => {
         return localStorage.getItem('accessToken');
     };
@@ -46,13 +39,17 @@ export const AuthProvider = ({ children }) => {
     // 토큰 갱신 함수
     const refreshAccessToken = async () => {
         try {
-            const response = await axiosInstance.post('/api/auth/refresh', {}, {
-                withCredentials: true // 쿠키 전송을 위해 필요
+            const response = await axios.post('/api/auth/token/refresh', {}, {
+                withCredentials: true,
+                baseURL: PATH.SERVER
             });
             
-            if (response.data?.accessToken) {
-                setAccessToken(response.data.accessToken);
-                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+            console.log('토큰 재발급 응답:', response.data);
+            
+            if (response.data.newAccessToken) {
+                localStorage.setItem('accessToken', response.data.newAccessToken);
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.newAccessToken}`;
+                setIsAuthenticated(true);
                 return true;
             }
             return false;
@@ -166,62 +163,7 @@ export const AuthProvider = ({ children }) => {
         return true;
     };
 
-    // axios 인터셉터 설정
-    useEffect(() => {
-        // 요청 인터셉터 추가
-        const requestInterceptor = axiosInstance.interceptors.request.use(
-            (config) => {
-                const token = localStorage.getItem('accessToken');
-                if (token) {
-                    config.headers.Authorization = `Bearer ${token}`;
-                }
-                return config;
-            },
-            (error) => {
-                return Promise.reject(error);
-            }
-        );
-
-        // 응답 인터셉터
-        const responseInterceptor = axiosInstance.interceptors.response.use(
-            (response) => response,
-            async (error) => {
-                const originalRequest = error.config;
-
-                // access token 만료 에러 && 재시도하지 않은 요청
-                if (error.response.status === 401 && !originalRequest._retry) {
-                    originalRequest._retry = true;
-
-                    try {
-                        // refresh token으로 새로운 access token 발급
-                        const refreshToken = localStorage.getItem('refreshToken');
-                        const response = await axiosInstance.post('/api/auth/refresh', { refreshToken });
-                        
-                        const { accessToken } = response.data;
-                        localStorage.setItem('accessToken', accessToken);
-
-                        // 새로운 토큰으로 원래 요청 재시도
-                        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                        return axiosInstance(originalRequest);
-                    } catch (refreshError) {
-                        // refresh token도 만료된 경우
-                        localStorage.removeItem('accessToken');
-                        setIsAuthenticated(false);
-                        window.location.href = '/user';
-                        return Promise.reject(refreshError);
-                    }
-                }
-                return Promise.reject(error);
-            }
-        );
-
-        return () => {
-            axiosInstance.interceptors.request.eject(requestInterceptor);
-            axiosInstance.interceptors.response.eject(responseInterceptor);
-        };
-    }, []);
-
-    // 초기 인증 상태 확인 (새로고침해도 로그인 상�� 유지)
+    // 초기 인증 상태 확인 (새로고침해도 로그인 상태 유지)
     useEffect(() => {
         const token = getAccessToken();
         const storedIsAdmin = localStorage.getItem('isAdmin') === 'true'; // 2024-12-11 isAdmin 값을 가져옴 장훈

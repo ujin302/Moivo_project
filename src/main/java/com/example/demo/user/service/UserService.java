@@ -41,4 +41,6 @@ public interface UserService {
     public boolean checkPassword(int userId, String password);
     public void deleteUser(int userId);
 
+    public boolean isUserAdmin(int id);
+
 }

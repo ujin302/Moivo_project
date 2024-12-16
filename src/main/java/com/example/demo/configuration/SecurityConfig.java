@@ -64,7 +64,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(
                     "/api/user/login", 
-                    "/api/user/join", 
+                    "/api/user/join",
+                    "/api/auth/**" ,
                     "/api/auth/token/refresh",
                     "/api/oauth/kakao/callback",
                     "/api/oauth/kakao/**",
@@ -74,6 +75,7 @@ public class SecurityConfig {
                     "/oauth/**",
                     "/api/mail/success"
                 ).permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
