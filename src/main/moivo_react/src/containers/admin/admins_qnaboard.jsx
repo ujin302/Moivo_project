@@ -178,10 +178,30 @@ const Admins_qnaboard = () => {
             }
         };
 
-    // 문의 카테고리에 따라 필터링된 데이터 생성
-    const filteredQuestions = selectedCategory
-        ? questions.filter(question => question.categoryId === selectedCategory)
-        : questions;
+    // 카테고리 매핑 상수 추가
+    const CATEGORY_MAPPING = {
+        'ALL': 0,      // 전체문의
+        'BASIC': 1,    // 일반문의 
+        'OTHER': 2,    // 기타문의
+        'SIZE': 3,     // 사이즈문의
+        'PRIVATE': 4   // 비밀문의
+    };
+
+    // 카테고리 이름 매핑 추가
+    const CATEGORY_NAMES = {
+        'ALL': '전체문의',
+        'BASIC': '일반문의',
+        'OTHER': '기타문의',
+        'SIZE': '사이즈문의',
+        'PRIVATE': '비밀문의'
+    };
+
+    // 필터링 로직 수정
+    const filteredQuestions = questions.filter(question => {
+        if (selectedCategory === 'ALL') return true;
+        if (selectedCategory === 'PRIVATE') return question.secret === "true";
+        return question.categoryId === CATEGORY_MAPPING[selectedCategory];
+    });
 
     // 페이징 데이터 계산
     const totalItems = filteredQuestions.length;
@@ -236,30 +256,32 @@ const Admins_qnaboard = () => {
                             onClick={toggleDropdown}
                         >
                             <span>
-                                {selectedCategory 
-                                    ? categories.find(c => c.id === selectedCategory)?.name 
-                                    : '전체 카테고리'
-                                }
+                                {CATEGORY_NAMES[selectedCategory] || '전체문의'}
                             </span>
                             <i className={`fas fa-chevron-${isDropdownVisible ? 'up' : 'down'}`}></i>
                         </button>
                         {isDropdownVisible && (
                             <ul className={admin_qnaboard.filterList}>
                                 <li onClick={() => {
-                                    setSelectedCategory('');
+                                    setSelectedCategory('ALL');
                                     toggleDropdown();
-                                }}>전체</li>
-                                {categories.map((category) => (
-                                    <li 
-                                        key={category.id} 
-                                        onClick={() => {
-                                            setSelectedCategory(category.id);
-                                            toggleDropdown();
-                                        }}
-                                    >
-                                        {category.name}
-                                    </li>
-                                ))}
+                                }}>전체문의</li>
+                                <li onClick={() => {
+                                    setSelectedCategory('BASIC');
+                                    toggleDropdown();
+                                }}>일반문의</li>
+                                <li onClick={() => {
+                                    setSelectedCategory('PRIVATE');
+                                    toggleDropdown();
+                                }}>비밀문의</li>
+                                <li onClick={() => {
+                                    setSelectedCategory('SIZE');
+                                    toggleDropdown();
+                                }}>사이즈문의</li>
+                                <li onClick={() => {
+                                    setSelectedCategory('OTHER');
+                                    toggleDropdown();
+                                }}>기타문의</li>
                             </ul>
                         )}
                     </div>

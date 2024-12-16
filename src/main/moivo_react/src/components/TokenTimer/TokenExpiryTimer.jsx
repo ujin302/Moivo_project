@@ -59,7 +59,7 @@ const TokenExpiryTimer = () => {
                 <i className="fas fa-clock"></i>
                 <span className={styles.timerText}>
                     {tokenExpiryTime 
-                        ? `관리자 로그인 만료까지: ${remainingTime}`
+                        ? `로그인 만료까지: ${remainingTime}`
                         : '로그인 정보 없음'
                     }
                 </span>
