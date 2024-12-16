@@ -6,8 +6,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
  
-
-
 const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null); // 문의리시트 확장기능
     const [currentPage, setCurrentPage] = useState(1); // 문의리시트 페이징기능
@@ -147,6 +145,7 @@ const TokenExpiryTimer = () => {
         setResponseInput('');
     };
 
+    // 답변 등록
     const handleRespondToQuestion = async (e) => {
         e.preventDefault();
         try {
@@ -345,8 +344,8 @@ const TokenExpiryTimer = () => {
                         {activeIndex === question.id && (
                             <div className={admin_qnaboard.qnalistDetails}>
                                 <div className={admin_qnaboard.qnalistUserInfo}>
-                                    <i className="fas fa-user"></i> {question.userId} 
-                                    <span className={admin_qnaboard.dateDivider}>|</span>
+                                    <i className="fas fa-user"> </i> ID : {question.userId}  
+                                    <span className={admin_qnaboard.dateDivider}> | </span>
                                     <i className="far fa-clock"></i> {new Date(question.questionDate).toLocaleString()}
                                 </div>
                                 <div className={admin_qnaboard.qnalistUserQuestion}>
