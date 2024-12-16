@@ -6,6 +6,22 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
  
+
+
+const Admins_qnaboard = () => {
+    const [activeIndex, setActiveIndex] = useState(null); // 문의리시트 확장기능
+    const [currentPage, setCurrentPage] = useState(1); // 문의리시트 페이징기능
+    const [selectedCategory, setSelectedCategory] = useState(''); // 문의리시트 카테고리 필터기능
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false); // 문의리시트 카테고리 드롭다운 기능
+    const itemsPerPage = 6; // 문의리시트 페이징기능
+    const [questions, setQuestions] = useState([]); // 문의리시트 데이터 저장기능
+    const [categories, setCategories] = useState([]); // 문의리시트 카테고리 데이터 저장기능
+    const [selectedQuestion, setSelectedQuestion] = useState(null); // 문의리시트 선택문의 데이터 저장기능
+    const [responseModalOpen, setResponseModalOpen] = useState(false); // 문의리시트 답변등록 모달창 기능
+    const [editResponseModalOpen, setEditResponseModalOpen] = useState(false); // 문의리시트 답변수정 모달창 기능
+    const [responseInput, setResponseInput] = useState(''); // 문의리시트 답변등록 모달창 기능
+
+    // 토큰타이머 2024-12-16 성찬
 const TokenExpiryTimer = () => {
     const { tokenExpiryTime, logout } = useAuth();
     const navigate = useNavigate();
@@ -56,24 +72,10 @@ const TokenExpiryTimer = () => {
     return (
         <div className={admin_qnaboard.tokenTimer}>
             <i className="fas fa-clock"></i>
-            <span>관리자 로그인 만료까지: {remainingTime}</span>
+            <span>관리자 로그인 토큰 만료까지: {remainingTime}</span>
         </div>
     );
 };
-
-const Admins_qnaboard = () => {
-    const [activeIndex, setActiveIndex] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-    const itemsPerPage = 6;
-
-    const [questions, setQuestions] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedQuestion, setSelectedQuestion] = useState(null);
-    const [responseModalOpen, setResponseModalOpen] = useState(false);
-    const [editResponseModalOpen, setEditResponseModalOpen] = useState(false);
-    const [responseInput, setResponseInput] = useState('');
 
     useEffect(() => {
         fetchQuestions();
