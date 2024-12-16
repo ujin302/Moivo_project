@@ -8,7 +8,7 @@ import TokenExpiryTimer from '../../components/TokenTimer/TokenExpiryTimer';
 const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null); // 문의리시트 확장기능
     const [currentPage, setCurrentPage] = useState(1); // 문의리시트 페이징기능
-    const [selectedCategory, setSelectedCategory] = useState(''); // 문의리시트 카테고리 필터기능
+    const [selectedCategory, setSelectedCategory] = useState('ALL'); // 문의리시트 카테고리 필터기능
     const [isDropdownVisible, setIsDropdownVisible] = useState(false); // 문의리시트 카테고리 드롭다운 기능
     const itemsPerPage = 6; // 문의리시트 페이징기능
     const [questions, setQuestions] = useState([]); // 문의리시트 데이터 저장기능
@@ -17,6 +17,7 @@ const Admins_qnaboard = () => {
     const [responseModalOpen, setResponseModalOpen] = useState(false); // 문의리시트 답변등록 모달창 기능
     const [editResponseModalOpen, setEditResponseModalOpen] = useState(false); // 문의리시트 답변수정 모달창 기능
     const [responseInput, setResponseInput] = useState(''); // 문의리시트 답변등록 모달창 기능
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchQuestions();
@@ -196,11 +197,28 @@ const Admins_qnaboard = () => {
         'PRIVATE': '비밀문의'
     };
 
-    // 필터링 로직 수정
+    // 문의글 열고 닫기 함수
+    const toggleQuestion = (index) => {
+        setActiveIndex(activeIndex === index ? null : index);
+    };
+
+    // 검색 처리 함수
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+        setCurrentPage(1); // 검색 시 첫 페이지로 이동
+    };
+
+    // 검색 필터링 로직
     const filteredQuestions = questions.filter(question => {
-        if (selectedCategory === 'ALL') return true;
-        if (selectedCategory === 'PRIVATE') return question.secret === "true";
-        return question.categoryId === CATEGORY_MAPPING[selectedCategory];
+        const matchesCategory = selectedCategory === 'ALL' ? true : 
+            selectedCategory === 'PRIVATE' ? question.secret === "true" :
+            question.categoryId === CATEGORY_MAPPING[selectedCategory];
+
+        const matchesSearch = searchQuery.trim() === '' ? true :
+            question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            question.content.toLowerCase().includes(searchQuery.toLowerCase());
+
+        return matchesCategory && matchesSearch;
     });
 
     // 페이징 데이터 계산
@@ -236,6 +254,19 @@ const Admins_qnaboard = () => {
     // 드롭다운 토글 함수
     const toggleDropdown = () => {
         setIsDropdownVisible(!isDropdownVisible);
+    };
+
+    // 검과 시간 계산 함수
+    const getTimeElapsed = (date) => {
+        const now = new Date();
+        const questionDate = new Date(date);
+        const diffTime = Math.abs(now - questionDate);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+        if (diffDays > 0) return `${diffDays}일 전`;
+        if (diffHours > 0) return `${diffHours}시간 전`;
+        return '방금 전';
     };
 
     return (
@@ -287,12 +318,52 @@ const Admins_qnaboard = () => {
                     </div>
                 </div>
 
-                {currentPageQuestions.map((question) => (
+                {/* 통계 섹션 추가 */}
+                <div className={admin_qnaboard.statsContainer}>
+                    <div className={admin_qnaboard.statCard}>
+                        <div className={admin_qnaboard.statNumber}>
+                            {questions.length}
+                        </div>
+                        <div className={admin_qnaboard.statLabel}>전체 문의</div>
+                    </div>
+                    <div className={admin_qnaboard.statCard}>
+                        <div className={admin_qnaboard.statNumber}>
+                            {questions.filter(q => q.response).length}
+                        </div>
+                        <div className={admin_qnaboard.statLabel}>답변 완료</div>
+                    </div>
+                    <div className={admin_qnaboard.statCard}>
+                        <div className={admin_qnaboard.statNumber}>
+                            {questions.filter(q => !q.response).length}
+                        </div>
+                        <div className={admin_qnaboard.statLabel}>답변 대기</div>
+                    </div>
+                </div>
+
+                {/* 검색 기능 추가 */}
+                <div className={admin_qnaboard.searchContainer}>
+                    <i className={`fas fa-search ${admin_qnaboard.searchIcon}`}></i>
+                    <input
+                        type="text"
+                        className={admin_qnaboard.searchInput}
+                        placeholder="문의 제목이나 내용으로 검색..."
+                        value={searchQuery}
+                        onChange={handleSearch}
+                    />
+                </div>
+
+                {currentPageQuestions.map((question, index) => (
                     <div key={question.id} className={admin_qnaboard.qnalistItem}>
                         <div 
                             className={admin_qnaboard.qnalistHeader}
-                            onClick={() => setActiveIndex(activeIndex === question.id ? null : question.id)}
+                            onClick={() => toggleQuestion(index)}
                         >
+                            <span className={admin_qnaboard.statusIcon + 
+                                (question.response ? ' answered' : ' waiting')}>
+                                <i className={question.response ? 
+                                    "fas fa-check-circle" : 
+                                    "fas fa-clock"}></i>
+                            </span>
                             <span className={admin_qnaboard.qnalistQuestionType}>
                                 {getIconForCategory(question.categoryId)}
                             </span>
@@ -304,9 +375,12 @@ const Admins_qnaboard = () => {
                                     <i className="fas fa-lock"></i> 비밀글
                                 </span>
                             )}
+                            <span className={admin_qnaboard.timeElapsed}>
+                                {getTimeElapsed(question.questionDate)}
+                            </span>
                         </div>
                         
-                        {activeIndex === question.id && (
+                        {activeIndex === index && (
                             <div className={admin_qnaboard.qnalistDetails}>
                                 <div className={admin_qnaboard.qnalistUserInfo}>
                                     <i className="fas fa-user"> </i> ID : {question.userId}  
