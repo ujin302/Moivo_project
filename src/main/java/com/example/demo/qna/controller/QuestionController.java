@@ -56,7 +56,7 @@ public class QuestionController {
         return ResponseEntity.ok("200 Ok");
     }
 
-    //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang 
+    //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang 12/17 18:30 제목별, 카테고리별 검색 추가
     @GetMapping("")
     public ResponseEntity<?> searchQuestion(
             @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
