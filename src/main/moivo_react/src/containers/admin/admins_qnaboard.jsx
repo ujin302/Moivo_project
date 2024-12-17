@@ -27,7 +27,7 @@ const Admins_qnaboard = () => {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axiosInstance.get('/api/admin/qna/management/questions');
+            const response = await axiosInstance.get(`${PATH.SERVER}/api/admin/qna/management/questions`);
             setQuestions(response.data);
         } catch (error) {
             console.error('Failed to fetch questions:', error);
@@ -36,7 +36,7 @@ const Admins_qnaboard = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axiosInstance.get('/api/admin/qna/management/categories');
+            const response = await axiosInstance.get(`${PATH.SERVER}/api/admin/qna/management/categories`);
             setCategories(response.data);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
