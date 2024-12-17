@@ -13,7 +13,7 @@ import feign.Param;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer> {
-    // 특정 User의 Wish를 조회
+    // 특정 User의 orders를 조회
     public List<PaymentEntity> findByUserEntity_Id(Integer userId);
 
     // 특정 User의 Payment 조회 (특정 월에 대한 데이터)

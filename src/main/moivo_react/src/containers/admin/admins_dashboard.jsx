@@ -72,6 +72,10 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
       <div className={admin_dashboard.sidebar}>
         <Admins_side />
       </div>
+      {/* 토큰 만료 타이머 추가_12.16 15:30 성찬 */}
+      <div>
+        <TokenExpiryTimer />
+      </div>
 
       <div className={admin_dashboard.mainContent}>
         {/* 1번 섹션 - 판매 현황 */}

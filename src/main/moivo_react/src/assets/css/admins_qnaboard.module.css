@@ -8,11 +8,9 @@
 }
 
 .qnalistMainDiv {
-    display: flex;
-    padding-top: 30px;
+    background: linear-gradient(135deg, #fff8ec 0%, #fff2e6 100%);
     min-height: 100vh;
-    background-color: #f8f9fa;
-    position: relative;
+    padding: 20px;
 }
   
 .qnalistheader {
@@ -87,21 +85,18 @@
 /* 드롭다운 버튼 스타일 */
 .dropdownBtn {
   width: 100%;
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  border: 1px solid #e0e0e0;
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-weight: 500;
-  cursor: pointer;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: white;
+  border: 2px solid rgba(233, 179, 132, 0.3);
+  color: #8b6b4f;
+  font-weight: 600;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .dropdownBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: #d4a373;
+  background: #fff5eb;
 }
 
 /* 드롭다운 목록 스타일 */
@@ -150,36 +145,41 @@
 
 /* QnA 리스트 컨테이너 */
 .qnalistContainer {
+  background: rgba(255, 250, 242, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(212, 163, 115, 0.1);
   margin-left: 80px;
-  padding: 20px 40px;
   width: calc(100% - 80px);
-  background: white;
-  position: relative;
-  z-index: 1;
 }
 
 /* QnA 항목 스타일 */
 .qnalistItem {
   background: white;
-  border-radius: 12px;
+  border-radius: 15px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 15px rgba(212, 163, 115, 0.08);
   transition: all 0.3s ease;
+  border-left: 5px solid #d4a373;
 }
 
 .qnalistItem:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(212, 163, 115, 0.15);
 }
 
 .qnalistHeader {
   padding: 20px;
-  border-radius: 12px 12px 0 0;
-  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 15px;
-  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.qnalistHeader:hover {
+  background-color: #fff5eb;
 }
 
 .qnalistQuestionType {
@@ -196,28 +196,29 @@
 .qnalistQuestionTitle {
   font-size: 16px;
   font-weight: 500;
-  color: #333;
+  color: #5c4b3c;
   flex: 1;
 }
 
 .qnalistSecretLabel {
-  background: #ff6b6b;
+  background: linear-gradient(145deg, #e9b384, #d4a373);
   color: white;
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
+  box-shadow: 0 2px 8px rgba(212, 163, 115, 0.2);
 }
 
 .qnalistDetails {
   padding: 0px 20px;
   background-color: #fff;
-  
+  transition: all 0.4s ease-in-out;
 }
 
 .qnalistUserInfo {
   font-size: 14px;
-  color: #666;
+  color: #8b6b4f;
   margin-bottom: 10px;
 }
 
@@ -236,29 +237,23 @@
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-top: 40px;
+  gap: 10px;
+  margin-top: 30px;
 }
 
 .paginationBtn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 2px solid rgba(233, 179, 132, 0.3);
+  background: white;
+  color: #8b6b4f;
   transition: all 0.3s ease;
 }
 
-.paginationBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
 .paginationBtn.active {
-  background: linear-gradient(145deg, #4A90E2, #357ABD);
+  background: #d4a373;
   color: white;
+  border-color: #d4a373;
 }
 
 .modalOverlay {
@@ -267,7 +262,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
@@ -276,12 +271,12 @@
 }
 
 .modalContent {
-  width: 600px;
-  background: white;
+  background: #fff9f4;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  animation: modalFadeIn 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 90%;
 }
 
 @keyframes modalFadeIn {
@@ -306,18 +301,17 @@
   width: 100%;
   min-height: 150px;
   padding: 15px;
-  border: 2px solid #E0E0E0;
   border-radius: 10px;
-  font-size: 15px;
-  resize: vertical;
-  margin-bottom: 20px;
-  transition: border-color 0.3s ease;
-  background-color: #191b1a;
-  color: #ffffff;
+  border: 2px solid rgba(233, 179, 132, 0.3);
+  background: white;
+  margin: 15px 0;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
 .modalInput:focus {
-  border-color: #4A90E2;
+  border-color: #d4a373;
+  box-shadow: 0 0 10px rgba(212, 163, 115, 0.1);
   outline: none;
 }
 
@@ -435,10 +429,10 @@
 
 /*  관리자 답변 섹션  */
 .adminResponseSection {
-  background: linear-gradient(145deg, #f8f9fa, #ffffff);
-  padding: 25px;
-  border-radius: 12px;
-  margin-top: 20px;
+  background: #fff9f4;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 15px;
 }
 
 .responseTextarea {
@@ -467,22 +461,21 @@
 }
 
 .responseButton {
-  background: linear-gradient(145deg, #4A90E2, #357ABD);
-  color: white;
-  padding: 12px 25px;
-  border-radius: 25px;
+  padding: 10px 20px;
+  border-radius: 8px;
   border: none;
-  font-weight: 500;
-  cursor: pointer;
+  background: linear-gradient(145deg, #d4a373, #c89b6d);
+  color: white;
+  font-weight: 600;
   transition: all 0.3s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
 .responseButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
 }
 
 .responseButton::before {
@@ -511,10 +504,427 @@
 /* 필터 섹션 스타일링 */
 .filterSection {
     position: relative;
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    background: linear-gradient(145deg, #fff9f4, #fff5eb);
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
-    z-index: 100;
+    box-shadow: 0 4px 15px rgba(212, 163, 115, 0.08);
 }
+
+/* 상태 뱃지 스타일 */
+.statusBadge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.statusBadge.answered {
+  background: #d4a373;
+  color: white;
+}
+
+.statusBadge.waiting {
+  background: #e74c3c;
+  color: white;
+}
+
+/* 헤더 섹션 스타일 추가 */
+.customerServiceHeader {
+  text-align: center;
+  padding: 40px 0;
+  background: linear-gradient(to right, #c89b6d, #d4a373);
+  color: white;
+  margin-bottom: 30px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.customerServiceTitle {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.customerServiceSubtitle {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* 추가: 부드러운 스크롤 효과 */
+.qnalistDetails {
+  transition: all 0.4s ease-in-out;
+}
+
+/* 추가: 아이콘 색상 */
+.qnalistQuestionType i {
+  color: #d4a373;
+}
+
+/* 추가: 구분선 스타일 */
+.dateDivider {
+  color: rgba(139, 107, 79, 0.4);
+  margin: 0 10px;
+}
+
+/* 상태 표시 아이콘 추가 */
+.statusIcon {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.statusIcon.answered {
+  color: #2ecc71;
+}
+
+.statusIcon.waiting {
+  color: #e74c3c;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.priorityBadge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+.priorityBadge.high {
+  background: #ff7675;
+  color: white;
+}
+
+.priorityBadge.medium {
+  background: #fdcb6e;
+  color: white;
+}
+
+.priorityBadge.low {
+  background: #81ecec;
+  color: white;
+}
+
+.timeElapsed {
+  font-size: 12px;
+  color: #95a5a6;
+  margin-left: auto;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* 검색 섹션 스타일 개선 */
+.searchContainer {
+    position: relative;
+    margin: 25px auto;
+    width: 100%;
+    width: auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+}
+
+.searchInput {
+    width: 100%;
+    height: 50px;
+    padding: 10px 20px 10px 55px;
+    border-radius: 25px;
+    border: 2px solid rgba(212, 163, 115, 0.3);
+    background: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(212, 163, 115, 0.1);
+}
+
+.searchIcon {
+    position: absolute;
+    left: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d4a373;
+    font-size: 20px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* 검색바 포커스/호버 효과 개선 */
+.searchInput:focus {
+    border-color: #d4a373;
+    box-shadow: 0 6px 20px rgba(212, 163, 115, 0.2);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.searchInput:focus + .searchIcon {
+    color: #c89b6d;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.searchContainer:hover .searchInput {
+    border-color: #d4a373;
+    box-shadow: 0 6px 20px rgba(212, 163, 115, 0.15);
+}
+
+.searchContainer:hover .searchIcon {
+    color: #c89b6d;
+}
+
+.searchInput::placeholder {
+    color: #b8b8b8;
+    font-size: 15px;
+}
+
+/* 반응형 디자인 개선 */
+@media (max-width: 768px) {
+    .searchContainer {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+    
+    .searchInput {
+        height: 45px;
+        padding: 10px 15px 10px 50px;
+        font-size: 15px;
+    }
+    
+    .searchIcon {
+        left: 30px;
+        font-size: 18px;
+    }
+}
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 0 15px;
+}
+
+.statCard {
+  background: linear-gradient(145deg, #fff9f4, #fff5eb);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(233, 179, 132, 0.3);
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(212, 163, 115, 0.15);
+}
+
+.statNumber {
+  font-size: 24px;
+  font-weight: 700;
+  color: #d4a373;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 13px;
+  color: #8b6b4f;
+}
+
+/* 활성화된 카드 스타일 */
+.statCard.active {
+  background: linear-gradient(145deg, #d4a373, #c89b6d);
+  border-color: #d4a373;
+}
+
+.statCard.active .statNumber,
+.statCard.active .statLabel {
+  color: white;
+}
+
+/* 선택 효과 애니메이션 */
+.statCard.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #fff;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* 모달 디자인 개선 */
+.modalOverlay {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modalContent {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.3s ease;
+}
+
+.modalContent h3 {
+  color: #d4a373;
+  font-size: 18px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modalInput {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid rgba(233, 179, 132, 0.3);
+  background: #fff;
+  margin: 10px 0;
+  font-size: 14px;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modalButtons button {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.modalButtons button[type="submit"] {
+  background: #d4a373;
+  color: white;
+  border: none;
+}
+
+.modalButtons button[type="button"] {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+/* 문의 리스트 아이템 디자인 개선 */
+.qnalistItem {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #d4a373;
+  transition: all 0.3s ease;
+}
+
+.qnalistHeader {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 검색 입력창 디자인 개선 */
+.searchContainer {
+  position: relative;
+  margin: 15px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 15px 10px 35px;
+  border-radius: 8px;
+  border: 1px solid rgba(233, 179, 132, 0.3);
+  font-size: 14px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d4a373;
+}
+
+/* 애니메이션 효과 */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 반응형 디자인 개선 */
+@media (max-width: 768px) {
+  .statsContainer {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .statCard {
+    min-height: 80px;
+    padding: 12px;
+  }
+
+  .statNumber {
+    font-size: 20px;
+  }
+
+  .statLabel {
+    font-size: 12px;
+  }
+}
+
+
