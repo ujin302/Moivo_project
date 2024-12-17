@@ -33,14 +33,16 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
         // 2. 오늘 하루 매출액
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 오늘 00:00:00
         LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX); // 오늘 23:59:59
-        long todayPrice = paymentRepository.sumTotalPriceByPaymentDate(startOfDay, endOfDay);
-        System.out.println("하루 매출액: " + todayPrice);
-        map.put("todayPrice", todayPrice);
+        Long todaySum = paymentRepository.sumTotalPriceByPaymentDate(startOfDay, endOfDay);
+        long todayTotal = (todaySum != null) ? todaySum : 0L;
+        System.out.println("하루 매출액: " + todayTotal);
+        map.put("todayPrice", todayTotal);
 
         // 3. 총 결제 금액
-        long totalPrice = paymentRepository.sumTotalPrice();
-        System.out.println("총 매출액: " + totalPrice);
-        map.put("totalPrice", totalPrice);
+        Long totalSum = paymentRepository.sumTotalPrice();
+        long total = (totalSum != null) ? totalSum : 0L;
+        System.out.println("총 매출액: " + total);
+        map.put("totalPrice", total);
 
         return map;
     }

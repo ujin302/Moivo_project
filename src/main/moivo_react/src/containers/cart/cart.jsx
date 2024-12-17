@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../assets/css/Cart.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosConfig";
 import { PATH } from "../../../scripts/path";
 
 const Cart = () => {
@@ -18,20 +18,12 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const token = getAccessToken();
         const storedUserid = localStorage.getItem("id");
         
-        console.log("요청 전 확인 - userId:", storedUserid, "token:", token);
+        console.log("요청 전 확인 - userId:", storedUserid);
         
-        const response = await axios({
-          method: 'get',
-          url: `${PATH.SERVER}/api/user/cart/list`,
-          params: { 
-            userid: storedUserid 
-          },
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        const response = await axiosInstance.get(`${PATH.SERVER}/api/user/cart/list`, {
+          params: { userid: storedUserid }
         });
         
         console.log("전체 응답:", response);
@@ -44,21 +36,18 @@ const Cart = () => {
           return;
         }
         
-        const mappedItems = response.data.cartItems.map(item => {
-          console.log("매핑 중인 아이템:", item);
-          return {
-            usercartId: item.id,
-            productId: item.productDTO.id,
-            name: item.productDTO.name,
-            price: item.productDTO.price,
-            img: item.productDTO.img,
-            content: item.productDTO.content,
-            size: item.size,
-            count: item.count,
-            stockCount: item.stockCount,
-            soldOut: item.soldOut
-          };
-        });
+        const mappedItems = response.data.cartItems.map(item => ({
+          usercartId: item.id,
+          productId: item.productDTO.id,
+          name: item.productDTO.name,
+          price: item.productDTO.price,
+          img: item.productDTO.img,
+          content: item.productDTO.content,
+          size: item.size,
+          count: item.count,
+          stockCount: item.stockCount,
+          soldOut: item.soldOut
+        }));
         
         console.log("매핑된 아이템:", mappedItems);
         setCartItems(mappedItems);
@@ -72,22 +61,17 @@ const Cart = () => {
     };
 
     fetchCartItems();
-  }, [isAuthenticated, navigate, getAccessToken]);
+  }, [isAuthenticated, navigate]);
 
   // 상품 제거
   const handleRemoveItem = async (id) => {
-    const token = localStorage.getItem("accessToken");
-    console.log(id);
     if (!userid) return;
     try {
-      await axios.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: { userid },
+      await axiosInstance.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
+        params: { userid }
       });
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-      console.log(`${id} 상품 삭제 성공 ~`);
+      console.log(`${id} 상품 삭제 성공`);
     } catch (error) {
       console.error("Error removing item:", error);
       if (error.response?.status === 401) {
@@ -100,7 +84,6 @@ const Cart = () => {
 
   // 상품 업데이트
   const handleUpdateItem = async (id, newCount, newSize) => {
-    const token = localStorage.getItem("accessToken");
     if (!userid) return;
     const item = cartItems.find((item) => item.usercartId === id);
     if (newCount > item.stockCount) {
@@ -108,28 +91,22 @@ const Cart = () => {
       return;
     }
     try {
-      await axios.put(
-        `${PATH.SERVER}/api/user/cart/update/${id}`,
-        {
-          count: newCount,
-          size: newSize !== null ? newSize : item.size,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axiosInstance.put(`${PATH.SERVER}/api/user/cart/update/${id}`, {
+        count: newCount,
+        size: newSize || item.size,
+        userid
+      });
+      
       setCartItems((prevItems) =>
         prevItems.map((item) =>
           item.usercartId === id
-            ? { ...item, count: newCount, size: newSize !== null ? newSize : item.size }
+            ? { ...item, count: newCount, size: newSize || item.size }
             : item
         )
       );
     } catch (error) {
-      console.error(error);
-      alert("수정 중 문제가 발생했습니다. !!");
+      console.error("Error updating item:", error);
+      alert("상품 업데이트에 실패했습니다.");
     }
   };
 
