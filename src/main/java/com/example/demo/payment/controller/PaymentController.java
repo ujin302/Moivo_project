@@ -22,14 +22,9 @@ public class PaymentController {
     // Toss 결제 후, 테이블에 주문 내역 저장
     @PostMapping("")
     public ResponseEntity<?> savePaymentInfo(@RequestBody Map<String, Object> requestData) {
-        System.out.println(requestData);
         try {
-            // 1.params 맵 추출
-            Map<String, Object> params = (Map<String, Object>) requestData.get("params");
-
-            // 2. 결제 데이터 저장
-            paymentService.savePaymentInfo(params);
-
+            System.out.println(requestData);
+            paymentService.savePaymentInfo(requestData);
             return ResponseEntity.ok(null);
         } catch (Exception e) {
             e.printStackTrace();
