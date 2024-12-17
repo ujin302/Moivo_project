@@ -18,6 +18,15 @@ const Qna_boardlist = () => {
     const [passwordError, setPasswordError] = useState('');
     const [selectedPost, setSelectedPost] = useState(null);
 
+    // 새로운 상태 추가: 편집 모달 관련
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editedPost, setEditedPost] = useState({
+        categoryId: 1,
+        title: '',
+        content: '',
+        secret: false
+    });
+
     // 현재 로그인한 사용자 ID 상태 추가
     const [currentUserId, setCurrentUserId] = useState(null);
 
@@ -78,13 +87,41 @@ const Qna_boardlist = () => {
         }
     };
 
-    // 게시글 수정 핸들러
+    // 게시글 수정 핸들러 - 모달 열기
     const handleEditPost = (item) => {
         // 로그인한 사용자의 글만 수정 가능
         if (currentUserId && currentUserId === item.userId) {
-            navigate(`/qna_board/edit/${item.id}`);
+            setEditedPost({
+                id: item.id,
+                categoryId: item.categoryId,
+                title: item.title,
+                content: item.content,
+                secret: item.secret || item.categoryId === 3
+            });
+            setEditModalVisible(true);
         } else {
             alert('수정 권한이 없습니다.');
+        }
+    };
+
+    // 게시글 수정 제출 핸들러
+    const handleEditSubmit = async () => {
+        try {
+            await axiosInstance.put('/api/user/question/update', {
+                ...editedPost,
+                userId: currentUserId
+            });
+            
+            // 모달 닫기
+            setEditModalVisible(false);
+            
+            // 현재 페이지 다시 불러오기
+            fetchQnaData(currentPage);
+            
+            alert('수정이 완료되었습니다.');
+        } catch (error) {
+            console.error('수정 중 오류:', error);
+            alert('수정에 실패했습니다.');
         }
     };
 
@@ -203,16 +240,17 @@ const Qna_boardlist = () => {
                                 {activeIndex === index && (
                                     <div className={QnA_b.qnalistDetails}>
                                         <div className={QnA_b.qnalistUserInfo}>
-                                            <span>{item.userId}</span> | <span>{item.questionDate}</span>
-                                            {/* 수정, 삭제 버튼 추가 */}
-                                            {currentUserId === item.userId && (
+                                            <span>ID : {item.userId}</span> | DAY : <span>{item.questionDate}</span>
+                                                {/* 수정, 삭제 버튼 추가 */}
+                                                {currentUserId === item.userId && (
                                                 <div className={QnA_b.actionButtons}>
                                                     <button onClick={() => handleEditPost(item)}>수정</button>
                                                     <button onClick={() => handleDeletePost(item)}>삭제</button>
                                                 </div>
                                             )}
                                         </div>
-                                        <div className={QnA_b.qnalistUserQuestion}>{item.content}</div>
+                                        <div className={QnA_b.qnalistUserQuestion}>{item.content}
+                                        </div>
                                         <div className={QnA_b.qnalistDivider}></div>
                                         <div className={QnA_b.qnalistUserAnswer}>
                                             {item.response || '답변 대기 중'}
@@ -222,6 +260,61 @@ const Qna_boardlist = () => {
                             </div>
                         ))
                     )}
+                    {/* 게시글 수정 모달 */}
+                    {editModalVisible && (
+                        <div className={QnA_b.modalOverlay}>
+                            <div className={QnA_b.modalContent}>
+                                <h3>문의 수정</h3>
+                                
+                                {/* 문의 유형 선택 */}
+                                <span className={QnA_b.modalQuestionTitle}>문의 유형</span>
+                                <select value={editedPost.categoryId} onChange={(e) => setEditedPost({
+                                            ...editedPost, 
+                                            categoryId: parseInt(e.target.value)
+                                        })}
+                                className={QnA_b.modalSelect}>
+                                    <option value={1}>일반 문의</option>
+                                    <option value={2}>기타 문의</option>
+                                    <option value={3}>비밀 문의</option>
+                                    <option value={4}>사이즈 문의</option>
+                                </select>
+                                
+                                {/* 제목 입력 */}
+                                <span className={QnA_b.modalQuestionTitle}>제목</span>
+                                <input type="text"  value={editedPost.title} onChange={(e) => setEditedPost({
+                                        ...editedPost, 
+                                        title: e.target.value
+                                    })}
+                                    placeholder="제목을 입력하세요"
+                                    className={QnA_b.modalInput} />
+                                    
+                                {/* 비밀글 여부 체크박스 */}
+                                <div className={QnA_b.secretCheckbox}>
+                                    <label>비밀글</label>
+                                    <input type="checkbox" checked={editedPost.categoryId === 3 || editedPost.secret === true} onChange={(e) => setEditedPost({
+                                            ...editedPost, 
+                                            categoryId: e.target.checked ? 3 : 1,
+                                            secret: e.target.checked
+                                        })} />
+                                </div>
+
+                                {/* 내용 입력 */}
+                                <span className={QnA_b.modalQuestionTitle}>내용</span>
+                                <textarea value={editedPost.content} onChange={(e) => setEditedPost({
+                                        ...editedPost, 
+                                        content: e.target.value
+                                    })}
+                                    placeholder="내용을 입력하세요"
+                                    className={QnA_b.modalTextarea} />
+
+                                <div className={QnA_b.modalButtons}>
+                                    <button onClick={handleEditSubmit}>수정</button>
+                                    <button onClick={() => setEditModalVisible(false)}>취소</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </div>
 
                 {/* 페이징 버튼 */}

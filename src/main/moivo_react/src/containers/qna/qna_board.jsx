@@ -26,12 +26,35 @@ const Qna_board = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  //2024/12/17 핸들러 예외처리 수정 장훈
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  
+    // 비밀글 체크박스 처리
+    if (name === "isSecret") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: checked,
+        // 체크된 상태에서는 type을 "비밀 문의"로 설정, 체크 해제시 type을 ""으로 설정
+        type: checked ? "비밀 문의" : "",
+      }));
+    } 
+    // 문의 유형(type) 처리
+    else if (name === "type") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        // "비밀 문의"를 선택하면 isSecret을 체크하고, 그 외에는 해제
+        isSecret: value === "비밀 문의" ? true : false,
+      }));
+    } 
+    // 기타 필드 처리
+    else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
