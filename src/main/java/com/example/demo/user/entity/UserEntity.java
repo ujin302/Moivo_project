@@ -35,7 +35,7 @@ public class UserEntity { // 사용자 & 관리자
         // 0, 10, 30, 50, 70
     }
 
-    //양방량 매핑시킴
+    // 양방량 매핑시킴
     @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude // 순환 참조 방지
     private WishEntity wishEntity; // Wish와 연결
@@ -85,7 +85,6 @@ public class UserEntity { // 사용자 & 관리자
     private double height;
     private double weight;
 
-
     // DTO -> Entity
 
     // 사용자 데이터 출력
@@ -129,52 +128,18 @@ public class UserEntity { // 사용자 & 관리자
         return entity;
     }
 
-    // Social 사용자 데이터 저장
-    public static UserEntity toSaveSocialUserEntity(UserDTO dto) {
-        UserEntity entity = new UserEntity();
-        entity.setUserId(dto.getUserId());
-        entity.setLoginType(dto.getLoginType());
-
-        return entity;
-    }
-
-    // Entity -> DTO 변환
-    public static UserDTO toGetUserDTO(UserEntity userEntity) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(userEntity.getId());
-        userDTO.setUserId(userEntity.getUserId());
-        userDTO.setName(userEntity.getName());
-        userDTO.setPwd(userEntity.getPwd());
-        userDTO.setEmail(userEntity.getEmail());
-        userDTO.setTel(userEntity.getTel());
-        userDTO.setBirth(userEntity.getBirth());
-        userDTO.setAddr1(userEntity.getAddr1());
-        userDTO.setAddr2(userEntity.getAddr2());
-        userDTO.setZipcode(userEntity.getZipcode());
-        userDTO.setGender(userEntity.getGender());
-        userDTO.setLoginType(userEntity.getLoginType());
-        userDTO.setAdmin(userEntity.isAdmin());
-        userDTO.setGrade(userEntity.getGrade()); 
-        userDTO.setHeight(userEntity.getHeight());
-        userDTO.setWeight(userEntity.getWeight());
-
-        return userDTO;
-    }
-
-
-     // Kakao 사용자 데이터 저장
-     public static UserEntity toSaveKakaoUserEntity(String userId, String nickname) {
+    // Kakao 사용자 데이터 저장
+    public static UserEntity toSaveKakaoUserEntity(UserDTO dto) {
         UserEntity entity = new UserEntity();
 
-        entity.setUserId(userId); // userid
-        entity.setName(nickname); // 닉네임
+        entity.setUserId(dto.getUserId()); // userid
+        entity.setName(dto.getName()); // 닉네임
+        entity.setEmail(dto.getEmail()); // 닉네임
 
         // Kakao 로그인이므로 LoginType 설정
         entity.setLoginType(LoginType.KAKAO);
 
         return entity;
     }
-
-
 
 }

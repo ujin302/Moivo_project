@@ -33,7 +33,7 @@ public class UserDTO { // 사용자 & 관리자
     private double height;
     private double weight;
     private List<CouponDTO> coupons;
-    
+
     // Entity -> DTO
 
     // 사용자 데이터 출력
@@ -77,12 +77,4 @@ public class UserDTO { // 사용자 & 관리자
         return dto;
     }
 
-    // Social 사용자 데이터 저장
-    public static UserDTO toSaveSocialUserDTO(UserEntity entity) {
-        UserDTO dto = new UserDTO();
-        dto.setUserId(entity.getUserId());
-        dto.setLoginType(entity.getLoginType());
-
-        return dto;
-    }
 }
