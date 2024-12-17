@@ -16,6 +16,9 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
         // 특정 User의 orders를 조회
         public List<PaymentEntity> findByUserEntity_Id(Integer userId);
 
+        // 12/17 tosscode 값으로 PaymentEntity 조회 - km
+        public List<PaymentEntity> findByTossCode(String tossCode);             
+
         // 특정 User의 Payment 조회 (특정 월에 대한 데이터)
         public List<PaymentEntity> findByUserEntity_IdAndPaymentDateBetween(int userId, LocalDateTime startDate,
                         LocalDateTime endDate);

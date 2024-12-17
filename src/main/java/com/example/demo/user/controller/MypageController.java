@@ -85,23 +85,24 @@ public class MypageController {
     @GetMapping("/orders/info/{tosscode}")
     public ResponseEntity<List<PaymentDTO>> getOrderInfo(@PathVariable(name = "tosscode") String tosscode) {
         try {
-            List<PaymentDTO> orderDetails = mypageService.getOrderInfo(tosscode);
-            return ResponseEntity.ok(orderDetails);
+            List<PaymentDTO> orderInfo = mypageService.getOrderInfo(tosscode);
+            System.out.println("Orders Info: " + orderInfo);
+            return ResponseEntity.ok(orderInfo);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     // 주문 디테일 목록 조회 12/17 작업 - 강민
-    @GetMapping("/orders/details/{tosscode}")
-    public ResponseEntity<List<PaymentDTO>> getOrderDetails(@PathVariable(name = "tosscode") String tosscode) {
-        try {
-            List<PaymentDTO> orderDetails = mypageService.getOrderDetails(tosscode);
-            return ResponseEntity.ok(orderDetails);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+    // @GetMapping("/orders/details/{tosscode}")
+    // public ResponseEntity<List<PaymentDTO>> getOrderDetails(@PathVariable(name = "tosscode") String tosscode) {
+    //     try {
+    //         List<PaymentDTO> orderDetails = mypageService.getOrderDetails(tosscode);
+    //         return ResponseEntity.ok(orderDetails);
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    //     }
+    // }
  
 
 

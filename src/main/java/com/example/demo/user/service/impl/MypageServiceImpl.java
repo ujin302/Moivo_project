@@ -164,4 +164,20 @@ public class MypageServiceImpl implements MypageService {
         // PaymentEntity를 PaymentDTO로 변환
         return list;
     }
+
+    //mypage order detail info 가지고 오기 - 강민
+    @Transactional
+    @Override
+    public List<PaymentDTO> getOrderInfo(String tosscode) {
+        List<PaymentEntity> orderEntities = paymentRepository.findByTossCode(tosscode);
+        if (orderEntities == null || orderEntities.isEmpty()) {
+            throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
+        }
+        
+        // PaymentEntity를 PaymentDTO로 변환
+        return orderEntities.stream()
+        .map(PaymentDTO::toGetOrderDTO)
+        .collect(Collectors.toList());
+    }
+
 }
