@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.payment.dto.PaymentDTO;
+import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
@@ -69,7 +70,7 @@ public class MypageController {
         
     }
 
-    // 주문 내역 조회
+    // 주문 내역 조회 12/16 완료 - 강민
     @GetMapping("/orders/{id}")
     public ResponseEntity<List<PaymentDTO>> getOrders(@PathVariable(name = "id") int id) {
         try {
@@ -80,18 +81,31 @@ public class MypageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-/*
-    // 주문 상세 조회
-    @GetMapping("/orders/details/{orderId}")
-    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable int orderId) {
+
+    // 주문 기본 정보 조회 12/17 작업 - 강민
+    @GetMapping("/orders/info/{tosscode}")
+    public ResponseEntity<List<PaymentDTO>> getOrderInfo(@PathVariable(name = "tosscode") String tosscode) {
         try {
-            OrderDTO orderDetails = mypageService.getOrderDetails(orderId);
+            List<PaymentDTO> orderInfo = mypageService.getOrderInfo(tosscode);
+            System.out.println("Orders Info: " + orderInfo);
+            return ResponseEntity.ok(orderInfo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // 주문 디테일 목록 조회 12/17 작업 - 강민
+    @GetMapping("/orders/details/{paymentId}")
+    public ResponseEntity<List<PaymentDetailDTO>> getOrderDetails(@PathVariable(name = "paymentId") int paymentId) {
+        try {
+            List<PaymentDetailDTO> orderDetails = mypageService.getOrderDetails(paymentId);
+            System.out.println("Orders details: " + orderDetails);
             return ResponseEntity.ok(orderDetails);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
- */
+ 
 
 
     // 주문내역 조회
