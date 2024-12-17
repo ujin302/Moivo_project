@@ -4,12 +4,7 @@ import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import TokenExpiryTimer from './../../components/TokenTimer/TokenExpiryTimer';
 
-=======
-//
->>>>>>> a93bbbee70b6e6c168c9474b594cd5fe19e72460
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
   const navigate = useNavigate();
