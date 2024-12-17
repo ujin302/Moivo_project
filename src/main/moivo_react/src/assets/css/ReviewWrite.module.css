@@ -35,22 +35,53 @@
   margin-bottom: 5px;
 }
 
-.reviewWriteContainer textarea {
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  background-color: #f9f9f9;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-  resize: none;
+.reviewWriteContainer .contentInput {
+  width: 100%;
   min-height: 200px;
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  font-size: 1rem;
+  color: #333;
+  resize: none;
+  transition: background-color 0.3s ease;
 }
 
-.reviewWriteContainer textarea:focus {
+.reviewWriteContainer .contentInput::placeholder {
+  color: #999;
+}
+
+.reviewWriteContainer .contentInput:focus {
   outline: none;
-  border-color: #ff385c;
   background-color: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.reviewWriteContainer .contentInputWrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.reviewWriteContainer .contentIcon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: #ff385c;
+  font-size: 1.5rem;
+}
+
+.reviewWriteContainer .characterCount {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.reviewWriteContainer .characterCount .remainingChars {
+  color: #ff385c;
+  font-weight: bold;
 }
 
 .reviewWriteContainer .ratingContainer {
@@ -120,13 +151,7 @@
 
 .reviewWriteContainer .preview div {
   margin-bottom: 10px;
-  color: #ffdd00;
-}
-
-.reviewWriteContainer .characterCount {
-  align-self: flex-end;
-  color: #888;
-  font-size: 0.9rem;
+  color: #5c5c5a;
 }
 
 .reviewWriteContainer button {
@@ -184,5 +209,206 @@
 
 .reviewWriteContainer .emoji.selected {
   transform: scale(1.2);
+}
+
+.reviewWriteContainer .reviewStats {
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #888;
+}
+
+.ratingStars {
+  display: flex;
+  padding-bottom: 0.375em;
+  position: relative;
+}
+
+.ratingStar {
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+  width: 2em;
+  height: 2em;
+}
+
+.ratingStarRing,
+.ratingStarFill,
+.ratingStarLine,
+.ratingStarStroke {
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+.ratingStarRing,
+.ratingStarFill,
+.ratingStarLine {
+  stroke: #ffdd00;
+}
+
+.ratingStarFill {
+  fill: #ffdd00;
+  transform: scale(0);
+  transition:
+    fill 0.3s cubic-bezier(0.42,0,0.58,1),
+    transform 0.3s cubic-bezier(0.42,0,0.58,1);
+}
+
+.ratingStarLine {
+  stroke-dasharray: 12 13;
+  stroke-dashoffset: -13;
+}
+
+.ratingStarStroke {
+  stroke: #ddd;
+  transition: stroke 0.3s;
+}
+
+.ratingLabel {
+  cursor: pointer;
+  padding: 0.125em;
+}
+
+.ratingInput {
+  position: absolute;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ratingInput:hover ~ .ratingDisplay:not([hidden]) {
+  display: none;
+}
+
+.ratingInput1:hover ~ .ratingDisplay[data-rating="1"][hidden],
+.ratingInput2:hover ~ .ratingDisplay[data-rating="2"][hidden],
+.ratingInput3:hover ~ .ratingDisplay[data-rating="3"][hidden],
+.ratingInput4:hover ~ .ratingDisplay[data-rating="4"][hidden],
+.ratingInput5:hover ~ .ratingDisplay[data-rating="5"][hidden],
+.ratingInput:checked:hover ~ .ratingDisplay:not([hidden]) {
+  display: block;
+}
+
+.ratingInput1:hover ~ .ratingLabel:first-of-type .ratingStarStroke,
+.ratingInput2:hover ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarStroke,
+.ratingInput3:hover ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarStroke,
+.ratingInput4:hover ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarStroke,
+.ratingInput5:hover ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarStroke {
+  stroke: #ffdd00;
+  transform: scale(1);
+}
+
+.ratingInput1:checked ~ .ratingLabel:first-of-type .ratingStarRing,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarRing,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarRing,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarRing,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarRing {
+  animation-name: starRing;
+}
+
+.ratingInput1:checked ~ .ratingLabel:first-of-type .ratingStarStroke,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarStroke,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarStroke,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarStroke,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarStroke {
+  animation-name: starStroke;
+}
+
+.ratingInput1:checked ~ .ratingLabel:first-of-type .ratingStarLine,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarLine,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarLine,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarLine,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarLine {
+  animation-name: starLine;
+}
+
+.ratingInput1:checked ~ .ratingLabel:first-of-type .ratingStarFill,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarFill,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarFill,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarFill,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarFill {
+  animation-name: starFill;
+}
+
+.ratingInput1:not(:checked):hover ~ .ratingLabel:first-of-type .ratingStarFill,
+.ratingInput2:not(:checked):hover ~ .ratingLabel:nth-of-type(2) .ratingStarFill,
+.ratingInput3:not(:checked):hover ~ .ratingLabel:nth-of-type(3) .ratingStarFill,
+.ratingInput4:not(:checked):hover ~ .ratingLabel:nth-of-type(4) .ratingStarFill,
+.ratingInput5:not(:checked):hover ~ .ratingLabel:nth-of-type(5) .ratingStarFill {
+  fill: rgba(255, 221, 0, 0);
+}
+
+.ratingSr {
+  clip: rect(1px,1px,1px,1px);
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+}
+
+@keyframes starRing {
+  from,
+  20% {
+    animation-timing-function: ease-in;
+    opacity: 1;
+    r: 8px;
+    stroke-width: 16px;
+    transform: scale(0);
+  }
+  35% {
+    animation-timing-function: ease-out;
+    opacity: 0.5;
+    r: 8px;
+    stroke-width: 16px;
+    transform: scale(1);
+  }
+  50%,
+  to {
+    opacity: 0;
+    r: 16px;
+    stroke-width: 0;
+    transform: scale(1);  
+  }
+}
+
+@keyframes starFill {
+  from,
+  40% {
+    animation-timing-function: ease-out;
+    transform: scale(0);
+  }
+  60% {
+    animation-timing-function: ease-in-out;
+    transform: scale(1.2);
+  }
+  80% {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes starStroke {
+  from {
+    transform: scale(1);
+  }
+  20%,
+  to {
+    transform: scale(0);
+  }
+}
+
+@keyframes starLine {
+  from,
+  40% {
+    animation-timing-function: ease-out;
+    stroke-dasharray: 1 23;
+    stroke-dashoffset: 1;
+  }
+  60%,
+  to {
+    stroke-dasharray: 12 13;
+    stroke-dashoffset: -13;
+  }
 }
 
