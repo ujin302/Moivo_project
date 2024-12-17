@@ -62,12 +62,14 @@ public class QuestionController {
             @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "block", required = false, defaultValue = "10") int block,
             @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "sortby", required = false, defaultValue = "questiondate")String sortby) {
+            @RequestParam(name = "sortby", required = false, defaultValue = "questiondate")String sortby,
+            @RequestParam(name = "categoryid", required = false, defaultValue = "0")int categoryid) {
         Map<String, Object> datamap = new HashMap<>();
         datamap.put("pageable", pageable);
         datamap.put("block", block);
         datamap.put("sortby",sortby);
         datamap.put("title", title);
+        datamap.put("categoryid", categoryid);
 
         Map<String, Object> map = questionsService.getQuestionList(datamap);
 
