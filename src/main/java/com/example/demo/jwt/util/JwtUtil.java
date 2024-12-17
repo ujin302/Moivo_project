@@ -105,11 +105,12 @@ public class JwtUtil {
     // 토큰에서 isAdmin 추출
     public boolean getIsAdminFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("isAdmin", Boolean.class);
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+        Boolean isAdmin = claims.get("isAdmin", Boolean.class);
+        return isAdmin != null ? isAdmin : false;
     }
 
     // 토큰에서 만료 시간 추출
@@ -177,7 +178,7 @@ public class JwtUtil {
             userData.put("isAdmin", claims.get("isAdmin"));
             return userData;
         } catch (Exception e) {
-            throw new RuntimeException("토큰에서 사용자 정보를 추출할 수 없습니다.");
+            throw new RuntimeException("토큰에서 사용자 정보를 추출할 ��� 없습니다.");
         }
     }
 }

@@ -48,30 +48,35 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository)
             throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .oauth2Login(oauth2 -> oauth2
-                        .clientRegistrationRepository(clientRegistrationRepository)
-                        .authorizedClientRepository(authorizedClientRepository())
-                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
-                        .successHandler(successHandler()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
-                                "/api/user/login",
-                                "/api/user/join",
-                                "/api/auth/token/refresh",
-                                "/api/user/social/kakao", // 카카오 인증 URI
-                                "/api/user/social/kakao/login", // 카카오 로그인
-                                "/api/store/**",
-                                "/api/oauth/**",
-                                "/oauth/**",
-                                "/api/mail/success")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .oauth2Login(oauth2 -> oauth2
+                .clientRegistrationRepository(clientRegistrationRepository)
+                .authorizedClientRepository(authorizedClientRepository())
+                .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                .successHandler(successHandler()))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(
+                    "/api/user/login", 
+                    "/api/user/join",
+                    "/api/auth/**" ,
+                    "/api/auth/token/refresh",
+                    "/api/user/social/kakao", // 카카오 인증 URI
+                    "/api/user/social/kakao/login", // 카카오 로그인
+                    "/api/store/**",
+                    "/api/oauth/**",
+                    "/api/user/mypage/orders/88",
+                    "/oauth/**",
+                    "/api/mail/success"
+                ).permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
 
         return http.build();
     }

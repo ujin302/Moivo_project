@@ -435,5 +435,12 @@ public class UserServiceImpl implements UserService {
         // 3. 사용자 삭제
         userRepository.delete(userEntity);
     }
+    
+    @Override
+    public boolean isUserAdmin(int id) {
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        return userEntity.isAdmin();
+    }
 
 }
