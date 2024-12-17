@@ -68,7 +68,8 @@ public class SecurityConfig {
                     "/api/oauth/**",
                     "/api/user/mypage/orders/88",
                     "/oauth/**",
-                    "/api/mail/success"
+                    "/api/mail/success",
+                    "/api/user/question" // 12/17 questionlist 추가 장훈
                 ).permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
