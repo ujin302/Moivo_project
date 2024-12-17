@@ -1,0 +1,188 @@
+/* 리뷰 작성 페이지 */
+
+.reviewWriteContainer {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.reviewWriteContainer h1 {
+  font-size: 2.5rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.error {
+  color: #ff385c;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.reviewWriteContainer form {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewWriteContainer label {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.reviewWriteContainer textarea {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  resize: none;
+  min-height: 200px;
+}
+
+.reviewWriteContainer textarea:focus {
+  outline: none;
+  border-color: #ff385c;
+  background-color: #fff;
+}
+
+.reviewWriteContainer .ratingContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.reviewWriteContainer .ratingContainer label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.reviewWriteContainer .star {
+  cursor: pointer;
+  color: #ddd;
+  font-size: 2.5rem;
+  transition: color 0.2s;
+}
+
+.reviewWriteContainer .star:hover,
+.reviewWriteContainer .star:hover ~ .star,
+.reviewWriteContainer .star.selected,
+.reviewWriteContainer .star.selected ~ .star {
+  color: #ffdd00;
+}
+
+.reviewWriteContainer .star.burst {
+  animation: starBurst 0.5s ease-out;
+}
+
+.reviewWriteContainer .imageUpload {
+  margin-bottom: 20px;
+}
+
+.reviewWriteContainer .imageUpload label {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ff385c;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.reviewWriteContainer .imageUpload label:hover {
+  background-color: #e00007;
+}
+
+.reviewWriteContainer .imageUpload input[type="file"] {
+  display: none;
+}
+
+.reviewWriteContainer .preview {
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.reviewWriteContainer .preview h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.reviewWriteContainer .preview div {
+  margin-bottom: 10px;
+  color: #ffdd00;
+}
+
+.reviewWriteContainer .characterCount {
+  align-self: flex-end;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.reviewWriteContainer button {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ff385c;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  align-self: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.reviewWriteContainer button:hover {
+  background-color: #e00007;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.2);
+}
+
+.reviewWriteContainer button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+@keyframes starBurst {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.reviewWriteContainer .emojiPicker {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.reviewWriteContainer .emoji {
+  font-size: 2rem;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: transform 0.2s ease;
+}
+
+.reviewWriteContainer .emoji:hover {
+  transform: scale(1.2);
+}
+
+.reviewWriteContainer .emoji.selected {
+  transform: scale(1.2);
+}
+

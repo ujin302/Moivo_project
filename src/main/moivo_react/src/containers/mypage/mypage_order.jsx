@@ -6,7 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import { PATH } from '../../../scripts/path';
 import axiosInstance from '../../utils/axiosConfig';
 
-const mypage_order = () => {
+const Mypage_order = () => {
     const [OrdersList, setOrdersList] = useState([]);
     const navigate = useNavigate();
 
@@ -124,7 +124,7 @@ const mypage_order = () => {
                                         <div className={styles.confirmedText}>배송완료</div>
                                         <button 
                                             className={styles.reviewButton} 
-                                            onClick={() => navigate('/review/review_write', { state: { orderId: order.tosscode } })}
+                                            onClick={() => navigate('/review/write', { state: { productId: order.productId } })}
                                         >
                                             Review
                                         </button>
@@ -147,4 +147,4 @@ const mypage_order = () => {
     );
 };
 
-export default mypage_order;
+export default Mypage_order;
