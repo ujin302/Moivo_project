@@ -1,129 +1,150 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
+import axiosInstance from "../../utils/axiosConfig";
 import QnA_b from '../../assets/css/qna_boardlist.module.css';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 
 const Qna_boardlist = () => {
+    const navigate = useNavigate();
+    const [qnaData, setQnaData] = useState([]);
     const [activeIndex, setActiveIndex] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
-    const [passwordModal, setPasswordModal] = useState({ visible: false, index: null });
+    const [currentPage, setCurrentPage] = useState(0);
+    const [selectedType, setSelectedType] = useState('');
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const [totalPages, setTotalPages] = useState(1);
+    const [passwordModalVisible, setPasswordModalVisible] = useState(false); 
     const [enteredPassword, setEnteredPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const [selectedType, setSelectedType] = useState(''); // 선택된 문의 유형
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false); // 드롭다운 상태
-    const itemsPerPage = 6; // 페이지당 항목 수
+    const [selectedPost, setSelectedPost] = useState(null);
 
-    const qnaData = [
-        {
-            title: '제품 배송 언제 되나요?',
-            secret: false,
-            type: '일반문의',
-            userId: 'user123',
-            date: '2024-11-21',
-            question: '안녕하세요, 제품 배송 상태를 알고 싶습니다.',
-            answer: '안녕하세요, 배송은 내일 출발 예정입니다.',
-            password: ''
-        },
-        {
-            title: '개인 정보 관련 문의',
-            secret: true,
-            type: '비밀문의',
-            userId: 'user456',
-            date: '2024-11-20',
-            question: '개인 정보 보호 정책에 대해 알고 싶습니다.',
-            answer: '비밀문의입니다.',
-            password: '4567'
-        },
-        {
-            title: '결제 방법 변경은 어떻게 하나요?',
-            secret: false,
-            type: '기타문의',
-            userId: 'user789',
-            date: '2024-11-19',
-            question: '결제 방법을 변경하고 싶습니다.',
-            answer: '결제 방법 변경은 고객센터를 통해 가능합니다.',
-            password: ''
-        },
-        {
-            title: '사이즈 문의',
-            secret: false,
-            type: '사이즈문의',
-            userId: 'user123',
-            date: '2024-11-18',
-            question: '이 옷은 어떤 사이즈로 구입해야 하나요?',
-            answer: '이 제품은 M사이즈가 적합합니다.',
-            password: ''
-        },
-        { title: '추가 질문 1', secret: false, type: '기타문의', userId: 'user123', date: '2024-11-17', question: '내용1', answer: null, password: '' },
-        { title: '추가 질문 2', secret: false, type: '일반문의', userId: 'user123', date: '2024-11-16', question: '내용2', answer: null, password: '' },
-        { title: '추가 질문 3', secret: false, type: '사이즈문의', userId: 'user123', date: '2024-11-15', question: '내용3', answer: null, password: '' },
-        { title: '추가 질문 4', secret: false, type: '기타문의', userId: 'user123', date: '2024-11-14', question: '내용4', answer: null, password: '' },
-        { title: '추가 질문 5', secret: true, type: '비밀문의', userId: 'user123', date: '2024-11-13', question: '내용5', answer: null, password: '1234' },
-    ];
+    // 현재 로그인한 사용자 ID 상태 추가
+    const [currentUserId, setCurrentUserId] = useState(null);
 
-    // 문의 유형에 따라 필터링된 데이터 생성
-    const filteredData = selectedType
-        ? qnaData.filter(item => item.type === selectedType)
-        : qnaData;
+    // 서버에서 문의 데이터를 가져오는 함수
+    const fetchQnaData = async (page = 0) => {
+        try {
+            const response = await axiosInstance.get(`/api/user/question?page=${page}`);
+            setQnaData(response.data.QuestionList || []);
+            setTotalPages(response.data.totalPages);
+            setCurrentPage(page);
+            console.log('API 응답 데이터:', response.data);
+        } catch (error) {
+            console.error('Error fetching QnA data:', error);
+        }
+    };
 
-    // 페이징 데이터 계산
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentPageData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+    // 현재 사용자 ID 확인
+    const checkUserId = () => {
+        const storedUserId = localStorage.getItem('id');
+            if (storedUserId) {
+                setCurrentUserId(parseInt(storedUserId));
+            }
+    };
 
-    const handleToggle = (index, isSecret) => {
-        if (isSecret) {
-            // 비밀글이면 비밀번호 모달을 보여줌
-            setPasswordModal({ visible: true, index });
+    useEffect(() => {
+        fetchQnaData();
+        checkUserId();
+    }, []);
+
+    // 필터링된 데이터는 백엔드에서 처리하도록 요청할 수도 있음
+    const handleFilterChange = (type) => {
+        setSelectedType(type);
+        setCurrentPage(0);
+        fetchQnaData(0);
+        setIsDropdownVisible(false);
+    };
+
+    const handleToggle = (index, item) => {
+        if (!currentUserId) {
+            // 로그인하지 않은 유저는 목록을 클릭하면 로그인 화면으로 이동
+            alert('로그인이 필요합니다.');
+            navigate('/user');
+            return;
+        }
+    
+        if (item.categoryId === 3) { // 비밀글인 경우
+            if (currentUserId === item.userId) {
+                // 자신이 작성한 비밀글인 경우 비밀번호 모달 없이 바로 열기
+                setActiveIndex(activeIndex === index ? null : index);
+            } else {
+                // 다른 사용자가 작성한 비밀글인 경우 비밀번호 모달 표시
+                setSelectedPost(item);
+                setPasswordModalVisible(true);
+            }
         } else {
-            // 비밀글이 아니면 해당 게시글 펼침
+            // 비밀글이 아닌 경우 바로 열기
             setActiveIndex(activeIndex === index ? null : index);
         }
     };
 
+    // 게시글 수정 핸들러
+    const handleEditPost = (item) => {
+        // 로그인한 사용자의 글만 수정 가능
+        if (currentUserId && currentUserId === item.userId) {
+            navigate(`/qna_board/edit/${item.id}`);
+        } else {
+            alert('수정 권한이 없습니다.');
+        }
+    };
+
+    // 게시글 삭제 핸들러
+    const handleDeletePost = async (item) => {
+        // 로그인한 사용자의 글만 삭제 가능
+        if (currentUserId && currentUserId === item.userId) {
+            if (window.confirm('정말로 삭제하시겠습니까?')) {
+                try {
+                    await axiosInstance.delete('/api/user/question/delete', {
+                        data: { 
+                            id: item.id,
+                            userId: currentUserId 
+                        }
+                    });
+                    fetchQnaData(currentPage); // 현재 페이지 다시 불러오기
+                } catch (error) {
+                    console.error('삭제 중 오류:', error);
+                    alert('삭제에 실패했습니다.');
+                }
+            }
+        } else {
+            alert('삭제 권한이 없습니다.');
+        }
+    };
+
     const handlePageChange = (page) => {
-        setCurrentPage(page);
+        fetchQnaData(page);
         setActiveIndex(null); // 페이지 변경 시 열려있는 아이템 초기화
     };
 
+    const getIconForType = (item) => {
+        if (item.categoryId === 3) return <i className="fas fa-lock"></i>; // 비밀문의 아이콘
+    
+        // categoryId에 따라 다른 아이콘 표시
+        switch (item.categoryId) {
+            case 1: return <i className="fas fa-question-circle"></i>; // 일반문의
+            case 2: return <i className="fas fa-comment-alt"></i>; // 기타문의
+            case 4: return <i className="fas fa-ruler"></i>; // 사이즈문의
+            default: return <i className="fas fa-question-circle"></i>; // 기본 아이콘
+        }
+    };
+
+    const toggleDropdown = () => {
+        setIsDropdownVisible(!isDropdownVisible);
+    };
+
     const handlePasswordCheck = () => {
-        const selectedPost = qnaData[passwordModal.index];
-        if (enteredPassword === selectedPost.password) {
-            setPasswordModal({ visible: false, index: null });
-            setActiveIndex(passwordModal.index);  // 비밀글이 맞다면 열림
-            setEnteredPassword('');
-            setPasswordError('');
+        if (enteredPassword === selectedPost.password) { // 비밀번호가 맞으면
+            setActiveIndex(qnaData.indexOf(selectedPost)); // 해당 글 활성화
+            setPasswordModalVisible(false); // 모달 닫기
         } else {
-            setPasswordError('비밀번호가 일치하지 않습니다.');
+            setPasswordError('비밀번호가 틀렸습니다.');
         }
     };
 
     const closePasswordModal = () => {
-        setPasswordModal({ visible: false, index: null });
+        setPasswordModalVisible(false);
         setEnteredPassword('');
         setPasswordError('');
-    };
-
-    // 각 문의 유형에 맞는 아이콘을 반환하는 함수
-    const getIconForType = (type) => {
-        switch (type) {
-            case '일반문의':
-            case '기타문의':
-                return <i className="fas fa-question-circle"></i>;  // 물음표 아이콘
-            case '비밀문의':
-                return <i className="fas fa-lock"></i>;  // 자물쇠 아이콘
-            case '사이즈문의':
-                return <i className="fas fa-ruler"></i>;  // 자 아이콘
-            default:
-                return <i className="fas fa-question-circle"></i>;  // 기본 물음표 아이콘
-        }
-    };
-
-    // 드롭다운 토글 함수
-    const toggleDropdown = () => {
-        setIsDropdownVisible(!isDropdownVisible);
     };
 
     return (
@@ -138,59 +159,63 @@ const Qna_boardlist = () => {
                 <Link to="/qna_faqboard">
                     <button className={QnA_b.qnalistNaviBtn}>자주 묻는 질문</button>
                 </Link>
-
                 <Link to="/qna_board">
                     <button className={QnA_b.qnalistNaviBtn}>문의 작성하기</button>
                 </Link>
-
                 <Link to="/qna_boardlist">
                     <button className={QnA_b.qnalistNaviBtn}>문의 게시글</button>
                 </Link>
             </div>
-       
+
             {/* QnA 리스트 */}
             <div className={QnA_b.qnalist}>
                 <div className={QnA_b.qnalistContainer}>
-                     
-                     {/* 문의 유형 드롭다운 버튼 */}
+
+                    {/* 문의 유형 드롭다운 */}
                     <div className={QnA_b.dropdownContainer}>
                         <button className={QnA_b.dropdownBtn} onClick={toggleDropdown}>
-                            전체 문의 {isDropdownVisible ? <i className="fas fa-chevron-up"></i> : <i className="fas fa-chevron-down"></i>}
+                            {selectedType || '전체 문의'} {isDropdownVisible ? '▲' : '▼'}
                         </button>
-
-                        {/* 드롭다운 목록 */}
                         {isDropdownVisible && (
                             <ul className={QnA_b.filterList}>
-                                <li onClick={() => { setSelectedType(''); setIsDropdownVisible(false); setActiveIndex(null); }}>전체</li>
-                                <li onClick={() => { setSelectedType('일반문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>일반문의</li>
-                                <li onClick={() => { setSelectedType('비밀문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>비밀문의</li>
-                                <li onClick={() => { setSelectedType('사이즈문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>사이즈문의</li>
-                                <li onClick={() => { setSelectedType('기타문의'); setIsDropdownVisible(false); setActiveIndex(null); }}>기타문의</li>
+                                <li onClick={() => handleFilterChange('')}>전체</li>
+                                <li onClick={() => handleFilterChange('일반 문의')}>일반 문의</li>
+                                <li onClick={() => handleFilterChange('비밀 문의')}>비밀 문의</li>
+                                <li onClick={() => handleFilterChange('사이즈 문의')}>사이즈 문의</li>
+                                <li onClick={() => handleFilterChange('기타 문의')}>기타 문의</li>
                             </ul>
                         )}
                     </div>
-                    {currentPageData.length === 0 ? (
+
+                    {qnaData.length === 0 ? (
                         <div>등록된 문의가 없습니다.</div>
                     ) : (
-                        currentPageData.map((item, index) => (
+                        qnaData.map((item, index) => (
                             <div key={index} className={QnA_b.qnalistItem}>
-                                <div className={QnA_b.qnalistHeader} onClick={() => handleToggle(index + startIndex, item.secret)}>
+                                <div className={QnA_b.qnalistHeader} onClick={() => handleToggle(index, item)}>
                                     <span className={QnA_b.qnalistQuestionType}>
-                                        {getIconForType(item.type)}
+                                        {getIconForType(item)}
                                     </span>
                                     <span className={QnA_b.qnalistQuestionTitle}>
-                                        {item.secret ? '비밀글입니다.' : item.title}
+                                        {item.categoryId === 3 ? '비밀글입니다.' : item.title}
                                     </span>
                                 </div>
-                                {activeIndex === index + startIndex && (
+                                {activeIndex === index && (
                                     <div className={QnA_b.qnalistDetails}>
                                         <div className={QnA_b.qnalistUserInfo}>
-                                            <span>{item.userId}</span> | <span>{item.date}</span>
+                                            <span>{item.userId}</span> | <span>{item.questionDate}</span>
+                                            {/* 수정, 삭제 버튼 추가 */}
+                                            {currentUserId === item.userId && (
+                                                <div className={QnA_b.actionButtons}>
+                                                    <button onClick={() => handleEditPost(item)}>수정</button>
+                                                    <button onClick={() => handleDeletePost(item)}>삭제</button>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className={QnA_b.qnalistUserQuestion}>{item.question}</div>
+                                        <div className={QnA_b.qnalistUserQuestion}>{item.content}</div>
                                         <div className={QnA_b.qnalistDivider}></div>
                                         <div className={QnA_b.qnalistUserAnswer}>
-                                            {item.answer || '답변 대기 중'}
+                                            {item.response || '답변 대기 중'}
                                         </div>
                                     </div>
                                 )}
@@ -198,28 +223,23 @@ const Qna_boardlist = () => {
                         ))
                     )}
                 </div>
+
                 {/* 페이징 버튼 */}
                 <div className={QnA_b.pagination}>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)}>
-                            {page}
+                    {Array.from({ length: totalPages }, (_, i) => i).map(page => (
+                        <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)} >
+                            {page + 1}
                         </button>
                     ))}
                 </div>
             </div>
 
             {/* 비밀번호 확인 모달 */}
-            {passwordModal.visible && (
+            {passwordModalVisible && (
                 <div className={QnA_b.modalOverlay}>
                     <div className={QnA_b.modalContent}>
                         <h3>비밀글 비밀번호 확인</h3>
-                        <input
-                            type="password"
-                            placeholder="비밀번호 입력"
-                            value={enteredPassword}
-                            onChange={(e) => setEnteredPassword(e.target.value)}
-                            className={QnA_b.modalInput}
-                        />
+                        <input type="password" placeholder="비밀번호 입력" value={enteredPassword} onChange={(e) => setEnteredPassword(e.target.value)} className={QnA_b.modalInput} />
                         {passwordError && <p className={QnA_b.errorText}>{passwordError}</p>}
                         <div className={QnA_b.modalButtons}>
                             <button onClick={handlePasswordCheck}>확인</button>
@@ -235,4 +255,3 @@ const Qna_boardlist = () => {
 };
 
 export default Qna_boardlist;
-

@@ -4,7 +4,7 @@ import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
+//
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
   const navigate = useNavigate();
@@ -71,10 +71,6 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
       {/* Sidebar 영역 */}
       <div className={admin_dashboard.sidebar}>
         <Admins_side />
-      </div>
-      {/* 토큰 만료 타이머 추가_12.16 15:30 성찬 */}
-      <div>
-        <TokenExpiryTimer />
       </div>
 
       <div className={admin_dashboard.mainContent}>

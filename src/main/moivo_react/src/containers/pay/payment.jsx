@@ -132,6 +132,7 @@ const Payment = () => {
     const selectedCoupon = coupons.find(coupon => coupon.name === formData.coupon);
     if (selectedCoupon) {
       const discountAmount = (totalPrice * selectedCoupon.discountValue) / 100;
+      console.log(discountAmount);
       return totalPrice - discountAmount;
     }
     return totalPrice;
@@ -151,6 +152,27 @@ const Payment = () => {
   useEffect(() => {
       console.log("Updated paymentData:", paymentData);
   }, [paymentData]);
+
+  // 쿠폰 변경 시 결제 정보를 업데이트 - uj
+  useEffect(() => {
+    if (!formData.coupon) {
+      setPaymentData((prevData) => ({
+        ...prevData,
+        discount: 0,
+      }));
+      return;
+    }
+
+    const selectedCoupon = coupons.find(coupon => coupon.name === formData.coupon);
+    if (selectedCoupon) {
+      const discountAmount = (totalPrice * selectedCoupon.discountValue) / 100;
+      setPaymentData((prevData) => ({
+        ...prevData,
+        discount: discountAmount,
+      }));
+    }
+  }, [formData.coupon, coupons, totalPrice]);
+
 
   // 결제 정보 전송
   const handlePayment = () => {
@@ -176,7 +198,7 @@ const Payment = () => {
     // 사용자가 입력한 정보와 카트 정보를 state로 전달하면서 payment-method로 이동
     navigate("/payment-method", {
       state: {
-        paymentData: updatedPaymentData, // 결제자 정보(고객명 + 아이디 + 이메일 + 전화번호(추후결정) )
+        paymentData: updatedPaymentData, // 결제자 정보
         paymentDetailList: cartItems, // 상품 정보
         isCartItem: isCartItem
       },
