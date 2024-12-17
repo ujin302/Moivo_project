@@ -4,7 +4,7 @@ import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
+//
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
   const navigate = useNavigate();
