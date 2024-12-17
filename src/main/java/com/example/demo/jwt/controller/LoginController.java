@@ -1,12 +1,10 @@
 package com.example.demo.jwt.controller;
 
-import com.example.demo.jwt.service.BlacklistService;
 import com.example.demo.jwt.service.RefreshTokenService;
 import com.example.demo.jwt.util.JwtUtil;
 import com.example.demo.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,11 +14,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class LoginController {
-    @Autowired 
+    @Autowired
     private JwtUtil jwtUtil;
-    @Autowired 
-    private UserService userService;
-    @Autowired 
+
+    @Autowired
     private RefreshTokenService refreshTokenService;
 
     // Access 토큰 재발급 API
@@ -38,17 +35,13 @@ public class LoginController {
 
         String userId = jwtUtil.getUserIdFromToken(refreshToken);
         int id = jwtUtil.getIdFromToken(refreshToken);
-        int wishId = userService.getWishIdById(id);
-        int cartId = userService.getCartIdById(id);
         boolean isAdmin = jwtUtil.getIsAdminFromToken(refreshToken);
-        
-        String newAccessToken = jwtUtil.generateAccessToken(userId, id, wishId, cartId, isAdmin);
+
+        String newAccessToken = jwtUtil.generateAccessToken(userId, id, isAdmin);
 
         return ResponseEntity.ok(Map.of(
-            "newAccessToken", newAccessToken,
-            "isAdmin", isAdmin
-        ));
+                "newAccessToken", newAccessToken,
+                "isAdmin", isAdmin));
     }
 
-    
 }

@@ -97,8 +97,6 @@ export const AuthProvider = ({ children }) => {
             // 사용자 정보 제거
             localStorage.removeItem('userId');
             localStorage.removeItem('id');
-            localStorage.removeItem('cartId');
-            localStorage.removeItem('wishId');
 
             // 로컬 스토리지 토큰 제거
             localStorage.removeItem('accessToken');
@@ -131,19 +129,21 @@ export const AuthProvider = ({ children }) => {
     };
 
     // 카카오 로그인 함수
+    // 24.1216~17 - uj (수정)
     const kakaoLogin = async (code) => {
         try {
-            const response = await axios.get(`${PATH.SERVER}/api/oauth/kakao/callback`, {
-                params: { code },
+            const response = await axios.get(`${PATH.SERVER}/api/user/social/kakao/login?code=${code}`, {
                 withCredentials: true
             });
+            console.log(response.data);
             
-            const success = await handleLoginSuccess(response.data);
+            const success = await handleLoginSuccess(response);
             if (success) {
                 setIsAuthenticated(true);
                 return true;
             }
-            return false;
+
+            return await handleLoginSuccess(response);
         } catch (error) {
             console.error('카카오 로그인 실패:', error);
             throw error.response?.data?.error || error.message;
@@ -165,8 +165,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('id', response.data.id);
-        localStorage.setItem('cartId', response.data.cartId);
-        localStorage.setItem('wishId', response.data.wishId);
         localStorage.setItem('isAdmin', isAdmin); // 2024-12-11 isAdmin 값을 localStorage에 저장 장훈
 
         // 상태 업데이트

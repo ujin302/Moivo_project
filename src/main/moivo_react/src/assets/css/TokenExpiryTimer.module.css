@@ -1,44 +1,100 @@
 /* token timer */
 .tokenTimerContainer {
     position: fixed;
-    top: 20px;
-    right: 20px;
     z-index: 1000;
+    cursor: move;
+    user-select: none;
+}
+
+.tokenTimerContainer.dragging {
+    cursor: grabbing;
 }
 
 .tokenTimer {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.98);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     color: #333;
-    padding: 10px 20px;
-    border-radius: 30px;
+    padding: 12px 25px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 500;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    backdrop-filter: blur(5px);
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    max-width: 410px;
+    min-width: 250px;
 }
 
-/* 기본 상태 호버 효과 */
+.timerContent {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.warningMessage {
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.toggleButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    color: inherit;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.toggleButton:hover {
+    opacity: 1;
+}
+
+.minimized {
+    padding: 8px 15px;
+}
+
+.minimized .warningMessage {
+    display: none;
+}
+
 .tokenTimer:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* 시계 아이콘 기본 스타일 */
 .tokenTimer i {
     color: #4a90e2;
     font-size: 16px;
     animation: pulse 2s infinite;
 }
 
-/* 타이머 텍스트 스타일 */
 .timerText {
-    font-family: 'Roboto Mono', monospace;
-    letter-spacing: 0.5px;
+    font-family: 'Pretendard', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+/* 경고 상태 (5분 이하) */
+.tokenTimer.warning {
+    background: linear-gradient(to right, #f09e78, #fd2803);
+    color: white;
+}
+
+/* 위험 상태 (1분 이하) */
+.tokenTimer.danger {
+    background: linear-gradient(to right, #ff4c4c, #ff0000);
+    color: white;
+    animation: shake 0.5s infinite;
 }
 
 /* 기본 펄스 애니메이션 */
@@ -46,31 +102,6 @@
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
-}
-
-/* 경고 상태 (5분 이하) */
-.tokenTimer.warning {
-    background: rgba(255, 166, 0, 0.95);
-    color: white;
-    border-color: rgba(255, 166, 0, 0.5);
-}
-
-.tokenTimer.warning i {
-    color: white;
-    animation: pulse-warning 1.5s infinite;
-}
-
-/* 위험 상태 (1분 이하) */
-.tokenTimer.danger {
-    background: rgba(255, 76, 76, 0.95);
-    color: white;
-    border-color: rgba(255, 76, 76, 0.5);
-    animation: shake 0.5s infinite;
-}
-
-.tokenTimer.danger i {
-    color: white;
-    animation: pulse-danger 1s infinite;
 }
 
 /* 경고 상태 애니메이션 */
@@ -94,11 +125,109 @@
     75% { transform: translateX(2px); }
 }
 
-/* 다크 모드 지원 */
+/* 다크 모드 */
 @media (prefers-color-scheme: dark) {
     .tokenTimer {
-        background: rgba(40, 40, 40, 0.95);
+        background: rgba(40, 40, 40, 0.98);
         color: #fff;
-        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .warningMessage {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .tokenTimerContainer {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .tokenTimer {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* 최대화 상태일 때의 스타일 */
+.tokenTimer:not(.minimized) {
+    width: 350px;
+    padding: 20px 25px;
+}
+
+.additionalContent {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.infoText {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.loginButton {
+    width: 100%;
+    padding: 10px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.loginButton:hover {
+    background: #357abd;
+}
+
+/* 다크 모드에서의 추가 스타일 */
+@media (prefers-color-scheme: dark) {
+    .additionalContent {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .infoText {
+        color: #ccc;
+    }
+
+    .loginButton {
+        background: #5a9ee2;
+    }
+
+    .loginButton:hover {
+        background: #4a90e2;
+    }
+}
+
+/* 경고 상태일 때 버튼 스타일 */
+.warning .loginButton {
+    background: #ff7b00;
+}
+
+.warning .loginButton:hover {
+    background: #ff6600;
+}
+
+.danger .loginButton {
+    background: #ff0000;
+    animation: pulse-danger 1s infinite;
+}
+
+.danger .loginButton:hover {
+    background: #cc0000;
+}
+
+/* 모바일에서의 추가 스타일 */
+@media (max-width: 768px) {
+    .tokenTimer:not(.minimized) {
+        width: 100%;
+        max-width: none;
     }
 }

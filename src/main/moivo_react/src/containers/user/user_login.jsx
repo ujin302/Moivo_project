@@ -6,7 +6,6 @@ import { PATH } from "../../../scripts/path";
 import signin from '../../assets/css/user_login.module.css';
 import apiClient from '../../utils/apiClient';
 import kakaoLoginImage from '../../assets/image/kakao_login.png';
-import { KAKAO_AUTH_URL } from '../../utils/OAuth';
 
 const user_login = () => {
 
@@ -52,16 +51,13 @@ const user_login = () => {
         });
     };
 
-    const handleKakaoLogin = (e) => {
-        e.preventDefault();
-        console.log("카카오 로그인 시도");
-        
+    const handleKakaoLogin = async () => {
         try {
-            console.log("카카오 인증 URL:", KAKAO_AUTH_URL);
-            window.location.href = KAKAO_AUTH_URL;
+            const response = await axios.get(`${PATH.SERVER}/api/user/social/kakao`);
+            console.log(response.data);
+            window.location.href = response.data;
         } catch (error) {
-            console.error("카카오 로그인 중 에러:", error);
-            setError("카카오 로그인 처리 중 오류가 발생했습니다.");
+            console.error("인증 오류:", error);
         }
     };
 
