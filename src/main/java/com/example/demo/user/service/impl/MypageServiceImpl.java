@@ -13,8 +13,10 @@ import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.payment.dto.PaymentDTO;
+import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
+import com.example.demo.payment.repository.PaymentDetailRepository;
 import com.example.demo.payment.repository.PaymentRepository;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.entity.ProductEntity;
@@ -47,6 +49,9 @@ public class MypageServiceImpl implements MypageService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private PaymentDetailRepository paymentDetailRepository;
 
     // 마이페이지 사용자 정보 가져오기
     @Override
@@ -165,7 +170,7 @@ public class MypageServiceImpl implements MypageService {
         return list;
     }
 
-    //mypage order detail info 가지고 오기 - 강민
+    //mypage order detail info 가지고 오기 - 12/17 강민
     @Transactional
     @Override
     public List<PaymentDTO> getOrderInfo(String tosscode) {
@@ -180,4 +185,18 @@ public class MypageServiceImpl implements MypageService {
         .collect(Collectors.toList());
     }
 
+    //mypage order detail list 가지고 오기 - 12/17 강민
+    @Transactional
+    @Override
+    public List<PaymentDetailDTO> getOrderDetails(int paymentId) {
+        List<PaymentDetailEntity> orderDetailEntities = paymentDetailRepository.findByPaymentEntityId(paymentId);
+        if (orderDetailEntities == null || orderDetailEntities.isEmpty()) {
+            throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
+        }
+        
+        // PaymentEntity를 PaymentDTO로 변환
+        return orderDetailEntities.stream()
+        .map(PaymentDetailDTO::toGetOrderDetailDTO)
+        .collect(Collectors.toList());
+    }
 }

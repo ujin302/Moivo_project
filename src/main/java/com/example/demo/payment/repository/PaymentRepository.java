@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
 
 import feign.Param;
@@ -17,7 +18,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
         public List<PaymentEntity> findByUserEntity_Id(Integer userId);
 
         // 12/17 tosscode 값으로 PaymentEntity 조회 - km
-        public List<PaymentEntity> findByTossCode(String tossCode);             
+        public List<PaymentEntity> findByTossCode(String tossCode);     
 
         // 특정 User의 Payment 조회 (특정 월에 대한 데이터)
         public List<PaymentEntity> findByUserEntity_IdAndPaymentDateBetween(int userId, LocalDateTime startDate,
