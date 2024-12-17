@@ -33,7 +33,6 @@ public class UserDTO { // 사용자 & 관리자
     private double height;
     private double weight;
     private List<CouponDTO> coupons;
-
     private int totalSpent;         // 누적 구매 금액
     private int nextLevelTarget;    // 다음 등급까지 남은 금액
 
@@ -58,4 +57,23 @@ public class UserDTO { // 사용자 & 관리자
         dto.setWeight(entity.getWeight());
         return dto;
     }
+
+    // 사용자 데이터 저장
+    public static UserDTO toSaveUserDTO(UserEntity entity) {
+        UserDTO dto = new UserDTO();
+        dto.setUserId(entity.getUserId());
+        dto.setName(entity.getName());
+        dto.setPwd(entity.getPwd());
+        dto.setEmail(entity.getEmail());
+        dto.setTel(entity.getTel());
+        dto.setBirth(entity.getBirth());
+        dto.setAddr1(entity.getAddr1());
+        dto.setAddr2(entity.getAddr2());
+        dto.setZipcode(entity.getZipcode());
+        dto.setGender(entity.getGender());
+        dto.setLoginType(entity.getLoginType());
+
+        return dto;
+    }
+
 }

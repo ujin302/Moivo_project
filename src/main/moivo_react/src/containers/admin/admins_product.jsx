@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import admin_product from "../../assets/css/admins_product.module.css";
-import axios from "axios";
-import { PATH } from "../../../scripts/path";
+import axiosInstance from "../../utils/axiosConfig";
 import Admins_side from '../../components/admin_sidebar/admins_side';
 
 const AdminsProduct = () => {
@@ -33,20 +32,20 @@ const AdminsProduct = () => {
 
   useEffect(() => {
     // 카테고리 정보 가져오기
-    axios.get(`${PATH.SERVER}/api/admin/store/category`).then((res) => {
-      if (Array.isArray(res.data)) {
-        setCategories(res.data);
-      } else {
-        console.error("카테고리 데이터는 배열이 아닙니다 ? :", res.data);
-      }
-    });
+    axiosInstance.get('/api/admin/store/category')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setCategories(res.data);
+        }
+      });
 
-    // 성별 정보 가져오기
-    axios.get(`${PATH.SERVER}/api/admin/store/gender`).then((res) => {
-      if (Array.isArray(res.data)) {
-        setGenders(res.data);
-      }
-    });
+    // 성별 정보 가져오기  
+    axiosInstance.get('/api/admin/store/gender')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setGenders(res.data);
+        }
+      });
   }, []);
 
   // 상품 정보 입력 핸들러
@@ -117,8 +116,8 @@ const AdminsProduct = () => {
     formData.append("layer4", files.layer4); // 단일 파일
 
     try {
-      const response = await axios.post(
-        `${PATH.SERVER}/api/admin/store/product`,
+      const response = await axiosInstance.post(
+        '/api/admin/store/product',
         formData,
         {
           headers: {
@@ -129,7 +128,7 @@ const AdminsProduct = () => {
               (progressEvent.loaded * 100) / progressEvent.total
             );
             setProgress(percentCompleted);
-          },
+          }
         }
       );
 

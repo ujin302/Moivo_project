@@ -4,6 +4,7 @@ import styles from "../../assets/css/Mypage.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import { PATH } from '../../../scripts/path';
+import axiosInstance from "../../utils/axiosConfig";
 
 
 const MypageMain = () => {
@@ -28,54 +29,21 @@ const MypageMain = () => {
     const id = decodedPayload.id;  //토큰에 있는 id 추출
     console.log("User ID:", id);
 
-    // 사용자 정보 가져오기
-    fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error("사용자 정보를 가져오지 못했습니다.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUserInfo(data); // 사용자 정보 상태에 저장
-        console.log("사용자 정보:", data);
-        console.log("사용자 정보:", JSON.stringify(data, null, 2));
-      })
-      .catch((error) => {
-        console.error("Error fetching user info:", error);
-        alert("사용자 정보를 가져오는 중 오류가 발생했습니다.");
-      });
-
-    // 상품 목록 가져오기
-    fetch(`${PATH.SERVER}/api/user/mypage/products/${id}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+    const fetchData = async () => {
+      try {
+        // 사용자 정보 가져오기
+        const userResponse = await axiosInstance.get(`/api/user/mypage/info/${id}`);
+        setUserInfo(userResponse.data);
+        
+        // 상품 목록 가져오기  
+        const productsResponse = await axiosInstance.get(`/api/user/mypage/products/${id}`);
+        setProductList(productsResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error("상품 목록을 가져오지 못했습니다.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setProductList(data); // 상품 목록 상태에 저장
-        console.log("상품 목록:", data);
-      })
-      .catch((error) => {
-        console.error("Error fetching product list:", error);
-        alert("상품 목록을 가져오는 중 오류가 발생했습니다.");
-      });
+    };
+
+    fetchData();
 
   }, [navigate]);
 

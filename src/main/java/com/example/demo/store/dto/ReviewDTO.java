@@ -3,6 +3,7 @@ package com.example.demo.store.dto;
 import java.time.LocalDateTime;
 
 import com.example.demo.store.entity.ReviewEntity;
+import com.example.demo.store.entity.ProductStockEntity.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,8 @@ public class ReviewDTO { // 리뷰
     private Integer userId; // 리뷰 작성자 PK
     private String userName; // 리뷰 작성자 Name
     private int productId; // 상품 고유 키
+    private Size size; // 구매 상품의 size
+    private int paymentDetailId; // 결제 상세 고유 키
     private int rating; // 평점 (1~5)
     private String content; // 리뷰 내용
     private LocalDateTime reviewDate; // 리뷰 작성 일시
@@ -29,6 +32,7 @@ public class ReviewDTO { // 리뷰
         dto.setUserId(entity.getUserEntity().getId());
         dto.setUserName(entity.getUserEntity().getName());
         dto.setProductId(entity.getProductEntity().getId());
+        dto.setSize(entity.getPaymentDetailEntity().getSize());
         dto.setRating(entity.getRating());
         dto.setContent(entity.getContent());
         dto.setReviewDate(entity.getReviewDate());

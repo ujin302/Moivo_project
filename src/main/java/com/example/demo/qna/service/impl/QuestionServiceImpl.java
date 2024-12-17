@@ -86,10 +86,15 @@ public class QuestionServiceImpl implements QuestionService {
         Pageable pageable = (Pageable) datemap.get("pageable");
         int block = Integer.parseInt(datemap.get("block").toString());
         String sortby = datemap.get("sortby").toString();
+        int categoryid = 0;
         String title = null;
 
         if (datemap.get("title") != null) {
             title = datemap.get("title").toString();
+        }
+
+        if (datemap.get("categoryid") != null){
+            categoryid = (int) datemap.get("categoryid");
         }
 
         Sort sort = pageable.getSort();
@@ -102,23 +107,43 @@ public class QuestionServiceImpl implements QuestionService {
 
         Page<QuestionEntity> pageQuestionList = null;
 
-        if (title == null || title.isEmpty()) { //전체검색
-            System.out.println("전체 검색");
-            pageQuestionList = questionRepository.findAll(pageable); //전체 DB 추출
+        //문의 리스트 출력부분
+        //title이 null이고 문의카테고리 0일때 전체문의 출력
+        //title이 null이고 문의카테고리 1일때 문의카테고리가 1인 문의 출력
+        //title이 null이고 문의카테고리 2일때 문의카테고리가 2인 문의 출력
+        //title이 null이고 문의카테고리 3일때 문의카테고리가 3인 문의 출력
+        //title이 null이고 문의카테고리 4일때 문의카테고리가 4인 문의 출력
+
+        //title이 null이 아니고 문의카테고리 0일때 전체문의중 title에 맞는 문의 출력
+        //title이 null이 아니고 문의카테고리 1일때 title이 들어가고 문의카테고리가 1인 문의 출력
+        //title이 null이 아니고 문의카테고리 2일때 title이 들어가고 문의카테고리가 2인 문의 출력
+        //title이 null이 아니고 문의카테고리 3일때 title이 들어가고 문의카테고리가 3인 문의 출력
+        //title이 null이 아니고 문의카테고리 4일때 title이 들어가고 문의카테고리가 4인 문의 출력
+        if ((title == null || title.isEmpty()) && categoryid == 0) { //전체검색
+            System.out.println("title X = " + " categoryid X = 전체검색");
+            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
         }
-        if (title != null) {
-            System.out.println("title" + title);
-            pageQuestionList = questionRepository.findByTitleContainingIgnoreCase(title, pageable);
+        else if(((title == null || title.isEmpty())) && categoryid != 0) {
+            System.out.println("title X = " + " categoryid = " + categoryid );
+            pageQuestionList = questionRepository.findByCategoryEntityId(categoryid, pageable);  //categoryid로 DB추출 확인완료 12/17 17:10
         }
-//        else if (title == null && keyword != null) {
-//            pageQuestionList = questionRepository.findByNameContainingIgnoreCase(keyword, pageable);
-//        }
+        else if (title != null && categoryid == 0) {
+            System.out.println("title = " + title + " categoryid X = ");
+            pageQuestionList = questionRepository.findByTitleContainingIgnoreCase(title, pageable); //title DB추출 확인완료 12/17 17:37
+        }
+        else if (title != null && categoryid != 0) {
+            System.out.println("title = " + title + " categoryid = " + categoryid );
+            pageQuestionList = questionRepository.findByTitleContainingIgnoreCaseAndCategoryEntityId(title, categoryid, pageable); //title,categoryid로 DB추출 확인완료 12/17 17:37
+        }
 
 
         // 4. Entity -> DTO 변환
         List<QuestionDTO> dtoList = pageQuestionList.getContent() // Java8 이상 사용시 Entity -> DTO 변환하는 방법
                 .stream()
                 .map(questionEntity -> {
+                    //if(로그인한 id == question.userid 같으면 다 보여주고 boolean값 true로 바뀌고)
+                    //else if(question category가 비밀글이 아닌거 boolean값 true로 (다 보여줌)
+                    //else  나머지는 boolean 값 false 안보여줌
                     System.out.println("Title = " + questionEntity.getTitle());
                     System.out.println("Content = " + questionEntity.getContent());
                     return QuestionDTO.toGetQuestionDTO(questionEntity); // DTO로 변환

@@ -25,9 +25,11 @@ import SuccessPage from './containers/pay/payment-success';
 import FailPage from './containers/pay/payment-fail';
 import Dashboard from './containers/admin/admins_dashboard';
 import Admins_qna from './containers/admin/admins_qnaboard';
-import Admins_product from './containers/admin/admins_product';
+import Admins_productAdd from './containers/admin/admins_productadd';
+import Admins_productUpdate from './containers/admin/admins_productupdate';
 import ProductTrash from './containers/admin/admin_productTrash';
 import KakaoCallback from './components/kakao/KakaoCallback';
+import ReviewWrite from './containers/review/review_write';
 
 
 const routeConfig = [
@@ -37,6 +39,7 @@ const routeConfig = [
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
   { path: "/product-detail/:productId", element: <ProductDetail /> },
+  { path: "/review/review_write", element: <ReviewWrite /> },
   { path: "/upload", element: <Upload /> },
   { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },
@@ -56,9 +59,10 @@ const routeConfig = [
   { path : "/admins_dashboard", element: <Dashboard/>},
   { path: "/api/oauth/kakao/callback", element: <KakaoCallback /> },
   { path : "/admins_qnaboard", element: <Admins_qna/>},
-  { path : "/admins_product", element: <Admins_product/>},
+  { path : "/admins_productadd", element: <Admins_productAdd/>},
+  { path : "/admins_productupdate", element: <Admins_productUpdate/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
-
+  { path: "/oauth2/callback/kakao", element: <KakaoCallback /> }
 ];
 
 const App = () => {

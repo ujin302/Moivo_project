@@ -44,14 +44,12 @@ public class JwtUtil {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String userId, int id, int wishId, int cartId, boolean isAdmin) {
-        //payload에 추가하는 것들
+    public String generateAccessToken(String userId, int id, boolean isAdmin) {
+        // payload에 추가하는 것들
         return Jwts.builder()
                 .setSubject(userId)
                 .claim("userId", userId)
                 .claim("id", id)
-                .claim("wishId", wishId)
-                .claim("cartId", cartId)
                 .claim("isAdmin", isAdmin)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenDate))
@@ -68,7 +66,7 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenDate))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-        
+
         // 리프레시 토큰 저장 로직 추가
         return refreshToken;
     }
@@ -86,32 +84,33 @@ public class JwtUtil {
     // 토큰에서 userId 추출
     public String getUserIdFromToken(String token) {
         return Jwts.parserBuilder()
-        .setSigningKey(getSigningKey())
-        .build()
-        .parseClaimsJws(token)
-        .getBody()
-        .getSubject();
-}
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 
     // 토큰에서 id(PK) 추출
     public int getIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-            .setSigningKey(getSigningKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-        
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
         return claims.get("id", Integer.class);
     }
 
-    //토큰에서 isAdmin 추출
+    // 토큰에서 isAdmin 추출
     public boolean getIsAdminFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
             .setSigningKey(getSigningKey())
             .build()
             .parseClaimsJws(token)
             .getBody();
-        return claims.get("isAdmin", Boolean.class);
+        Boolean isAdmin = claims.get("isAdmin", Boolean.class);
+        return isAdmin != null ? isAdmin : false;
     }
 
     // 토큰에서 만료 시간 추출
@@ -140,27 +139,25 @@ public class JwtUtil {
     }
 
     public String resolveToken(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
-    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-        return bearerToken.substring(7);
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
-    return null;
-}
 
     // Authentication 객체 생성 메서드 추가
     public Authentication getAuthentication(String token, HttpServletRequest request) {
         String userId = getUserIdFromToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-        
-        UsernamePasswordAuthenticationToken authentication = 
-            new UsernamePasswordAuthenticationToken(
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
-                userDetails.getAuthorities()
-            );
-        
+                userDetails.getAuthorities());
+
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        
+
         return authentication;
     }
 
@@ -168,11 +165,11 @@ public class JwtUtil {
     public Map<String, Object> getUserDataFromToken(String token) {
         try {
             Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-            
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
             Map<String, Object> userData = new HashMap<>();
             userData.put("userId", claims.getSubject());
             userData.put("id", claims.get("id"));
@@ -181,7 +178,7 @@ public class JwtUtil {
             userData.put("isAdmin", claims.get("isAdmin"));
             return userData;
         } catch (Exception e) {
-            throw new RuntimeException("토큰에서 사용자 정보를 추출할 수 없습니다.");
+            throw new RuntimeException("토큰에서 사용자 정보를 추출할 ��� 없습니다.");
         }
     }
 }

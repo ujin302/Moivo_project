@@ -66,7 +66,7 @@ public class PaymentEntity {
     @Column(name = "paymentdate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime paymentDate = LocalDateTime.now(); // 결제 요청 일시
 
-    @Column(name = "tosscode", length = 100, nullable = false)
+    @Column(name = "tosscode", length = 100, nullable = false, unique = true)
     private String tossCode; // 토스 고유 주문 번호 (예시: MC44MjA2MjI3OTQwNjI5)
 
     @Enumerated(EnumType.STRING)

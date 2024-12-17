@@ -4,8 +4,9 @@ import styles from "../../assets/css/Mypage_order.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import { PATH } from '../../../scripts/path';
+import axiosInstance from '../../utils/axiosConfig';
 
-const mypage_order = () => {
+const Mypage_order = () => {
     const [OrdersList, setOrdersList] = useState([]);
     const navigate = useNavigate();
 
@@ -21,34 +22,46 @@ const mypage_order = () => {
             navigate("/user");
             return;
         }
-    
         const payload = token.split('.')[1];
         const decodedPayload = JSON.parse(atob(payload));
         const id = decodedPayload.id; 
-    
-        // 구매 목록 가져오기
-        fetch(`${PATH.SERVER}/api/user/mypage/orders/${id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("구매 목록을 가져오지 못했습니다.");
+
+        const fetchOrders = async () => {
+            try {
+                const ordersResponse = await axiosInstance.get(`/api/user/mypage/orders/${id}`);
+
+                // 응답 데이터 유효성 검증
+                if (!Array.isArray(ordersResponse.data)) {
+                    console.warn("Unexpected response data format:", ordersResponse.data);
+                    setOrdersList([]);
+                    return;
+                }
+
+                setOrdersList(ordersResponse.data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+
+                // 에러 상황 처리
+                if (error.response) {
+                    // 서버 응답에 상태 코드가 있는 경우
+                    console.error("Server response error:", error.response.status, error.response.data);
+                    alert("구매목록이 없습니다.");
+                } else if (error.request) {
+                    // 요청이 전송되었으나 응답이 없는 경우
+                    console.error("No response received from server:", error.request);
+                    alert("서버에서 응답이 없습니다. 네트워크 상태를 확인해주세요.");
+                } else {
+                    // 기타 에러
+                    console.error("Error setting up request:", error.message);
+                    alert("알 수 없는 에러가 발생했습니다.");
+                }
+
+                // 기본 데이터로 설정
+                setOrdersList([]);
             }
-            return response.json();
-          })
-          .then((data) => {
-            setOrdersList(data); // 구매 목록 상태에 저장
-          })
-          .catch((error) => {
-            console.error("Error fetching order list:", error);
-            alert("구매 목록을 가져오는 중 오류가 발생했습니다.");
-          });
-    
+        }
+
+        fetchOrders();
       }, [navigate]);
 
     return (
@@ -81,7 +94,7 @@ const mypage_order = () => {
                         return (
                             <div className={styles.row} key={index}>
                                 <div className={styles.column}>
-                                    <Link to={'/mypage/orderDetails'} className={styles.orderLink}>
+                                    <Link to={'/mypage/orderDetails'} state={{ tosscode: order.tosscode }} className={styles.orderLink}>
                                         [{order.tosscode}]
                                     </Link>
                                 </div>
@@ -106,7 +119,19 @@ const mypage_order = () => {
                                     KRW {totalPrice.toLocaleString()}
                                 </div>
                                 <div className={styles.column}>
-                                    {order.deliveryStatus || "배송 상태 없음"}
+                                {order.deliveryStatus === "CONFIRMED" ? (
+                                    <>
+                                        <div className={styles.confirmedText}>배송완료</div>
+                                        <button 
+                                            className={styles.reviewButton} 
+                                            onClick={() => navigate('/review/write', { state: { productId: order.productId } })}
+                                        >
+                                            Review
+                                        </button>
+                                    </>
+                                ) : (
+                                    order.deliveryStatus || "배송 상태 없음"
+                                )}
                                 </div>
                             </div>
                         );
@@ -122,4 +147,4 @@ const mypage_order = () => {
     );
 };
 
-export default mypage_order;
+export default Mypage_order;

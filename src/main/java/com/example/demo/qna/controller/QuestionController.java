@@ -56,18 +56,20 @@ public class QuestionController {
         return ResponseEntity.ok("200 Ok");
     }
 
-    //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang
+    //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang 12/17 18:30 제목별, 카테고리별 검색 추가
     @GetMapping("")
     public ResponseEntity<?> searchQuestion(
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "block", required = false, defaultValue = "10") int block,
             @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "sortby", required = false, defaultValue = "questiondate")String sortby) {
+            @RequestParam(name = "sortby", required = false, defaultValue = "questiondate")String sortby,
+            @RequestParam(name = "categoryid", required = false, defaultValue = "0")int categoryid) {
         Map<String, Object> datamap = new HashMap<>();
         datamap.put("pageable", pageable);
         datamap.put("block", block);
         datamap.put("sortby",sortby);
         datamap.put("title", title);
+        datamap.put("categoryid", categoryid);
 
         Map<String, Object> map = questionsService.getQuestionList(datamap);
 
