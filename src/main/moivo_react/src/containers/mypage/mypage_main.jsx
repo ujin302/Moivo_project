@@ -147,18 +147,15 @@ const MypageMain = () => {
           <div className={styles.membershipInfo}>
             {userInfo ? (
               <>
-                <p>{userInfo.name}님의 멤버십 등급은 [ {userInfo.grade} ]입니다.</p>
+                <p>{userInfo.name}님의 멤버십 등급은 <strong>[ {userInfo.grade} ]</strong>입니다.</p>
                 {userInfo.nextLevelTarget === 0 ? (
-                  <strong><p>최고 등급 LV.5입니다.</p></strong>
+                  <strong><p></p></strong>
                 ) : (
                   <p>
-                    LV.{userInfo.grade + 1}까지 남은 구매금액은 
+                    다음 등급까지 남은 구매금액은 
                     <strong> KRW {userInfo.nextLevelTarget.toLocaleString()}원</strong>입니다.
                   </p>
                 )}
-                <p style={{ color: "gray", fontSize: "0.9em" }}>
-                  ※ 등급 변경은 매월 1일에 적용됩니다.
-                </p>
                 <p>
                   키: <strong>{userInfo.height}cm</strong> &nbsp;
                   몸무게: <strong>{userInfo.weight}kg</strong>
@@ -196,7 +193,6 @@ const MypageMain = () => {
                     LV 3: 월 구매 30만원 이상<br />
                     LV 4: 월 구매 50만원 이상<br />
                     LV 5: 월 구매 70만원 이상<br /><br/>
-                    ※ <strong>등급 변경은 매월 1일</strong>에 적용됩니다.<br />
                     <strong>LV 2 혜택:</strong> LV2 전용 15% 할인 쿠폰<br />
                     <strong>LV 3 혜택:</strong> LV3 전용 20% 할인 쿠폰<br />
                     <strong>LV 4 혜택:</strong> LV4 전용 25% 할인 쿠폰<br />
