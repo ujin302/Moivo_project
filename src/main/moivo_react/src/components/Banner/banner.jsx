@@ -4,7 +4,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import styles from '../../assets/css/banner.module.css';
 import mypageIcon from '../../assets/image/mypage.png'; 
 import cartIcon from '../../assets/image/cart.png';
-import TokenExpiryTimer from './../TokenTimer/TokenExpiryTimer';
+//import TokenExpiryTimer from './../TokenTimer/TokenExpiryTimer';
 
 
 const Banner = () => {
@@ -157,7 +157,7 @@ const Banner = () => {
           </div>
         </div>
       </header>
-      <TokenExpiryTimer />
+      {/* <TokenExpiryTimer /> */}
       {/*  토큰(세션) 만료 타이머 컴포넌트 추가_24.12.16 16:16 성찬 */}
     </>
   );

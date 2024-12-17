@@ -4,7 +4,8 @@ import Modal from "react-modal";
 import styles from "../../assets/css/Mypage_profile.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
-import { PATH } from '../../../scripts/path';
+import axiosInstance from '../../utils/axiosConfig';
+import { useAuth } from '../../contexts/AuthContext';
 
 const MypageProfile = () => {
     const [formData, setFormData] = useState({
@@ -30,6 +31,8 @@ const MypageProfile = () => {
     const [showTooltip, setShowTooltip] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [deletePassword, setDeletePassword] = useState("");
+
+    const { refreshAccessToken } = useAuth();  // useAuth에서 refreshAccessToken 가져오기
 
     const validateForm = () => {
         const newErrors = {};
@@ -60,14 +63,13 @@ const MypageProfile = () => {
     };
 
     // 회원정보 수정
-    const handleSubmit = (e) => {
-        e.preventDefault();  // 폼 제출 기본 동작 방지
+    const handleSubmit = async (e) => {
+        e.preventDefault();
     
         if (!validateForm()) return;  // 유효성 검사를 통과하지 못하면 서버로 전송하지 않음
     
-        const token = localStorage.getItem("accessToken"); // 로컬 스토리지에서 토큰을 가져옴
-        const userId = formData.userId; // 수정할 사용자 ID
-        const phone = `${formData.phone1}${formData.phone2}${formData.phone3}`; // 전화번호 합치기
+        const userId = formData.userId;
+        const phone = `${formData.phone1}${formData.phone2}${formData.phone3}`;
     
         // 서버로 전송할 데이터 준비
         const updateData = {
@@ -86,32 +88,26 @@ const MypageProfile = () => {
             birth: formData.birth, // 생일
         };
 
-        console.log("phone = " + phone);
-        console.log("birth = " + formData.birth);
-        console.log("updateData = " + updateData);
-        // 서버로 데이터 전송
-        fetch(`${PATH.SERVER}/api/user/mypage/update`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(updateData), // 수정된 데이터 전송
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("회원정보 수정에 실패했습니다.");
+        try {
+            const response = await axiosInstance.post('/api/user/mypage/update', updateData);
+            alert("회원정보가 성공적으로 수정되었습니다!");
+            navigate("/mypage");
+        } catch (error) {
+            console.error("Error:", error);
+            if (error.response?.status === 401) {
+                // 토큰 만료 시 갱신 시도
+                const refreshed = await refreshAccessToken();
+                if (refreshed) {
+                    // 토큰 갱신 성공 시 다시 요청
+                    handleSubmit(e);
+                } else {
+                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                    navigate("/user");
                 }
-                return response.text();
-            })
-            .then((data) => {
-                alert("회원정보가 성공적으로 수정되었습니다!");
-                navigate("/mypage"); // 수정 후 마이페이지로 이동
-            })
-            .catch((error) => {
-                console.error("Error:", error);
+            } else {
                 alert("회원정보 수정 중 오류가 발생했습니다.");
-            });
+            }
+        }
     };
 
     const updateFormData = (key, value) => {
@@ -163,41 +159,38 @@ const MypageProfile = () => {
             return;
         }
     
-        const token = localStorage.getItem("accessToken");
         const userId = parseInt(localStorage.getItem("id"));
     
-        if (!token || isNaN(userId)) {
+        if (isNaN(userId)) {
             alert("로그인이 필요합니다. 다시 로그인해주세요.");
             navigate("/login");
             return;
         }
     
         try {
-            const response = await fetch(`${PATH.SERVER}/api/user/mypage/delete`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    userId: userId,
-                    pwd: deletePassword,
-                }),
+            await axiosInstance.post('/api/user/mypage/delete', {
+                userId: userId,
+                pwd: deletePassword,
             });
     
-            const responseData = await response.json();  // 응답을 JSON으로 파싱
-    
-            if (!response.ok) {
-                // 응답이 실패하면 메시지를 던지기
-                throw new Error(responseData.message || "탈퇴에 실패했습니다.");
-            }
-    
             alert("회원 탈퇴가 완료되었습니다.");
-            localStorage.clear(); // 로그아웃 처리
-            navigate("/"); // 홈으로 이동
+            localStorage.clear();
+            navigate("/");
         } catch (error) {
             console.error("Account deletion error:", error);
-            alert(error.message || "비밀번호가 틀렸거나 오류가 발생했습니다.");
+            if (error.response?.status === 401) {
+                // 토큰 만료 시 갱신 시도
+                const refreshed = await refreshAccessToken();
+                if (refreshed) {
+                    // 토큰 갱신 성공 시 다시 요청
+                    handleDeleteAccount();
+                } else {
+                    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                    navigate("/user");
+                }
+            } else {
+                alert(error.response?.data?.message || "비밀번호가 틀렸거나 오류가 발생했습니다.");
+            }
         }
     };
     
@@ -228,54 +221,59 @@ const MypageProfile = () => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        const id = localStorage.getItem("id");
-    
-        if (!token || !id) {
-            alert("로그인이 필요합니다.");
-            navigate("/user");
-            return;
-        }
-    
-        // Fetch user info
-        fetch(`${PATH.SERVER}/api/user/mypage/info/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`, // 인증 토큰 전달
-            },
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("사용자 정보를 가져오지 못했습니다.");
+        const fetchUserInfo = async () => {
+            const id = localStorage.getItem("id");
+        
+            if (!id) {
+                alert("로그인이 필요합니다.");
+                navigate("/user");
+                return;
             }
-            return response.json();
-        })
-        .then((data) => {
-            // Split the phone number into parts
-            const { phone1, phone2, phone3 } = splitPhoneNumber(data.tel);
-    
-            setUserInfo(data);
-            setFormData({
-                userId: data.userId,
-                name: data.name,
-                gender: data.gender,
-                zipcode: data.zipcode,
-                addr1: data.addr1,
-                addr2: data.addr2,
-                phone1,
-                phone2,
-                phone3,
-                email: data.email,
-                height: data.height,
-                weight: data.weight,
-                coupon: data.coupons,
-                birth: data.birth,
-            });
-        })
-        .catch((error) => {
-            console.error("Error fetching user info:", error);
-            alert("사용자 정보를 가져오는 중 오류가 발생했습니다.");
-        });
-    }, [navigate]);
+        
+            try {
+                const response = await axiosInstance.get(`/api/user/mypage/info/${id}`);
+                const data = response.data;
+                
+                const { phone1, phone2, phone3 } = splitPhoneNumber(data.tel);
+        
+                setUserInfo(data);
+                setFormData({
+                    userId: data.userId,
+                    name: data.name,
+                    gender: data.gender,
+                    zipcode: data.zipcode,
+                    addr1: data.addr1,
+                    addr2: data.addr2,
+                    phone1,
+                    phone2,
+                    phone3,
+                    email: data.email,
+                    height: data.height,
+                    weight: data.weight,
+                    coupon: data.coupons,
+                    birth: data.birth,
+                });
+            } catch (error) {
+                console.error("에러 메시지:" + error);
+                if (error.response?.status === 401) {
+                    // 토큰 만료 시 갱신 시도
+                    const refreshed = await refreshAccessToken();
+                    if (refreshed) {
+                        // 토큰 갱신 성공 시 다시 데이터 요청
+                        fetchUserInfo();
+                    } else {
+                        // 리프레시 토큰도 만료된 경우에만 로그인 페이지로 이동
+                        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+                        navigate("/user");
+                    }
+                } else {
+                    alert("사용자 정보를 가져오는 중 오류가 발생했습니다.");
+                }
+            }
+        };
+
+        fetchUserInfo();
+    }, [navigate, refreshAccessToken]);
     console.log(formData);
 
     const splitPhoneNumber = (tel) => {

@@ -42,7 +42,7 @@ const mypage_order = () => {
             return response.json();
           })
           .then((data) => {
-            setOrdersList(data); // 구매 목록 상태에 저장
+            setOrdersList(data); // 구매 목록 상태에 저장   
           })
           .catch((error) => {
             console.error("Error fetching order list:", error);
