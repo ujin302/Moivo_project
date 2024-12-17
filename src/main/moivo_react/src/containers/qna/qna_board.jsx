@@ -44,7 +44,7 @@ const Qna_board = () => {
   
     if (!token) {
       alert("로그인이 필요합니다."); // 토큰이 없으면 알림 표시
-      navigate("/login"); // 로그인 페이지로 리다이렉트
+      navigate("/user"); // 로그인 페이지로 리다이렉트
       return;
     }
   
@@ -59,7 +59,14 @@ const Qna_board = () => {
       secret: formData.isSecret,
       userId: userId, // 로컬스토리지에서 가져온 userId
     };
-  
+    
+    console.log("CategoryId before request:", 
+      formData.type === "일반 문의" ? 1 :  
+      formData.type === "기타 문의" ? 2 :
+      formData.type === "비밀 문의" ? 3 :
+      formData.type === "사이즈 문의" ? 4 : 0
+    );
+    
     console.log("Submitted Data:", postData);
   
     // 서버로 데이터 전송
