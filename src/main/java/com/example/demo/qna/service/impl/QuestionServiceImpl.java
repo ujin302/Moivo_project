@@ -119,6 +119,9 @@ public class QuestionServiceImpl implements QuestionService {
         List<QuestionDTO> dtoList = pageQuestionList.getContent() // Java8 이상 사용시 Entity -> DTO 변환하는 방법
                 .stream()
                 .map(questionEntity -> {
+                    //if(로그인한 id == question.userid 같으면 다 보여주고 boolean값 true로 바뀌고)
+                    //else if(question category가 비밀글이 아닌거 boolean값 true로 (다 보여줌)
+                    //else  나머지는 boolean 값 false 안보여줌
                     System.out.println("Title = " + questionEntity.getTitle());
                     System.out.println("Content = " + questionEntity.getContent());
                     return QuestionDTO.toGetQuestionDTO(questionEntity); // DTO로 변환
