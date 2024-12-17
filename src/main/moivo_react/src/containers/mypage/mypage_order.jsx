@@ -81,7 +81,7 @@ const mypage_order = () => {
                         return (
                             <div className={styles.row} key={index}>
                                 <div className={styles.column}>
-                                    <Link to={'/mypage/orderDetails'} className={styles.orderLink}>
+                                    <Link to={'/mypage/orderDetails'} state={{ tosscode: order.tosscode }} className={styles.orderLink}>
                                         [{order.tosscode}]
                                     </Link>
                                 </div>

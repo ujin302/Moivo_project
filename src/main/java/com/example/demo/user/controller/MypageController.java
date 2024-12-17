@@ -69,7 +69,7 @@ public class MypageController {
         
     }
 
-    // 주문 내역 조회
+    // 주문 내역 조회 12/16 완료 - 강민
     @GetMapping("/orders/{id}")
     public ResponseEntity<List<PaymentDTO>> getOrders(@PathVariable(name = "id") int id) {
         try {
@@ -80,18 +80,29 @@ public class MypageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-/*
-    // 주문 상세 조회
-    @GetMapping("/orders/details/{orderId}")
-    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable int orderId) {
+
+    // 주문 기본 정보 조회 12/17 작업 - 강민
+    @GetMapping("/orders/info/{tosscode}")
+    public ResponseEntity<List<PaymentDTO>> getOrderInfo(@PathVariable(name = "tosscode") String tosscode) {
         try {
-            OrderDTO orderDetails = mypageService.getOrderDetails(orderId);
+            List<PaymentDTO> orderDetails = mypageService.getOrderInfo(tosscode);
             return ResponseEntity.ok(orderDetails);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
- */
+
+    // 주문 디테일 목록 조회 12/17 작업 - 강민
+    @GetMapping("/orders/details/{tosscode}")
+    public ResponseEntity<List<PaymentDTO>> getOrderDetails(@PathVariable(name = "tosscode") String tosscode) {
+        try {
+            List<PaymentDTO> orderDetails = mypageService.getOrderDetails(tosscode);
+            return ResponseEntity.ok(orderDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+ 
 
 
     // 주문내역 조회

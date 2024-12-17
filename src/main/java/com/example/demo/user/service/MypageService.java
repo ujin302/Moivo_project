@@ -19,4 +19,6 @@ public interface MypageService {
 
     public List<PaymentDTO> getOrders(int id);
 
+    public List<PaymentDTO> getOrderInfo(String tosscode);
+
 }
