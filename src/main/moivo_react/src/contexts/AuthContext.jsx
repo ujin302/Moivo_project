@@ -1,4 +1,5 @@
 import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from "../../scripts/path";
@@ -23,17 +24,6 @@ export const AuthProvider = ({ children }) => {
     const [tokenExpiryTime, setTokenExpiryTime] = useState(null);
 
     // 토큰 관리 함수들
-    const setAccessToken = (token) => {
-        localStorage.setItem('accessToken', token);
-        const expiryTime = getTokenExpiryTime(token);
-        console.log('Token expiry time set to:', new Date(expiryTime)); // 디버깅용 로그
-        setTokenExpiryTime(expiryTime);
-    };
-
-    const setRefreshToken = (token) => {
-        localStorage.setItem('refreshToken', token);
-    };
-
     const getAccessToken = () => {
         return localStorage.getItem('accessToken');
     };
@@ -50,17 +40,17 @@ export const AuthProvider = ({ children }) => {
     // 토큰 갱신 함수
     const refreshAccessToken = async () => {
         try {
-            const refreshToken = getRefreshToken();
-            if (!refreshToken) throw new Error('No refresh token');
-    
-            const response = await axios.post(`${PATH.SERVER}/api/auth/token/refresh`, 
-                refreshToken ,
-                { withCredentials: true }
-            );
+            const response = await axios.post('/api/auth/token/refresh', {}, {
+                withCredentials: true,
+                baseURL: PATH.SERVER
+            });
             
-            if (response.data?.accessToken) {
-                setAccessToken(response.data.accessToken);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+            console.log('토큰 재발급 응답:', response.data);
+            
+            if (response.data.newAccessToken) {
+                localStorage.setItem('accessToken', response.data.newAccessToken);
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.newAccessToken}`;
+                setIsAuthenticated(true);
                 return true;
             }
             return false;
@@ -80,7 +70,7 @@ export const AuthProvider = ({ children }) => {
             
             // 토큰이 있는 경우에만 로그아웃 요청
             if (accessToken) {
-                await axios.post(`${PATH.SERVER}/api/user/logout`, 
+                await axiosInstance.post(`/api/user/logout`, 
                     { refreshToken },
                     {
                         withCredentials: true,
@@ -97,8 +87,6 @@ export const AuthProvider = ({ children }) => {
             // 사용자 정보 제거
             localStorage.removeItem('userId');
             localStorage.removeItem('id');
-            localStorage.removeItem('cartId');
-            localStorage.removeItem('wishId');
 
             // 로컬 스토리지 토큰 제거
             localStorage.removeItem('accessToken');
@@ -118,7 +106,7 @@ export const AuthProvider = ({ children }) => {
     // 일반 로그인 함수
     const login = async (userId, pwd) => {
         try {
-            const response = await axios.post(`${PATH.SERVER}/api/user/login`, {
+            const response = await axiosInstance.post(`/api/user/login`, {
                 userId,
                 pwd
             }, {
@@ -131,19 +119,21 @@ export const AuthProvider = ({ children }) => {
     };
 
     // 카카오 로그인 함수
+    // 24.1216~17 - uj (수정)
     const kakaoLogin = async (code) => {
         try {
-            const response = await axios.get(`${PATH.SERVER}/api/oauth/kakao/callback`, {
-                params: { code },
+            const response = await axiosInstance.get(`/api/user/social/kakao/login?code=${code}`, {
                 withCredentials: true
             });
+            console.log(response.data);
             
-            const success = await handleLoginSuccess(response.data);
+            const success = await handleLoginSuccess(response);
             if (success) {
                 setIsAuthenticated(true);
                 return true;
             }
-            return false;
+
+            return await handleLoginSuccess(response);
         } catch (error) {
             console.error('카카오 로그인 실패:', error);
             throw error.response?.data?.error || error.message;
@@ -165,8 +155,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('id', response.data.id);
-        localStorage.setItem('cartId', response.data.cartId);
-        localStorage.setItem('wishId', response.data.wishId);
         localStorage.setItem('isAdmin', isAdmin); // 2024-12-11 isAdmin 값을 localStorage에 저장 장훈
 
         // 상태 업데이트
@@ -174,58 +162,9 @@ export const AuthProvider = ({ children }) => {
         setIsAdmin(isAdmin); // 2024-12-11 isAdmin 상태 업데이트 장훈
 
         // axios 헤더 설정
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         return true;
     };
-
-    // axios 인터셉터 설정
-    useEffect(() => {
-        // 요청 인터셉터 추가
-        const requestInterceptor = axios.interceptors.request.use(
-            config => {
-                const token = localStorage.getItem('accessToken');
-                if (token) {
-                    config.headers.Authorization = `Bearer ${token}`;
-                }
-                return config;
-            },
-            error => {
-                return Promise.reject(error);
-            }
-        );
-
-        // 응답 인터셉터
-        const responseInterceptor = axios.interceptors.response.use(
-            response => response,
-            async error => {
-                const originalRequest = error.config;
-                
-                if (error.response?.status === 401 && !originalRequest._retry) {
-                    originalRequest._retry = true;
-                    
-                    try {
-                        const success = await refreshAccessToken();
-                        if (success) {
-                            const newToken = localStorage.getItem('accessToken');
-                            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                            return axios(originalRequest);
-                        }
-                    } catch (refreshError) {
-                        removeTokens();
-                        setIsAuthenticated(false);
-                        navigate('/user');
-                        return Promise.reject(refreshError);
-                    }
-                }
-                return Promise.reject(error);
-            }
-        );
-
-        return () => {
-            axios.interceptors.request.eject(requestInterceptor);
-            axios.interceptors.response.eject(responseInterceptor);
-        };
-    }, [navigate]);
 
     // 초기 인증 상태 확인 (새로고침해도 로그인 상태 유지)
     useEffect(() => {
@@ -237,7 +176,7 @@ export const AuthProvider = ({ children }) => {
             setTokenExpiryTime(expiryTime);
             setIsAuthenticated(true);
             setIsAdmin(storedIsAdmin); // 2024-12-11 isAdmin 상태 설정 장훈
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
     }, []);
 

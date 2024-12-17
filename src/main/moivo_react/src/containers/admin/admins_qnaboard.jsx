@@ -3,7 +3,7 @@ import admin_qnaboard from '../../assets/css/admins_qnaboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { PATH } from '../../../scripts/path';
 import axios from 'axios';
-import TokenExpiryTimer from '../../components/TokenTimer/TokenExpiryTimer';
+import axiosInstance from "../../utils/axiosConfig";
  
 const Admins_qnaboard = () => {
     const [activeIndex, setActiveIndex] = useState(null); // 문의리시트 확장기능
@@ -27,38 +27,16 @@ const Admins_qnaboard = () => {
 
     const fetchQuestions = async () => {
         try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-            const response = await axios.get(`${PATH.SERVER}/api/admin/qna/management/questions`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            console.log('Server response:', response.data);
+            const response = await axiosInstance.get('/api/admin/qna/management/questions');
             setQuestions(response.data);
         } catch (error) {
-            console.error('Failed to fetch questions:', error.response?.data || error.message);
+            console.error('Failed to fetch questions:', error);
         }
     };
 
     const fetchCategories = async () => {
         try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-            const response = await axios.get(`${PATH.SERVER}/api/admin/qna/management/categories`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            console.log('Server response:', response.data);
+            const response = await axiosInstance.get('/api/admin/qna/management/categories');
             setCategories(response.data);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
@@ -288,11 +266,6 @@ const Admins_qnaboard = () => {
             <div className={admin_qnaboard.sidebar}>
                 <Admins_side />
             </div>
-            
-            <div>
-                <TokenExpiryTimer />
-            </div>
-            
             <div className={admin_qnaboard.qnalistContainer}>
                 <div className={admin_qnaboard.filterSection}>
                     <div className={admin_qnaboard.dropdownContainer}>
@@ -507,7 +480,7 @@ const Admins_qnaboard = () => {
                                 className={admin_qnaboard.modalInput}
                                 value={responseInput}
                                 onChange={(e) => setResponseInput(e.target.value)}
-                                placeholder="수정할 답변을 입력해주세요..."
+                                placeholder="수정할 답변을 입력해주세��..."
                                 required
                             ></textarea>
                             <div className={admin_qnaboard.modalButtons}>
