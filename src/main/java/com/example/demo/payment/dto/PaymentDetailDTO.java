@@ -17,4 +17,5 @@ public class PaymentDetailDTO {
     private int price; // 상품 가격: 1개 상품 가격 * 상품 수량
     private int count; // 상품 수량
     private Size size; // 상품 수량
+    private boolean isWriteReview = false; // 리뷰 작성 여부
 }
