@@ -170,7 +170,7 @@ const Qna_boardlist = () => {
     };
 
     const handlePasswordCheck = () => {
-        if (enteredPassword === selectedPost.password) { // 비밀번호가 맞으면
+        if (enteredPassword === selectedPost.password) { 
             setActiveIndex(qnaData.indexOf(selectedPost)); // 해당 글 활성화
             setPasswordModalVisible(false); // 모달 닫기
         } else {
@@ -183,6 +183,16 @@ const Qna_boardlist = () => {
         setEnteredPassword('');
         setPasswordError('');
     };
+
+    // 줄바꿈 문자를 <br />로 변환하는 함수
+    const convertNewlinesToBreaks = (text) => {
+    return text.split('\n').map((line, index) => (
+        <span key={index}>
+            {line}
+            <br />
+        </span>
+    ));
+};
 
     return (
         <div className={QnA_b.qnalistMainDiv}>
@@ -240,7 +250,7 @@ const Qna_boardlist = () => {
                                 {activeIndex === index && (
                                     <div className={QnA_b.qnalistDetails}>
                                         <div className={QnA_b.qnalistUserInfo}>
-                                            <span>ID : {item.userId}</span> | DAY : <span>{item.questionDate}</span>
+                                            <span> <i className="fas fa-user"></i> ID : {item.userId}</span> | <i className="far fa-clock"></i> <span>{item.questionDate}</span>
                                                 {/* 수정, 삭제 버튼 추가 */}
                                                 {currentUserId === item.userId && (
                                                 <div className={QnA_b.actionButtons}>
@@ -249,7 +259,7 @@ const Qna_boardlist = () => {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className={QnA_b.qnalistUserQuestion}>{item.content}
+                                        <div className={QnA_b.qnalistUserQuestion}>{convertNewlinesToBreaks(item.content)}
                                         </div>
                                         <div className={QnA_b.qnalistDivider}></div>
                                         <div className={QnA_b.qnalistUserAnswer}>

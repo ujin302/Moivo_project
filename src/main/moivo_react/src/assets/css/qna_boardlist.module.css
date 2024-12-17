@@ -181,15 +181,20 @@
   color: #666;
   margin-bottom: 10px;
   display: flex;
-  align-items: center; /* 세로 중앙 정렬 */
+  align-items: center;
   gap: 5px;
+}
+
+.actionButtons{
+  display: flex;
+  margin-left: auto;
 }
 
 .actionButtons button {
   font-size: 14px;
   background-color: transparent;
   border: none;
-  color: #007bff;
+  color: slategray;
   cursor: pointer;
   transition: color 0.3s ease;
 }
@@ -295,6 +300,7 @@
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin-bottom: 15px;
 }
 
 /* 내용 입력 */
@@ -374,6 +380,14 @@
   
   .qnalist{
     height: 700px;
+  }
+
+  .qnalistUserInfo{
+    font-size: 12px;
+  }
+
+  .actionButtons button{
+    font-size: 12px;
   }
 
   .modalContent {
