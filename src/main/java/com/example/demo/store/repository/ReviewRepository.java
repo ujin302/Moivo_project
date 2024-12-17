@@ -11,6 +11,7 @@ import com.example.demo.store.entity.ReviewEntity;
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Integer> {
     
     public Page<ReviewEntity> findByProductEntityId(int productId, Pageable pageable);
-
     
+    // 특정 사용자의 리뷰 조회
+    public Page<ReviewEntity> findByUserEntityIdAndProductEntityId(int userId, int productId, Pageable pageable);
 }

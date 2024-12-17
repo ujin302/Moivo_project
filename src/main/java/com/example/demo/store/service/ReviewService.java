@@ -14,9 +14,12 @@ public interface ReviewService {
     public Page<ReviewDTO> getReviewsByProductIdAndPage(int productId, Pageable pageable);
     
     // 리뷰 수정
-    public void updateReview(int reviewId, ReviewDTO reviewDTO);
+    public ReviewDTO updateReview(int reviewId, ReviewDTO reviewDTO);
 
     // 리뷰 삭제
-    public void deleteReview(int reviewId);
+    public ReviewDTO deleteReview(int reviewId);
+
+    // 특정 사용자의 리뷰 조회
+    public Page<ReviewDTO> getUserReviewsByProductId(int userId, int productId, Pageable pageable);
 
 }

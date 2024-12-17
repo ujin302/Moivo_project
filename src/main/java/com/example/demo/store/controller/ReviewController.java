@@ -38,16 +38,26 @@ public class ReviewController {
         
     // 리뷰 수정
     @PutMapping("/{reviewId}")
-    public ResponseEntity<String> updateReview(@PathVariable int reviewId, @RequestBody ReviewDTO reviewDTO) {
-        reviewService.updateReview(reviewId, reviewDTO);
-        return ResponseEntity.ok("리뷰 수정 완료");
+    public ResponseEntity<ReviewDTO> updateReview(@PathVariable int reviewId, @RequestBody ReviewDTO reviewDTO) {
+        ReviewDTO updatedReview = reviewService.updateReview(reviewId, reviewDTO);
+        return ResponseEntity.ok(updatedReview);
     }
 
     // 리뷰 삭제
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<String> deleteReview(@PathVariable int reviewId) {
-        reviewService.deleteReview(reviewId);
-        return ResponseEntity.ok("리뷰 삭제 완료");
+    public ResponseEntity<ReviewDTO> deleteReview(@PathVariable int reviewId) {
+        ReviewDTO deletedReview = reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok(deletedReview);
+    }
+
+    // 특정 사용자의 리뷰 조회
+    @GetMapping("/user/{userId}/{productId}")
+    public ResponseEntity<Page<ReviewDTO>> getUserReviewsByPage(
+            @PathVariable int userId,
+            @PathVariable int productId,
+            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ReviewDTO> reviews = reviewService.getUserReviewsByProductId(userId, productId, pageable);
+        return ResponseEntity.ok(reviews);
     }
 }
 

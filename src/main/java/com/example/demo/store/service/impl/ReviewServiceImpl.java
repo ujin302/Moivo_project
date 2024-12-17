@@ -55,7 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
     
     // 리뷰 수정
     @Override
-    public void updateReview(int reviewId, ReviewDTO reviewDTO) {
+    public ReviewDTO updateReview(int reviewId, ReviewDTO reviewDTO) {
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
 
@@ -70,11 +70,14 @@ public class ReviewServiceImpl implements ReviewService {
 
         reviewEntity.updateReview(reviewDTO);
         reviewRepository.save(reviewEntity);
+        
+        // 수정된 리뷰 DTO 반환
+        return ReviewDTO.toGetReviewDTO(reviewEntity);
     }
 
     // 리뷰 삭제
     @Override
-    public void deleteReview(int reviewId) {
+    public ReviewDTO deleteReview(int reviewId) {
         ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
 
@@ -88,5 +91,15 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         reviewRepository.delete(reviewEntity);
+        
+        // 삭제된 리뷰 DTO 반환
+        return ReviewDTO.toGetReviewDTO(reviewEntity);
+    }
+
+    // 특정 사용자의 리뷰 조회
+    @Override
+    public Page<ReviewDTO> getUserReviewsByProductId(int userId, int productId, Pageable pageable) {
+        return reviewRepository.findByUserEntityIdAndProductEntityId(userId, productId, pageable)
+                .map(ReviewDTO::toGetReviewDTO);
     }
 }
