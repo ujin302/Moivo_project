@@ -16,26 +16,26 @@ public class ReviewController {
 
     @Autowired
     private ReviewService reviewService;
-
-    // 리뷰 조회 (페이징 처리)
-    @GetMapping("/{productId}")
-    public ResponseEntity<Page<ReviewDTO>> getReviewsByPage(
-            @PathVariable int productId,
-            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        Page<ReviewDTO> reviews = reviewService.getReviewsByProductIdAndPage(productId, pageable);
-        return ResponseEntity.ok(reviews);
-    }
-
+    
     // 리뷰 작성 -> 주문상세 페이지에서 페이지를 따로 띄워서 리뷰 작성 진행.
     @PostMapping("")
     public ResponseEntity<String> insertReview(@RequestBody ReviewDTO reviewDTO,
-                                               @RequestParam(name = "userid") int userid,
-                                               @RequestParam(name = "productid") int productid) {
+    @RequestParam(name = "userid") int userid,
+    @RequestParam(name = "productid") int productid) {
         reviewService.insertReview(reviewDTO, userid, productid);
         return ResponseEntity.ok("리뷰 작성 완료");
     }
-
+    
+        // 리뷰 조회 (페이징 처리)
+        @GetMapping("/{productId}")
+        public ResponseEntity<Page<ReviewDTO>> getReviewsByPage(
+                @PathVariable int productId,
+                @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+        ) {
+            Page<ReviewDTO> reviews = reviewService.getReviewsByProductIdAndPage(productId, pageable);
+            return ResponseEntity.ok(reviews);
+        }
+        
     // 리뷰 수정
     @PutMapping("/{reviewId}")
     public ResponseEntity<String> updateReview(@PathVariable int reviewId, @RequestBody ReviewDTO reviewDTO) {

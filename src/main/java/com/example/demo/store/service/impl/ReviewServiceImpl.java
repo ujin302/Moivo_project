@@ -29,29 +29,30 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private ProductRepository productRepository;
 
+    
+    // 리뷰 작성
+    @Override
+    public void insertReview(ReviewDTO reviewDTO, int userid, int productid) {
+        UserEntity userEntity = userRepository.findById(userid)
+        .orElseThrow(() -> new RuntimeException("User not found")); 
+        
+        if (userEntity == null) {
+            throw new RuntimeException("User not found");
+        }
+        ProductEntity productEntity = productRepository.findById(productid).orElseThrow();
+        ReviewEntity entity = ReviewEntity.toSaveReviewEntity(reviewDTO, userEntity, productEntity);
+        
+        // 리뷰 저장
+        reviewRepository.save(entity);
+    }
+    
     // 리뷰 조회 (페이징 처리)
     @Override
     public Page<ReviewDTO> getReviewsByProductIdAndPage(int productId, Pageable pageable) {
         return reviewRepository.findByProductEntityId(productId, pageable)
                 .map(ReviewDTO::toGetReviewDTO);
     }
-
-    // 리뷰 작성
-    @Override
-    public void insertReview(ReviewDTO reviewDTO, int userid, int productid) {
-        UserEntity userEntity = userRepository.findById(userid)
-                .orElseThrow(() -> new RuntimeException("User not found")); 
-
-        if (userEntity == null) {
-            throw new RuntimeException("User not found");
-        }
-        ProductEntity productEntity = productRepository.findById(productid).orElseThrow();
-        ReviewEntity entity = ReviewEntity.toSaveReviewEntity(reviewDTO, userEntity, productEntity);
-
-        // 리뷰 저장
-        reviewRepository.save(entity);
-    }
-
+    
     // 리뷰 수정
     @Override
     public void updateReview(int reviewId, ReviewDTO reviewDTO) {
