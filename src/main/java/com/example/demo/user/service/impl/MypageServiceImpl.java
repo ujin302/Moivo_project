@@ -193,10 +193,14 @@ public class MypageServiceImpl implements MypageService {
         if (orderDetailEntities == null || orderDetailEntities.isEmpty()) {
             throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
         }
-        
+
         // PaymentEntity를 PaymentDTO로 변환
-        return orderDetailEntities.stream()
-        .map(PaymentDetailDTO::toGetOrderDetailDTO)
-        .collect(Collectors.toList());
+        List<PaymentDetailDTO> paymentDetailDTOList = new ArrayList<>();
+        for (PaymentDetailEntity paymentDetailEntity : orderDetailEntities) {
+            PaymentDetailDTO paymentDetailDTO = PaymentDetailDTO.toGetOrderDetailDTO(paymentDetailEntity);
+            paymentDetailDTOList.add(paymentDetailDTO);
+        }
+        
+        return paymentDetailDTOList;
     }
 }
