@@ -39,6 +39,9 @@ public interface UserService {
 
     public void deleteUser(int userId);
 
+
+    public boolean isUserAdmin(int id);
+
     // 24.12.16 - uj
     // 회원 가입 시, 초기화 (소셜 & Moivo 로그인 공통 사용)
     public UserEntity insertInit(UserEntity userEntity);
@@ -46,5 +49,6 @@ public interface UserService {
     // 24.12.16 - uj
     // JWT 토큰 생성 & 응답 데이터
     public Map<String, Object> loginResponseData(UserEntity user);
+
 
 }
