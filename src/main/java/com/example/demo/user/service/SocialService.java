@@ -1,14 +1,11 @@
 package com.example.demo.user.service;
 
-import com.example.demo.user.entity.UserEntity;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.security.core.Authentication;
+import java.util.Map;
 
 public interface SocialService {
 
-    UserEntity loginWithKakao(String code, String provider) throws JsonProcessingException;
+    public String getKakaoURI();
 
-    public void saveOrUpdateUser(UserEntity userEntity);
+    public Map<String, Object> getKakaoLogin(String code);
 
-    public String getUserAccessToken(Authentication authentication);
 }
