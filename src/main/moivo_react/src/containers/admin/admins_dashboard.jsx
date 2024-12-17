@@ -62,7 +62,7 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
     if (isAdmin) {
       fetchDashboardData();
     } else {
-      navigate('/login');
+      navigate('/user');
     }
   }, [isAdmin, navigate, refreshAccessToken]);
 
@@ -71,10 +71,6 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
       {/* Sidebar 영역 */}
       <div className={admin_dashboard.sidebar}>
         <Admins_side />
-      </div>
-      {/* 토큰 만료 타이머 추가_12.16 15:30 성찬 */}
-      <div>
-        <TokenExpiryTimer />
       </div>
 
       <div className={admin_dashboard.mainContent}>

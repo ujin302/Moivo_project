@@ -74,5 +74,5 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 답변 완료 문의 수 조회
     int countByResponseIsNotNull();
 
-    
+
 }

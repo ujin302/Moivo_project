@@ -325,6 +325,22 @@ const ProductDetail = () => {
     return null;
   }
 
+  // 리뷰 가져오기
+  // const fetchReviews = async () => {
+  //   try {
+  //     const userId = localStorage.getItem('id');
+  //     const response = await axios.get(`${PATH.SERVER}/api/user/review/user/${userId}/${productId}`);
+  //     setReviews(response.data.content); // 페이지네이션을 고려하여 content만 설정
+  //   } catch (error) {
+  //     console.error('리뷰 불러오기 실패:', error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (activeTab === 'reviews') {
+  //     fetchReviews();
+  //   }
+  // }, [activeTab, productId]);
+
   return (
     <div className={styles.productDetailRoot}>
       <div className={styles.container}>

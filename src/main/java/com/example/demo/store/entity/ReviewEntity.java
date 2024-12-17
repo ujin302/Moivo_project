@@ -61,8 +61,14 @@ public class ReviewEntity { // 리뷰
         entity.setPaymentDetailEntity(detailEntity);
         entity.setRating(dto.getRating());
         entity.setContent(dto.getContent());
+        entity.setReviewDate(LocalDateTime.now()); // 리뷰 작성 일시 추가 12.17 성찬
 
         return entity;
+    }
+
+    public void updateReview(ReviewDTO reviewDTO) {
+        this.rating = reviewDTO.getRating();
+        this.content = reviewDTO.getContent();
     }
 
 }
