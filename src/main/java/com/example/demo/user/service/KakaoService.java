@@ -4,7 +4,7 @@ import com.example.demo.configuration.SocialConfiguration;
 import com.example.demo.user.dto.KakaoTokenDTO;
 import com.example.demo.user.dto.UserDTO;
 
-public interface NaverService {
+public interface KakaoService {
 
     KakaoTokenDTO getToken(String code, SocialConfiguration socialConfig);
 
