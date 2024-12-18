@@ -1,9 +1,9 @@
 package com.example.demo.store.dto;
 
-import com.example.demo.configuration.NCPStorageConfig;
 import com.example.demo.ncp.dto.NCPObjectStorageDTO;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductEntity.Gender;
+import com.example.demo.store.entity.ProductEntity.ProductStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +20,7 @@ public class ProductDTO { // 상품
     private int price;
     private Gender gender; // 성별 F or M
     private int categoryId;
+    private ProductStatus status; // 재고 상황
 
     // entity => dto 변환
 
@@ -35,20 +36,21 @@ public class ProductDTO { // 상품
         dto.setPrice(entity.getPrice());
         dto.setGender(entity.getGender());
         dto.setCategoryId(entity.getCategoryEntity().getId());
+        dto.setStatus(entity.getStatus());
 
         return dto;
     }
 
     // ProductEntity -> ProductDTO 변환
-    public ProductDTO(ProductEntity entity) {
-        NCPObjectStorageDTO ncpDTO = new NCPObjectStorageDTO();
+    // public ProductDTO(ProductEntity entity) {
+    // NCPObjectStorageDTO ncpDTO = new NCPObjectStorageDTO();
 
-        this.id = entity.getId();
-        this.name = entity.getName();
-        this.img = ncpDTO.getURL() + entity.getImg();
-        this.content = entity.getContent();
-        this.price = entity.getPrice();
-        this.gender = entity.getGender();
-        this.categoryId = entity.getCategoryEntity().getId();
-    }
+    // this.id = entity.getId();
+    // this.name = entity.getName();
+    // this.img = ncpDTO.getURL() + entity.getImg();
+    // this.content = entity.getContent();
+    // this.price = entity.getPrice();
+    // this.gender = entity.getGender();
+    // this.categoryId = entity.getCategoryEntity().getId();
+    // }
 }

@@ -4,6 +4,8 @@ import java.util.Map;
 
 public interface AdminStoreService {
 
-    Map<String, Object> getProductStatus();
-    
+    public Map<String, Object> getProductStatus();
+
+    public Map<String, Object> getAllProductList(Map<String, Object> datamap);
+
 }
