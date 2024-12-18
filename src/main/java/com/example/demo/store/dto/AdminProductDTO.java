@@ -20,6 +20,7 @@ public class AdminProductDTO {
     private String name;
     private int price;
     private int allcount;
+    private Boolean delete = false;
     private ProductStatus status; // "" or 일부 품절 or 전체 품절
     private Map<Size, Integer> stock; // 사이즈별 재고
 
@@ -32,6 +33,7 @@ public class AdminProductDTO {
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setPrice(entity.getPrice());
+        dto.setDelete(entity.getDelete());
         dto.setStatus(entity.getStatus());
         dto.setStock(stock);
 

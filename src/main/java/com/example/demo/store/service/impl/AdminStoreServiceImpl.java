@@ -79,7 +79,7 @@ public class AdminStoreServiceImpl implements AdminStoreService {
         Page<ProductEntity> pageProductList = null;
         List<ProductEntity.ProductStatus> statusList = new ArrayList<>();
         if (sortby == 1) {
-            pageProductList = productRepository.findByDeleteFalse(pageable);
+            pageProductList = productRepository.findAll(pageable);
             System.out.println("delete = false 상품 추출 >> " + pageProductList.getSize() + "개");
         } else if (sortby == 2) {
             statusList.add(ProductEntity.ProductStatus.SOLDOUT);
