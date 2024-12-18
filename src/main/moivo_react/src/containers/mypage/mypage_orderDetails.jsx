@@ -180,26 +180,7 @@ const MypageOrderDetails = () => {
                                         </button>
                                     </>
                                 ) : (
-                                    <>
-                                        <div className={styles.reviewCompleteText}>리뷰작성완료</div>
-                                        <button 
-                                            className={styles.editReviewButton}
-                                            onClick={() => navigate('/review/write', { 
-                                                state: { 
-                                                    productId: item.productId,
-                                                    productName: item.productName,
-                                                    paymentDetailId: item.id,
-                                                    size: item.size,
-                                                    userId: userId,
-                                                    userName: OrdersInfo[0]?.name,
-                                                    orderDate: OrdersInfo[0]?.paymentDate,
-                                                    isEdit: true
-                                                } 
-                                            })}
-                                        >
-                                            리뷰 수정
-                                        </button>
-                                    </>
+                                    <div className={styles.reviewCompleteText}>리뷰작성완료</div>
                                 )
                             ) : OrdersInfo[0]?.deliveryStatus === "PAYMENT_COMPLETED" ? (
                                 <div className={styles.statusText}>결제완료</div>
