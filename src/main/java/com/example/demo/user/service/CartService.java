@@ -13,7 +13,7 @@ public interface CartService {
     public Map<String, Object> printCart(int userId);
 
     // 장바구니에서 상품 삭제
-    public void deleteProduct(int productId, int userId);
+    public void deleteProduct(int userCartId, int userId);
 
     public UserCartDTO updateCartItem(int userCartId, Integer count, String size);
 }

@@ -1,6 +1,5 @@
 package com.example.demo.user.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,60 +127,60 @@ public class UserController {
             String actualToken = token.substring(7); // "Bearer " 제거
             Map<String, Object> userData = jwtUtil.getUserDataFromToken(actualToken);
             String userIdFromToken = (String) userData.get("userId");
-    
+
             // 사용자 ID 일치 여부 확인 (보안 검증)
             if (!userIdFromToken.equals(userDTO.getUserId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-    
+
             // 회원 정보 업데이트 처리
             userService.updateUserInfo(userDTO);
-    
+
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.err.println("회원정보 수정 실패: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     // 회원정보 삭제 - sumin (2024.12.12)
     @PostMapping("/mypage/delete")
     public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String token,
             @RequestBody Map<String, Object> requestData) {
         Integer userIdFromRequest = (Integer) requestData.get("userId");
         String passwordFromRequest = (String) requestData.get("pwd");
-    
+
         System.out.println("userId = " + userIdFromRequest);
         System.out.println("pwd = " + passwordFromRequest);
-    
+
         try {
             // Authorization 헤더에서 실제 토큰 값 추출
             if (token == null || !token.startsWith("Bearer ")) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-    
+
             String actualToken = token.trim().substring(7); // "Bearer " 제거 후 공백 제거
-    
+
             // 토큰에서 사용자 ID 추출
             Map<String, Object> userData = jwtUtil.getUserDataFromToken(actualToken);
             System.out.println("userData = " + userData);
             int userIdFromToken = (Integer) userData.get("id");
             System.out.println(userIdFromToken);
-    
+
             // 사용자 ID 일치 여부 확인 (보안 검증)
             if (userIdFromToken == userIdFromRequest) {
                 // 비밀번호 검증
                 if (!userService.checkPassword(userIdFromRequest, passwordFromRequest)) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
-    
+
                 // 회원 탈퇴 처리
                 userService.deleteUser(userIdFromRequest);
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-    
+
         } catch (NumberFormatException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (IllegalArgumentException e) {
@@ -190,6 +189,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
 
 }
