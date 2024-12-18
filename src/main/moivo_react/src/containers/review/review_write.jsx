@@ -5,6 +5,7 @@ import { PATH } from '../../../scripts/path';
 import styles from "../../assets/css/ReviewWrite.module.css";
 import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
+import { FaPen } from 'react-icons/fa';
 
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('accessToken');
@@ -18,8 +19,6 @@ axiosInstance.interceptors.request.use((config) => {
 const ReviewWrite = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [reviewId, setReviewId] = useState(null);
-    const [userId, setUserId] = useState(null);
     
     // location.state에서 모든 필요한 데이터 추출
     const {
@@ -39,41 +38,6 @@ const ReviewWrite = () => {
     useEffect(() => {
         console.log("전달받은 데이터:", location.state);
     }, [location]);
-
-    useEffect(() => {
-        // location.state에서 필요한 데이터 추출
-        if (location.state) {
-            setReviewId(location.state.reviewId);
-            setUserId(location.state.userId);
-        } else {
-            // localStorage에서 userId 가져오기
-            const storedUserId = localStorage.getItem('userId');
-            if (storedUserId) {
-                setUserId(parseInt(storedUserId));
-            }
-        }
-    }, [location]);
-
-    useEffect(() => {
-        const fetchReview = async () => {
-            if (paymentDetailId) {
-                try {
-                    const response = await axiosInstance.get(`/api/user/review/payment/${paymentDetailId}`);
-                    if (response.data) {
-                        setReviewId(response.data.id);
-                        setRating(response.data.rating);
-                        setContent(response.data.content);
-                    }
-                } catch (error) {
-                    console.error('리뷰 조회 오류:', error);
-                }
-            }
-        };
-
-        if (error && error.includes('이미 작성하였습니다')) {
-            fetchReview();
-        }
-    }, [paymentDetailId, error]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -118,62 +82,6 @@ const ReviewWrite = () => {
         return '';
     };
 
-    // 리뷰 수정 핸들러
-    const handleEditReview = async () => {
-        const missingFields = [];
-        
-        if (!reviewId) missingFields.push('리뷰 ID');
-        if (!userId) missingFields.push('사용자 ID');
-        if (!productId) missingFields.push('상품 ID');
-        if (!paymentDetailId) missingFields.push('주문 상세 ID');
-        if (!rating) missingFields.push('별점');
-        if (!content) missingFields.push('리뷰 내용');
-
-        if (missingFields.length > 0) {
-            setError(`다음 정보가 누락되었습니다: ${missingFields.join(', ')}`);
-            return;
-        }
-
-        try {
-            const response = await axiosInstance.put(`/api/user/review/${reviewId}`, {
-                userId,
-                productId,
-                paymentDetailId,
-                rating,
-                content
-            });
-            
-            if (response.status === 200) {
-                alert('리뷰가 성공적으로 수정되었습니다.');
-                navigate(-1);
-            }
-        } catch (error) {
-            console.error('리뷰 수정 오류:', error);
-            setError(error.response?.data || '리뷰 수정 중 오류가 발생했습니다.');
-        }
-    };
-
-    // 리뷰 삭제 핸들러
-    const handleDeleteReview = async () => {
-        if (window.confirm('정말로 리뷰를 삭제하시겠습니까?')) {
-            try {
-                const response = await axiosInstance.delete(`/api/user/review/${reviewId}`);
-                
-                if (response.status === 200) {
-                    alert('리뷰가 성공적으로 삭제되었습니다.');
-                    navigate(-1);
-                }
-            } catch (error) {
-                console.error('리뷰 삭제 오류:', error);
-                if (error.response?.status === 401) {
-                    setError('로그인이 필요한 서비스입니다.');
-                } else {
-                    setError(error.response?.data || '리뷰 삭제 중 오류가 발생했습니다.');
-                }
-            }
-        }
-    };
-
     return (
         <>
             <div>
@@ -181,30 +89,31 @@ const ReviewWrite = () => {
             </div>
 
             <div className={styles.reviewWriteContainer}>
-
+                <br/><br/>
                 <h1>리뷰 작성</h1>
+
                 
                 <div className={styles.productInfo} data-tooltip="구매하신 상품 정보입니다">
                     <h2>{productName}</h2>
                     <p>구매일: {new Date(orderDate).toLocaleDateString()}</p>
-                    <p>사이즈: {size}</p>
+                    <p>사이즈:  {size}</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className={styles.ratingContainer}>
                         <div className={styles.ratingStars}>
-                            {[...Array(5)].reverse().map((_, index) => (
+                            {[...Array(5)].map((_, index) => (
                                 <React.Fragment key={index}>
                                     <input
-                                        id={`rating-${5 - index}`}
-                                        className={`${styles.ratingInput} ${styles[`ratingInput${5 - index}`]}`}
+                                        id={`rating-${index + 1}`}
+                                        className={`${styles.ratingInput} ${styles[`ratingInput${index + 1}`]}`}
                                         type="radio"
                                         name="rating"
-                                        value={5 - index}
-                                        checked={rating === 5 - index}
-                                        onChange={() => handleStarClick(5 - index)}
+                                        value={index + 1}
+                                        checked={rating === index + 1}
+                                        onChange={() => handleStarClick(index + 1)}
                                     />
-                                    <label className={styles.ratingLabel} htmlFor={`rating-${5 - index}`}>
+                                    <label className={styles.ratingLabel} htmlFor={`rating-${index + 1}`}>
                                         <svg className={styles.ratingStar} width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
                                             <g transform="translate(16,16)">
                                                 <circle className={styles.ratingStarRing} fill="none" stroke="#000" strokeWidth="16" r="8" transform="scale(0)" />
@@ -223,7 +132,7 @@ const ReviewWrite = () => {
                                                 </g>
                                             </g>
                                         </svg>
-                                        <span className={styles.ratingSr}>{5 - index} star{5 - index !== 1 && 's'}</span>
+                                        <span className={styles.ratingSr}>{index + 1} star{index !== 0 && 's'}</span>
                                     </label>
                                 </React.Fragment>
                             ))}
@@ -236,6 +145,7 @@ const ReviewWrite = () => {
                     </div>
 
                     <div className={styles.contentInputWrapper}>
+                        <FaPen className={styles.contentIcon} />
                         <textarea
                             className={styles.contentInput}
                             value={content}
@@ -262,35 +172,22 @@ const ReviewWrite = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className={styles.submitButton}>
-                        리뷰 등록하기
-                    </button>
-
-                </form>
-                <br/>                
-                {error && (
-                    <div className={styles.errorContainer}>
-                        <div className={styles.error}>{error}</div>
-                        {error.includes('이미 작성하였습니다') && (
-                            <div className={styles.reviewActions}>
-                                <button 
-                                    type="button" 
-                                    className={`${styles.actionButton} ${styles.editButton}`}
-                                    onClick={handleEditReview}
-                                >
-                                    기존 리뷰 수정
-                                </button>
-                                <button 
-                                    type="button" 
-                                    className={`${styles.actionButton} ${styles.deleteButton}`}
-                                    onClick={handleDeleteReview}
-                                >
-                                    기존 리뷰 삭제
-                                </button>
-                            </div>
-                        )}
+                    <div className={styles.buttonContainer}>
+                        <button type="submit" className={styles.submitButton}>
+                            리뷰 등록하기
+                        </button>
+                        <button 
+                            type="button" 
+                            className={styles.cancelButton}
+                            onClick={() => navigate('/mypage/order')}
+                        >
+                            취소
+                        </button>
                     </div>
-                )}
+                </form>
+                <br/>
+
+                {error && <div className={styles.error}>{error}</div>}
             </div>
             
             <Footer />

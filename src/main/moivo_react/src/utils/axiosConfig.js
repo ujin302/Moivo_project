@@ -72,11 +72,18 @@ axiosInstance.interceptors.response.use(
         }
       } catch (refreshError) {
         processQueue(refreshError, null);
+        localStorage.removeItem('accessToken');
+        window.location.href = '/user';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
+
+    if (error.response?.status === 404) {
+      return Promise.resolve({ data: null });
+    }
+
     return Promise.reject(error);
   }
 );

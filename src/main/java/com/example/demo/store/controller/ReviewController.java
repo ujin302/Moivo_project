@@ -56,7 +56,7 @@ public class ReviewController {
         }
     }
 
-    // 특정 사용자��� 리뷰 조회
+    // 특정 사용자 리뷰 조회
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<ReviewDTO>> getUserReviews(
             @PathVariable int userId,
@@ -103,5 +103,20 @@ public class ReviewController {
         }
     }
 
+    // 결제상세ID로 리뷰 조회
+    @GetMapping("/payment/{paymentDetailId}")
+    public ResponseEntity<ReviewDTO> getReviewByPaymentDetailId(@PathVariable int paymentDetailId) {
+        try {
+            ReviewDTO review = reviewService.getReviewByPaymentDetailId(paymentDetailId);
+            return ResponseEntity.ok(review);
+        } catch (RuntimeException e) {
+            // 리뷰가 없는 경우 404 반환
+            if (e.getMessage().contains("Review not found")) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+            }
+            // 다른 오류의 경우 500 반환
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 }

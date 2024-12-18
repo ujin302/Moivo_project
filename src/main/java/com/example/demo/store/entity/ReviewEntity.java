@@ -67,8 +67,16 @@ public class ReviewEntity { // 리뷰
     }
 
     public void updateReview(ReviewDTO reviewDTO) {
+        if (reviewDTO.getRating() < 1 || reviewDTO.getRating() > 5) {
+            throw new IllegalArgumentException("별점은 1-5 사이여야 합니다.");
+        }
+        if (reviewDTO.getContent() == null || reviewDTO.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("리뷰 내용은 필수입니다.");
+        }
+        
         this.rating = reviewDTO.getRating();
-        this.content = reviewDTO.getContent();
+        this.content = reviewDTO.getContent().trim();
+        this.reviewDate = LocalDateTime.now(); // 수정 시간 업데이트
     }
 
 }
