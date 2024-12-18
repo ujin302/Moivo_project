@@ -45,6 +45,9 @@ public class QuestionServiceImpl implements QuestionService {
         System.out.println("questionEntity Id 저장 전 = " + questionEntity);
         QuestionCategoryEntity questionCategoryEntity = questionCategoryRepository.findById(questionDTO.getCategoryId()).orElseThrow();
         UserEntity userEntity = userRepository.findById(questionDTO.getUserId()).orElseThrow();
+        System.out.println("questionDTO = " + questionDTO);
+        System.out.println("questionCategoryEntity = " + questionCategoryEntity);
+        System.out.println("userEntity = " + userEntity);
         questionEntity = QuestionEntity.tosaveQuestionEntity(questionDTO, questionCategoryEntity, userEntity);
         questionRepository.save(questionEntity);
         System.out.println("questionEntity Id 저장 후 = " + questionEntity);
