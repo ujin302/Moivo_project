@@ -23,10 +23,10 @@ const processQueue = (error, token = null) => {
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (token) {  //토큰 존재 여부 체크
+      config.headers.Authorization = `Bearer ${token}`;  //있으면 헤더에 추가
     }
-    return config;
+    return config;    // 토큰 없으면 그대로 반환
   },
   (error) => {
     return Promise.reject(error);

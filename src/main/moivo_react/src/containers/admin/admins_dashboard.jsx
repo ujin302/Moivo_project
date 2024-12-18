@@ -3,8 +3,8 @@ import axiosInstance from '../../utils/axiosConfig';
 import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate, Link } from 'react-router-dom';
+//
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
     if (isAdmin) {
       fetchDashboardData();
     } else {
-      navigate('/user');
+      navigate('/login');
     }
   }, [isAdmin, navigate, refreshAccessToken]);
 
@@ -147,18 +147,27 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
             <div className={admin_dashboard.card}>
               <h3 className={admin_dashboard.cardTitle}>문의 현황</h3>
               <div className={admin_dashboard.cardList}>
-                <div className={admin_dashboard.cardItem}>
+                <Link 
+                  to="/admins_qnaboard?filter=ALL" 
+                  className={`${admin_dashboard.cardItem} ${admin_dashboard.clickable}`}
+                >
                   전체 문의 :
                   <span className={admin_dashboard.cardNumber}>{questionStatus.totalQuestions}</span>
-                </div>
-                <div className={admin_dashboard.cardItem}>
+                </Link>
+                <Link 
+                  to="/admins_qnaboard?filter=WAITING" 
+                  className={`${admin_dashboard.cardItem} ${admin_dashboard.clickable}`}
+                >
                   미 답변 :
                   <span className={admin_dashboard.cardNumber}>{questionStatus.unansweredQuestions}</span>
-                </div>
-                <div className={admin_dashboard.cardItem}>
+                </Link>
+                <Link 
+                  to="/admins_qnaboard?filter=ANSWERED" 
+                  className={`${admin_dashboard.cardItem} ${admin_dashboard.clickable}`}
+                >
                   답변 완료 :
                   <span className={admin_dashboard.cardNumber}>{questionStatus.answeredQuestions}</span>
-                </div>
+                </Link>
               </div>
             </div>
 
