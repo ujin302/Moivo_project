@@ -38,7 +38,7 @@ public class ReviewEntity { // 리뷰
     // 결제 상품 1개 : 리뷰 1개
     @OneToOne
     @JoinColumn(name = "paymentdetailid", nullable = false)
-    private PaymentDetailEntity PaymentDetailEntity; // 결제제 상세 고유 키
+    private PaymentDetailEntity paymentDetailEntity; // 결제제 상세 고유 키
 
     @Column(name = "rating", nullable = false)
     private int rating; // 평점 (1~5)
