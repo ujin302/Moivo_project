@@ -270,8 +270,9 @@ public class MypageServiceImpl implements MypageService {
     // 나의 문의 목록 조회 12/18 작업 - 강민
     @Transactional
     @Override
-    public List<QuestionDTO> getMyQuestion(int id) {
-        List<QuestionEntity> questionEntities = questionRepository.findByUserEntity_Id(id);
+    public Page<QuestionDTO> getMyQuestion(int id, Pageable pageable) {
+        Pageable sortedByIdDesc = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "id"));
+        Page<QuestionEntity> questionEntities = questionRepository.findByUserEntity_Id(id, sortedByIdDesc);
         if (questionEntities == null || questionEntities.isEmpty()) {
             throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
         }
@@ -283,7 +284,7 @@ public class MypageServiceImpl implements MypageService {
             questionDTOList.add(questionDTO);
         }
         
-        return questionDTOList;
+        return new PageImpl<>(questionDTOList, pageable, questionEntities.getTotalElements());
     }
 
 }

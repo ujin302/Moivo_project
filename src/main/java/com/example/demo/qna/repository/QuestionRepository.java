@@ -87,5 +87,5 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
 
     // 마이페이지 나의 문의 리스트 조회 - 강민 12/18 11:06
-    public List<QuestionEntity> findByUserEntity_Id(Integer userId);
+    Page<QuestionEntity> findByUserEntity_Id(Integer userId, Pageable pageable);
 }

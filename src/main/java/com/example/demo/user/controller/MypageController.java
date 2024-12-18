@@ -121,9 +121,14 @@ public class MypageController {
  
     // 나의 문의 목록 조회 12/18 작업 - 강민
     @GetMapping("/question/{id}")
-    public ResponseEntity<List<QuestionDTO>> getMyQuestion(@PathVariable(name = "id") int id) {
+    public ResponseEntity<Page<QuestionDTO>> getMyQuestion(
+        @PathVariable(name = "id") int id,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "4") int size
+        ) {
         try {
-            List<QuestionDTO> myQuestion = mypageService.getMyQuestion(id);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+            Page<QuestionDTO> myQuestion = mypageService.getMyQuestion(id, pageable);
             System.out.println("my question : " + myQuestion);
             return ResponseEntity.ok(myQuestion);
         } catch (Exception e) {
