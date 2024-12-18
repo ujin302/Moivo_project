@@ -56,21 +56,7 @@ public class ReviewController {
         }
     }
 
-    // 리뷰 수정
-    @PutMapping("/{reviewId}")
-    public ResponseEntity<ReviewDTO> updateReview(@PathVariable int reviewId, @RequestBody ReviewDTO reviewDTO) {
-        ReviewDTO updatedReview = reviewService.updateReview(reviewId, reviewDTO);
-        return ResponseEntity.ok(updatedReview);
-    }
-
-    // 리뷰 삭제
-    @DeleteMapping("/{reviewId}")
-    public ResponseEntity<ReviewDTO> deleteReview(@PathVariable int reviewId) {
-        ReviewDTO deletedReview = reviewService.deleteReview(reviewId);
-        return ResponseEntity.ok(deletedReview);
-    }
-
-    // 특정 사용자의 리뷰 조회
+    // 특정 사용자��� 리뷰 조회
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<ReviewDTO>> getUserReviews(
             @PathVariable int userId,
@@ -92,4 +78,30 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body(null);
         }
     }
+
+    // 리뷰 수정
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<String> updateReview(
+            @PathVariable int reviewId,
+            @RequestBody ReviewDTO reviewDTO) {
+        try {
+            reviewService.updateReview(reviewId, reviewDTO);
+            return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    // 리뷰 삭제
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable int reviewId) {
+        try {
+            reviewService.deleteReview(reviewId);
+            return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
 }
