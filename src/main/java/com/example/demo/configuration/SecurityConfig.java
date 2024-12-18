@@ -67,7 +67,8 @@ public class SecurityConfig {
                                 "/api/oauth/**",
                                 "/oauth/**",
                                 "/api/mail/success",
-                                "/api/user/question")
+                                "/api/user/question",
+                                "/api/user/question/faq/list")
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
