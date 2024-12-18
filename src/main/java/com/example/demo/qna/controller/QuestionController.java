@@ -53,7 +53,7 @@ public class QuestionController {
         return ResponseEntity.ok("200 Ok");
     }
 
-    //문의 비밀글 조회
+    //문의 비밀글 조회 12/18 16:47 tang
     @GetMapping("/private")
     public ResponseEntity<Map<String, String>> privateBoardCheck(@RequestParam String privatepwd, @RequestParam int id) {
         //게시글번호랑 비밀번호 받아옴
@@ -72,7 +72,7 @@ public class QuestionController {
         }
     }
 
-    //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang 12/17 18:30 제목별, 카테고리별 검색 추가
+    //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang 12/17 18:30 제목별, 카테고리별 검색 추가 12/18 문의리스트 공지사항 제외
     @GetMapping("")
     public ResponseEntity<?> searchQuestion(
             @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
