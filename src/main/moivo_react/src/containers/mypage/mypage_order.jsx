@@ -8,13 +8,12 @@ import axiosInstance from '../../utils/axiosConfig';
 
 const Mypage_order = () => {
     const [OrdersList, setOrdersList] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log(OrdersList);
-    }, [OrdersList]);
-
-    useEffect(() => {
+    // fetchOrders 함수 정의
+    const fetchOrders = async (page = 0, size = 4) => {
         const token = localStorage.getItem("accessToken");
         
         if (!token) {
@@ -22,47 +21,50 @@ const Mypage_order = () => {
             navigate("/user");
             return;
         }
+
         const payload = token.split('.')[1];
         const decodedPayload = JSON.parse(atob(payload));
-        const id = decodedPayload.id; 
+        const id = decodedPayload.id;
 
-        const fetchOrders = async () => {
-            try {
-                const ordersResponse = await axiosInstance.get(`/api/user/mypage/orders/${id}`);
+        try {
+            const ordersResponse = await axiosInstance.get(`/api/user/mypage/orders/${id}`, {
+                params: { page, size, sort: 'id,desc' },
+            });
 
-                // 응답 데이터 유효성 검증
-                if (!Array.isArray(ordersResponse.data)) {
-                    console.warn("Unexpected response data format:", ordersResponse.data);
-                    setOrdersList([]);
-                    return;
-                }
-
-                setOrdersList(ordersResponse.data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-
-                // 에러 상황 처리
-                if (error.response) {
-                    // 서버 응답에 상태 코드가 있는 경우
-                    console.error("Server response error:", error.response.status, error.response.data);
-                    alert("구매목록이 없습니다.");
-                } else if (error.request) {
-                    // 요청이 전송되었으나 응답이 없는 경우
-                    console.error("No response received from server:", error.request);
-                    alert("서버에서 응답이 없습니다. 네트워크 상태를 확인해주세요.");
-                } else {
-                    // 기타 에러
-                    console.error("Error setting up request:", error.message);
-                    alert("알 수 없는 에러가 발생했습니다.");
-                }
-
-                // 기본 데이터로 설정
+            if (ordersResponse.data && ordersResponse.data.content && Array.isArray(ordersResponse.data.content)) {
+                setOrdersList(ordersResponse.data.content);
+                setTotalPages(ordersResponse.data.totalPages);
+                setCurrentPage(page);
+            } else {
+                console.warn("Unexpected response data format:", ordersResponse.data);
                 setOrdersList([]);
             }
-        }
+        } catch (error) {
+            console.error("Error fetching data:", error);
 
+            if (error.response) {
+                console.error("Server response error:", error.response.status, error.response.data);
+                alert("구매목록이 없습니다.");
+            } else if (error.request) {
+                console.error("No response received from server:", error.request);
+                alert("서버에서 응답이 없습니다. 네트워크 상태를 확인해주세요.");
+            } else {
+                console.error("Error setting up request:", error.message);
+                alert("알 수 없는 에러가 발생했습니다.");
+            }
+
+            setOrdersList([]);
+        }
+    }
+
+    // 페이지네이션 버튼 클릭 시 fetchOrders 호출
+    const handlePageClick = (page) => {
+        fetchOrders(page);
+    };
+
+    useEffect(() => {
         fetchOrders();
-      }, [navigate]);
+    }, [navigate]);
 
     return (
         <div>
@@ -135,6 +137,20 @@ const Mypage_order = () => {
                         );
                     })}
                 </div>
+
+                {/* 페이지네이션 */}
+                <div className={styles.pagination}>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i}
+                            className={`${styles.pageButton} ${i === currentPage ? styles.active : ""}`}
+                            onClick={() => handlePageClick(i)}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
+
                 <div className={styles.bottomBar}></div>
                 <Link to="/mypage" className={styles.backLink}>
                     Go Back to MyPage

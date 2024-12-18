@@ -13,12 +13,15 @@ import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.entity.PaymentEntity.DeliveryStatus;
 
-import feign.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.repository.query.Param; 
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer> {
         // 특정 User의 orders를 조회
-        public List<PaymentEntity> findByUserEntity_Id(Integer userId);
+        public Page<PaymentEntity> findByUserEntity_Id(Integer userId, Pageable pageable);
 
         // 12/17 tosscode 값으로 PaymentEntity 조회 - km
         public List<PaymentEntity> findByTossCode(String tossCode);     
