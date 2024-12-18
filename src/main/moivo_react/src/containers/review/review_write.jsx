@@ -9,7 +9,6 @@ import { FaPen } from 'react-icons/fa';
 
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('accessToken');
-    // console.log('요청 헤더의 토큰:', token);
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -20,7 +19,6 @@ const ReviewWrite = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    // location.state에서 모든 필요한 데이터 추출
     const {
         productId,
         productName,
@@ -33,7 +31,7 @@ const ReviewWrite = () => {
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
     const [error, setError] = useState(null);
-    const maxLength = 1000; // 최대 글자수 제한
+    const maxLength = 1000;
 
     useEffect(() => {
         console.log("전달받은 데이터:", location.state);
@@ -71,10 +69,10 @@ const ReviewWrite = () => {
     };
 
     const handleStarClick = (selectedRating) => {
-        setRating(selectedRating);
+        const reversedRating = 6 - selectedRating;
+        setRating(reversedRating);
     };
 
-    // 글자수 경고 상태 추가
     const getCharacterCountClass = () => {
         const remaining = maxLength - content.length;
         if (remaining < 50) return styles.danger;
@@ -110,7 +108,7 @@ const ReviewWrite = () => {
                                         type="radio"
                                         name="rating"
                                         value={index + 1}
-                                        checked={rating === index + 1}
+                                        checked={rating === (6 - (index + 1))}
                                         onChange={() => handleStarClick(index + 1)}
                                     />
                                     <label className={styles.ratingLabel} htmlFor={`rating-${index + 1}`}>
@@ -138,7 +136,7 @@ const ReviewWrite = () => {
                             ))}
                             {[...Array(5)].map((_, index) => (
                                 <p key={index} className={styles.ratingDisplay} data-rating={index + 1} hidden={rating !== index + 1}>
-                                    {['끔찍해요', '별로에요', '보통이에요', '좋아요', '최고에요'][index]}
+                                    {/* {['끔찍해요', '별로에요', '보통이에요', '좋아요', '최고에요'][index]} */}
                                 </p>
                             ))}
                         </div>

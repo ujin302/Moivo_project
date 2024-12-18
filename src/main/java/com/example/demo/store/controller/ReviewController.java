@@ -43,7 +43,7 @@ public class ReviewController {
     }
 
     // 리뷰 조회는 인증 없이 접근 가능하도록 /api/store 경로로 이동
-    @GetMapping("/api/store/review/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<Page<ReviewDTO>> getReviewsByPage(
             @PathVariable int productId,
             @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -103,19 +103,37 @@ public class ReviewController {
         }
     }
 
-    // 결제상세ID로 리뷰 조회
-    @GetMapping("/payment/{paymentDetailId}")
-    public ResponseEntity<ReviewDTO> getReviewByPaymentDetailId(@PathVariable int paymentDetailId) {
+    // 리뷰 조회
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ReviewDTO> getReview(@PathVariable int reviewId) {
         try {
-            ReviewDTO review = reviewService.getReviewByPaymentDetailId(paymentDetailId);
+            ReviewDTO review = reviewService.getReview(reviewId);
             return ResponseEntity.ok(review);
         } catch (RuntimeException e) {
-            // 리뷰가 없는 경우 404 반환
-            if (e.getMessage().contains("Review not found")) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+        }
+    }
+
+    // 결제상세ID로 리뷰 수정
+    @PutMapping("/detail/{paymentDetailId}")
+    public ResponseEntity<String> updateReviewByPaymentDetailId(
+            @PathVariable int paymentDetailId,
+            @RequestBody ReviewDTO reviewDTO) {
+        try {
+            System.out.println("리뷰 수정 요청 데이터: " + reviewDTO);
+            
+            // 기존 리뷰 조회
+            ReviewDTO existingReview = reviewService.getReviewByPaymentDetailId(paymentDetailId);
+            if (existingReview == null) {
+                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("리뷰를 찾을 수 없습니다.");
             }
-            // 다른 오류의 경우 500 반환
-            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
+            
+            // 리뷰 수정
+            reviewService.updateReview(existingReview.getId(), reviewDTO);
+            return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

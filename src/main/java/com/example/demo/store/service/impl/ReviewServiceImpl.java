@@ -1,5 +1,7 @@
 package com.example.demo.store.service.impl;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,18 +95,16 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewEntity review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
                 
-        // 리뷰 작성자 확인
-        if (!review.getUserEntity().getId().equals(reviewDTO.getUserId())) {
-            throw new RuntimeException("리뷰 작성자만 수정할 수 있습니다.");
-        }
+        System.out.println("수정할 리뷰 ID: " + reviewId);
+        System.out.println("수정 데이터: " + reviewDTO);
         
-        review.updateReview(reviewDTO);
+        // 리뷰 내용 업데이트
+        review.setRating(reviewDTO.getRating());
+        review.setContent(reviewDTO.getContent().trim());
+        review.setReviewDate(LocalDateTime.now());
+        
+        // 리뷰 저장
         reviewRepository.save(review);
-        
-        // 결제상세 정보의 리뷰 작성 상태 유지
-        PaymentDetailEntity paymentDetail = review.getPaymentDetailEntity();
-        paymentDetail.setWriteReview(true);
-        detailRepository.save(paymentDetail);
     }
 
     // 리뷰 삭제
@@ -122,14 +122,17 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public ReviewDTO getReview(int reviewId) {
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        return ReviewDTO.toGetReviewDTO(review);
+    }
+
+    @Override
     public ReviewDTO getReviewByPaymentDetailId(int paymentDetailId) {
-        try {
-            ReviewEntity review = reviewRepository.findByPaymentDetailEntityId(paymentDetailId)
-                    .orElseThrow(() -> new RuntimeException("Review not found"));
-            return ReviewDTO.toGetReviewDTO(review);
-        } catch (Exception e) {
-            throw new RuntimeException("리뷰 조회 중 오류가 발생했습니다: " + e.getMessage());
-        }
+        ReviewEntity review = reviewRepository.findByPaymentDetailEntityId(paymentDetailId)
+            .orElseThrow(() -> new RuntimeException("Review not found"));
+        return ReviewDTO.toGetReviewDTO(review);
     }
 
 }

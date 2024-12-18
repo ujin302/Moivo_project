@@ -263,8 +263,9 @@
 
 .ratingStars {
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   gap: 5px;
+  justify-content: flex-end;
 }
 
 .ratingStars::after {
@@ -1018,53 +1019,11 @@
   }
 }
 
-/* 별점 선택 시 이전 별들도 채워지도록 수정 */
-.ratingInput1:checked ~ .ratingLabel:nth-of-type(-n + 1) .ratingStarFill,
-.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarFill,
-.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarFill,
-.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarFill,
-.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarFill {
-  animation-name: starFill;
-  transform: scale(1);
-  fill: #ffdd00;
-}
-
-/* 호버 시에도 이전 별들이 채워지도록 수정 */
-.ratingInput1:hover ~ .ratingLabel:nth-of-type(-n + 1) .ratingStarFill,
-.ratingInput2:hover ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarFill,
-.ratingInput3:hover ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarFill,
-.ratingInput4:hover ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarFill,
-.ratingInput5:hover ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarFill {
-  transform: scale(1);
-  fill: #ffdd00;
-}
-
-/* 별점 스타일 수정 */
-.ratingStars {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-}
-
-/* 별 아이콘 기본 스타일 */
-.ratingStarFill {
-  fill: #ddd;
-  transition: fill 0.3s ease;
-}
-
-.ratingStarStroke {
-  stroke: #ddd;
-}
-
-/* 별점 선택 및 호버 효과 수정 */
-.ratingLabel:hover .ratingStarFill,
-.ratingLabel:hover ~ .ratingLabel .ratingStarFill,
+/* 별점 선택 효과만 유지 */
 .ratingInput:checked ~ .ratingLabel .ratingStarFill {
   fill: #ffdd00;
 }
 
-.ratingLabel:hover .ratingStarStroke,
-.ratingLabel:hover ~ .ratingLabel .ratingStarStroke,
 .ratingInput:checked ~ .ratingLabel .ratingStarStroke {
   stroke: #ffdd00;
 }
@@ -1075,15 +1034,6 @@
 .ratingInput3:checked ~ .ratingLabel:nth-of-type(-n+3) .ratingStarFill,
 .ratingInput4:checked ~ .ratingLabel:nth-of-type(-n+4) .ratingStarFill,
 .ratingInput5:checked ~ .ratingLabel:nth-of-type(-n+5) .ratingStarFill {
-  fill: #ffdd00;
-}
-
-/* 호버 시 별과 그 이전 별들 채우기 */
-.ratingInput1:hover ~ .ratingLabel:nth-of-type(-n+1) .ratingStarFill,
-.ratingInput2:hover ~ .ratingLabel:nth-of-type(-n+2) .ratingStarFill,
-.ratingInput3:hover ~ .ratingLabel:nth-of-type(-n+3) .ratingStarFill,
-.ratingInput4:hover ~ .ratingLabel:nth-of-type(-n+4) .ratingStarFill,
-.ratingInput5:hover ~ .ratingLabel:nth-of-type(-n+5) .ratingStarFill {
   fill: #ffdd00;
 }
 
@@ -1134,7 +1084,7 @@
     margin-top: 20px;
 }
 
-.cancelButton {
+/* .cancelButton {
     padding: 10px 20px;
     background-color: #gray;
     color: #fff;
@@ -1142,7 +1092,7 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-}
+} */
 
 .cancelButton:hover {
     background-color: #666;
