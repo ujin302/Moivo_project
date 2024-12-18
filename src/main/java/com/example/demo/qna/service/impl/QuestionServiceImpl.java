@@ -124,7 +124,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         if ((title == null || title.isEmpty()) && categoryid == 0) { //전체검색
             System.out.println("title X = " + " categoryid X = 전체검색");
-            pageQuestionList = questionRepository.findAllByFixquestion(pageable);
+            pageQuestionList = questionRepository.findAllByFixQuestionFalse(pageable);
 //            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
         }
         else if(((title == null || title.isEmpty())) && categoryid != 0) {
