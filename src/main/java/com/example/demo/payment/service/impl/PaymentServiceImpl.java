@@ -1,6 +1,5 @@
 package com.example.demo.payment.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.coupon.entity.UserCouponEntity;
+import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.payment.entity.PaymentDetailEntity;
@@ -19,10 +20,8 @@ import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductStockEntity;
 import com.example.demo.store.repository.ProductRepository;
 import com.example.demo.user.entity.CartEntity;
-import com.example.demo.user.entity.UserCartEntity;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.CartRepository;
-import com.example.demo.user.repository.UserCartRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +49,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private UserCouponRepository userCouponRepository;
 
     // 24.12.12 - uj
     // 결제 정보 저장
@@ -115,6 +117,14 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 4-1. 장바구니 DB에 반영
         cartRepository.save(cartEntity);
+
+        // 5. 쿠폰 사용 여부 저장
+        if (paymentDTO.getDiscount() > 0) {
+            List<UserCouponEntity> couponEntityList = userCouponRepository.findByUserEntity_Id(paymentDTO.getUserId());
+            couponEntityList.get(0).setUsed(true);
+            userCouponRepository.save(couponEntityList.get(0));
+        }
+
     }
 
     // Json -> PaymentDTO
