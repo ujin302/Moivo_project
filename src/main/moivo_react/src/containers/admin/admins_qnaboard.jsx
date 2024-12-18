@@ -78,7 +78,7 @@ const Admins_qnaboard = () => {
                 { response: responseInput }
             );
 
-            console.log('Server response:', response);
+            // console.log('Server response:', response);
 
             if (response.status === 200) {
                 await fetchQuestions();

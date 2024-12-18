@@ -6,7 +6,6 @@ import mypageIcon from '../../assets/image/mypage.png';
 import cartIcon from '../../assets/image/cart.png';
 
 
-
 const Banner = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout, tokenExpiration, isAdmin } = useContext(AuthContext);
@@ -34,6 +33,7 @@ const Banner = () => {
         { name: '상품복구', navigateTo: '/admin/admin_productTrash' },
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
+        { name: 'MyReview', navigateTo: '/myreview' }  // 여기에 마이리뷰 추가
       ]
     },
     ...(isAdmin ? [{

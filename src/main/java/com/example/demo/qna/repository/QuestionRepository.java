@@ -70,11 +70,15 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     // 24.12.13 - yjy
     // 미답변 문의 수 조회
-    int countByResponseIsNull();
+    public int countByResponseIsNull();
 
     // 24.12.13 - yjy
     // 답변 완료 문의 수 조회
-    int countByResponseIsNotNull();
+    public int countByResponseIsNotNull();
+
+    // FAQ 목록 조회 (fixQuestion이 true인 것만 최신순으로)
+    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion = true ORDER BY q.questionDate DESC")
+    List<QuestionEntity> findByFixQuestionTrueOrderByQuestionDateDesc();
 
     // 문의리스트 제목, 카테고리 검색
     Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);

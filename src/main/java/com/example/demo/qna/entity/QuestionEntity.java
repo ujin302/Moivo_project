@@ -6,10 +6,12 @@ import com.example.demo.user.entity.UserEntity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "question")
+@ToString(exclude = {"categoryEntity", "userEntity"})  // toString 순환 참조 방지 _ 24.12.18_yjy
 public class QuestionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
