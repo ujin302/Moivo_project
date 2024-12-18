@@ -128,7 +128,7 @@ public class QuestionServiceImpl implements QuestionService {
         } else if (((title == null || title.isEmpty())) && categoryid != 0) {
             System.out.println("title X = " + " categoryid = " + categoryid);
 //            pageQuestionList = questionRepository.findByCategoryEntityId(categoryid, pageable);  //categoryid로 DB추출 확인완료 12/17 17:10
-            pageQuestionList = questionRepository.findByFixQuestionFalseAndAndCategoryEntity(categoryid, pageable);
+            pageQuestionList = questionRepository.findByFixQuestionFalseAndCategoryEntityId(categoryid, pageable);
 
         } else if (title != null && categoryid == 0) {
             System.out.println("title = " + title + " categoryid X = ");
