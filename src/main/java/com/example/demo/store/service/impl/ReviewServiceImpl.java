@@ -34,7 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private PaymentDetailRepository detailRepository;
 
-    // 24.12.17 - uj (수정)
+// 24.12.17 - uj (수정)
     // 리뷰 작성
     @Override
     public void insertReview(ReviewDTO reviewDTO) {

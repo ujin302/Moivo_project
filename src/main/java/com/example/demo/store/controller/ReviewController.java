@@ -25,10 +25,10 @@ public class ReviewController {
     // 24.12.17 - uj (수정)
     // 리뷰 작성 -> 주문상세 페이지에서 모달 또는 페이지를 따로 띄워서 리뷰 작성 진행.
     @PostMapping("")
-    public ResponseEntity<String> insertReview(@ModelAttribute ReviewDTO reviewDTO) {
+    public ResponseEntity<String> insertReview(@RequestBody ReviewDTO reviewDTO) {
         try {
             reviewService.insertReview(reviewDTO);
-            return ResponseEntity.ok("리뷰 작성");
+            return ResponseEntity.ok("리뷰 작성 성공");
         } catch (RuntimeException e) {
             e.printStackTrace();
             if (e.getMessage().toLowerCase().contains("user")) {
