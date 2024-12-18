@@ -27,5 +27,5 @@ public interface MypageService {
 
     public List<PaymentDetailDTO> getOrderDetails(int paymentId);
 
-    public List<QuestionDTO> getMyQuestion(int id);
+    public Page<QuestionDTO> getMyQuestion(int id, Pageable pageable);
 }

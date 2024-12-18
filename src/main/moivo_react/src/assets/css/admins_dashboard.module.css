@@ -83,3 +83,14 @@
   margin-bottom: 5px;
   font-size: 20px;
 }
+
+/* 링크 스타일 없애기 */
+.clickable {
+  text-decoration: none;
+  color: inherit;
+}
+
+.clickable:hover {
+  text-decoration: none;
+  color: inherit;
+}

@@ -174,5 +174,13 @@ public class QuestionServiceImpl implements QuestionService {
         return map;
     }
 
+    // FAQ 목록 조회
+    @Override
+    public List<QuestionDTO> getFaqList() {
+        List<QuestionEntity> faqEntities = questionRepository.findByFixQuestionTrueOrderByQuestionDateDesc();
+        return faqEntities.stream()
+                .map(QuestionDTO::toGetQuestionDTO)
+                .collect(Collectors.toList());
+    }
 
 }

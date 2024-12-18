@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import admin_productupdate from "../../assets/css/admins_productupdate.module.css";
-import axios from "axios";
 import Admins_side from '../../components/admin_sidebar/admins_side';
-import { PATH } from "../../../scripts/path";
 import { Link } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosConfig';
 
 const Admins_productupdate = () => {
   const productId = 40; // 수정 상품 Id
@@ -43,7 +42,7 @@ const Admins_productupdate = () => {
 
   useEffect(() => {
     // 카테고리 정보 가져오기
-    axios.get(`${PATH.SERVER}/api/admin/store/category`).then((res) => {
+    axiosInstance.get(`/api/admin/store/category`).then((res) => {
       if (Array.isArray(res.data)) {
         setCategories(res.data);
         console.log(res.data);
@@ -52,14 +51,14 @@ const Admins_productupdate = () => {
       }
 
       // 성별 정보 가져오기
-      axios.get(`${PATH.SERVER}/api/admin/store/gender`).then((res) => {
+      axiosInstance.get(`/api/admin/store/gender`).then((res) => {
         if (Array.isArray(res.data)) {
           setGenders(res.data);
         }
       });
     });
 
-    axios.get(`${PATH.SERVER}/api/store/${productId}`).then((res) => {
+    axiosInstance.get(`/api/store/${productId}`).then((res) => {
       console.log(res.data);
       // 상품 정보 설정
       setProduct({
@@ -225,8 +224,8 @@ const Admins_productupdate = () => {
 
     console.log(formData);
     try {
-      const response = await axios.put(
-        `${PATH.SERVER}/api/admin/store/product`,
+      const response = await axiosInstance.put(
+        `/api/admin/store/product`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

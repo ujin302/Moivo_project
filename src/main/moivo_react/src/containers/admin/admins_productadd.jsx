@@ -4,6 +4,7 @@
   import { PATH } from "../../../scripts/path";
   import Admins_side from '../../components/admin_sidebar/admins_side';
   import { Link } from 'react-router-dom';
+  import axiosInstance from '../../utils/axiosConfig';
 
   const Admins_ProductAdd = () => {
     const [product, setProduct] = useState({
@@ -42,7 +43,7 @@
 
     useEffect(() => {
       // 카테고리 정보 가져오기
-      axios.get(`${PATH.SERVER}/api/admin/store/category`).then((res) => {
+      axiosInstance.get(`/api/admin/store/category`).then((res) => {
         if (Array.isArray(res.data)) {
           setCategories(res.data);
         } else {
@@ -51,7 +52,7 @@
       });
 
       // 성별 정보 가져오기
-      axios.get(`${PATH.SERVER}/api/admin/store/gender`).then((res) => {
+      axiosInstance.get(`/api/admin/store/gender`).then((res) => {
         if (Array.isArray(res.data)) {
           setGenders(res.data);
         }
@@ -144,8 +145,8 @@
       formData.append("layer4", files.layer4); // 단일 파일
 
       try {
-        const response = await axios.post(
-          `${PATH.SERVER}/api/admin/store/product`,
+        const response = await axiosInstance.post(
+          `/api/admin/store/product`,
           formData,
           {
             headers: {

@@ -1,22 +1,18 @@
 package com.example.demo.payment.repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.entity.PaymentEntity.DeliveryStatus;
 
+// import feign.Param; 오류 import
+import org.springframework.data.repository.query.Param; // 추가수정 12.18 14:56 성찬
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import org.springframework.data.repository.query.Param; 
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer> {
