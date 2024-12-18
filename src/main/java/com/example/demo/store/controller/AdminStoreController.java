@@ -18,7 +18,11 @@ import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,7 +40,7 @@ public class AdminStoreController {
     @Autowired
     private AdminStoreService adminStoreService;
 
-    // 상품 등록
+    // 상품 등록 - uj
     @PostMapping("/product")
     public ResponseEntity<String> saveProduct(
             // 1. 카테고리 관련 매개변수 필요 >> int형
@@ -72,14 +76,14 @@ public class AdminStoreController {
         return ResponseEntity.ok(null);
     }
 
-    // 상품 등록 화면 카테고리 출력
+    // 상품 등록 화면 카테고리 출력 - uj
     @GetMapping("/category")
     public ResponseEntity<List<ProductCategoryDTO>> getCategory() {
         List<ProductCategoryDTO> list = productService.getCategory();
         return ResponseEntity.ok(list);
     }
 
-    // 상품 수정 - 24.11.25, 26, 27 - 이유진
+    // 상품 수정 - 24.11.25, 26, 27 - uj
     @PutMapping("/product")
     public ResponseEntity<String> putProduct(
             @ModelAttribute ProductDTO productDTO,
@@ -144,14 +148,14 @@ public class AdminStoreController {
         return ResponseEntity.ok(deletedProducts);
     }
 
-    //삭제된 상품 복구 - 12.11 sumin
+    // 삭제된 상품 복구 - 12.11 sumin
     @PostMapping("/restore/{productId}")
     public ResponseEntity<Void> restoreProduct(@PathVariable(name = "productId") int productId) {
         System.out.println("productId = " + productId);
 
         boolean result = productService.restoreProduct(productId);
         System.out.println("result = " + result);
-        
+
         if (result) {
             return ResponseEntity.ok().build(); // 성공 시 200 OK
         } else {
@@ -159,7 +163,7 @@ public class AdminStoreController {
         }
     }
 
-    //관리자 상품 현황 조회 - 24.12.13 - yjy
+    // 관리자 상품 현황 조회 - 24.12.13 - yjy
     @GetMapping("/product/status")
     public ResponseEntity<?> getProductStatus() {
         try {
@@ -170,5 +174,33 @@ public class AdminStoreController {
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
         }
     }
-    
+
+    // 관리자 상품목록 가져오기, 카테고리 or 키워드별 검색 후 페이징처리 -12/16 17:31 tang
+    @GetMapping("/list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllProductList(
+            @PageableDefault(page = 0, size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "block", required = false, defaultValue = "3") int block,
+            @RequestParam(name = "sortby", required = false, defaultValue = "0") int sortby,
+            @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid,
+            @RequestParam(name = "keyword", required = false) String keyword) {
+        Map<String, Object> datamap = new HashMap<>();
+        datamap.put("pageable", pageable); // 페이지 처리
+        datamap.put("block", block); // 한 페이지당 보여줄 숫자
+        datamap.put("sortby", sortby); // 정렬 기준
+        datamap.put("categoryid", categoryid); // 카테고리 정렬 기준
+        datamap.put("keyword", keyword); // 검색어
+
+        Map<String, Object> map = adminStoreService.getAllProductList(datamap);
+
+        // 값 존재 X
+        if (map == null) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+        }
+
+        System.out.println("Controller map = " + map);
+
+        // 값 존재 O
+        return ResponseEntity.ok(map);
+    }
 }

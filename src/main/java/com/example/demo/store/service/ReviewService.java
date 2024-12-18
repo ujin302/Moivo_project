@@ -24,7 +24,12 @@ public interface ReviewService {
     // 리뷰 삭제
     public void deleteReview(int reviewId);
 
-    // 결제상세ID로 리뷰 조회 메서드 추가
+    // 리뷰 조회
+    public ReviewDTO getReview(int reviewId);
+
+    // 결제상세ID로 리뷰 조회
     public ReviewDTO getReviewByPaymentDetailId(int paymentDetailId);
+
+
 
 }
