@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
+import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
@@ -23,4 +24,6 @@ public interface MypageService {
     public List<PaymentDTO> getOrderInfo(String tosscode);
 
     public List<PaymentDetailDTO> getOrderDetails(int paymentId);
+
+    public List<QuestionDTO> getMyQuestion(int id);
 }
