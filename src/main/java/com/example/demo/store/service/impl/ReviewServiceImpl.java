@@ -38,23 +38,30 @@ public class ReviewServiceImpl implements ReviewService {
     // 리뷰 작성
     @Override
     public void insertReview(ReviewDTO reviewDTO) {
+        System.out.println("ReviewDTO: " + reviewDTO);
+        
         UserEntity userEntity = userRepository.findById(reviewDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("UserEntity found: " + userEntity);
 
         PaymentDetailEntity paymentDetailEntity = detailRepository.findById(
-                reviewDTO.getPaymentDetailId()).orElseThrow();
+                reviewDTO.getPaymentDetailId())
+                .orElseThrow(() -> new RuntimeException("PaymentDetail not found"));
+        System.out.println("PaymentDetailEntity found: " + paymentDetailEntity);
 
-        // 리뷰 중복 작성 방지
-        System.out.println("리뷰 작성 여부 : " + paymentDetailEntity.isWriteReview());
         if (!paymentDetailEntity.isWriteReview()) {
-            ProductEntity productEntity = productRepository.findById(reviewDTO.getProductId()).orElseThrow();
+            ProductEntity productEntity = productRepository.findById(reviewDTO.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            System.out.println("ProductEntity found: " + productEntity);
 
             ReviewEntity entity = ReviewEntity.toSaveReviewEntity(
                     reviewDTO, userEntity,
                     productEntity, paymentDetailEntity);
+            System.out.println("ReviewEntity created: " + entity);
 
             // 리뷰 저장
             reviewRepository.save(entity);
+            System.out.println("Review saved successfully");
 
             // 리뷰 작성 여부 저장
             paymentDetailEntity.setWriteReview(true);
@@ -62,8 +69,6 @@ public class ReviewServiceImpl implements ReviewService {
         } else {
             throw new RuntimeException("결제 상품에 대한 리뷰를 이미 작성하였습니다.");
         }
-
-        System.out.println("리뷰 작성 성공");
     }
 
     // 리뷰 조회 (페이징 처리)

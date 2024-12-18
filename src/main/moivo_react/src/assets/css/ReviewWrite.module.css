@@ -113,28 +113,6 @@
   animation: starBurst 0.5s ease-out;
 }
 
-.reviewWriteContainer .imageUpload {
-  margin-bottom: 20px;
-}
-
-.reviewWriteContainer .imageUpload label {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #ff385c;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.reviewWriteContainer .imageUpload label:hover {
-  background-color: #e00007;
-}
-
-.reviewWriteContainer .imageUpload input[type="file"] {
-  display: none;
-}
-
 .reviewWriteContainer .preview {
   margin-bottom: 20px;
   padding: 20px;
@@ -188,27 +166,6 @@
     transform: scale(1.5);
     opacity: 0;
   }
-}
-
-.reviewWriteContainer .emojiPicker {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.reviewWriteContainer .emoji {
-  font-size: 2rem;
-  cursor: pointer;
-  margin: 0 5px;
-  transition: transform 0.2s ease;
-}
-
-.reviewWriteContainer .emoji:hover {
-  transform: scale(1.2);
-}
-
-.reviewWriteContainer .emoji.selected {
-  transform: scale(1.2);
 }
 
 .reviewWriteContainer .reviewStats {
