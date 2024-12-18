@@ -19,26 +19,32 @@ public class PaymentScheduler {
     private PaymentRepository paymentRepository;
 
     @Transactional
-    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    //@Scheduled(fixedRate = 60000) // 1분마다 실행
     public void updateDeliveryStatus() {
         // 전체 결제 내역 가져오기
         List<PaymentEntity> payments = paymentRepository.findAll();
-
+    
         LocalDateTime now = LocalDateTime.now(); // 현재 시간
-
+    
         for (PaymentEntity payment : payments) {
             // CONFIRMED 상태는 더 이상 변경하지 않음
             if (payment.getDeliveryStatus() == DeliveryStatus.CONFIRMED) {
                 continue;
             }
-
-            // 결제 후 30분이 지났는지 확인
+    
+            // 결제 날짜가 null인지 확인
             LocalDateTime paymentDate = payment.getPaymentDate();
+            if (paymentDate == null) {
+                System.err.println("Null paymentDate detected for Payment ID: " + payment.getId());
+                continue; // Null 데이터는 건너뜁니다.
+            }
+    
+            // 결제 후 30분이 지났는지 확인
             long minutesPassed = java.time.Duration.between(paymentDate, now).toMinutes();
-
+    
             if (minutesPassed >= 30) { // 30분이 지난 경우 상태 업데이트
                 DeliveryStatus currentStatus = payment.getDeliveryStatus();
-
+    
                 switch (currentStatus) {
                     case PAYMENT_COMPLETED:
                         payment.setDeliveryStatus(DeliveryStatus.READY);
@@ -52,7 +58,7 @@ public class PaymentScheduler {
                     default:
                         break;
                 }
-
+    
                 // 상태가 변경되었으므로 저장
                 paymentRepository.save(payment);
             }

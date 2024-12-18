@@ -55,7 +55,7 @@ public class MypageServiceImpl implements MypageService {
     // @Autowired
     // private AttendanceRepository attendanceRepository; // 출석
 
-    // 마이페이지 사용자 정보 가져오기
+    // 마이페이지 사용자 정보 가져오기 - sumin
     @Override
     public UserDTO getUserInfo(int userId) {
         UserEntity userEntity = userRepository.findById(userId)
@@ -95,7 +95,7 @@ public class MypageServiceImpl implements MypageService {
         }
 
         // UserDTO 변환
-        UserDTO userDTO = UserEntity.toGetUserDTO(userEntity);
+        UserDTO userDTO = UserDTO.toGetUserDTO(userEntity);
         userDTO.setTotalSpent(totalSpent);
         userDTO.setGrade(grade);
         userDTO.setNextLevelTarget(nextLevelTarget);
@@ -130,7 +130,8 @@ public class MypageServiceImpl implements MypageService {
         System.out.println("다음 등급까지 남은 금액: " + nextLevelTarget);
         return userDTO;
     }
-    // 성별에따른 상품 추천 리스트 가져오기
+    
+    // 성별에따른 상품 추천 리스트 가져오기 - sumin
     @Override
     public List<ProductDTO> getProductList(int userId) {
         UserEntity userEntity = userRepository.findById(userId)
@@ -250,4 +251,6 @@ public class MypageServiceImpl implements MypageService {
         
         return paymentDetailDTOList;
     }
+
+    
 }
