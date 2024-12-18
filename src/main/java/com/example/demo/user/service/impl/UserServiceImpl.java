@@ -397,6 +397,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
     }
 
+    // 회원정보 삭제 전 비밀번호 확인 - sumin (2024.12.12)
     public boolean checkPassword(int userId, String password) {
         // 사용자 정보 조회
         UserEntity userEntity = userRepository.findById(userId)
@@ -413,6 +414,7 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    // 회원정보 삭제 - sumin (2024.12.12)
     public void deleteUser(int userId) {
         // 사용자 정보 조회
         UserEntity userEntity = userRepository.findById(userId)

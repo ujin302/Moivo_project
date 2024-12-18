@@ -1,7 +1,9 @@
 package com.example.demo.payment.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,6 +29,12 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
         // 24.12.13 - 배송 현황에 따른 개수 - uj
         public long countByDeliveryStatus(PaymentEntity.DeliveryStatus paymentCompleted);
 
+        // 2024.12.15 - 사용자 누적 금액 계산 - sumin
+        // 특정 사용자의 월별 총 결제 금액 조회
+        @Query("SELECT SUM(p.totalPrice) FROM PaymentEntity p WHERE p.userEntity.id = :userid")
+        public long sumTotalPriceByUserId(@Param("userid") Integer userid);    
+        
+
         // 24.12.13 - 날짜별 매출액 - uj
         @Query("SELECT SUM(p.totalPrice) FROM PaymentEntity p WHERE p.paymentDate BETWEEN :startOfDay AND :endOfDay")
         Long sumTotalPriceByPaymentDate(
@@ -37,3 +45,4 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
         @Query("SELECT SUM(p.totalPrice) FROM PaymentEntity p")
         public long sumTotalPrice();
 }
+

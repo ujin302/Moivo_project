@@ -33,9 +33,9 @@ public class MypageController {
     // 회원 정보 (포스트맨 테스트 성공)
     @GetMapping("/info/{id}")
     public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) { 
-
+        System.out.println("회원정보 조회 컨트롤러");
         UserDTO userInfo = mypageService.getUserInfo(id);
-        System.out.println(userInfo);
+        System.out.println("userInfo = " + userInfo);
         return ResponseEntity.ok(userInfo);
     }
 

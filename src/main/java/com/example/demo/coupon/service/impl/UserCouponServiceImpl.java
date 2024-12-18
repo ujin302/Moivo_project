@@ -45,7 +45,6 @@ public class UserCouponServiceImpl implements UserCouponService {
     
         // 3. 기존에 해당 사용자가 보유한 쿠폰을 조회
         List<UserCouponEntity> userCoupons = userCouponRepository.findByUserEntity_Id(userId);
-        System.out.println("userCoupons = " + userCoupons);
     
         // 4. 동일 등급의 쿠폰이 이미 있는지 확인
         UserCouponEntity existingCoupon = userCoupons.stream()
