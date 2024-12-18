@@ -65,9 +65,11 @@ public class SecurityConfig {
                                 "/api/user/social/kakao/login", // 카카오 로그인
                                 "/api/store/**",
                                 "/api/oauth/**",
+                                "/api/user/mypage/orders/**",
                                 "/oauth/**",
                                 "/api/mail/success",
-                                "/api/user/question")
+                                "/api/user/question",
+                                "/api/user/question/faq/list")
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

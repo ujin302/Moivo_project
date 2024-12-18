@@ -2,14 +2,17 @@ package com.example.demo.qna.entity;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.user.entity.UserEntity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
 @Table(name = "question")
+@ToString(exclude = {"categoryEntity", "userEntity"})  // toString 순환 참조 방지 _ 24.12.18_yjy
 public class QuestionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,8 +43,8 @@ public class QuestionEntity {
     @Column(name = "responsedate")
     private LocalDateTime responseDate; // 응답 일시 (NULL이면 미응답)
 
-    @Column(name = "secret")
-    private String secret; // 비밀 글 (비밀글이 아닐 경우, Null)
+    @Column(name = "privatepwd")
+    private String privatePwd; // 비밀 글 비밀번호, 일반글이면 null
 
     @Column(name = "fixquestion", nullable = false)
     private Boolean fixQuestion = false; // 고정 글일 경우, True
@@ -51,19 +54,15 @@ public class QuestionEntity {
 //        this.questionDate = LocalDateTime.now(); // 현재 시간을 설정
 //    }
 
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
-
-    public LocalDateTime getResponseDate() {
-        return responseDate;
-    }
-
-    public void setResponseDate(LocalDateTime responseDate) {
-        this.responseDate = responseDate;
+    // DTO -> Entity 변환
+    public static QuestionEntity tosaveQuestionEntity(QuestionDTO questionDTO, QuestionCategoryEntity questionCategoryEntity, UserEntity userEntity){
+        QuestionEntity questionEntity = new QuestionEntity();
+        questionEntity.setFixQuestion(questionDTO.getFixQuestion());
+        questionEntity.setPrivatePwd(questionDTO.getPrivatePwd());
+        questionEntity.setTitle(questionDTO.getTitle()); //제목
+        questionEntity.setContent(questionDTO.getContent()); //내용
+        questionEntity.setCategoryEntity(questionCategoryEntity); //문의 카테고리
+        questionEntity.setUserEntity(userEntity); //userId 받아온거로 userRepository에서 찾아서 questionEntity의 UserEntity에 셋팅
+        return questionEntity;
     }
 }

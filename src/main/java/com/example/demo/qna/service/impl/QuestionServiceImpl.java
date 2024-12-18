@@ -1,9 +1,11 @@
 package com.example.demo.qna.service.impl;
 
 import com.example.demo.qna.dto.QuestionDTO;
+import com.example.demo.qna.entity.QuestionCategoryEntity;
 import com.example.demo.qna.entity.QuestionEntity;
 import com.example.demo.qna.repository.QuestionCategoryRepository;
 import com.example.demo.qna.repository.QuestionRepository;
+import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,22 +35,19 @@ public class QuestionServiceImpl implements QuestionService {
 
     //문의사항 추가
     @Override
-    public QuestionEntity addQuestion(QuestionDTO questionDTO) {
+    public void addQuestion(QuestionDTO questionDTO) {
 
         QuestionEntity questionEntity = new QuestionEntity();
         //여기서 로그인한 아이디를 받아오는 방법? 재영이가 jwt 사용시 다른방법으로 가능. 현재는 프론트에서 id 를 받아옴
 //        questionEntity.setQuestionDate(questionDTO.getQuestionDate()); //시간은 자동으로 등록되므로 필요 X
         System.out.println("프론트에서 받아온 questionDTO = " +questionDTO);
         System.out.println("프론트에서 받아온 id = " + questionDTO.getUserId()); // QuestionDTO의 userid는 user 테이블 id 값임
-        questionEntity.setTitle(questionDTO.getTitle()); //제목
-        questionEntity.setContent(questionDTO.getContent()); //내용
-        questionEntity.setSecret(questionDTO.getSecret()); //비밀글 여부
-        questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId()).get()); //문의 카테고리
-        questionEntity.setUserEntity(userRepository.findById(questionDTO.getUserId()).get()); //userId 받아온거로 userRepository에서 찾아서 questionEntity의 UserEntity에 셋팅
         System.out.println("questionEntity Id 저장 전 = " + questionEntity);
+        QuestionCategoryEntity questionCategoryEntity = questionCategoryRepository.findById(questionDTO.getCategoryId()).orElseThrow();
+        UserEntity userEntity = userRepository.findById(questionDTO.getUserId()).orElseThrow();
+        questionEntity = QuestionEntity.tosaveQuestionEntity(questionDTO, questionCategoryEntity, userEntity);
         questionRepository.save(questionEntity);
         System.out.println("questionEntity Id 저장 후 = " + questionEntity);
-        return questionEntity;
     }
 
     //문의사항 수정
@@ -62,9 +61,6 @@ public class QuestionServiceImpl implements QuestionService {
         System.out.println("수정한 글 번호 questionEntity.getId() = " + questionEntity.getId());
         questionEntity.setTitle(questionDTO.getTitle()); //제목
         questionEntity.setContent(questionDTO.getContent()); //내용
-        questionEntity.setSecret(questionDTO.getSecret()); //비밀글 여부
-        questionEntity.setCategoryEntity(questionCategoryRepository.findById(questionDTO.getCategoryId()).get()); //문의 카테고리
-        questionEntity.setUserEntity(userRepository.findById(questionDTO.getUserId()).get()); //UserEntity 셋팅
         System.out.println("수정한 questionEntity = " + questionEntity);
         questionRepository.save(questionEntity);
     }
@@ -73,9 +69,25 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void deleteQuestion(QuestionDTO questionDTO) {
         QuestionEntity questionEntity = questionRepository.findById(questionDTO.getId()).get(); //Question 레포지토리에서 Question Id(글 번호)로 등록한 글 찾기
-
         questionRepository.delete(questionEntity);
     }
+    
+    //문의사항 비밀글 조회
+    //프론트에서 받아온 게시글번호랑 비밀번호로 그 게시글번호에 맞는 글을 찾아서 비밀번호 맞으면 true 틀리면 false
+    @Override
+    public String privateBoardCheck(String privatepwd, int id){
+
+        QuestionEntity questionEntity = questionRepository.findQuestionById(id); //받아온 게시글 id로 id에 맞는 게시글 조회
+
+        if(questionEntity.getPrivatePwd().equals(privatepwd)){
+            //입력한 비밀번호와 게시글 비밀번호가 일치하면
+            return "true";
+        } else {
+            //입력한 비밀번호와 게시글 비밀번호가 틀리면
+            return "false";
+        }
+    }
+
 
 
     //문의 리스트, 검색, 정렬
@@ -107,21 +119,10 @@ public class QuestionServiceImpl implements QuestionService {
 
         Page<QuestionEntity> pageQuestionList = null;
 
-        //문의 리스트 출력부분
-        //title이 null이고 문의카테고리 0일때 전체문의 출력
-        //title이 null이고 문의카테고리 1일때 문의카테고리가 1인 문의 출력
-        //title이 null이고 문의카테고리 2일때 문의카테고리가 2인 문의 출력
-        //title이 null이고 문의카테고리 3일때 문의카테고리가 3인 문의 출력
-        //title이 null이고 문의카테고리 4일때 문의카테고리가 4인 문의 출력
-
-        //title이 null이 아니고 문의카테고리 0일때 전체문의중 title에 맞는 문의 출력
-        //title이 null이 아니고 문의카테고리 1일때 title이 들어가고 문의카테고리가 1인 문의 출력
-        //title이 null이 아니고 문의카테고리 2일때 title이 들어가고 문의카테고리가 2인 문의 출력
-        //title이 null이 아니고 문의카테고리 3일때 title이 들어가고 문의카테고리가 3인 문의 출력
-        //title이 null이 아니고 문의카테고리 4일때 title이 들어가고 문의카테고리가 4인 문의 출력
         if ((title == null || title.isEmpty()) && categoryid == 0) { //전체검색
             System.out.println("title X = " + " categoryid X = 전체검색");
-            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
+            pageQuestionList = questionRepository.findAllByFixquestion(pageable);
+//            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
         }
         else if(((title == null || title.isEmpty())) && categoryid != 0) {
             System.out.println("title X = " + " categoryid = " + categoryid );
@@ -173,5 +174,13 @@ public class QuestionServiceImpl implements QuestionService {
         return map;
     }
 
+    // FAQ 목록 조회
+    @Override
+    public List<QuestionDTO> getFaqList() {
+        List<QuestionEntity> faqEntities = questionRepository.findByFixQuestionTrueOrderByQuestionDateDesc();
+        return faqEntities.stream()
+                .map(QuestionDTO::toGetQuestionDTO)
+                .collect(Collectors.toList());
+    }
 
 }

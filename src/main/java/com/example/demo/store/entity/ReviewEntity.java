@@ -38,7 +38,7 @@ public class ReviewEntity { // 리뷰
     // 결제 상품 1개 : 리뷰 1개
     @OneToOne
     @JoinColumn(name = "paymentdetailid", nullable = false)
-    private PaymentDetailEntity PaymentDetailEntity; // 결제제 상세 고유 키
+    private PaymentDetailEntity paymentDetailEntity; // 결제제 상세 고유 키
 
     @Column(name = "rating", nullable = false)
     private int rating; // 평점 (1~5)
@@ -67,8 +67,16 @@ public class ReviewEntity { // 리뷰
     }
 
     public void updateReview(ReviewDTO reviewDTO) {
+        if (reviewDTO.getRating() < 1 || reviewDTO.getRating() > 5) {
+            throw new IllegalArgumentException("별점은 1-5 사이여야 합니다.");
+        }
+        if (reviewDTO.getContent() == null || reviewDTO.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("리뷰 내용은 필수입니다.");
+        }
+        
         this.rating = reviewDTO.getRating();
-        this.content = reviewDTO.getContent();
+        this.content = reviewDTO.getContent().trim();
+        this.reviewDate = LocalDateTime.now(); // 수정 시간 업데이트
     }
 
 }
