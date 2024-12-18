@@ -95,7 +95,7 @@ const ReviewWrite = () => {
                 <div className={styles.productInfo} data-tooltip="구매하신 상품 정보입니다">
                     <h2>{productName}</h2>
                     <p>구매일: {new Date(orderDate).toLocaleDateString()}</p>
-                    <p>사이즈: {size}</p>
+                    <p>사이즈:  {size}</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
