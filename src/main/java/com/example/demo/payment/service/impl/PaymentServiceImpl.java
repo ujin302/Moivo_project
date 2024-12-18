@@ -78,10 +78,18 @@ public class PaymentServiceImpl implements PaymentService {
         // 0-3. Json -> isCartItem 변환
         Boolean isCartItem = Boolean.parseBoolean(map.get("isCartItem").toString());
         System.out.println("Json -> isCartItem: " + isCartItem);
-
+        
+        // 중복된 TOSS 코드 검사
+        if (paymentRepository.existsByTossCode(paymentDTO.getTosscode())) {
+            throw new RuntimeException("이미 처리된 결제 정보가 존재합니다. TOSS 코드: " + paymentDTO.getTosscode());
+        }
+        
         // 1, 필요한 Entity 추출
-        UserEntity userEntity = userRepository.findById(paymentDTO.getUserId()).orElseThrow();
-        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId()).orElseThrow();
+        UserEntity userEntity = userRepository.findById(paymentDTO.getUserId())
+        .orElseThrow(() -> new RuntimeException("사용자 ID " + paymentDTO.getUserId() + "에 해당하는 사용자가 존재하지 않습니다."));
+        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId())
+        .orElseThrow(() -> new RuntimeException("사용자 ID " + userEntity.getId() + "에 해당하는 장바구니가 존재하지 않습니다."));
+        
 
         // 2. payment 저장
         paymentDTO.setCount(detailDTOList.size());
