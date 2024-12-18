@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.entity.QuestionEntity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,4 +81,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     // 문의리스트 문의 카테고리만 검색
     Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
+
+    // 마이페이지 나의 문의 리스트 조회 - 강민 12/18 11:06
+    public List<QuestionEntity> findByUserEntity_Id(Integer userId);
 }

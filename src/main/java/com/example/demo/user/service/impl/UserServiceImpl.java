@@ -8,16 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.coupon.service.UserCouponService;
@@ -384,6 +378,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setAddr2(userDTO.getAddr2());
         userEntity.setZipcode(userDTO.getZipcode());
         userEntity.setTel(userDTO.getTel());
+        userEntity.setBirth(userDTO.getBirth());
         userEntity.setEmail(userDTO.getEmail());
         userEntity.setHeight(userDTO.getHeight());
         userEntity.setWeight(userDTO.getWeight());
@@ -397,6 +392,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
     }
 
+    // 회원정보 삭제 전 비밀번호 확인 - sumin (2024.12.12)
     public boolean checkPassword(int userId, String password) {
         // 사용자 정보 조회
         UserEntity userEntity = userRepository.findById(userId)
@@ -413,6 +409,7 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    // 회원정보 삭제 - sumin (2024.12.12)
     public void deleteUser(int userId) {
         // 사용자 정보 조회
         UserEntity userEntity = userRepository.findById(userId)
@@ -435,7 +432,7 @@ public class UserServiceImpl implements UserService {
         // 3. 사용자 삭제
         userRepository.delete(userEntity);
     }
-    
+
     @Override
     public boolean isUserAdmin(int id) {
         UserEntity userEntity = userRepository.findById(id)

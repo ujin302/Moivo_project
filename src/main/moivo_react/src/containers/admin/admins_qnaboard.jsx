@@ -78,7 +78,7 @@ const Admins_qnaboard = () => {
                 { response: responseInput }
             );
 
-            console.log('Server response:', response);
+            // console.log('Server response:', response);
 
             if (response.status === 200) {
                 await fetchQuestions();
@@ -443,7 +443,7 @@ const Admins_qnaboard = () => {
                                 className={admin_qnaboard.modalInput}
                                 value={responseInput}
                                 onChange={(e) => setResponseInput(e.target.value)}
-                                placeholder="수정할 답변을 입력해주세��..."
+                                placeholder="수정할 답변을 입력해주세요..."
                                 required
                             ></textarea>
                             <div className={admin_qnaboard.modalButtons}>
