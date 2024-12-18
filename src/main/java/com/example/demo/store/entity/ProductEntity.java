@@ -28,6 +28,22 @@ public class ProductEntity { // 상품
         ALL, MAN, WOMAN
     }
 
+    public enum ProductStatus {
+        EXIST(""), // 모든 재고가 존재
+        SOMESOLDOUT("일부 품절"), // 일부 품절
+        SOLDOUT("전체 품절"); // 전체 품절
+
+        private final String description;
+
+        ProductStatus(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -50,6 +66,10 @@ public class ProductEntity { // 상품
 
     @Column(name = "isdelete", nullable = false)
     private Boolean delete = false; // 상품 삭제 시, true로 변경
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ProductStatus status = ProductStatus.EXIST;
 
     // 상품 n개 : 카테고리 1개
     @ManyToOne
@@ -92,6 +112,7 @@ public class ProductEntity { // 상품
         entity.setContent(dto.getContent());
         entity.setPrice(dto.getPrice());
         entity.setGender(dto.getGender());
+        entity.setStatus(dto.getStatus());
 
         return entity;
     }

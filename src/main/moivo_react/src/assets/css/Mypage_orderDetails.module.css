@@ -541,3 +541,33 @@
         height: 100%;
     }
 }
+
+.editReviewButton {
+    font-family: 'GmarketSans', serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 15px;
+    margin-top: 8px;
+    background-color: #988c736f;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.editReviewButton:hover {
+    background-color: #988C73;
+    transform: scale(1.05);
+}
+
+.reviewCompleteText {
+    color: #2F2E2C;
+    font-weight: bold;
+}
+
+@media (max-width: 576px) {
+    .editReviewButton {
+        font-size: 16px;
+        padding: 8px 15px;
+    }
+}

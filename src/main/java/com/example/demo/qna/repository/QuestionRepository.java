@@ -57,9 +57,6 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 문의 삭제
     public void deleteById(Integer id);
 
-    // 문의리스트 제목만 검색
-    public Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
-
     // 답변 상태로 문의 조회
     @Query("SELECT q FROM QuestionEntity q WHERE q.response IS NOT NULL")
     public List<QuestionEntity> findAllWithResponse();
@@ -80,12 +77,29 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion = true ORDER BY q.questionDate DESC")
     List<QuestionEntity> findByFixQuestionTrueOrderByQuestionDateDesc();
 
-    // 문의리스트 제목, 카테고리 검색
-    Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
+    //문의리스트 전체검색 fixquestion이 false 것만
+    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false ")
+    Page<QuestionEntity> findAllByFixquestion(Pageable pageable);
+
+    // 문의리스트 제목만 검색
+    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false  AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%'))")
+    public Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     // 문의리스트 문의 카테고리만 검색
+    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false AND q.categoryEntity.id=:categoryid")
     Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
 
+    // 문의리스트 제목, 카테고리 검색
+    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion = false AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%')) AND q.categoryEntity.id = :categoryid")
+    Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
+
+
+    // 문의리스트 비밀글 조회
+    @Query("SELECT q FROM QuestionEntity q WHERE q.id=:id")
+    QuestionEntity findQuestionById(@Param("id") int id);
+//
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.secret IS FALSE")
+//    Page<QuestionEntity> findBySecret(Pageable pageable);
     // 마이페이지 나의 문의 리스트 조회 - 강민 12/18 11:06
     Page<QuestionEntity> findByUserEntity_Id(Integer userId, Pageable pageable);
 }
