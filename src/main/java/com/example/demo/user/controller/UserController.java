@@ -94,24 +94,23 @@ public class UserController {
     @GetMapping("/info")
     public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
         try {
+            // Bearer 토큰에서 실제 토큰 값 추출
             String actualToken = token.substring(7);
-            System.out.println("토큰 검증 시작: " + actualToken); // 디버깅 로그 추가
+
+            // 토큰 유효성 검사
+            if (!userService.validateToken(actualToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "유효하지 않은 토큰입니다."));
+            }
 
             // 토큰에서 사용자 정보 추출
-            Map<String, Object> userData = jwtUtil.getUserDataFromToken(actualToken);
-            System.out.println("토큰에서 추출한 사용자 데이터: " + userData); // 디버깅 로그 추가
+            Map<String, Object> userData = userService.getUserDataFromToken(actualToken);
+            String userId = (String) userData.get("userId");
 
-            // Integer로 형변환 (String이 아님)
-            Integer userId = (Integer) userData.get("id");
-            
             // 사용자 정보 조회
-            UserDTO userInfo = userService.findUserById(String.valueOf(userId));
-            System.out.println("조회된 사용자 정보: " + userInfo); // 디버깅 로그 추가
-            
+            UserDTO userInfo = userService.findUserById(userId);
             return ResponseEntity.ok(userInfo);
         } catch (Exception e) {
-            System.err.println("사용자 정보 조회 실패: " + e.getMessage());
-            e.printStackTrace(); // 스택 트레이스 출력
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", e.getMessage()));
         }
