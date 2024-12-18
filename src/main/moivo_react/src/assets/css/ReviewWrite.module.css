@@ -263,9 +263,9 @@
 
 .ratingStars {
   display: flex;
-  padding-bottom: 0.375em;
-  position: relative;
-  z-index: 1;
+  flex-direction: row-reverse;
+  gap: 5px;
+  justify-content: flex-end;
 }
 
 .ratingStars::after {
@@ -302,11 +302,8 @@
 }
 
 .ratingStarFill {
-  fill: #ffdd00;
-  transform: scale(0);
-  transition:
-    fill 0.3s cubic-bezier(0.42,0,0.58,1),
-    transform 0.3s cubic-bezier(0.42,0,0.58,1);
+  fill: #ddd;
+  transition: fill 0.3s ease;
 }
 
 .ratingStarLine {
@@ -316,7 +313,6 @@
 
 .ratingStarStroke {
   stroke: #ddd;
-  transition: stroke 0.3s;
 }
 
 .ratingLabel {
@@ -1021,5 +1017,84 @@
   .ratingStars:hover {
     transform: scale(1.05);
   }
+}
+
+/* 별점 선택 효과만 유지 */
+.ratingInput:checked ~ .ratingLabel .ratingStarFill {
+  fill: #ffdd00;
+}
+
+.ratingInput:checked ~ .ratingLabel .ratingStarStroke {
+  stroke: #ffdd00;
+}
+
+/* 선택된 별과 그 이전 별들 채우기 */
+.ratingInput1:checked ~ .ratingLabel:nth-of-type(-n+1) .ratingStarFill,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n+2) .ratingStarFill,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n+3) .ratingStarFill,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n+4) .ratingStarFill,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n+5) .ratingStarFill {
+  fill: #ffdd00;
+}
+
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.reviewActions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.actionButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.editButton {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.editButton:hover {
+    background-color: #45a049;
+}
+
+.deleteButton {
+    background-color: #f44336;
+    color: white;
+}
+
+.deleteButton:hover {
+    background-color: #da190b;
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* .cancelButton {
+    padding: 10px 20px;
+    background-color: #gray;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+} */
+
+.cancelButton:hover {
+    background-color: #666;
 }
 

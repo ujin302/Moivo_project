@@ -8,16 +8,18 @@ import axiosInstance from '../../utils/axiosConfig';
 
 const mypage_board = () => {
   const [MyQnaList, setMyQnaList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
     console.log("* MyQnaList DB : " + MyQnaList);
   },[MyQnaList])
 
-  //12/18 나의 문의 리스트 가져오기 - km 
-  useEffect(() => {
+  //12/18 나의 문의 리스트 가져오기 - km
+  const fetchMyQna = async (page = 0, size = 4) => {
     const token = localStorage.getItem("accessToken");
-        
+      
     if (!token) {
         alert("로그인이 필요합니다.");
         navigate("/user");
@@ -27,20 +29,34 @@ const mypage_board = () => {
     const decodedPayload = JSON.parse(atob(payload));
     const id = decodedPayload.id; 
 
-    const fetchMyQna = async () => {
-      try {
-        // 문의 가져오기
-        const myQuestionResponse = await axiosInstance.get(`/api/user/mypage/question/${id}`);
-        setMyQnaList(myQuestionResponse.data);
+    try {
+      // 문의 가져오기
+      const myQuestionResponse = await axiosInstance.get(`/api/user/mypage/question/${id}`,{
+        params: { page, size, sort: 'id,desc' },
+      });
 
-      } catch (error) {
-        console.error("Error data:", error);
+      if (myQuestionResponse.data && myQuestionResponse.data.content && Array.isArray(myQuestionResponse.data.content)) {
+        setMyQnaList(myQuestionResponse.data.content);
+        setTotalPages(myQuestionResponse.data.totalPages);
+        setCurrentPage(page);
+      } else {
+          console.warn("Unexpected response data format:", myQuestionResponse.data);
+          setMyQnaList([]);
       }
+    } catch (error) {
+      console.error("Error data:", error);
+      setMyQnaList([]);
     }
+  }
 
+  // 페이지네이션 버튼 클릭 시 fetchOrders 호출
+    const handlePageClick = (page) => {
+      fetchMyQna(page);
+  };
+
+  useEffect(() => {
     fetchMyQna();
-
-  },[navigate])
+  }, [navigate]);
 
 
   // 답변 표시 여부 관리 상태
@@ -91,6 +107,19 @@ const mypage_board = () => {
             )}
           </div>
         ))}
+      </div>
+
+      {/* 페이지네이션 */}
+      <div className={styles.pagination}>
+          {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                  key={i}
+                  className={`${styles.pageButton} ${i === currentPage ? styles.active : ""}`}
+                  onClick={() => handlePageClick(i)}
+              >
+                  {i + 1}
+              </button>
+          ))}
       </div>
 
       {/* 메뉴로 돌아가기 */}

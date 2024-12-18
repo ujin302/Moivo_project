@@ -3,8 +3,8 @@ import QnA from '../../assets/css/qna_faqboard.module.css';
 import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import axiosInstance from '../../utils/axiosConfig';
+import axios from 'axios';
 
 const Qna_faqboard = () => {
   // FAQ 열림 상태 관리
@@ -18,10 +18,9 @@ const Qna_faqboard = () => {
     const fetchFAQs = async () => {
       setIsLoading(true);
       try {
-        const response = await axiosInstance.get('/api/admin/faq/list');
+        const response = await axiosInstance.get('/api/user/question/faq/list');
         console.log('API Response:', response.data);
         
-        // response.data가 직접 배열인 경우를 처리
         const faqs = Array.isArray(response.data) ? response.data : [];
         
         if (faqs.length === 0) {
@@ -82,14 +81,14 @@ const Qna_faqboard = () => {
                           <input 
                             id={`faq-${faq.id}`}
                             type="checkbox"
-                            checked={openFAQ === `faq-${faq.id}`}
-                            onChange={() => handleToggle(`faq-${faq.id}`)}
+                            checked={openFAQ === faq.id}
+                            onChange={() => handleToggle(faq.id)}
                           />
                           <label htmlFor={`faq-${faq.id}`}>
                             <p className={QnA.faqHeading}>{faq.title}</p>
                             <div className={QnA.faqArrow}></div>
                           </label>
-                          {openFAQ === `faq-${faq.id}` && (
+                          {openFAQ === faq.id && (
                             <p className={QnA.faqText}>
                               {faq.content}
                             </p>

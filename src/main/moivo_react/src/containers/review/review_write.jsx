@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../utils/axiosConfig';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PATH } from '../../../scripts/path';
 import styles from "../../assets/css/ReviewWrite.module.css";
 import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
-import { FaPen } from 'react-icons/fa';
+import { PATH } from '../../../scripts/path';
 
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('accessToken');
@@ -65,7 +64,7 @@ const ReviewWrite = () => {
             alert('리뷰가 성공적으로 작성되었습니다.');
             navigate('/mypage/order');
         } catch (err) {
-            console.error('에러 발생:', err);
+            console.error('에러 : 발생:', err);
             setError(err.response?.data || '리뷰 작성에 실패했습니다.');
         }
     };
@@ -89,8 +88,9 @@ const ReviewWrite = () => {
             </div>
 
             <div className={styles.reviewWriteContainer}>
+                <br/><br/>
                 <h1>리뷰 작성</h1>
-                {error && <div className={styles.error}>{error}</div>}
+
                 
                 <div className={styles.productInfo} data-tooltip="구매하신 상품 정보입니다">
                     <h2>{productName}</h2>
@@ -101,50 +101,54 @@ const ReviewWrite = () => {
                 <form onSubmit={handleSubmit}>
                     <div className={styles.ratingContainer}>
                         <div className={styles.ratingStars}>
-                            {[...Array(5)].map((_, index) => (
-                                <React.Fragment key={index}>
-                                    <input
-                                        id={`rating-${index + 1}`}
-                                        className={`${styles.ratingInput} ${styles[`ratingInput${index + 1}`]}`}
-                                        type="radio"
-                                        name="rating"
-                                        value={index + 1}
-                                        checked={rating === index + 1}
-                                        onChange={() => handleStarClick(index + 1)}
-                                    />
-                                    <label className={styles.ratingLabel} htmlFor={`rating-${index + 1}`}>
-                                        <svg className={styles.ratingStar} width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-                                            <g transform="translate(16,16)">
-                                                <circle className={styles.ratingStarRing} fill="none" stroke="#000" strokeWidth="16" r="8" transform="scale(0)" />
-                                            </g>
-                                            <g stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <g transform="translate(16,16) rotate(180)">
-                                                    <polygon className={styles.ratingStarStroke} points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07" fill="none" />
-                                                    <polygon className={styles.ratingStarFill} points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07" fill="#000" />
+                            {[...Array(5)].reverse().map((_, index) => {
+                                const ratingValue = 5 - index;
+                                return (
+                                    <React.Fragment key={index}>
+                                        <input
+                                            id={`rating-${ratingValue}`}
+                                            className={`${styles.ratingInput} ${styles[`ratingInput${ratingValue}`]}`}
+                                            type="radio"
+                                            name="rating"
+                                            value={ratingValue}
+                                            checked={rating === ratingValue}
+                                            onChange={() => handleStarClick(ratingValue)}
+                                        />
+                                        <label className={styles.ratingLabel} htmlFor={`rating-${ratingValue}`}>
+                                            <svg className={styles.ratingStar} width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                                                <g transform="translate(16,16)">
+                                                    <circle className={styles.ratingStarRing} fill="none" stroke="#000" strokeWidth="16" r="8" transform="scale(0)" />
                                                 </g>
-                                                <g transform="translate(16,16)" strokeDasharray="12 12" strokeDashoffset="12">
-                                                    <polyline className={styles.ratingStarLine} transform="rotate(0)" points="0 4,0 16" />
-                                                    <polyline className={styles.ratingStarLine} transform="rotate(72)" points="0 4,0 16" />
-                                                    <polyline className={styles.ratingStarLine} transform="rotate(144)" points="0 4,0 16" />
-                                                    <polyline className={styles.ratingStarLine} transform="rotate(216)" points="0 4,0 16" />
-                                                    <polyline className={styles.ratingStarLine} transform="rotate(288)" points="0 4,0 16" />
+                                                <g stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <g transform="translate(16,16) rotate(180)">
+                                                        <polygon className={styles.ratingStarStroke} points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07" fill="none" />
+                                                        <polygon className={styles.ratingStarFill} points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07" fill="#000" />
+                                                    </g>
+                                                    <g transform="translate(16,16)" strokeDasharray="12 12" strokeDashoffset="12">
+                                                        <polyline className={styles.ratingStarLine} transform="rotate(0)" points="0 4,0 16" />
+                                                        <polyline className={styles.ratingStarLine} transform="rotate(72)" points="0 4,0 16" />
+                                                        <polyline className={styles.ratingStarLine} transform="rotate(144)" points="0 4,0 16" />
+                                                        <polyline className={styles.ratingStarLine} transform="rotate(216)" points="0 4,0 16" />
+                                                        <polyline className={styles.ratingStarLine} transform="rotate(288)" points="0 4,0 16" />
+                                                    </g>
                                                 </g>
-                                            </g>
-                                        </svg>
-                                        <span className={styles.ratingSr}>{index + 1} star{index !== 0 && 's'}</span>
-                                    </label>
-                                </React.Fragment>
-                            ))}
-                            {[...Array(5)].map((_, index) => (
-                                <p key={index} className={styles.ratingDisplay} data-rating={index + 1} hidden={rating !== index + 1}>
-                                    {['끔찍해요', '별로에요', '보통이에요', '좋아요', '최고에요'][index]}
-                                </p>
-                            ))}
+                                            </svg>
+                                            <span className={styles.ratingSr}>{ratingValue} star{ratingValue !== 1 && 's'}</span>
+                                        </label>
+                                    </React.Fragment>
+                                );
+                            })}
+                            {[...Array(5)].reverse().map((_, index) => {
+                                const ratingValue = 5 - index;
+                                return (
+                                    <p key={index} className={styles.ratingDisplay} data-rating={ratingValue} hidden={rating !== ratingValue}>
+                                    </p>
+                                );
+                            })}
                         </div>
                     </div>
 
                     <div className={styles.contentInputWrapper}>
-                        <FaPen className={styles.contentIcon} />
                         <textarea
                             className={styles.contentInput}
                             value={content}
@@ -171,10 +175,22 @@ const ReviewWrite = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className={styles.submitButton}>
-                        리뷰 등록하기
-                    </button>
+                    <div className={styles.buttonContainer}>
+                        <button type="submit" className={styles.submitButton}>
+                            리뷰 등록하기
+                        </button>
+                        <button 
+                            type="button" 
+                            className={styles.cancelButton}
+                            onClick={() => navigate('/mypage/order')}
+                        >
+                            취소
+                        </button>
+                    </div>
                 </form>
+                <br/>
+
+                {error && <div className={styles.error}>{error}</div>}
             </div>
             
             <Footer />
