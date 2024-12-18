@@ -66,10 +66,22 @@ const Cart = () => {
   // 상품 제거
   const handleRemoveItem = async (id) => {
     if (!userid) return;
+    const token = getAccessToken(); // 토큰을 가져옵니다.
+    console.log(id);
+    if (!token) {
+      alert("인증되지 않았습니다. 로그인 후 다시 시도해주세요.");
+      return;
+    }
+
     try {
       await axiosInstance.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
-        params: { userid }
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: { userid },
       });
+
+      
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
       console.log(`${id} 상품 삭제 성공`);
     } catch (error) {
@@ -204,7 +216,7 @@ const Cart = () => {
                   )}
                   <button
                     className={styles.removeButton}
-                    onClick={() => handleRemoveItem(item.id)}
+                    onClick={() => handleRemoveItem(item.usercartId)}
                   >
                     REMOVE
                   </button>
