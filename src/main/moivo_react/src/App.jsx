@@ -29,6 +29,7 @@ import Admins_productAdd from './containers/admin/admins_productadd';
 import Admins_productUpdate from './containers/admin/admins_productupdate';
 import ProductTrash from './containers/admin/admin_productTrash';
 import KakaoCallback from './components/kakao/KakaoCallback';
+import ReviewWrite from './containers/review/review_write';
 
 
 const routeConfig = [
@@ -38,6 +39,7 @@ const routeConfig = [
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
   { path: "/product-detail/:productId", element: <ProductDetail /> },
+  { path: "/review/write", element: <ReviewWrite /> },
   { path: "/upload", element: <Upload /> },
   { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },

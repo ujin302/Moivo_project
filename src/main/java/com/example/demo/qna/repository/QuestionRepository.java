@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.entity.QuestionEntity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +57,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 문의 삭제
     public void deleteById(Integer id);
 
-    // 문의 카테고리 검색
+    // 문의리스트 제목만 검색
     public Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     // 답변 상태로 문의 조회
@@ -74,5 +76,12 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     // 답변 완료 문의 수 조회
     int countByResponseIsNotNull();
 
+    // 문의리스트 제목, 카테고리 검색
+    Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
 
+    // 문의리스트 문의 카테고리만 검색
+    Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
+
+    // 마이페이지 나의 문의 리스트 조회 - 강민 12/18 11:06
+    public List<QuestionEntity> findByUserEntity_Id(Integer userId);
 }

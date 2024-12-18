@@ -177,30 +177,37 @@ const MypageProfile = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`, // Authorization 헤더 설정
                 },
                 body: JSON.stringify({
-                    userId: userId,
-                    pwd: deletePassword,
+                    userId: userId, // userId 전달
+                    pwd: deletePassword, // 입력받은 비밀번호 전달
                 }),
             });
     
-            const responseData = await response.json();  // 응답을 JSON으로 파싱
-    
-            if (!response.ok) {
-                // 응답이 실패하면 메시지를 던지기
-                throw new Error(responseData.message || "탈퇴에 실패했습니다.");
+            if (response.status === 403) {
+                alert("권한이 없거나 비밀번호가 일치하지 않습니다.");
+                return;
             }
     
-            alert("회원 탈퇴가 완료되었습니다.");
-            localStorage.clear(); // 로그아웃 처리
-            navigate("/"); // 홈으로 이동
+            if (response.status === 500) {
+                alert("서버에서 오류가 발생했습니다. 다시 시도해주세요.");
+                return;
+            }
+    
+            if (response.ok) {
+                alert("회원 탈퇴가 완료되었습니다.");
+                localStorage.clear(); // 로그아웃 처리
+                navigate("/"); // 홈으로 이동
+            } else {
+                alert("탈퇴에 실패했습니다. 다시 시도해주세요.");
+            }
         } catch (error) {
             console.error("Account deletion error:", error);
-            alert(error.message || "비밀번호가 틀렸거나 오류가 발생했습니다.");
+            alert("예기치 못한 오류가 발생했습니다. 다시 시도해주세요.");
         }
     };
-    
+
     
 
     const handleCancel = () => {

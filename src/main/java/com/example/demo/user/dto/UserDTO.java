@@ -33,10 +33,10 @@ public class UserDTO { // 사용자 & 관리자
     private double height;
     private double weight;
     private List<CouponDTO> coupons;
+    private int totalSpent;         // 누적 구매 금액
+    private int nextLevelTarget;    // 다음 등급까지 남은 금액
 
-    // Entity -> DTO
-
-    // 사용자 데이터 출력
+    // Entity -> DTO 변환
     public static UserDTO toGetUserDTO(UserEntity entity) {
         UserDTO dto = new UserDTO();
         dto.setId(entity.getId());
@@ -55,7 +55,6 @@ public class UserDTO { // 사용자 & 관리자
         dto.setGrade(entity.getGrade());
         dto.setHeight(entity.getHeight());
         dto.setWeight(entity.getWeight());
-
         return dto;
     }
 

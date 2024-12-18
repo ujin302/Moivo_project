@@ -1,5 +1,8 @@
 package com.example.demo.payment.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.coupon.entity.UserCouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
+import com.example.demo.coupon.service.UserCouponService;
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.payment.entity.PaymentDetailEntity;
@@ -53,6 +57,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private UserCouponRepository userCouponRepository;
 
+    @Autowired
+    private UserCouponService userCouponService;
+
     // 24.12.12 - uj
     // 결제 정보 저장
     @Override
@@ -75,9 +82,16 @@ public class PaymentServiceImpl implements PaymentService {
         Boolean isCartItem = Boolean.parseBoolean(map.get("isCartItem").toString());
         System.out.println("Json -> isCartItem: " + isCartItem);
 
+        // 중복된 TOSS 코드 검사
+        if (paymentRepository.existsByTossCode(paymentDTO.getTosscode())) {
+            throw new RuntimeException("이미 처리된 결제 정보가 존재합니다. TOSS 코드: " + paymentDTO.getTosscode());
+        }
+
         // 1, 필요한 Entity 추출
-        UserEntity userEntity = userRepository.findById(paymentDTO.getUserId()).orElseThrow();
-        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId()).orElseThrow();
+        UserEntity userEntity = userRepository.findById(paymentDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("사용자 ID " + paymentDTO.getUserId() + "에 해당하는 사용자가 존재하지 않습니다."));
+        CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId())
+                .orElseThrow(() -> new RuntimeException("사용자 ID " + userEntity.getId() + "에 해당하는 장바구니가 존재하지 않습니다."));
 
         // 2. payment 저장
         paymentDTO.setCount(detailDTOList.size());
@@ -125,6 +139,57 @@ public class PaymentServiceImpl implements PaymentService {
             userCouponRepository.save(couponEntityList.get(0));
         }
 
+        // 6. 결제 후 등급 업데이트 - sumin (2024.12.16)
+        updateUserGradeBasedOnPurchase(paymentDTO.getUserId());
+
+        // 7. 결제 후 등급에 맞는 쿠폰 발급 - sumin (2024.12.16)
+        String grade = userEntity.getGrade().name(); // 현재 사용자의 등급을 가져오기기
+        userCouponService.updateCouponByUserAndGrade(paymentDTO.getUserId(), grade);
+    }
+
+    // 결제에 따른 등급 업데이트 - sumin (2024.12.16)
+    @Override
+    public void updateUserGradeBasedOnPurchase(int userId) {
+        // 사용자 정보 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 현재 날짜를 기준으로 해당 월의 결제 금액을 계산
+        LocalDateTime now = LocalDateTime.now();
+        YearMonth yearMonth = YearMonth.from(now);
+        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay(); // 해당 월의 첫날 00:00
+        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59); // 해당 월의 마지막날 23:59
+
+        // 해당 월에 해당하는 결제 금액 계산
+        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate,
+                endDate);
+        int totalSpent = payments.stream()
+                .mapToInt(payment -> (int) payment.getTotalPrice())
+                .sum();
+
+        // 결제 금액에 따른 등급 변경
+        UserEntity.Grade newGrade = determineGradeBasedOnAmount(totalSpent);
+        userEntity.setGrade(newGrade);
+
+        System.out.println(newGrade);
+
+        // 업데이트된 사용자 정보 저장
+        userRepository.save(userEntity);
+    }
+
+    // 결제 금액에 따른 등급 결정
+    private UserEntity.Grade determineGradeBasedOnAmount(int totalSpent) {
+        if (totalSpent >= 700000) {
+            return UserEntity.Grade.LV5;
+        } else if (totalSpent >= 500000) {
+            return UserEntity.Grade.LV4;
+        } else if (totalSpent >= 300000) {
+            return UserEntity.Grade.LV3;
+        } else if (totalSpent >= 100000) {
+            return UserEntity.Grade.LV2;
+        } else {
+            return UserEntity.Grade.LV1; // LV1: 일반회원
+        }
     }
 
     // Json -> PaymentDTO

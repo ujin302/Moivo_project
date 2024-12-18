@@ -376,7 +376,7 @@ public class UserServiceImpl implements UserService {
     public void updateUserInfo(UserDTO userDTO) {
         UserEntity userEntity = userRepository.findByUserId(userDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
+ 
         // 업데이트할 필드들 설정
         userEntity.setName(userDTO.getName());
         userEntity.setGender(userDTO.getGender());
@@ -384,6 +384,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setAddr2(userDTO.getAddr2());
         userEntity.setZipcode(userDTO.getZipcode());
         userEntity.setTel(userDTO.getTel());
+        userEntity.setBirth(userDTO.getBirth());
         userEntity.setEmail(userDTO.getEmail());
         userEntity.setHeight(userDTO.getHeight());
         userEntity.setWeight(userDTO.getWeight());
@@ -397,6 +398,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
     }
 
+    // 회원정보 삭제 전 비밀번호 확인 - sumin (2024.12.12)
     public boolean checkPassword(int userId, String password) {
         // 사용자 정보 조회
         UserEntity userEntity = userRepository.findById(userId)
@@ -413,6 +415,7 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    // 회원정보 삭제 - sumin (2024.12.12)
     public void deleteUser(int userId) {
         // 사용자 정보 조회
         UserEntity userEntity = userRepository.findById(userId)

@@ -43,7 +43,6 @@ public class UserCouponServiceImpl implements UserCouponService {
 
         // 3. 기존에 해당 사용자가 보유한 쿠폰을 조회
         List<UserCouponEntity> userCoupons = userCouponRepository.findByUserEntity_Id(userId);
-        System.out.println("userCoupons = " + userCoupons);
 
         // 4. 동일 등급의 쿠폰이 이미 있는지 확인
         UserCouponEntity existingCoupon = userCoupons.stream()
@@ -53,15 +52,16 @@ public class UserCouponServiceImpl implements UserCouponService {
 
         if (existingCoupon != null) {
             // 동일 등급의 쿠폰이 이미 있는 경우
-            if (existingCoupon.getUsed()) {
-                // 쿠폰이 사용된 상태라면 사용 여부를 초기화
-                existingCoupon.setUsed(false);
-                userCouponRepository.save(existingCoupon);
-                System.out.println("기존 쿠폰의 사용 상태를 초기화했습니다.");
-            } else {
+            if (!existingCoupon.getUsed()) {
                 // 사용 가능한 쿠폰이 이미 존재한다면 처리 종료
                 System.out.println("사용 가능한 쿠폰이 이미 존재합니다. 추가 작업이 필요 없습니다.");
+                return; // 추가 작업 없이 종료
             }
+
+            // 쿠폰이 사용된 상태라면 사용 여부를 초기화
+            existingCoupon.setUsed(false);
+            userCouponRepository.save(existingCoupon);
+            System.out.println("기존 쿠폰의 사용 상태를 초기화했습니다.");
             return; // 추가 작업 없이 종료
         }
 
@@ -85,5 +85,4 @@ public class UserCouponServiceImpl implements UserCouponService {
         userCouponRepository.save(newUserCoupon);
         System.out.println("새 쿠폰(" + coupon.getGrade() + ")이 발급되었습니다.");
     }
-
 }

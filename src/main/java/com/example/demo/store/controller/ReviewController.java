@@ -25,10 +25,10 @@ public class ReviewController {
     // 24.12.17 - uj (수정)
     // 리뷰 작성 -> 주문상세 페이지에서 모달 또는 페이지를 따로 띄워서 리뷰 작성 진행.
     @PostMapping("")
-    public ResponseEntity<String> insertReview(@ModelAttribute ReviewDTO reviewDTO) {
+    public ResponseEntity<String> insertReview(@RequestBody ReviewDTO reviewDTO) {
         try {
             reviewService.insertReview(reviewDTO);
-            return ResponseEntity.ok("리뷰 작성");
+            return ResponseEntity.ok("리뷰 작성 성공");
         } catch (RuntimeException e) {
             e.printStackTrace();
             if (e.getMessage().toLowerCase().contains("user")) {
@@ -76,20 +76,28 @@ public class ReviewController {
     }
 }
 
-// 1. 리뷰 작성
-// HTTP Method: POST
-// URL: /api/user/review
-// Request Body: ReviewDTO (리뷰 내용 포함)
-// 2. 리뷰 조회
-// HTTP Method: GET
-// URL: /api/user/review/{productId}
-// Path Variable: productId (리뷰를 조회할 상품 ID)
-// 3. 리뷰 수정
-// HTTP Method: PUT
-// URL: /api/user/review/{reviewId}
-// Path Variable: reviewId (수정할 리뷰 ID)
-// Request Body: ReviewDTO (수정할 내용 포함)
-// 4. 리뷰 삭제
-// HTTP Method: DELETE
-// URL: /api/user/review/{reviewId}
-// Path Variable: reviewId (삭제할 리뷰 ID)
+
+/* 
+
+1. 리뷰 작성
+HTTP Method: POST
+URL: /api/user/review
+Request Body: ReviewDTO (리뷰 내용 포함)
+Parameters:
+userid: 작성자 ID
+productid: 상품 ID
+2. 리뷰 조회
+HTTP Method: GET
+URL: /api/user/review/{productId}
+Path Variable: productId (리뷰를 조회할 상품 ID)
+3. 리뷰 수정
+HTTP Method: PUT
+URL: /api/user/review/{reviewId}
+Path Variable: reviewId (수정할 리뷰 ID)
+Request Body: ReviewDTO (수정할 내용 포함)
+4. 리뷰 삭제
+HTTP Method: DELETE
+URL: /api/user/review/{reviewId}
+Path Variable: reviewId (삭제할 리뷰 ID)
+
+*/

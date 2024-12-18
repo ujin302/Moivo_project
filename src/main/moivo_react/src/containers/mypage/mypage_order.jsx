@@ -6,7 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import { PATH } from '../../../scripts/path';
 import axiosInstance from '../../utils/axiosConfig';
 
-const mypage_order = () => {
+const Mypage_order = () => {
     const [OrdersList, setOrdersList] = useState([]);
     const navigate = useNavigate();
 
@@ -71,7 +71,7 @@ const mypage_order = () => {
                 <div className={styles.order}>ORDER</div>
                 <div className={styles.instructions}>
                     주문번호를 클릭하시면 해당 주문에 대한 상세내역을 확인하실 수 있습니다.<br />
-                    취소/교환/반품 신청은 배송완료일 기준 7일까지 가능합니다.
+                    취소/교환/반품 신청은 어렵습니다. 신중히 주문해주세요.
                 </div>
                 <div className={styles.table}>
                     <div className={styles.row}>
@@ -119,19 +119,17 @@ const mypage_order = () => {
                                     KRW {totalPrice.toLocaleString()}
                                 </div>
                                 <div className={styles.column}>
-                                {order.deliveryStatus === "CONFIRMED" ? (
-                                    <>
+                                    {order.deliveryStatus === "CONFIRMED" ? (
                                         <div className={styles.confirmedText}>배송완료</div>
-                                        <button 
-                                            className={styles.reviewButton} 
-                                            onClick={() => navigate('/review/review_write', { state: { orderId: order.tosscode } })}
-                                        >
-                                            Review
-                                        </button>
-                                    </>
-                                ) : (
-                                    order.deliveryStatus || "배송 상태 없음"
-                                )}
+                                    ) : order.deliveryStatus === "PAYMENT_COMPLETED" ? (
+                                        <div className={styles.statusText}>결제완료</div>
+                                    ) : order.deliveryStatus === "READY" ? (
+                                        <div className={styles.statusText}>준비중</div>
+                                    ) : order.deliveryStatus === "DELIVERY" ? (
+                                        <div className={styles.statusText}>배송중</div>
+                                    ) : (
+                                        order.deliveryStatus || "배송 상태 없음"
+                                    )}
                                 </div>
                             </div>
                         );
@@ -147,4 +145,4 @@ const mypage_order = () => {
     );
 };
 
-export default mypage_order;
+export default Mypage_order;
