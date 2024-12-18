@@ -29,6 +29,7 @@ import Admins_productAdd from './containers/admin/admins_productadd';
 import Admins_productUpdate from './containers/admin/admins_productupdate';
 import ProductTrash from './containers/admin/admin_productTrash';
 import KakaoCallback from './components/kakao/KakaoCallback';
+import Admins_FAQ from './containers/admin/admins_FAQ';
 
 
 const routeConfig = [
@@ -60,7 +61,8 @@ const routeConfig = [
   { path : "/admins_productadd", element: <Admins_productAdd/>},
   { path : "/admins_productupdate", element: <Admins_productUpdate/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
-  { path: "/oauth2/callback/kakao", element: <KakaoCallback /> }
+  { path: "/oauth2/callback/kakao", element: <KakaoCallback /> },
+  { path: "/admins_FAQ", element: <Admins_FAQ /> }
 ];
 
 const App = () => {
