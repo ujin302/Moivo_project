@@ -188,8 +188,8 @@ const Main_index = () => {
                         }`}
                     >
                         {slides.map((s, i) => (
-                            <Link to="/product-list">
-                                <li key={i} className={styles.slide_list}>
+                            <Link to="/product-list" key={i}>
+                                <li className={styles.slide_list}>
                                     
                                         <img
                                             src={s.src}
@@ -208,8 +208,8 @@ const Main_index = () => {
                         }`}
                     >
                         {slides.map((s, i) => (
-                            <Link to="/product-list">
-                                <li key={i} className={styles.slide_list}>
+                            <Link to="/product-list"  key={i}>
+                                <li className={styles.slide_list}>
                                         <img
                                             src={s.src}
                                             alt={`Slide ${i + 1}`}

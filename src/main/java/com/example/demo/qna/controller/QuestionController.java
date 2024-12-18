@@ -80,6 +80,15 @@ public class QuestionController {
         return ResponseEntity.ok(map);
     }
 
-
+    // FAQ 목록 조회
+    @GetMapping("/faq/list")
+    public ResponseEntity<List<QuestionDTO>> getFaqList() {
+        try {
+            List<QuestionDTO> faqList = questionsService.getFaqList();
+            return ResponseEntity.ok(faqList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }
