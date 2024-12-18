@@ -78,8 +78,8 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     List<QuestionEntity> findByFixQuestionTrueOrderByQuestionDateDesc();
 
     //문의리스트 전체검색 fixquestion이 false 것만
-    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false ")
-    Page<QuestionEntity> findAllByFixquestion(Pageable pageable);
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false ")
+    Page<QuestionEntity> findAllByFixQuestionFalse(Pageable pageable);
 
     // 문의리스트 제목만 검색
     @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false  AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%'))")
