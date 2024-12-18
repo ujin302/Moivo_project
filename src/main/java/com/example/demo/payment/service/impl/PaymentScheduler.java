@@ -18,50 +18,49 @@ public class PaymentScheduler {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    /**
+     * 스케줄러는 5분마다 실행된다. DeliveryStatus가 CONFIRMED가 아닌 데이터 중
+     * 결제 후 30분이 지난 데이터를 업데이트하기기
+     */
     @Transactional
-    //@Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Scheduled(fixedRate = 300000) // 5분마다 실행
     public void updateDeliveryStatus() {
-        // 전체 결제 내역 가져오기
-        List<PaymentEntity> payments = paymentRepository.findAll();
-    
-        LocalDateTime now = LocalDateTime.now(); // 현재 시간
-    
+        // 현재 시간 기준으로 30분 이상 경과한 데이터만 조회
+        LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(30);
+
+        //LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5); 테스트용으로 5분마다 바뀌게 해보기
+
+        List<PaymentEntity> payments = paymentRepository.findByDeliveryStatusNotAndPaymentDateBefore(
+            DeliveryStatus.CONFIRMED, cutoffTime
+        );
+
+        // 상태 변경하고 저장하기기
         for (PaymentEntity payment : payments) {
-            // CONFIRMED 상태는 더 이상 변경하지 않음
-            if (payment.getDeliveryStatus() == DeliveryStatus.CONFIRMED) {
-                continue;
+            DeliveryStatus currentStatus = payment.getDeliveryStatus();
+            DeliveryStatus newStatus = getNextDeliveryStatus(currentStatus);
+            System.out.println("현재 배송상태 : " + currentStatus);
+            System.out.println("다음 배송상태 : " + newStatus);
+
+            if (newStatus != null && newStatus != currentStatus) {
+                payment.setDeliveryStatus(newStatus);
+                paymentRepository.save(payment); // 상태가 변경된 경우만 저장
+                System.out.println("Payment ID " + payment.getId() + " 상태 변경: " 
+                    + currentStatus + " → " + newStatus);
             }
-    
-            // 결제 날짜가 null인지 확인
-            LocalDateTime paymentDate = payment.getPaymentDate();
-            if (paymentDate == null) {
-                System.err.println("Null paymentDate detected for Payment ID: " + payment.getId());
-                continue; // Null 데이터는 건너뜁니다.
-            }
-    
-            // 결제 후 30분이 지났는지 확인
-            long minutesPassed = java.time.Duration.between(paymentDate, now).toMinutes();
-    
-            if (minutesPassed >= 30) { // 30분이 지난 경우 상태 업데이트
-                DeliveryStatus currentStatus = payment.getDeliveryStatus();
-    
-                switch (currentStatus) {
-                    case PAYMENT_COMPLETED:
-                        payment.setDeliveryStatus(DeliveryStatus.READY);
-                        break;
-                    case READY:
-                        payment.setDeliveryStatus(DeliveryStatus.DELIVERY);
-                        break;
-                    case DELIVERY:
-                        payment.setDeliveryStatus(DeliveryStatus.CONFIRMED);
-                        break;
-                    default:
-                        break;
-                }
-    
-                // 상태가 변경되었으므로 저장
-                paymentRepository.save(payment);
-            }
+        }
+    }
+
+    // 현재 상태에 따라 다음 상태 반환
+    private DeliveryStatus getNextDeliveryStatus(DeliveryStatus currentStatus) {
+        switch (currentStatus) {
+            case PAYMENT_COMPLETED:
+                return DeliveryStatus.READY;
+            case READY:
+                return DeliveryStatus.DELIVERY;
+            case DELIVERY:
+                return DeliveryStatus.CONFIRMED;
+            default:
+                return null; // CONFIRMED 상태는 더 이상 변경하지 않음
         }
     }
 }
