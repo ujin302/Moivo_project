@@ -29,7 +29,6 @@ const Mypage_order = () => {
         const fetchOrders = async () => {
             try {
                 const ordersResponse = await axiosInstance.get(`/api/user/mypage/orders/${id}`);
-                console.log("주문 데이터:", ordersResponse.data);
 
                 // 응답 데이터 유효성 검증
                 if (!Array.isArray(ordersResponse.data)) {
@@ -92,17 +91,6 @@ const Mypage_order = () => {
                         // 총 수량 계산
                         const totalQuantity = order.count;
 
-                        // order 객체 로깅 추가
-                        console.log("전달할 주문 데이터:", {
-                            productId: order.productId,
-                            productName: order.productName,
-                            paymentDetailId: order.paymentDetailId,
-                            size: order.size,
-                            userId: order.userId,
-                            userName: order.userName,
-                            orderDate: order.paymentDate
-                        });
-
                         return (
                             <div className={styles.row} key={index}>
                                 <div className={styles.column}>
@@ -131,28 +119,17 @@ const Mypage_order = () => {
                                     KRW {totalPrice.toLocaleString()}
                                 </div>
                                 <div className={styles.column}>
-                                {order.deliveryStatus === "CONFIRMED" ? (
-                                    <>
+                                    {order.deliveryStatus === "CONFIRMED" ? (
                                         <div className={styles.confirmedText}>배송완료</div>
-                                        <Link 
-                                            to='/review/write' 
-                                            state={{ 
-                                                productId: order.productId,
-                                                productName: order.productName,
-                                                paymentDetailId: order.paymentDetailId,
-                                                size: order.size,
-                                                userId: order.userId,
-                                                userName: order.userName,
-                                                orderDate: order.paymentDate
-                                            }}
-                                            className={styles.reviewButton}
-                                        >
-                                            리뷰 작성
-                                        </Link>
-                                    </>
-                                ) : (
-                                    order.deliveryStatus || "배송 상태 없음"
-                                )}
+                                    ) : order.deliveryStatus === "PAYMENT_COMPLETED" ? (
+                                        <div className={styles.statusText}>결제완료</div>
+                                    ) : order.deliveryStatus === "READY" ? (
+                                        <div className={styles.statusText}>준비중</div>
+                                    ) : order.deliveryStatus === "DELIVERY" ? (
+                                        <div className={styles.statusText}>배송중</div>
+                                    ) : (
+                                        order.deliveryStatus || "배송 상태 없음"
+                                    )}
                                 </div>
                             </div>
                         );

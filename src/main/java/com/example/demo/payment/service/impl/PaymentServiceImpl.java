@@ -1,5 +1,7 @@
 package com.example.demo.payment.service.impl;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.coupon.service.UserCouponService;
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.payment.entity.PaymentDetailEntity;
@@ -50,6 +53,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private UserCouponService userCouponService;
 
     // 24.12.12 - uj
     // 결제 정보 저장
@@ -115,7 +121,59 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 4-1. 장바구니 DB에 반영
         cartRepository.save(cartEntity);
+
+        // 결제 후 등급 업데이트 - sumin (2024.12.16)
+        updateUserGradeBasedOnPurchase(paymentDTO.getUserId());
+
+        // 결제 후 등급에 맞는 쿠폰 발급 - sumin (2024.12.16)
+        String grade = userEntity.getGrade().name();  // 현재 사용자의 등급을 가져오기기
+        userCouponService.updateCouponByUserAndGrade(paymentDTO.getUserId(), grade);
     }
+
+    // 결제에 따른 등급 업데이트 - sumin (2024.12.16)
+    @Override
+    public void updateUserGradeBasedOnPurchase(int userId) {
+        // 사용자 정보 조회
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 현재 날짜를 기준으로 해당 월의 결제 금액을 계산
+        LocalDateTime now = LocalDateTime.now();
+        YearMonth yearMonth = YearMonth.from(now);
+        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();  // 해당 월의 첫날 00:00
+        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59);  // 해당 월의 마지막날 23:59
+
+        // 해당 월에 해당하는 결제 금액 계산
+        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate, endDate);
+        int totalSpent = payments.stream()
+                .mapToInt(payment -> (int) payment.getTotalPrice())
+                .sum();
+
+        // 결제 금액에 따른 등급 변경
+        UserEntity.Grade newGrade = determineGradeBasedOnAmount(totalSpent);
+        userEntity.setGrade(newGrade);
+
+        System.out.println(newGrade);
+        
+        // 업데이트된 사용자 정보 저장
+        userRepository.save(userEntity);
+    }
+
+    // 결제 금액에 따른 등급 결정
+    private UserEntity.Grade determineGradeBasedOnAmount(int totalSpent) {
+        if (totalSpent >= 700000) {
+            return UserEntity.Grade.LV5;
+        } else if (totalSpent >= 500000) {
+            return UserEntity.Grade.LV4;
+        } else if (totalSpent >= 300000) {
+            return UserEntity.Grade.LV3;
+        } else if (totalSpent >= 100000) {
+            return UserEntity.Grade.LV2;
+        } else {
+            return UserEntity.Grade.LV1; // LV1: 일반회원
+        }
+    }
+
 
     // Json -> PaymentDTO
     public PaymentDTO convertToPaymentDTO(String json, String tossCode, String userId) {

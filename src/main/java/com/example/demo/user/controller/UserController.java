@@ -119,7 +119,7 @@ public class UserController {
 
     // 회원정보 수정 - sumin (2024.12.12)
     @PostMapping("/mypage/update")
-    public ResponseEntity<String> updateUserInfo(@RequestBody UserDTO userDTO,
+    public ResponseEntity<Void> updateUserInfo(@RequestBody UserDTO userDTO,
             @RequestHeader("Authorization") String token) {
         try {
             System.out.println("생일출력 = " + userDTO.getBirth());
@@ -127,79 +127,68 @@ public class UserController {
             String actualToken = token.substring(7); // "Bearer " 제거
             Map<String, Object> userData = jwtUtil.getUserDataFromToken(actualToken);
             String userIdFromToken = (String) userData.get("userId");
-
+    
             // 사용자 ID 일치 여부 확인 (보안 검증)
             if (!userIdFromToken.equals(userDTO.getUserId())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-
+    
             // 회원 정보 업데이트 처리
             userService.updateUserInfo(userDTO);
-
-            return ResponseEntity.ok("회원정보가 성공적으로 수정되었습니다.");
+    
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.err.println("회원정보 수정 실패: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원정보 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    
+    // 회원정보 삭제 - sumin (2024.12.12)
     @PostMapping("/mypage/delete")
-    public ResponseEntity<Map<String, String>> deleteUser(@RequestHeader("Authorization") String token,
+    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String token,
             @RequestBody Map<String, Object> requestData) {
         Integer userIdFromRequest = (Integer) requestData.get("userId");
         String passwordFromRequest = (String) requestData.get("pwd");
-
+    
         System.out.println("userId = " + userIdFromRequest);
         System.out.println("pwd = " + passwordFromRequest);
-
+    
         try {
             // Authorization 헤더에서 실제 토큰 값 추출
             if (token == null || !token.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "토큰이 잘못되었습니다."));
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-
+    
             String actualToken = token.trim().substring(7); // "Bearer " 제거 후 공백 제거
-
+    
             // 토큰에서 사용자 ID 추출
             Map<String, Object> userData = jwtUtil.getUserDataFromToken(actualToken);
             System.out.println("userData = " + userData);
             int userIdFromToken = (Integer) userData.get("id");
             System.out.println(userIdFromToken);
-
+    
             // 사용자 ID 일치 여부 확인 (보안 검증)
             if (userIdFromToken == userIdFromRequest) {
                 // 비밀번호 검증
                 if (!userService.checkPassword(userIdFromRequest, passwordFromRequest)) {
-                    Map<String, String> response = new HashMap<>();
-                    response.put("message", "비밀번호가 일치하지 않습니다.");
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
-
+    
                 // 회원 탈퇴 처리
                 userService.deleteUser(userIdFromRequest);
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "회원 탈퇴가 완료되었습니다.");
-                return ResponseEntity.ok(response);
+                return ResponseEntity.ok().build();
             } else {
-                Map<String, String> response = new HashMap<>();
-                response.put("message", "권한이 없습니다.");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-
+    
         } catch (NumberFormatException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "잘못된 사용자 ID 형식입니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (IllegalArgumentException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "회원 탈퇴 실패: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "회원 탈퇴 중 오류가 발생했습니다.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    
 
 }

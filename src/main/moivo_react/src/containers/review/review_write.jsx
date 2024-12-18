@@ -7,6 +7,15 @@ import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
 import { FaPen } from 'react-icons/fa';
 
+axiosInstance.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken');
+    console.log('요청 헤더의 토큰:', token);
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 const ReviewWrite = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -17,7 +26,6 @@ const ReviewWrite = () => {
         productName,
         paymentDetailId,
         size,
-        userId,
         userName,
         orderDate
     } = location.state || {};
@@ -34,39 +42,30 @@ const ReviewWrite = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 필수 데이터 체크
-        const missingFields = [];
-        if (!userId) missingFields.push('사용자 ID');
-        if (!userName) missingFields.push('사용자 이름');
-        if (!productId) missingFields.push('상품 ID');
-        if (!paymentDetailId) missingFields.push('주문 상세 ID');
-        if (!rating) missingFields.push('평점');
-        if (!content.trim()) missingFields.push('리뷰 내용');
-        if (!size) missingFields.push('상품 사이즈');
-
-        if (missingFields.length > 0) {
-            setError(`다음 정보가 누락되었습니다: ${missingFields.join(', ')}`);
-            return;
-        }
-
-        const reviewData = {
-            userId,
-            userName,
-            productId,
-            size,
-            paymentDetailId,
-            rating,
-            content,
-            reviewDate: new Date().toISOString()
-        };
-
         try {
+            const token = localStorage.getItem('accessToken');
+            const payload = token.split('.')[1];
+            const decodedPayload = JSON.parse(atob(payload));
+            
+            const reviewData = {
+                userId: decodedPayload.id,
+                userName,
+                productId,
+                size: size.toUpperCase(),
+                paymentDetailId,
+                rating,
+                content,
+                reviewDate: new Date().toISOString()
+            };
+            
+            console.log('전송할 리뷰 데이터:', reviewData);
             const response = await axiosInstance.post(`${PATH.SERVER}/api/user/review`, reviewData);
             console.log('서버 응답:', response);
+            
             alert('리뷰가 성공적으로 작성되었습니다.');
             navigate('/mypage/order');
         } catch (err) {
-            console.error('리뷰 작성 실패:', err);
+            console.error('에러 발생:', err);
             setError(err.response?.data || '리뷰 작성에 실패했습니다.');
         }
     };
