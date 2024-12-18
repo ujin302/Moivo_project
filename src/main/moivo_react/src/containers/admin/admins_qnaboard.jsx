@@ -3,8 +3,14 @@ import admin_qnaboard from '../../assets/css/admins_qnaboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { PATH } from '../../../scripts/path';
 import axiosInstance from "../../utils/axiosConfig";
- 
+import { useLocation } from 'react-router-dom';
+
 const Admins_qnaboard = () => {
+    // 문의리스트 페이지 이동시 필터 기능 추가_ 24.12.18 yjy
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const filterFromUrl = searchParams.get('filter');
+
     const [activeIndex, setActiveIndex] = useState(null); // 문의리시트 확장기능
     const [currentPage, setCurrentPage] = useState(1); // 문의리시트 페이징기능
     const [selectedCategory, setSelectedCategory] = useState('ALL'); // 문의리시트 카테고리 필터기능
@@ -17,12 +23,19 @@ const Admins_qnaboard = () => {
     const [editResponseModalOpen, setEditResponseModalOpen] = useState(false); // 문의리시트 답변수정 모달창 기능
     const [responseInput, setResponseInput] = useState(''); // 문의리시트 답변등록 모달창 기능
     const [searchQuery, setSearchQuery] = useState('');
-    const [filterType, setFilterType] = useState('ALL'); // 'ALL', 'ANSWERED', 'WAITING' 상태 추가
+    const [filterType, setFilterType] = useState(filterFromUrl || 'ALL'); // 'ALL', 'ANSWERED', 'WAITING' 상태 추가
 
     useEffect(() => {
         fetchQuestions();
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        // URL 파라미터가 변경될 때마다 필터 업데이트
+        if (filterFromUrl) {
+            setFilterType(filterFromUrl);
+        }
+    }, [filterFromUrl]);
 
     const fetchQuestions = async () => {
         try {
@@ -78,7 +91,7 @@ const Admins_qnaboard = () => {
                 { response: responseInput }
             );
 
-            console.log('Server response:', response);
+            // console.log('Server response:', response);
 
             if (response.status === 200) {
                 await fetchQuestions();

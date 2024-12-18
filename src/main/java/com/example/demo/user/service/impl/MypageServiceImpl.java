@@ -34,6 +34,12 @@ import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.repository.WishRepository;
 import com.example.demo.user.service.MypageService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 @Service
 public class MypageServiceImpl implements MypageService {
     @Autowired
@@ -203,10 +209,13 @@ public class MypageServiceImpl implements MypageService {
 
     @Transactional
     @Override
-    public List<PaymentDTO> getOrders(int id) {
-        List<PaymentEntity> orderEntities = paymentRepository.findByUserEntity_Id(id);
+    public Page<PaymentDTO> getOrders(int id, Pageable pageable) {
+        Pageable sortedByIdDesc = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+        Page<PaymentEntity> orderEntities = paymentRepository.findByUserEntity_Id(id, sortedByIdDesc);
         List<PaymentDTO> list = new ArrayList<>();
         NCPObjectStorageDTO ncpDTO = new NCPObjectStorageDTO();
+
         if (orderEntities == null || orderEntities.isEmpty()) {
             throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
         }
@@ -220,7 +229,7 @@ public class MypageServiceImpl implements MypageService {
         }
 
         // PaymentEntity를 PaymentDTO로 변환
-        return list;
+        return new PageImpl<>(list, pageable, orderEntities.getTotalElements());
     }
 
     // mypage order detail info 가지고 오기 - 12/17 강민
@@ -260,8 +269,10 @@ public class MypageServiceImpl implements MypageService {
     // 나의 문의 목록 조회 12/18 작업 - 강민
     @Transactional
     @Override
-    public List<QuestionDTO> getMyQuestion(int id) {
-        List<QuestionEntity> questionEntities = questionRepository.findByUserEntity_Id(id);
+    public Page<QuestionDTO> getMyQuestion(int id, Pageable pageable) {
+        Pageable sortedByIdDesc = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+        Page<QuestionEntity> questionEntities = questionRepository.findByUserEntity_Id(id, sortedByIdDesc);
         if (questionEntities == null || questionEntities.isEmpty()) {
             throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
         }
@@ -273,7 +284,7 @@ public class MypageServiceImpl implements MypageService {
             questionDTOList.add(questionDTO);
         }
 
-        return questionDTOList;
+        return new PageImpl<>(questionDTOList, pageable, questionEntities.getTotalElements());
     }
 
 }

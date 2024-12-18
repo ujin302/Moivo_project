@@ -8,6 +8,18 @@
   border-radius: 10px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 6px 6px rgba(0, 0, 0, 0.1);
   font-family: 'Noto Sans KR', sans-serif;
+  animation: slideInFromTop 0.8s ease-out;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-80px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .reviewWriteContainer h1 {
@@ -22,6 +34,17 @@
   margin-bottom: 10px;
   font-weight: bold;
   text-align: center;
+  animation: shake 0.5s ease-in-out;
+  background: rgba(255, 56, 92, 0.1);
+  border-left: 4px solid #ff385c;
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
 }
 
 .reviewWriteContainer form {
@@ -46,6 +69,8 @@
   color: #333;
   resize: none;
   transition: background-color 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .reviewWriteContainer .contentInput::placeholder {
@@ -56,11 +81,18 @@
   outline: none;
   background-color: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(145deg, #ffffff, #f8f8f8);
+  box-shadow: 
+    inset 3px 3px 6px rgba(0,0,0,0.05),
+    inset -3px -3px 6px rgba(255,255,255,0.8);
 }
 
 .reviewWriteContainer .contentInputWrapper {
   position: relative;
   margin-bottom: 20px;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  padding: 20px;
+  border-radius: 15px;
 }
 
 .reviewWriteContainer .contentIcon {
@@ -69,6 +101,12 @@
   left: 20px;
   color: #ff385c;
   font-size: 1.5rem;
+  transition: transform 0.5s ease, color 0.3s ease;
+}
+
+.reviewWriteContainer .contentIcon:focus {
+  transform: rotate(360deg);
+  color: #ff385c;
 }
 
 .reviewWriteContainer .characterCount {
@@ -77,6 +115,16 @@
   right: 20px;
   color: #999;
   font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(145deg, #f0f0f0, #ffffff);
+  box-shadow: 3px 3px 6px #d9d9d9, -3px -3px 6px #ffffff;
+}
+
+.reviewWriteContainer .characterCount::before {
+  content: '✏️';
+  font-size: 0.9em;
 }
 
 .reviewWriteContainer .characterCount .remainingChars {
@@ -88,6 +136,8 @@
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  position: relative;
+  background: linear-gradient(145deg, #fff 0%, #fcfcfc 100%);
 }
 
 .reviewWriteContainer .ratingContainer label {
@@ -119,6 +169,21 @@
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.reviewWriteContainer .preview::after {
+  content: '미리보기';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 8px;
+  background: #ff385c;
+  color: white;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  opacity: 0.8;
 }
 
 .reviewWriteContainer .preview h3 {
@@ -144,6 +209,8 @@
   transition: background-color 0.3s ease, transform 0.3s ease;
   align-self: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
 }
 
 .reviewWriteContainer button:hover {
@@ -155,6 +222,26 @@
 .reviewWriteContainer button:active {
   transform: translateY(0);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.reviewWriteContainer button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.reviewWriteContainer button:hover::before {
+  left: 100%;
 }
 
 @keyframes starBurst {
@@ -176,8 +263,18 @@
 
 .ratingStars {
   display: flex;
-  padding-bottom: 0.375em;
-  position: relative;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.ratingStars::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffdd00, transparent);
 }
 
 .ratingStar {
@@ -204,11 +301,8 @@
 }
 
 .ratingStarFill {
-  fill: #ffdd00;
-  transform: scale(0);
-  transition:
-    fill 0.3s cubic-bezier(0.42,0,0.58,1),
-    transform 0.3s cubic-bezier(0.42,0,0.58,1);
+  fill: #ddd;
+  transition: fill 0.3s ease;
 }
 
 .ratingStarLine {
@@ -218,7 +312,6 @@
 
 .ratingStarStroke {
   stroke: #ddd;
-  transition: stroke 0.3s;
 }
 
 .ratingLabel {
@@ -367,5 +460,691 @@
     stroke-dasharray: 12 13;
     stroke-dashoffset: -13;
   }
+}
+
+/* 반응형 디자인을 위한 미디어 쿼리 */
+@media screen and (max-width: 1024px) {
+  .reviewWriteContainer {
+    max-width: 90%;
+    margin: 60px auto;
+    padding: 30px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .reviewWriteContainer {
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+
+  .reviewWriteContainer .contentInput {
+    min-height: 150px;
+    padding: 15px;
+  }
+
+  .reviewWriteContainer button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+  }
+
+  .ratingStar {
+    width: 1.8em;
+    height: 1.8em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .reviewWriteContainer {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 1.5rem;
+  }
+
+  .reviewWriteContainer .contentInput {
+    min-height: 120px;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .reviewWriteContainer .contentIcon {
+    top: 15px;
+    left: 15px;
+    font-size: 1.2rem;
+  }
+
+  .reviewWriteContainer .characterCount {
+    font-size: 0.8rem;
+  }
+
+  .reviewWriteContainer button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+
+  .ratingStar {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .preview h3 {
+    font-size: 1.2rem;
+  }
+
+  .previewContent {
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .reviewWriteContainer {
+    margin: 10px auto;
+    padding: 10px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 1.3rem;
+  }
+
+  .ratingStar {
+    width: 1.3em;
+    height: 1.3em;
+  }
+}
+
+/* 제품 정보 섹션 스타일링 */
+.productInfo {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.productInfo:hover {
+  transform: translateY(-5px);
+}
+
+.productInfo h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ff385c;
+  padding-bottom: 10px;
+}
+
+/* 별점 섹션 개선 */
+.ratingContainer {
+  background: rgba(255, 221, 0, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.ratingContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #ff385c, #ffdd00);
+}
+
+/* 리뷰 작성 영역 개선 */
+.contentInputWrapper {
+  position: relative;
+  margin: 30px 0;
+  transition: transform 0.3s ease;
+}
+
+.contentInputWrapper:focus-within {
+  transform: scale(1.01);
+}
+
+.contentInput {
+  background: #fff;
+  border: 2px solid #eee;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.contentInput:focus {
+  border-color: #ff385c;
+  box-shadow: 0 8px 16px rgba(255,56,92,0.1);
+}
+
+/* 미리보기 섹션 개선 */
+.preview {
+  background: linear-gradient(to right bottom, #ffffff, #fafafa);
+  border: none;
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.previewContent {
+  position: relative;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  border-left: 4px solid #ff385c;
+}
+
+.previewProductName {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.previewDate {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.previewRating {
+  color: #ffdd00;
+  font-size: 1.5rem;
+  margin: 10px 0;
+  display: flex;
+  gap: 5px;
+}
+
+.previewText {
+  line-height: 1.6;
+  color: #444;
+}
+
+/* 글자수 카운터 애니메이션 */
+.characterCount {
+  background: rgba(255,56,92,0.1);
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.characterCount.warning {
+  background: rgba(255,196,0,0.2);
+}
+
+.characterCount.danger {
+  background: rgba(255,56,92,0.2);
+}
+
+/* 제출 버튼 개선 */
+.submitButton {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(255,56,92,0.2);
+}
+
+.submitButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  background: rgba(255,255,255,0.2);
+  transform: translate(-50%, -50%) rotate(35deg);
+  transition: transform 0.5s ease;
+}
+
+.submitButton:hover::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+/* 툴팁 스타일 */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reviewWriteContainer > * {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* 반응형 조정 */
+@media screen and (max-width: 768px) {
+  .productInfo h2 {
+    font-size: 1.5rem;
+  }
+  
+  .previewContent {
+    padding: 15px;
+  }
+  
+  .previewProductName {
+    font-size: 1.1rem;
+  }
+}
+
+/* 새로운 스타일 추가 */
+
+/* 페이지 진입 시 전체 컨테이너 애니메이션 */
+.reviewWriteContainer {
+  animation: slideInFromTop 0.8s ease-out;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 제품 정보 섹션 개선 */
+.productInfo {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+.productInfo::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 56, 92, 0.03) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 별점 섹션 추가 스타일 */
+.ratingContainer {
+  position: relative;
+  background: linear-gradient(145deg, #fff 0%, #fcfcfc 100%);
+}
+
+.ratingStars {
+  position: relative;
+  z-index: 1;
+}
+
+.ratingStars::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffdd00, transparent);
+}
+
+/* 리뷰 작성 영역 강화 */
+.contentInputWrapper {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.contentInput {
+  position: relative;
+  z-index: 1;
+}
+
+.contentInput:focus + .contentIcon {
+  transform: rotate(360deg);
+  color: #ff385c;
+}
+
+.contentIcon {
+  transition: transform 0.5s ease, color 0.3s ease;
+}
+
+/* 글자수 카운터 개선 */
+.characterCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(145deg, #f0f0f0, #ffffff);
+  box-shadow: 3px 3px 6px #d9d9d9, -3px -3px 6px #ffffff;
+}
+
+.characterCount::before {
+  content: '✏️';
+  font-size: 0.9em;
+}
+
+/* 미리보기 섹션 강화 */
+.preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.preview::after {
+  content: '미리보기';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 8px;
+  background: #ff385c;
+  color: white;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  opacity: 0.8;
+}
+
+.previewContent {
+  position: relative;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  box-shadow: 
+    5px 5px 10px rgba(0,0,0,0.05),
+    -5px -5px 10px rgba(255,255,255,0.8);
+}
+
+/* 제출 버튼 추가 효과 */
+.submitButton {
+  background: linear-gradient(145deg, #ff385c, #ff1f47);
+  position: relative;
+  overflow: hidden;
+}
+
+.submitButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.submitButton:hover::before {
+  left: 100%;
+}
+
+/* 입력 필드 포커스 효과 */
+.contentInput:focus {
+  background: linear-gradient(145deg, #ffffff, #f8f8f8);
+  box-shadow: 
+    inset 3px 3px 6px rgba(0,0,0,0.05),
+    inset -3px -3px 6px rgba(255,255,255,0.8);
+}
+
+/* 스크롤바 커스터마이징 */
+.contentInput::-webkit-scrollbar {
+  width: 8px;
+}
+
+.contentInput::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.contentInput::-webkit-scrollbar-thumb {
+  background: #ff385c;
+  border-radius: 4px;
+}
+
+.contentInput::-webkit-scrollbar-thumb:hover {
+  background: #e00007;
+}
+
+/* 입력 필드 플레이스홀더 애니메이션 */
+@keyframes placeholderShimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.contentInput::placeholder {
+  animation: placeholderShimmer 2s infinite;
+}
+
+/* 호버 효과 개선 */
+.productInfo:hover,
+.preview:hover,
+.contentInputWrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 10px 20px rgba(0,0,0,0.1),
+    0 6px 6px rgba(0,0,0,0.1);
+}
+
+/* 에러 메시지 개선 */
+.error {
+  animation: shake 0.5s ease-in-out;
+  background: rgba(255, 56, 92, 0.1);
+  border-left: 4px solid #ff385c;
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* 로딩 상태 표시 */
+.loading {
+  position: relative;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff385c;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 반응형 디자인 개선 */
+@media (hover: hover) {
+  .submitButton:hover {
+    transform: translateY(-3px) scale(1.02);
+  }
+  
+  .ratingStars:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* 별점 선택 시 이전 별들도 채워지도록 수정 */
+.ratingInput1:checked ~ .ratingLabel:nth-of-type(-n + 1) .ratingStarFill,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarFill,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarFill,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarFill,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarFill {
+  animation-name: starFill;
+  transform: scale(1);
+  fill: #ffdd00;
+}
+
+/* 호버 시에도 이전 별들이 채워지도록 수정 */
+.ratingInput1:hover ~ .ratingLabel:nth-of-type(-n + 1) .ratingStarFill,
+.ratingInput2:hover ~ .ratingLabel:nth-of-type(-n + 2) .ratingStarFill,
+.ratingInput3:hover ~ .ratingLabel:nth-of-type(-n + 3) .ratingStarFill,
+.ratingInput4:hover ~ .ratingLabel:nth-of-type(-n + 4) .ratingStarFill,
+.ratingInput5:hover ~ .ratingLabel:nth-of-type(-n + 5) .ratingStarFill {
+  transform: scale(1);
+  fill: #ffdd00;
+}
+
+/* 별점 스타일 수정 */
+.ratingStars {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+/* 별 아이콘 기본 스타일 */
+.ratingStarFill {
+  fill: #ddd;
+  transition: fill 0.3s ease;
+}
+
+.ratingStarStroke {
+  stroke: #ddd;
+}
+
+/* 별점 선택 및 호버 효과 수정 */
+.ratingLabel:hover .ratingStarFill,
+.ratingLabel:hover ~ .ratingLabel .ratingStarFill,
+.ratingInput:checked ~ .ratingLabel .ratingStarFill {
+  fill: #ffdd00;
+}
+
+.ratingLabel:hover .ratingStarStroke,
+.ratingLabel:hover ~ .ratingLabel .ratingStarStroke,
+.ratingInput:checked ~ .ratingLabel .ratingStarStroke {
+  stroke: #ffdd00;
+}
+
+/* 선택된 별과 그 이전 별들 채우기 */
+.ratingInput1:checked ~ .ratingLabel:nth-of-type(-n+1) .ratingStarFill,
+.ratingInput2:checked ~ .ratingLabel:nth-of-type(-n+2) .ratingStarFill,
+.ratingInput3:checked ~ .ratingLabel:nth-of-type(-n+3) .ratingStarFill,
+.ratingInput4:checked ~ .ratingLabel:nth-of-type(-n+4) .ratingStarFill,
+.ratingInput5:checked ~ .ratingLabel:nth-of-type(-n+5) .ratingStarFill {
+  fill: #ffdd00;
+}
+
+/* 호버 시 별과 그 이전 별들 채우기 */
+.ratingInput1:hover ~ .ratingLabel:nth-of-type(-n+1) .ratingStarFill,
+.ratingInput2:hover ~ .ratingLabel:nth-of-type(-n+2) .ratingStarFill,
+.ratingInput3:hover ~ .ratingLabel:nth-of-type(-n+3) .ratingStarFill,
+.ratingInput4:hover ~ .ratingLabel:nth-of-type(-n+4) .ratingStarFill,
+.ratingInput5:hover ~ .ratingLabel:nth-of-type(-n+5) .ratingStarFill {
+  fill: #ffdd00;
+}
+
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.reviewActions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.actionButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.editButton {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.editButton:hover {
+    background-color: #45a049;
+}
+
+.deleteButton {
+    background-color: #f44336;
+    color: white;
+}
+
+.deleteButton:hover {
+    background-color: #da190b;
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.cancelButton {
+    padding: 10px 20px;
+    background-color: #gray;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.cancelButton:hover {
+    background-color: #666;
 }
 

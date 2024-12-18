@@ -159,25 +159,29 @@ const MypageOrderDetails = () => {
                             <div className={styles.column}>KRW {item.price}</div>
                             <div className={styles.column}>
                             {OrdersInfo[0]?.deliveryStatus === "CONFIRMED" ? (
-                                <>
-                                    <div className={styles.confirmedText}>배송완료</div>
-                                    <button 
-                                        className={styles.reviewButton} 
-                                        onClick={() => navigate('/review/write', { 
-                                            state: { 
-                                                productId: item.productId,
-                                                productName: item.productName,
-                                                paymentDetailId: item.id,
-                                                size: item.size,
-                                                userId: userId,
-                                                userName: OrdersInfo[0]?.name,
-                                                orderDate: OrdersInfo[0]?.paymentDate
-                                            } 
-                                        })}
-                                    >
-                                        Review
-                                    </button>
-                                </>
+                                item.writeReview === false ? (
+                                    <>
+                                        <div className={styles.confirmedText}>배송완료</div>
+                                        <button 
+                                            className={styles.reviewButton} 
+                                            onClick={() => navigate('/review/write', { 
+                                                state: { 
+                                                    productId: item.productId,
+                                                    productName: item.productName,
+                                                    paymentDetailId: item.id,
+                                                    size: item.size,
+                                                    userId: userId,
+                                                    userName: OrdersInfo[0]?.name,
+                                                    orderDate: OrdersInfo[0]?.paymentDate
+                                                } 
+                                            })}
+                                        >
+                                            Review
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className={styles.reviewCompleteText}>리뷰작성완료</div>
+                                )
                             ) : OrdersInfo[0]?.deliveryStatus === "PAYMENT_COMPLETED" ? (
                                 <div className={styles.statusText}>결제완료</div>
                             ) : OrdersInfo[0]?.deliveryStatus === "READY" ? (

@@ -9,7 +9,7 @@ import { FaPen } from 'react-icons/fa';
 
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('accessToken');
-    console.log('요청 헤더의 토큰:', token);
+    // console.log('요청 헤더의 토큰:', token);
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -74,6 +74,14 @@ const ReviewWrite = () => {
         setRating(selectedRating);
     };
 
+    // 글자수 경고 상태 추가
+    const getCharacterCountClass = () => {
+        const remaining = maxLength - content.length;
+        if (remaining < 50) return styles.danger;
+        if (remaining < 200) return styles.warning;
+        return '';
+    };
+
     return (
         <>
             <div>
@@ -81,12 +89,14 @@ const ReviewWrite = () => {
             </div>
 
             <div className={styles.reviewWriteContainer}>
+                <br/><br/>
                 <h1>리뷰 작성</h1>
-                {error && <div className={styles.error}>{error}</div>}
+
                 
-                <div className={styles.productInfo}>
+                <div className={styles.productInfo} data-tooltip="구매하신 상품 정보입니다">
                     <h2>{productName}</h2>
                     <p>구매일: {new Date(orderDate).toLocaleDateString()}</p>
+                    <p>사이즈:  {size}</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -143,7 +153,7 @@ const ReviewWrite = () => {
                             placeholder="상품에 대한 솔직한 리뷰를 작성해주세요."
                             required
                         />
-                        <div className={styles.characterCount}>
+                        <div className={`${styles.characterCount} ${getCharacterCountClass()}`}>
                             <span className={styles.remainingChars}>{maxLength - content.length}</span>/{maxLength}
                         </div>
                     </div>
@@ -162,8 +172,22 @@ const ReviewWrite = () => {
                         </div>
                     </div>
 
-                    <button type="submit">리뷰 작성</button>
+                    <div className={styles.buttonContainer}>
+                        <button type="submit" className={styles.submitButton}>
+                            리뷰 등록하기
+                        </button>
+                        <button 
+                            type="button" 
+                            className={styles.cancelButton}
+                            onClick={() => navigate('/mypage/order')}
+                        >
+                            취소
+                        </button>
+                    </div>
                 </form>
+                <br/>
+
+                {error && <div className={styles.error}>{error}</div>}
             </div>
             
             <Footer />

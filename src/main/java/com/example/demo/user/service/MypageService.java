@@ -8,6 +8,8 @@ import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 public interface MypageService {
 
@@ -19,11 +21,11 @@ public interface MypageService {
 
     public List<WishDTO> getWishlist(int id);
 
-    public List<PaymentDTO> getOrders(int id);
+    public Page<PaymentDTO> getOrders(int id, Pageable pageable);
 
     public List<PaymentDTO> getOrderInfo(String tosscode);
 
     public List<PaymentDetailDTO> getOrderDetails(int paymentId);
 
-    public List<QuestionDTO> getMyQuestion(int id);
+    public Page<QuestionDTO> getMyQuestion(int id, Pageable pageable);
 }

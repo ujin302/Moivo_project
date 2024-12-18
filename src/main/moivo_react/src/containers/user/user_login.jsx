@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { PATH } from "../../../scripts/path";
 import signin from '../../assets/css/user_login.module.css';
-import apiClient from '../../utils/apiClient';
 import kakaoLoginImage from '../../assets/image/kakao_login.png';
 
 const user_login = () => {

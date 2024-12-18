@@ -343,6 +343,33 @@
   .bottomBar:hover {
     background-color: #2f2e2c;
   }
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.pageButton {
+    background-color: #e6e1d0; 
+    color: #988c73; 
+    padding: 8px 13px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pageButton.active {
+    background-color: #988c73; 
+    color: #fff;
+}
+
+
+
+
   @media (max-width: 768px) {
     .memberFrame {
         padding: 10px; 

@@ -26,12 +26,35 @@ const Qna_board = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  //2024/12/17 핸들러 예외처리 수정 장훈
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  
+    // 비밀글 체크박스 처리
+    if (name === "isSecret") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: checked,
+        // 체크된 상태에서는 type을 "비밀 문의"로 설정, 체크 해제시 type을 ""으로 설정
+        type: checked ? "비밀 문의" : "",
+      }));
+    } 
+    // 문의 유형(type) 처리
+    else if (name === "type") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        // "비밀 문의"를 선택하면 isSecret을 체크하고, 그 외에는 해제
+        isSecret: value === "비밀 문의" ? true : false,
+      }));
+    } 
+    // 기타 필드 처리
+    else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -52,8 +75,8 @@ const Qna_board = () => {
     const postData = {
       categoryId: formData.type === "일반 문의" ? 1 :  
                   formData.type === "기타 문의" ? 2 :
-                  formData.type === "비밀 문의" ? 3 :
-                  formData.type === "사이즈 문의" ? 4 : 0,
+                  formData.type === "사이즈 문의" ? 3 :
+                  formData.type === "비밀 문의" ? 4 : 0 ,
       title: formData.title,
       content: formData.question,
       secret: formData.isSecret,
@@ -63,8 +86,8 @@ const Qna_board = () => {
     console.log("CategoryId before request:", 
       formData.type === "일반 문의" ? 1 :  
       formData.type === "기타 문의" ? 2 :
-      formData.type === "비밀 문의" ? 3 :
-      formData.type === "사이즈 문의" ? 4 : 0
+      formData.type === "사이즈 문의" ? 3 :
+      formData.type === "비밀 문의" ? 4 : 0
     );
     
     console.log("Submitted Data:", postData);
@@ -123,9 +146,9 @@ const Qna_board = () => {
               <select className={QnA_w.qnaboardSelect} name="type" value={formData.type} onChange={handleChange} required >
                 <option value="">문의 유형을 선택하세요</option>
                 <option value="일반 문의">일반 문의</option>
-                <option value="비밀 문의">비밀 문의</option>
                 <option value="기타 문의">기타 문의</option>
                 <option value="사이즈 문의">사이즈 문의</option>
+                <option value="비밀 문의">비밀 문의</option>
               </select>
               {errors.type && <p className={QnA_w.errorMsg}>{errors.type}</p>}
             </div>

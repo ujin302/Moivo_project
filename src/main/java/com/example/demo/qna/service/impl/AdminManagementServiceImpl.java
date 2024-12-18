@@ -109,7 +109,7 @@ public class AdminManagementServiceImpl implements AdminManagementService {
                         question.getQuestionDate(),
                         question.getResponse(),
                         question.getResponseDate(),
-                        question.getSecret(),
+                        question.getPrivatePwd(),
                         question.getFixQuestion()))
                 .collect(Collectors.toList());
     }
