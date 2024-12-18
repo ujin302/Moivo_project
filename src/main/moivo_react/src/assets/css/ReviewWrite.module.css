@@ -369,3 +369,104 @@
   }
 }
 
+/* 반응형 디자인을 위한 미디어 쿼리 */
+@media screen and (max-width: 1024px) {
+  .reviewWriteContainer {
+    max-width: 90%;
+    margin: 60px auto;
+    padding: 30px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .reviewWriteContainer {
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+
+  .reviewWriteContainer .contentInput {
+    min-height: 150px;
+    padding: 15px;
+  }
+
+  .reviewWriteContainer button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+  }
+
+  .ratingStar {
+    width: 1.8em;
+    height: 1.8em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .reviewWriteContainer {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 1.5rem;
+  }
+
+  .reviewWriteContainer .contentInput {
+    min-height: 120px;
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .reviewWriteContainer .contentIcon {
+    top: 15px;
+    left: 15px;
+    font-size: 1.2rem;
+  }
+
+  .reviewWriteContainer .characterCount {
+    font-size: 0.8rem;
+  }
+
+  .reviewWriteContainer button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+
+  .ratingStar {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  .preview h3 {
+    font-size: 1.2rem;
+  }
+
+  .previewContent {
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .reviewWriteContainer {
+    margin: 10px auto;
+    padding: 10px;
+  }
+
+  .reviewWriteContainer h1 {
+    font-size: 1.3rem;
+  }
+
+  .ratingStar {
+    width: 1.3em;
+    height: 1.3em;
+  }
+}
+

@@ -9,7 +9,7 @@ import { FaPen } from 'react-icons/fa';
 
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('accessToken');
-    console.log('요청 헤더의 토큰:', token);
+    // console.log('요청 헤더의 토큰:', token);
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

@@ -14,4 +14,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Integer> {
     
     // 특정 사용자의 리뷰 조회
     public Page<ReviewEntity> findByUserEntityIdAndProductEntityId(int userId, int productId, Pageable pageable);
+    
+    // 사용자의 모든 리뷰 조회 메서드 추가
+    public Page<ReviewEntity> findByUserEntityId(int userId, Pageable pageable);
 }

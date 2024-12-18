@@ -71,12 +71,25 @@ public class ReviewController {
     }
 
     // 특정 사용자의 리뷰 조회
-    @GetMapping("/user/{userId}/{productId}")
-    public ResponseEntity<Page<ReviewDTO>> getUserReviewsByPage(
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<ReviewDTO>> getUserReviews(
             @PathVariable int userId,
-            @PathVariable int productId,
-            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ReviewDTO> reviews = reviewService.getUserReviewsByProductId(userId, productId, pageable);
-        return ResponseEntity.ok(reviews);
+            @RequestHeader("Authorization") String token,
+            @PageableDefault(size = 10, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        try {
+            System.out.println("사용자 리뷰 조회 요청 - userId: " + userId);
+            System.out.println("Authorization 토큰: " + token);
+            
+            if (!token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+            }
+            
+            Page<ReviewDTO> reviews = reviewService.getAllUserReviews(userId, pageable);
+            System.out.println("조회된 리뷰 수: " + reviews.getContent().size());
+            return ResponseEntity.ok(reviews);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body(null);
+        }
     }
 }
