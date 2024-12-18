@@ -21,4 +21,7 @@ public interface ReviewService {
     // 특정 사용자의 리뷰 조회
     public Page<ReviewDTO> getUserReviewsByProductId(int userId, int productId, Pageable pageable);
 
+    // 사용자의 모든 리뷰 조회
+    public Page<ReviewDTO> getAllUserReviews(int userId, Pageable pageable);
+
 }

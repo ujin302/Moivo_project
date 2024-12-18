@@ -62,18 +62,18 @@ const routeConfig = [
   { path : "/admins_productadd", element: <Admins_productAdd/>},
   { path : "/admins_productupdate", element: <Admins_productUpdate/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
-  { path: "/oauth2/callback/kakao", element: <KakaoCallback /> }
+  { path: "/oauth2/callback/kakao", element: <KakaoCallback /> },
 ];
 
 const App = () => {
   return (
     <Router>
         <AuthProvider>
-            <Routes>
-            {routeConfig.map(({ path, element }, index) => (
-              <Route key={index} path={path} element={element} />
-            ))}
-          </Routes>
+                <Routes>
+                {routeConfig.map(({ path, element }, index) => (
+                  <Route key={index} path={path} element={element} />
+                ))}
+              </Routes>
         </AuthProvider>
     </Router>
   );
