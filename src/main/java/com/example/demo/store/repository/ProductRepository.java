@@ -75,4 +75,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 
     // 삭제되지 않은 상품(판매 중인 상품) 수 조회 - 24.12.13 - yjy
     public long countByDeleteFalse();
+
+    // 삭제된 상품 수 조회 - 24.12.18 - sumin
+    public long countByDeleteTrue();
 }

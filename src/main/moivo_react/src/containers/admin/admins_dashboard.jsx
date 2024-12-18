@@ -3,7 +3,7 @@ import axiosInstance from '../../utils/axiosConfig';
 import admin_dashboard from '../../assets/css/admins_dashboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
@@ -124,16 +124,22 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
               <h3 className={admin_dashboard.cardTitle}>상품 현황</h3>
               <div className={admin_dashboard.cardList}>
                 <div className={admin_dashboard.cardItem}>
-                  판매 상품 :
-                  <span className={admin_dashboard.cardNumber}>{productStatus['판매 상품']}</span>
+                  <Link to="/admin/admin_productList" >
+                    판매 상품 :
+                  </Link>
+                  <span className={admin_dashboard.cardNumber}>{productStatus['판매 상품'] }</span>
                 </div>
                 <div className={admin_dashboard.cardItem}>
-                  품절 상품 :
+                  <Link to="">
+                    품절 상품 :
+                  </Link>
                   <span className={admin_dashboard.cardNumber}>{productStatus['품절 상품']}</span>
                 </div>
                 <div className={admin_dashboard.cardItem}>
-                  재고 10 이하 :
-                  <span className={admin_dashboard.cardNumber}>{productStatus['재고 10 이하']}</span>
+                  <Link to="">
+                    삭제된 상품 :
+                  </Link>
+                  <span className={admin_dashboard.cardNumber}>{productStatus['삭제된 상품']}</span>
                 </div>
               </div>
             </div>
