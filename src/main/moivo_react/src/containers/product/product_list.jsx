@@ -74,12 +74,13 @@ const ProductList = () => {
         // 3. 카테고리 Data 저장
         setCategories([{ id: 0, name: '전체' }, ...response.data.category]);
 
-        // 4. 사용자 Wish Data 요청
-        if(id != null) {
-          // 사용자 Wish & Cart Data
-          getWishCartCount('wish');
-          getWishCartCount('cart');
-        }
+        //24.12.18_yjy 주석처리 이유 : 에러 문구 제거 위함
+        // // 4. 사용자 Wish Data 요청
+        // if(id != null) {
+        //   // 사용자 Wish & Cart Data
+        //   getWishCartCount('wish');
+        //   getWishCartCount('cart');
+        // }
         
         // 5. 현재 페이지 설정
         setCurrentPage(page);
@@ -106,46 +107,47 @@ const ProductList = () => {
     fetchProducts(0);
   }, []);
 
-  // 24.11.28 - uj
-  // 사용자 Wish or Cart Data 요청
-  const getWishCartCount = async (type) => {
-    try {
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+  //24.12.18_yjy 주석처리 이유 : 에러 문구 제거 위함
+  // // 24.11.28 - uj
+  // // 사용자 Wish or Cart Data 요청
+  // const getWishCartCount = async (type) => {
+  //   try {
+  //     const headers = {};
+  //     if (token) {
+  //       headers['Authorization'] = `Bearer ${token}`;
+  //     }
       
-      // 1. wish Data 요청
-      const response = await axios.get(`${PATH.SERVER}/api/user/${type}/list`, {
-        headers,
-        params: {
-          userid : id
-        }
-      });
+  //     // 1. wish Data 요청
+  //     const response = await axios.get(`${PATH.SERVER}/api/user/${type}/list`, {
+  //       headers,
+  //       params: {
+  //         userid : id
+  //       }
+  //     });
   
-      // 2. wish Data 저장
-      switch (type) {
-        case 'wish':
-          setWishItem(response.data.wishlist.length);
-        break;
-        case 'cart':
-          setCartItem(response.data.totalItems);
-        break;
-        default:
-          break;
-      }
-      console.log(type, " 상품 개수: " + wishItem);
-    } catch (error) {
-      console.error("Error:", error.message, error.response);
-      if (error.response?.status === 401) {
-        console.error("인증 오류: ", error);
-      } else {
-        console.error("사용자 ", type, " 정보를 가져오는 중 오류가 발생했습니다: ", error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     // 2. wish Data 저장
+  //     switch (type) {
+  //       case 'wish':
+  //         setWishItem(response.data.wishlist.length);
+  //       break;
+  //       case 'cart':
+  //         setCartItem(response.data.totalItems);
+  //       break;
+  //       default:
+  //         break;
+  //     }
+  //     console.log(type, " 상품 개수: " + wishItem);
+  //   } catch (error) {
+  //     console.error("Error:", error.message, error.response);
+  //     if (error.response?.status === 401) {
+  //       console.error("인증 오류: ", error);
+  //     } else {
+  //       console.error("사용자 ", type, " 정보를 가져오는 중 오류가 발생했습니다: ", error);
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // 24.11.28 - uj
   // 카테고리, 정렬, 검색에 따른 상품 목록 렌더링

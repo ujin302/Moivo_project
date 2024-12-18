@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { PATH } from '../../scripts/path';
+// yjy 만듬
 
 const axiosInstance = axios.create({
   baseURL: PATH.SERVER,
