@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from "../../assets/css/ReviewWrite.module.css";
 import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
+import { PATH } from '../../../scripts/path';
 
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('accessToken');
