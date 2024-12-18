@@ -60,7 +60,7 @@ public class QuestionController {
     @GetMapping("")
     public ResponseEntity<?> searchQuestion(
             @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(name = "block", required = false, defaultValue = "10") int block,
+            @RequestParam(name = "block", required = false, defaultValue = "5") int block,
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "sortby", required = false, defaultValue = "questiondate")String sortby,
             @RequestParam(name = "categoryid", required = false, defaultValue = "0")int categoryid) {
