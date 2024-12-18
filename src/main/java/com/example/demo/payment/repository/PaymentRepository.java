@@ -13,7 +13,8 @@ import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.entity.PaymentEntity.DeliveryStatus;
 
-import feign.Param;
+// import feign.Param; 오류 import
+import org.springframework.data.repository.query.Param; // 추가수정 12.18 14:56 성찬
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer> {
