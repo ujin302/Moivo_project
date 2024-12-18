@@ -470,3 +470,202 @@
   }
 }
 
+/* 제품 정보 섹션 스타일링 */
+.productInfo {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+
+.productInfo:hover {
+  transform: translateY(-5px);
+}
+
+.productInfo h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ff385c;
+  padding-bottom: 10px;
+}
+
+/* 별점 섹션 개선 */
+.ratingContainer {
+  background: rgba(255, 221, 0, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.ratingContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #ff385c, #ffdd00);
+}
+
+/* 리뷰 작성 영역 개선 */
+.contentInputWrapper {
+  position: relative;
+  margin: 30px 0;
+  transition: transform 0.3s ease;
+}
+
+.contentInputWrapper:focus-within {
+  transform: scale(1.01);
+}
+
+.contentInput {
+  background: #fff;
+  border: 2px solid #eee;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.contentInput:focus {
+  border-color: #ff385c;
+  box-shadow: 0 8px 16px rgba(255,56,92,0.1);
+}
+
+/* 미리보기 섹션 개선 */
+.preview {
+  background: linear-gradient(to right bottom, #ffffff, #fafafa);
+  border: none;
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.previewContent {
+  position: relative;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  border-left: 4px solid #ff385c;
+}
+
+.previewProductName {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.previewDate {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.previewRating {
+  color: #ffdd00;
+  font-size: 1.5rem;
+  margin: 10px 0;
+  display: flex;
+  gap: 5px;
+}
+
+.previewText {
+  line-height: 1.6;
+  color: #444;
+}
+
+/* 글자수 카운터 애니메이션 */
+.characterCount {
+  background: rgba(255,56,92,0.1);
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.characterCount.warning {
+  background: rgba(255,196,0,0.2);
+}
+
+.characterCount.danger {
+  background: rgba(255,56,92,0.2);
+}
+
+/* 제출 버튼 개선 */
+.submitButton {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(255,56,92,0.2);
+}
+
+.submitButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 300%;
+  background: rgba(255,255,255,0.2);
+  transform: translate(-50%, -50%) rotate(35deg);
+  transition: transform 0.5s ease;
+}
+
+.submitButton:hover::after {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+/* 툴팁 스타일 */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reviewWriteContainer > * {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* 반응형 조정 */
+@media screen and (max-width: 768px) {
+  .productInfo h2 {
+    font-size: 1.5rem;
+  }
+  
+  .previewContent {
+    padding: 15px;
+  }
+  
+  .previewProductName {
+    font-size: 1.1rem;
+  }
+}
+
