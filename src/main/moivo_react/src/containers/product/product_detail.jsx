@@ -299,6 +299,22 @@ const ProductDetail = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+        try {
+            // 인증 없이 접근 가능한 API로 변경
+            const response = await axios.get(`${PATH.SERVER}/api/store/review/${productId}`);
+            setReviews(response.data.content);
+        } catch (error) {
+            console.error("리뷰 데이터 가져오기 실패:", error);
+        }
+    };
+
+    if (productId && activeTab === 'reviews') {
+        fetchReviews();
+    }
+  }, [productId, activeTab]);
+
   if (loading) { // 로딩 중일 때 로딩 모달 표시
     return <LoadingModal isOpen={true} />;
   }
@@ -324,22 +340,6 @@ const ProductDetail = () => {
   if (!product) {
     return null;
   }
-
-  // 리뷰 가져오기
-  // const fetchReviews = async () => {
-  //   try {
-  //     const userId = localStorage.getItem('id');
-  //     const response = await axios.get(`${PATH.SERVER}/api/user/review/user/${userId}/${productId}`);
-  //     setReviews(response.data.content); // 페이지네이션을 고려하여 content만 설정
-  //   } catch (error) {
-  //     console.error('리뷰 불러오기 실패:', error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (activeTab === 'reviews') {
-  //     fetchReviews();
-  //   }
-  // }, [activeTab, productId]);
 
   return (
     <div className={styles.productDetailRoot}>
@@ -653,8 +653,20 @@ const ProductDetail = () => {
                           viewport={{ once: true }}
                         >
                           <div className={styles.reviewHeader}>
-                            <span className={styles.rating}>★ {review.rating}</span>
-                            <span className={styles.reviewAuthor}>{review.userName}</span>
+                            <div className={styles.reviewInfo}>
+                              <span className={styles.rating}>
+                                {[...Array(review.rating)].map((_, i) => (
+                                  <span key={i}>★</span>
+                                ))}
+                              </span>
+                              <span className={styles.reviewAuthor}>{review.userName}</span>
+                              <span className={styles.reviewDate}>
+                                {new Date(review.reviewDate).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <span className={styles.purchaseInfo}>
+                              구매 사이즈: {review.size}
+                            </span>
                           </div>
                           <p className={styles.reviewContent}>{review.content}</p>
                         </motion.div>
@@ -663,28 +675,6 @@ const ProductDetail = () => {
                   ) : (
                     <div className={styles.noReviewContainer}>
                       <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
-                      <div className={styles.exampleReviews}>
-                        <h3>리뷰 예시</h3>
-                        <div className={styles.exampleReview}>
-                          <div className={styles.reviewHeader}>
-                            <span className={styles.rating}>★ 4.5</span>
-                            <span className={styles.reviewAuthor}>홍길동</span>
-                          </div>
-                          <p className={styles.reviewContent}>
-                            상품이 너무 마음에 들어요! 사이즈도 딱 맞고 배송도 빨랐습니다.
-                            다음에도 구매하고 싶네요.
-                          </p>
-                        </div>
-                        <div className={styles.exampleReview}>
-                          <div className={styles.reviewHeader}>
-                            <span className={styles.rating}>★ 5.0</span>
-                            <span className={styles.reviewAuthor}>김철수</span>
-                          </div>
-                          <p className={styles.reviewContent}>
-                            퀄리티가 정말 좋아요. 가격대비 만족스럽습니다!
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   )}
                 </div>
