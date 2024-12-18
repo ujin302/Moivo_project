@@ -57,7 +57,6 @@ public class QuestionEntity {
     // DTO -> Entity 변환
     public static QuestionEntity tosaveQuestionEntity(QuestionDTO questionDTO, QuestionCategoryEntity questionCategoryEntity, UserEntity userEntity){
         QuestionEntity questionEntity = new QuestionEntity();
-        questionEntity.setFixQuestion(questionDTO.getFixQuestion());
         questionEntity.setPrivatePwd(questionDTO.getPrivatePwd());
         questionEntity.setTitle(questionDTO.getTitle()); //제목
         questionEntity.setContent(questionDTO.getContent()); //내용
