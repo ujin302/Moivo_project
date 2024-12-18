@@ -398,12 +398,16 @@ const Qna_boardlist = () => {
                             </div>
                         </div>
                     )}
-
                 </div>
-
+                
+                {/* 검색 */}
+                 <div className={QnA_b.suchMain}>
+                    
+                </div>   
+                
                 {/* 페이징 버튼 */}
                 <div className={QnA_b.pagination}>
-                {renderPagination()}
+                    {renderPagination()}
                 </div>
             </div>
 

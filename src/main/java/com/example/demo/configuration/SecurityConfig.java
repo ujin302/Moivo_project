@@ -66,7 +66,8 @@ public class SecurityConfig {
                                 "/api/store/**",
                                 "/api/oauth/**",
                                 "/oauth/**",
-                                "/api/mail/success")
+                                "/api/mail/success",
+                                "/api/user/question")
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
