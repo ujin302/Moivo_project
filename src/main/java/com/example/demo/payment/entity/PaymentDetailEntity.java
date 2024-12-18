@@ -44,6 +44,9 @@ public class PaymentDetailEntity {
     @Column(name = "size", nullable = false)
     private Size size; // 상품 사이즈
 
+    @Column(name = "writereview")
+    private boolean isWriteReview = false; // 리뷰 작성 여부
+
     // DTO -> Entity
 
     // 결제 정보 저장

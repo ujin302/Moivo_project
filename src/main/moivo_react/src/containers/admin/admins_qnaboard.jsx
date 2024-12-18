@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import admin_qnaboard from '../../assets/css/admins_qnaboard.module.css';
 import Admins_side from '../../components/admin_sidebar/admins_side';
 import { PATH } from '../../../scripts/path';
-import axios from 'axios';
 import axiosInstance from "../../utils/axiosConfig";
  
 const Admins_qnaboard = () => {
@@ -27,7 +26,7 @@ const Admins_qnaboard = () => {
 
     const fetchQuestions = async () => {
         try {
-            const response = await axiosInstance.get('/api/admin/qna/management/questions');
+            const response = await axiosInstance.get(`${PATH.SERVER}/api/admin/qna/management/questions`);
             setQuestions(response.data);
         } catch (error) {
             console.error('Failed to fetch questions:', error);
@@ -36,7 +35,7 @@ const Admins_qnaboard = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axiosInstance.get('/api/admin/qna/management/categories');
+            const response = await axiosInstance.get(`${PATH.SERVER}/api/admin/qna/management/categories`);
             setCategories(response.data);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
@@ -72,28 +71,14 @@ const Admins_qnaboard = () => {
     const handleRespondToQuestion = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
+            console.log('Sending response:', responseInput);
 
-            console.log('Sending response:', responseInput); // 요청 데이터 로깅
+            const response = await axiosInstance.post(
+                `/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
+                { response: responseInput }
+            );
 
-            const response = await axios({
-                method: 'post',
-                url: `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
-                data: { response: responseInput },
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                validateStatus: function (status) {
-                    return status >= 200 && status < 500; // 302를 포함한 모든 2xx, 3xx, 4xx 상태 허용
-                }
-            });
-
-            console.log('Server response:', response); // 서버 응답 로깅
+            console.log('Server response:', response);
 
             if (response.status === 200) {
                 await fetchQuestions();
@@ -107,56 +92,34 @@ const Admins_qnaboard = () => {
         }
     };
 
-        // 답변 수정
-        const handleUpdateResponse = async (e) => {
-            e.preventDefault();
-            try {
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    console.error('No token found');
-                    return;
-                }
-                
-                await axios({
-                    method: 'put',
-                    url: `${PATH.SERVER}/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
-                    data: { response: responseInput },  // 객체 형태로 변경
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                await fetchQuestions();  // 데이터 새로고침
-                closeEditResponseModal();
-            } catch (error) {
-                console.error('Failed to update response:', error);
-            }
-        };
+    // 답변 수정
+    const handleUpdateResponse = async (e) => {
+        e.preventDefault();
+        try {
+            await axiosInstance.put(
+                `/api/admin/qna/management/questions/${selectedQuestion.id}/response`,
+                { response: responseInput }
+            );
+            
+            await fetchQuestions();
+            closeEditResponseModal();
+        } catch (error) {
+            console.error('Failed to update response:', error);
+        }
+    };
 
-        // 답변 삭제
-        const handleDeleteResponse = async (questionId) => {
-            try {
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    console.error('No token found');
-                    return;
-                }
-                
-                await axios({
-                    method: 'delete',
-                    url: `${PATH.SERVER}/api/admin/qna/management/questions/${questionId}/response`,
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                await fetchQuestions();  // 데이터 새로고침
-            } catch (error) {
-                console.error('Failed to delete response:', error);
-            }
-        };
+    // 답변 삭제
+    const handleDeleteResponse = async (questionId) => {
+        try {
+            await axiosInstance.delete(
+                `/api/admin/qna/management/questions/${questionId}/response`
+            );
+            
+            await fetchQuestions();
+        } catch (error) {
+            console.error('Failed to delete response:', error);
+        }
+    };
 
     // 카테고리 매핑 상수 추가
     const CATEGORY_MAPPING = {

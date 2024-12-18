@@ -27,13 +27,26 @@ const Qna_boardlist = () => {
         secret: false
     });
 
+    const categoryMapping = {
+        '': 0,
+        '일반 문의': 1,
+        '기타 문의': 2,
+        '사이즈 문의': 3,
+        '비밀 문의': 4
+    };
+
     // 현재 로그인한 사용자 ID 상태 추가
     const [currentUserId, setCurrentUserId] = useState(null);
 
-    // 서버에서 문의 데이터를 가져오는 함수
-    const fetchQnaData = async (page = 0) => {
+    // 서버에서 문의 데이터를 가져오는 함수, 카테고리 필터링 포함
+    const fetchQnaData = async (page = 0, categoryId = 0) => {
         try {
-            const response = await axiosInstance.get(`/api/user/question?page=${page}`);
+            const response = await axiosInstance.get('/api/user/question', {
+                params: {
+                    page: page,
+                    categoryid: categoryId
+                }
+            });
             setQnaData(response.data.QuestionList || []);
             setTotalPages(response.data.totalPages);
             setCurrentPage(page);
@@ -56,12 +69,23 @@ const Qna_boardlist = () => {
         checkUserId();
     }, []);
 
-    // 필터링된 데이터는 백엔드에서 처리하도록 요청할 수도 있음
-    const handleFilterChange = (type) => {
-        setSelectedType(type);
-        setCurrentPage(0);
-        fetchQnaData(0);
+    // 문의 유형별 토글
+    const toggleDropdown = () => {
+        setIsDropdownVisible(!isDropdownVisible);
+    };
+
+    // 카테고리 필터링 핸들러
+    const handleFilterChange = (category) => {
+        const categoryId = categoryMapping[category];
+
+        // 상태 업데이트
+        setSelectedType(category);
         setIsDropdownVisible(false);
+
+        // 서버에 카테고리 필터링 요청
+        fetchQnaData(0, categoryId);
+
+        setActiveIndex(null);
     };
 
     const handleToggle = (index, item) => {
@@ -72,7 +96,7 @@ const Qna_boardlist = () => {
             return;
         }
     
-        if (item.categoryId === 3) { // 비밀글인 경우
+        if (item.categoryId === 4) { // 비밀글인 경우
             if (currentUserId === item.userId) {
                 // 자신이 작성한 비밀글인 경우 비밀번호 모달 없이 바로 열기
                 setActiveIndex(activeIndex === index ? null : index);
@@ -96,7 +120,7 @@ const Qna_boardlist = () => {
                 categoryId: item.categoryId,
                 title: item.title,
                 content: item.content,
-                secret: item.secret || item.categoryId === 3
+                secret: item.secret || item.categoryId === 4
             });
             setEditModalVisible(true);
         } else {
@@ -112,11 +136,12 @@ const Qna_boardlist = () => {
                 userId: currentUserId
             });
             
-            // 모달 닫기
-            setEditModalVisible(false);
-            
-            // 현재 페이지 다시 불러오기
-            fetchQnaData(currentPage);
+            // 현재 페이지와 선택된 카테고리 유지하며 데이터 다시 불러오기
+            const categoryId = categoryMapping[selectedType] || 0;
+            fetchQnaData(currentPage, categoryId);
+             // 초기화
+             setActiveIndex(null);
+             setEditModalVisible(false);
             
             alert('수정이 완료되었습니다.');
         } catch (error) {
@@ -137,7 +162,9 @@ const Qna_boardlist = () => {
                             userId: currentUserId 
                         }
                     });
-                    fetchQnaData(currentPage); // 현재 페이지 다시 불러오기
+                    const categoryId = categoryMapping[selectedType] || 0;
+                    fetchQnaData(currentPage, categoryId);
+                    setActiveIndex(null);
                 } catch (error) {
                     console.error('삭제 중 오류:', error);
                     alert('삭제에 실패했습니다.');
@@ -148,27 +175,27 @@ const Qna_boardlist = () => {
         }
     };
 
+    // 페이지 변경 핸들러
     const handlePageChange = (page) => {
-        fetchQnaData(page);
-        setActiveIndex(null); // 페이지 변경 시 열려있는 아이템 초기화
+        const categoryId = categoryMapping[selectedType] || 0;
+        setActiveIndex(null);
+        fetchQnaData(page, categoryId);
     };
 
+    // 아이콘 체크
     const getIconForType = (item) => {
-        if (item.categoryId === 3) return <i className="fas fa-lock"></i>; // 비밀문의 아이콘
+        if (item.categoryId === 4) return <i className="fas fa-lock"></i>; // 비밀문의 아이콘
     
         // categoryId에 따라 다른 아이콘 표시
         switch (item.categoryId) {
             case 1: return <i className="fas fa-question-circle"></i>; // 일반문의
             case 2: return <i className="fas fa-comment-alt"></i>; // 기타문의
-            case 4: return <i className="fas fa-ruler"></i>; // 사이즈문의
+            case 3: return <i className="fas fa-ruler"></i>; // 사이즈문의
             default: return <i className="fas fa-question-circle"></i>; // 기본 아이콘
         }
     };
 
-    const toggleDropdown = () => {
-        setIsDropdownVisible(!isDropdownVisible);
-    };
-
+    //비밀글 페스워드 모달
     const handlePasswordCheck = () => {
         if (enteredPassword === selectedPost.password) { 
             setActiveIndex(qnaData.indexOf(selectedPost)); // 해당 글 활성화
@@ -178,6 +205,7 @@ const Qna_boardlist = () => {
         }
     };
 
+    //비밀글 페스워드 모달
     const closePasswordModal = () => {
         setPasswordModalVisible(false);
         setEnteredPassword('');
@@ -186,13 +214,59 @@ const Qna_boardlist = () => {
 
     // 줄바꿈 문자를 <br />로 변환하는 함수
     const convertNewlinesToBreaks = (text) => {
-    return text.split('\n').map((line, index) => (
-        <span key={index}>
-            {line}
-            <br />
-        </span>
-    ));
-};
+        return text.split('\n').map((line, index) => (
+            <span key={index}>
+                {line}
+                <br />
+            </span>
+        ));
+    };
+
+    // 페이징 처리
+    const renderPagination = () => {
+        const maxPagesToShow = 5;  // 한 번에 표시할 최대 페이지 버튼 수
+    
+        // 현재 페이지가 속한 페이지 그룹의 시작 페이지 계산
+        const pageGroup = Math.floor(currentPage / maxPagesToShow);
+        const startPage = pageGroup * maxPagesToShow;
+        const endPage = Math.min(startPage + maxPagesToShow - 1, totalPages - 1);
+    
+        return (
+            <div className={QnA_b.pagination}>
+                {/* 이전 버튼 (첫 페이지 그룹이 아닐 때만 표시) */}
+                {pageGroup > 0 && (
+                    <button 
+                        className={QnA_b.paginationBtn} 
+                        onClick={() => handlePageChange(startPage - 1)}
+                    >
+                        이전
+                    </button>
+                )}
+    
+                {/* 페이지 번호들 */}
+                {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(page => (
+                    <button
+                        key={page}
+                        className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`}
+                        onClick={() => handlePageChange(page)}
+                    >
+                        {page + 1}
+                    </button>
+                ))}
+    
+                {/* 다음 버튼 (마지막 페이지 그룹이 아닐 때만 표시) */}
+                {endPage < totalPages - 1 && (
+                    <button 
+                        className={QnA_b.paginationBtn} 
+                        onClick={() => handlePageChange(endPage + 1)}
+                    >
+                        다음
+                    </button>
+                )}
+            </div>
+            );
+        };
+
 
     return (
         <div className={QnA_b.qnalistMainDiv}>
@@ -227,9 +301,9 @@ const Qna_boardlist = () => {
                             <ul className={QnA_b.filterList}>
                                 <li onClick={() => handleFilterChange('')}>전체</li>
                                 <li onClick={() => handleFilterChange('일반 문의')}>일반 문의</li>
-                                <li onClick={() => handleFilterChange('비밀 문의')}>비밀 문의</li>
-                                <li onClick={() => handleFilterChange('사이즈 문의')}>사이즈 문의</li>
                                 <li onClick={() => handleFilterChange('기타 문의')}>기타 문의</li>
+                                <li onClick={() => handleFilterChange('사이즈 문의')}>사이즈 문의</li>
+                                <li onClick={() => handleFilterChange('비밀 문의')}>비밀 문의</li>
                             </ul>
                         )}
                     </div>
@@ -244,7 +318,7 @@ const Qna_boardlist = () => {
                                         {getIconForType(item)}
                                     </span>
                                     <span className={QnA_b.qnalistQuestionTitle}>
-                                        {item.categoryId === 3 ? '비밀글입니다.' : item.title}
+                                        {item.categoryId === 4 ? '비밀글입니다.' : item.title}
                                     </span>
                                 </div>
                                 {activeIndex === index && (
@@ -285,8 +359,8 @@ const Qna_boardlist = () => {
                                 className={QnA_b.modalSelect}>
                                     <option value={1}>일반 문의</option>
                                     <option value={2}>기타 문의</option>
-                                    <option value={3}>비밀 문의</option>
-                                    <option value={4}>사이즈 문의</option>
+                                    <option value={3}>사이즈 문의</option>
+                                    <option value={4}>비밀 문의</option>
                                 </select>
                                 
                                 {/* 제목 입력 */}
@@ -301,9 +375,9 @@ const Qna_boardlist = () => {
                                 {/* 비밀글 여부 체크박스 */}
                                 <div className={QnA_b.secretCheckbox}>
                                     <label>비밀글</label>
-                                    <input type="checkbox" checked={editedPost.categoryId === 3 || editedPost.secret === true} onChange={(e) => setEditedPost({
+                                    <input type="checkbox" checked={editedPost.categoryId === 4 || editedPost.secret === true} onChange={(e) => setEditedPost({
                                             ...editedPost, 
-                                            categoryId: e.target.checked ? 3 : 1,
+                                            categoryId: e.target.checked ? 4 : 1,
                                             secret: e.target.checked
                                         })} />
                                 </div>
@@ -329,11 +403,7 @@ const Qna_boardlist = () => {
 
                 {/* 페이징 버튼 */}
                 <div className={QnA_b.pagination}>
-                    {Array.from({ length: totalPages }, (_, i) => i).map(page => (
-                        <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)} >
-                            {page + 1}
-                        </button>
-                    ))}
+                {renderPagination()}
                 </div>
             </div>
 

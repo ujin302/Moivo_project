@@ -1,58 +1,90 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from "../../assets/css/Mypage_orderDetails.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import { PATH } from '../../../scripts/path';
+import axiosInstance from '../../utils/axiosConfig';
 
 const MypageOrderDetails = () => {
+    const location = useLocation();
+    const [OrderDetailList, setOrderDetailList] = useState([]);
+    const [OrdersInfo, setOrdersInfo] = useState({});
+    const [paymentId, setPaymentId] = useState(undefined);
+    const { tosscode } = location.state || {};
     const navigate = useNavigate();
 
+    //주문 목록으로 다시 이동하는 부분
     const handleButtonClick = () => {
       navigate('/mypage/order'); // 이동할 경로 설정
     };
 
-    // 주문 상품 데이터를 배열로 정의
-    const orderItems = [
-        {
-            orderDate: "2024-11-15",
-            orderNumber: "20241115-0001256",
-            image: "../image/order1.png",
-            productName: "Ballerina skirt",
-            option: "black M",
-            price: 69000,
-            quantity: 2, // 수량 추가
-            status: "구매확정",
-        },
-        {
-            orderDate: "2024-11-15",
-            orderNumber: "20241115-0001257",
-            image: "../image/order2.png",
-            productName: "Golgi cotton bolero",
-            option: "white",
-            price: 65000,
-            quantity: 1,
-            status: "배송중",
-        },
-        {
-            orderDate: "2024-11-15",
-            orderNumber: "20241115-0001258",
-            image: "../image/order3.png",
-            productName: "Jewel tee",
-            option: "pink S",
-            price: 39000,
-            quantity: 3,
-            status: "배송완료",
-        },
-    ];
-    
+    //디테일 가지고 오기 - 12/17 강민
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate("/user");
+            return;
+        }
 
-    // 자동 계산 로직
-    const discount = 10000; // 고정 할인 금액
-    const shippingFee = 5000; // 고정 배송비
-    const totalPrice = orderItems.reduce((total, item) => total + item.price * item.quantity, 0);
-    const finalPrice = totalPrice - discount + shippingFee;
+        // 토큰 디코딩 (jwt-decode 없이)
+        const payload = token.split('.')[1];
+        const decodedPayload = JSON.parse(atob(payload));
+        const id = decodedPayload.id;  //토큰에 있는 id 추출
+        console.log("User ID:", id);
+
+        //구매한 payment info 정보 가지고 오기, 구매한 상세 목록 가지고 오기 - 12/17 강민
+        const fetchOrdersInfo = async () => {
+            try {
+                const orderInfoResponse = await axiosInstance.get(`/api/user/mypage/orders/info/${tosscode}`);
+                setOrdersInfo(orderInfoResponse.data);
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        fetchOrdersInfo();
+
+      }, [navigate, tosscode]);
+
+      useEffect(() => {
+        if (OrdersInfo.length > 0) {
+            const paymentId = OrdersInfo[0]?.id;
+            console.log("paymentId :", paymentId);
     
+            // 2단계: OrderDetailList 가져오기
+            const fetchOrderDetails = async () => {
+                try {
+                    const orderDetailsResponse = await axiosInstance.get(`/api/user/mypage/orders/details/${paymentId}`);
+                    setOrderDetailList(orderDetailsResponse.data);
+
+                    // OrdersInfo가 로드된 후 paymentId 설정
+                    if (OrdersInfo[0]) {
+                        setPaymentId(OrdersInfo[0].id); // OrdersInfo[0]가 있을 경우에만 설정
+                    }
+                } catch (error) {
+                    console.error("Error fetching order details:", error);
+                }
+            };
+    
+            fetchOrderDetails();
+        }
+    }, [OrdersInfo]);
+
+      //값 확인하기
+      useEffect(() => {
+        console.log("Updated OrdersInfo:", OrdersInfo);
+        console.log("OrdersInfo as JSON:", JSON.stringify(OrdersInfo, null, 2)); // JSON 형태로 보기
+      }, [OrdersInfo]);
+
+      useEffect(() => {
+        console.log("OrderDetailList:", OrderDetailList);
+      }, [OrderDetailList]);
+
+    //*********************************************************************** */
     return (
         <div>
             <div className={styles.orderDetailsContainer}>
@@ -69,17 +101,17 @@ const MypageOrderDetails = () => {
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>주문번호:</p>
-                            <p className={styles.value}>20241115-0001256</p>
+                            <p className={styles.value}>{OrdersInfo[0]?.tosscode}</p>
                         </div>
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>주문일자:</p>
-                            <p className={styles.value}>2024-11-15 15:56:26</p>
+                            <p className={styles.value}>{OrdersInfo[0]?.paymentDate}</p>
                         </div>
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>주문자:</p>
-                            <p className={styles.value} style={{ color: '#2F2E2C' }}>전수민</p>
+                            <p className={styles.value} style={{ color: '#2F2E2C' }}>{OrdersInfo[0]?.name}</p>
                         </div>
                     </div>
                     <div className={styles.shippingInfo}>
@@ -87,17 +119,17 @@ const MypageOrderDetails = () => {
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>우편번호:</p>
-                            <p className={styles.value} style={{ color: '#2F2E2C' }}>06134</p>
+                            <p className={styles.value} style={{ color: '#2F2E2C' }}>{OrdersInfo[0]?.zipcode}</p>
                         </div>
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>주소:</p>
-                            <p className={styles.value} style={{ color: '#2F2E2C' }}>서울시 강남구 강남대로94길 20 6층 602호</p>
+                            <p className={styles.value} style={{ color: '#2F2E2C' }}>{OrdersInfo[0]?.addr1} {OrdersInfo[0]?.addr2}</p>
                         </div>
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>휴대전화:</p>
-                            <p className={styles.value} style={{ color: '#2F2E2C' }}>010 - 4567 - 0680</p>
+                            <p className={styles.value} style={{ color: '#2F2E2C' }}>{OrdersInfo[0]?.tel}</p>
                         </div>
                     </div>
                 </section>
@@ -108,29 +140,25 @@ const MypageOrderDetails = () => {
                 <section className={styles.tableSection}>
                     <div className={styles.table}>
                     <div className={styles.row}>
-                        <div className={styles.column2}>주문일자</div>
-                        <div className={styles.column2}>상품</div>
-                        <div className={styles.column2}>상품정보</div>
-                        <div className={styles.column2}>수량</div> {/* 수량 열 추가 */}
+                        <div className={styles.column2}>상품이미지</div>
+                        <div className={styles.column2}>상품명</div>
+                        <div className={styles.column2}>사이즈</div>
+                        <div className={styles.column2}>수량</div>
                         <div className={styles.column2}>상품금액</div>
-                        <div className={styles.column2}>주문처리상태</div>
+                        <div className={styles.column2}>주문상태</div>
                     </div>
-                    {orderItems.map((item, index) => (
+                    {OrderDetailList.map((item, index) => (
                         <div className={styles.row} key={index}>
-                            <div className={styles.column}>
-                                {item.orderDate} <br />
-                            </div>
                             <div className={styles.image}>
-                                <img src={item.image} alt={`order-${index}`} />
+                                <img src={item.productImg} alt={`order-${index}`} />
                             </div>
-                            <div className={styles.column3}>
-                                {item.productName} <br />[옵션: {item.option}]
-                            </div>
-                            <div className={styles.column}>{item.quantity}</div> {/* 수량 표시 */}
-                            <div className={styles.column}>{(item.price * item.quantity).toLocaleString()}</div>
+                            <div className={styles.column3}>{item.productName}</div>
+                            <div className={styles.column}>{item.size}</div>
+                            <div className={styles.column}>x {item.count}</div> {/* 수량 표시 */}
+                            <div className={styles.column}>KRW {item.price}</div>
                             <div className={styles.column}>
-                                {item.status}
-                                {item.status === "구매확정" && (
+                                {OrdersInfo[0]?.deliveryStatus}
+                                {OrdersInfo[0]?.deliveryStatus === "구매확정" && (
                                     <button className={styles.reviewButton}>REVIEW</button>
                                 )}
                             </div>
@@ -144,12 +172,7 @@ const MypageOrderDetails = () => {
 
                 {/* 결제 정보 */}
                 <section className={styles.paymentSummary}>
-                    <div className={styles.paymentDetails}>
-                        <p>상품구매금액: KRW {totalPrice.toLocaleString()}</p>
-                        <p>- 할인금액: KRW {discount.toLocaleString()}</p>
-                        <p>+ 배송비: KRW {shippingFee.toLocaleString()}</p>
-                    </div>
-                    <p className={styles.totalPrice}>합계: <span>KRW {finalPrice.toLocaleString()}</span></p>
+                    <p className={styles.totalPrice}>합계: <span>KRW {OrdersInfo[0]?.totalPrice}</span></p>
                 </section>
 
 

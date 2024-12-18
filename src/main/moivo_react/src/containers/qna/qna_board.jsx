@@ -75,8 +75,8 @@ const Qna_board = () => {
     const postData = {
       categoryId: formData.type === "일반 문의" ? 1 :  
                   formData.type === "기타 문의" ? 2 :
-                  formData.type === "비밀 문의" ? 3 :
-                  formData.type === "사이즈 문의" ? 4 : 0,
+                  formData.type === "사이즈 문의" ? 3 :
+                  formData.type === "비밀 문의" ? 4 : 0 ,
       title: formData.title,
       content: formData.question,
       secret: formData.isSecret,
@@ -86,8 +86,8 @@ const Qna_board = () => {
     console.log("CategoryId before request:", 
       formData.type === "일반 문의" ? 1 :  
       formData.type === "기타 문의" ? 2 :
-      formData.type === "비밀 문의" ? 3 :
-      formData.type === "사이즈 문의" ? 4 : 0
+      formData.type === "사이즈 문의" ? 3 :
+      formData.type === "비밀 문의" ? 4 : 0
     );
     
     console.log("Submitted Data:", postData);
@@ -146,9 +146,9 @@ const Qna_board = () => {
               <select className={QnA_w.qnaboardSelect} name="type" value={formData.type} onChange={handleChange} required >
                 <option value="">문의 유형을 선택하세요</option>
                 <option value="일반 문의">일반 문의</option>
-                <option value="비밀 문의">비밀 문의</option>
                 <option value="기타 문의">기타 문의</option>
                 <option value="사이즈 문의">사이즈 문의</option>
+                <option value="비밀 문의">비밀 문의</option>
               </select>
               {errors.type && <p className={QnA_w.errorMsg}>{errors.type}</p>}
             </div>

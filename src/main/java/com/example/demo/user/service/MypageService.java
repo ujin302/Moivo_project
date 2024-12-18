@@ -3,6 +3,7 @@ package com.example.demo.user.service;
 import java.util.List;
 
 import com.example.demo.payment.dto.PaymentDTO;
+import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
@@ -19,4 +20,7 @@ public interface MypageService {
 
     public List<PaymentDTO> getOrders(int id);
 
+    public List<PaymentDTO> getOrderInfo(String tosscode);
+
+    public List<PaymentDetailDTO> getOrderDetails(int paymentId);
 }
