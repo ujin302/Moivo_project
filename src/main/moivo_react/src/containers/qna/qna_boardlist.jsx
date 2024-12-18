@@ -402,7 +402,6 @@ const Qna_boardlist = () => {
                 
                 {/* 검색 */}
                  <div className={QnA_b.suchMain}>
-                    
                 </div>   
                 
                 {/* 페이징 버튼 */}
