@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.qna.service.QuestionService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,9 +22,6 @@ import java.util.Map;
 public class QuestionController {
     @Autowired
     private QuestionService questionsService;
-
-
-
 
     //문의 작성
     @PostMapping("/add")

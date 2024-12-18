@@ -6,7 +6,6 @@ import mypageIcon from '../../assets/image/mypage.png';
 import cartIcon from '../../assets/image/cart.png';
 
 
-
 const Banner = () => {
   const navigate = useNavigate();
   const { isAuthenticated, logout, tokenExpiration, isAdmin } = useContext(AuthContext);
