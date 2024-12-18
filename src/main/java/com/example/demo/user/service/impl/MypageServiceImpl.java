@@ -20,6 +20,9 @@ import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
 import com.example.demo.payment.repository.PaymentDetailRepository;
 import com.example.demo.payment.repository.PaymentRepository;
+import com.example.demo.qna.dto.QuestionDTO;
+import com.example.demo.qna.entity.QuestionEntity;
+import com.example.demo.qna.repository.QuestionRepository;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.repository.ProductRepository;
@@ -51,6 +54,9 @@ public class MypageServiceImpl implements MypageService {
 
     @Autowired
     private UserCouponRepository userCouponRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
 
     // @Autowired
     // private AttendanceRepository attendanceRepository; // 출석
@@ -252,5 +258,23 @@ public class MypageServiceImpl implements MypageService {
         return paymentDetailDTOList;
     }
 
-    
+    // 나의 문의 목록 조회 12/18 작업 - 강민
+    @Transactional
+    @Override
+    public List<QuestionDTO> getMyQuestion(int id) {
+        List<QuestionEntity> questionEntities = questionRepository.findByUserEntity_Id(id);
+        if (questionEntities == null || questionEntities.isEmpty()) {
+            throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
+        }
+
+        // PaymentEntity를 PaymentDTO로 변환
+        List<QuestionDTO> questionDTOList = new ArrayList<>();
+        for (QuestionEntity questionEntity : questionEntities) {
+            QuestionDTO questionDTO = QuestionDTO.toGetQuestionDTO(questionEntity);
+            questionDTOList.add(questionDTO);
+        }
+        
+        return questionDTOList;
+    }
+
 }

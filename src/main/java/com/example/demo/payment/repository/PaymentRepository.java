@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.demo.payment.entity.PaymentDetailEntity;
 import com.example.demo.payment.entity.PaymentEntity;
+import com.example.demo.payment.entity.PaymentEntity.DeliveryStatus;
 
 import feign.Param;
 
@@ -44,5 +45,11 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Integer>
         // 24.12.13 - 총 매출액 - uj
         @Query("SELECT SUM(p.totalPrice) FROM PaymentEntity p")
         public long sumTotalPrice();
+
+        List<PaymentEntity> findByDeliveryStatusNotAndPaymentDateBefore(
+                DeliveryStatus status, LocalDateTime dateTime
+        );
+
+        boolean existsByTossCode(String tossCode);
 }
 
