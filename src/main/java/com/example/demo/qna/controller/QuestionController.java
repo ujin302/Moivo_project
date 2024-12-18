@@ -23,8 +23,6 @@ public class QuestionController {
     private QuestionService questionsService;
 
 
-
-
     //문의 작성
     @PostMapping("/add")
     public ResponseEntity<Map<String, String>> addQuestion(@RequestBody QuestionDTO questionDTO) {
@@ -56,18 +54,37 @@ public class QuestionController {
         return ResponseEntity.ok("200 Ok");
     }
 
+    //문의 비밀글 조회
+    @GetMapping("/private")
+    public ResponseEntity<Map<String, String>> privateBoardCheck(@RequestParam String privatepwd, @RequestParam int id) {
+        //게시글번호랑 비밀번호 받아옴
+        String pwd = questionsService.privateBoardCheck(privatepwd, id);
+
+        if (pwd == "true") {
+            //비밀번호가 맞으면
+            Map<String, String> response = new HashMap<>();
+            response.put("true", "200ok");
+            return ResponseEntity.ok(response);
+        } else {
+            //비밀번호가 틀리면
+            Map<String, String> response = new HashMap<>();
+            response.put("false", "비밀번호 틀림");
+            return ResponseEntity.ok(response);
+        }
+    }
+
     //문의 리스트 출력, 페이징처리, 최신순 정렬, 검색 완료 12/12 11:00 tang 12/17 18:30 제목별, 카테고리별 검색 추가
     @GetMapping("")
     public ResponseEntity<?> searchQuestion(
             @PageableDefault(page = 0, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "block", required = false, defaultValue = "10") int block,
             @RequestParam(name = "title", required = false) String title,
-            @RequestParam(name = "sortby", required = false, defaultValue = "questiondate")String sortby,
-            @RequestParam(name = "categoryid", required = false, defaultValue = "0")int categoryid) {
+            @RequestParam(name = "sortby", required = false, defaultValue = "questiondate") String sortby,
+            @RequestParam(name = "categoryid", required = false, defaultValue = "0") int categoryid) {
         Map<String, Object> datamap = new HashMap<>();
         datamap.put("pageable", pageable);
         datamap.put("block", block);
-        datamap.put("sortby",sortby);
+        datamap.put("sortby", sortby);
         datamap.put("title", title);
         datamap.put("categoryid", categoryid);
 
@@ -81,7 +98,6 @@ public class QuestionController {
         // 값 존재 O
         return ResponseEntity.ok(map);
     }
-
 
 
 }

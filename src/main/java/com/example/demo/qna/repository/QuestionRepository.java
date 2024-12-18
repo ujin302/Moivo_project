@@ -79,4 +79,11 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     // 문의리스트 문의 카테고리만 검색
     Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
+
+    // 문의리스트 비밀글 조회
+    @Query("SELECT q FROM QuestionEntity q WHERE q.id=:id")
+    QuestionEntity findQuestionById(@Param("id") int id);
+//
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.secret IS FALSE")
+//    Page<QuestionEntity> findBySecret(Pageable pageable);
 }
