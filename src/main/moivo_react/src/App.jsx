@@ -39,7 +39,7 @@ const routeConfig = [
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
   { path: "/product-detail/:productId", element: <ProductDetail /> },
-  { path: "/review/review_write", element: <ReviewWrite /> },
+  { path: "/review/write", element: <ReviewWrite /> },
   { path: "/upload", element: <Upload /> },
   { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },
