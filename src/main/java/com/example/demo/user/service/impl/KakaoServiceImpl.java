@@ -13,7 +13,7 @@ import com.example.demo.configuration.SocialConfiguration;
 import com.example.demo.user.dto.KakaoTokenDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.UserEntity.LoginType;
-import com.example.demo.user.service.NaverService;
+import com.example.demo.user.service.KakaoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Service
-public class NaverServiceImpl implements NaverService {
+public class KakaoServiceImpl implements KakaoService {
 
     // 24.12.16 - uj
     // Access Token 요청
