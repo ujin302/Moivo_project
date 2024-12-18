@@ -8,16 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.coupon.service.UserCouponService;
@@ -376,7 +370,7 @@ public class UserServiceImpl implements UserService {
     public void updateUserInfo(UserDTO userDTO) {
         UserEntity userEntity = userRepository.findByUserId(userDTO.getUserId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
- 
+
         // 업데이트할 필드들 설정
         userEntity.setName(userDTO.getName());
         userEntity.setGender(userDTO.getGender());
@@ -438,7 +432,7 @@ public class UserServiceImpl implements UserService {
         // 3. 사용자 삭제
         userRepository.delete(userEntity);
     }
-    
+
     @Override
     public boolean isUserAdmin(int id) {
         UserEntity userEntity = userRepository.findById(id)

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.coupon.entity.UserCouponEntity;
+import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.coupon.service.UserCouponService;
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
@@ -22,10 +24,8 @@ import com.example.demo.store.entity.ProductEntity;
 import com.example.demo.store.entity.ProductStockEntity;
 import com.example.demo.store.repository.ProductRepository;
 import com.example.demo.user.entity.CartEntity;
-import com.example.demo.user.entity.UserCartEntity;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.CartRepository;
-import com.example.demo.user.repository.UserCartRepository;
 import com.example.demo.user.repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,6 +55,9 @@ public class PaymentServiceImpl implements PaymentService {
     private ProductRepository productRepository;
 
     @Autowired
+    private UserCouponRepository userCouponRepository;
+
+    @Autowired
     private UserCouponService userCouponService;
 
     // 24.12.12 - uj
@@ -78,18 +81,17 @@ public class PaymentServiceImpl implements PaymentService {
         // 0-3. Json -> isCartItem 변환
         Boolean isCartItem = Boolean.parseBoolean(map.get("isCartItem").toString());
         System.out.println("Json -> isCartItem: " + isCartItem);
-        
+
         // 중복된 TOSS 코드 검사
         if (paymentRepository.existsByTossCode(paymentDTO.getTosscode())) {
             throw new RuntimeException("이미 처리된 결제 정보가 존재합니다. TOSS 코드: " + paymentDTO.getTosscode());
         }
-        
+
         // 1, 필요한 Entity 추출
         UserEntity userEntity = userRepository.findById(paymentDTO.getUserId())
-        .orElseThrow(() -> new RuntimeException("사용자 ID " + paymentDTO.getUserId() + "에 해당하는 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("사용자 ID " + paymentDTO.getUserId() + "에 해당하는 사용자가 존재하지 않습니다."));
         CartEntity cartEntity = cartRepository.findByUserEntity_Id(userEntity.getId())
-        .orElseThrow(() -> new RuntimeException("사용자 ID " + userEntity.getId() + "에 해당하는 장바구니가 존재하지 않습니다."));
-        
+                .orElseThrow(() -> new RuntimeException("사용자 ID " + userEntity.getId() + "에 해당하는 장바구니가 존재하지 않습니다."));
 
         // 2. payment 저장
         paymentDTO.setCount(detailDTOList.size());
@@ -130,11 +132,18 @@ public class PaymentServiceImpl implements PaymentService {
         // 4-1. 장바구니 DB에 반영
         cartRepository.save(cartEntity);
 
-        // 결제 후 등급 업데이트 - sumin (2024.12.16)
+        // 5. 쿠폰 사용 여부 저장
+        if (paymentDTO.getDiscount() > 0) {
+            List<UserCouponEntity> couponEntityList = userCouponRepository.findByUserEntity_Id(paymentDTO.getUserId());
+            couponEntityList.get(0).setUsed(true);
+            userCouponRepository.save(couponEntityList.get(0));
+        }
+
+        // 6. 결제 후 등급 업데이트 - sumin (2024.12.16)
         updateUserGradeBasedOnPurchase(paymentDTO.getUserId());
 
-        // 결제 후 등급에 맞는 쿠폰 발급 - sumin (2024.12.16)
-        String grade = userEntity.getGrade().name();  // 현재 사용자의 등급을 가져오기기
+        // 7. 결제 후 등급에 맞는 쿠폰 발급 - sumin (2024.12.16)
+        String grade = userEntity.getGrade().name(); // 현재 사용자의 등급을 가져오기기
         userCouponService.updateCouponByUserAndGrade(paymentDTO.getUserId(), grade);
     }
 
@@ -148,11 +157,12 @@ public class PaymentServiceImpl implements PaymentService {
         // 현재 날짜를 기준으로 해당 월의 결제 금액을 계산
         LocalDateTime now = LocalDateTime.now();
         YearMonth yearMonth = YearMonth.from(now);
-        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();  // 해당 월의 첫날 00:00
-        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59);  // 해당 월의 마지막날 23:59
+        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay(); // 해당 월의 첫날 00:00
+        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59); // 해당 월의 마지막날 23:59
 
         // 해당 월에 해당하는 결제 금액 계산
-        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate, endDate);
+        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate,
+                endDate);
         int totalSpent = payments.stream()
                 .mapToInt(payment -> (int) payment.getTotalPrice())
                 .sum();
@@ -162,7 +172,7 @@ public class PaymentServiceImpl implements PaymentService {
         userEntity.setGrade(newGrade);
 
         System.out.println(newGrade);
-        
+
         // 업데이트된 사용자 정보 저장
         userRepository.save(userEntity);
     }
@@ -181,7 +191,6 @@ public class PaymentServiceImpl implements PaymentService {
             return UserEntity.Grade.LV1; // LV1: 일반회원
         }
     }
-
 
     // Json -> PaymentDTO
     public PaymentDTO convertToPaymentDTO(String json, String tossCode, String userId) {

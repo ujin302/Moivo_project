@@ -39,12 +39,12 @@ const admins_side = () => {
                 </a>
               </li>
     
-              {/* Notices */}
+              {/* FAQ */}
               <li>
-                <a href="#">
+                <Link to="/admins_FAQ">
                   <i className="fa fa-bullhorn fa-2x"></i>
-                  <span className={admin_sidebar.navText}>Notices</span>
-                </a>
+                  <span className={admin_sidebar.navText}>FAQ</span>
+                </Link>
               </li>
     
               {/* Reviews */}

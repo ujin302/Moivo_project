@@ -11,7 +11,7 @@ import com.example.demo.user.dto.KakaoTokenDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.user.repository.UserRepository;
-import com.example.demo.user.service.NaverService;
+import com.example.demo.user.service.KakaoService;
 import com.example.demo.user.service.SocialService;
 import com.example.demo.user.service.UserService;
 
@@ -24,7 +24,7 @@ public class SocialServiceImpl implements SocialService {
     private SocialConfiguration socialConfig;
 
     @Autowired
-    private NaverService naverService;
+    private KakaoService kakaoService;
 
     @Autowired
     private UserRepository userRepository;
@@ -46,10 +46,10 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public Map<String, Object> getKakaoLogin(String code) {
         // 1. Access Token 요청
-        KakaoTokenDTO kakaoTokenDTO = naverService.getToken(code, socialConfig);
+        KakaoTokenDTO kakaoTokenDTO = kakaoService.getToken(code, socialConfig);
 
         // 2. 사용자 정보 요청
-        UserDTO userKakaoInfoDTO = naverService.getUserInfo(kakaoTokenDTO.getAccess_token(),
+        UserDTO userKakaoInfoDTO = kakaoService.getUserInfo(kakaoTokenDTO.getAccess_token(),
                 socialConfig.getKakaoUserInfoUri());
         if (userKakaoInfoDTO == null) {
             throw new NullPointerException("카카오 서버에서 사용자 정보 추출 실패");
@@ -61,9 +61,12 @@ public class SocialServiceImpl implements SocialService {
         if (checkUserOptional == null || checkUserOptional.isEmpty()) {
             // 신규 회원 >> 회원가입 진행
             userKakaoEntity = userService.insertInit(UserEntity.toSaveKakaoUserEntity(userKakaoInfoDTO));
+            System.out.println("신규 회원 >> pk: " + userKakaoEntity.getId() +
+                    " & userid: " + userKakaoEntity.getUserId());
         } else {
             // 기존 회원 >> 로그인 성공
-            System.out.println("기존 회원 >> pk: " + checkUserOptional.toString());
+            System.out.println("기존 회원 >> pk: " + checkUserOptional.get().getId() +
+                    " & userid: " + checkUserOptional.get().getUserId());
             userKakaoEntity = checkUserOptional.get();
         }
 

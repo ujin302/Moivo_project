@@ -67,7 +67,8 @@ public class SecurityConfig {
                                 "/api/oauth/**",
                                 "/api/user/mypage/orders/**",
                                 "/oauth/**",
-                                "/api/mail/success")
+                                "/api/mail/success",
+                                "/api/user/question")
                         .permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
@@ -83,6 +84,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
+                "https://kauth.kakao.com",
+                "https://kapi.kakao.com",
                 "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
