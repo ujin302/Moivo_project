@@ -65,22 +65,23 @@ public class MypageServiceImpl implements MypageService {
     @Override
     public UserDTO getUserInfo(int userId) {
         UserEntity userEntity = userRepository.findById(userId)
-                                              .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 현재 날짜를 기준으로 해당 월의 결제 금액을 계산
         LocalDateTime now = LocalDateTime.now();
         YearMonth yearMonth = YearMonth.from(now);
-        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();  // 해당 월의 첫날 00:00
-        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59);  // 해당 월의 마지막날 23:59
-    
+        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay(); // 해당 월의 첫날 00:00
+        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59); // 해당 월의 마지막날 23:59
+
         // 해당 월에 해당하는 결제 금액 계산
-        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate, endDate);
+        List<PaymentEntity> payments = paymentRepository.findByUserEntity_IdAndPaymentDateBetween(userId, startDate,
+                endDate);
         int totalSpent = payments.stream()
                 .mapToInt(payment -> (int) payment.getTotalPrice())
                 .sum();
         System.out.println(totalSpent);
 
-        // 등급 계산 로직 
+        // 등급 계산 로직
         UserEntity.Grade grade;
         int nextLevelTarget;
         if (totalSpent >= 700000) {
@@ -112,21 +113,19 @@ public class MypageServiceImpl implements MypageService {
 
         // 쿠폰 정보 가져오기
         List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(userId)
-            .stream()
-            .map(userCoupon -> {
-                CouponEntity coupon = userCoupon.getCouponEntity();
-                return new CouponDTO(
-                    coupon.getId(),
-                    coupon.getName(),
-                    coupon.getGrade(),
-                    coupon.getDiscountType(),
-                    coupon.getDiscountValue(),
-                    coupon.getMinOrderPrice(),
-                    coupon.getActive()
-                );
-            })
-            .collect(Collectors.toList());
-
+                .stream()
+                .map(userCoupon -> {
+                    CouponEntity coupon = userCoupon.getCouponEntity();
+                    return new CouponDTO(
+                            coupon.getId(),
+                            coupon.getName(),
+                            coupon.getGrade(),
+                            coupon.getDiscountType(),
+                            coupon.getDiscountValue(),
+                            coupon.getMinOrderPrice(),
+                            coupon.getActive());
+                })
+                .collect(Collectors.toList());
 
         userDTO.setCoupons(userCoupons); // 쿠폰 정보 설정
 
@@ -136,7 +135,7 @@ public class MypageServiceImpl implements MypageService {
         System.out.println("다음 등급까지 남은 금액: " + nextLevelTarget);
         return userDTO;
     }
-    
+
     // 성별에따른 상품 추천 리스트 가져오기 - sumin
     @Override
     public List<ProductDTO> getProductList(int userId) {
@@ -168,7 +167,7 @@ public class MypageServiceImpl implements MypageService {
 
         // ProductEntity -> ProductDTO 변환
         List<ProductDTO> productDTOList = productEntity.stream()
-                .map(ProductDTO::new) // ProductEntity를 ProductDTO로 변환
+                .map(ProductDTO::toGetProductDTO) // ProductEntity를 ProductDTO로 변환
                 .collect(Collectors.toList());
 
         return productDTOList;
@@ -224,7 +223,7 @@ public class MypageServiceImpl implements MypageService {
         return list;
     }
 
-    //mypage order detail info 가지고 오기 - 12/17 강민
+    // mypage order detail info 가지고 오기 - 12/17 강민
     @Transactional
     @Override
     public List<PaymentDTO> getOrderInfo(String tosscode) {
@@ -232,14 +231,14 @@ public class MypageServiceImpl implements MypageService {
         if (orderEntities == null || orderEntities.isEmpty()) {
             throw new RuntimeException("해당 사용자에 대한 주문 내역이 존재하지 않습니다.");
         }
-        
+
         // PaymentEntity를 PaymentDTO로 변환
         return orderEntities.stream()
-        .map(PaymentDTO::toGetOrderDTO)
-        .collect(Collectors.toList());
+                .map(PaymentDTO::toGetOrderDTO)
+                .collect(Collectors.toList());
     }
 
-    //mypage order detail list 가지고 오기 - 12/17 강민
+    // mypage order detail list 가지고 오기 - 12/17 강민
     @Transactional
     @Override
     public List<PaymentDetailDTO> getOrderDetails(int paymentId) {
@@ -254,7 +253,7 @@ public class MypageServiceImpl implements MypageService {
             PaymentDetailDTO paymentDetailDTO = PaymentDetailDTO.toGetOrderDetailDTO(paymentDetailEntity);
             paymentDetailDTOList.add(paymentDetailDTO);
         }
-        
+
         return paymentDetailDTOList;
     }
 
@@ -273,7 +272,7 @@ public class MypageServiceImpl implements MypageService {
             QuestionDTO questionDTO = QuestionDTO.toGetQuestionDTO(questionEntity);
             questionDTOList.add(questionDTO);
         }
-        
+
         return questionDTOList;
     }
 
