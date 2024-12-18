@@ -1,7 +1,4 @@
-@import url("https://cdn.jsdelivr.net/gh/webfontworld/gmarket/GmarketSans.css");
-
 .orderDetailsContainer {
-    font-family: 'Italiana', serif;
     background: #f6f2ee;
     padding: 20px;
     color: #2f2e2c;
@@ -11,6 +8,7 @@
 
 /* 헤더 */
 .header {
+    font-family: 'Italiana', serif;
     padding-top: 130px;
     text-align: center;
     margin-bottom: 30px;
@@ -47,11 +45,12 @@
 
 .orderInfo p, .shippingInfo p {
     color: #988c73;
-    font-size: 14px;
+    font-size: 17px;
     margin: 5px 0;
     display: flex; /* Flexbox를 사용해 정렬 */
     align-items: center;
     gap: 10px;
+    margin-right: 15px;
 }
 
 .rowInfo {
@@ -116,12 +115,36 @@
     border-collapse: collapse;
 }
 .row {
-
+    width: 100%;
     display: flex;
     align-items: center; /* 행의 모든 요소를 수직 중앙 정렬 */
     padding: 15px;
     border-bottom: 1px dashed #988c73;
     text-align: center;
+}
+
+.column2:nth-child(1), .image:nth-child(1){
+    width: 10%;
+}
+
+.column2:nth-child(2), .column3{
+    width: 33%;
+}
+
+.column2:nth-child(3), .column:nth-child(3){
+    width: 5%;
+}
+
+.column2:nth-child(4), .column:nth-child(4){
+    width: 10%;
+}
+
+.column2:nth-child(5), .column:nth-child(5){
+    width: 20%;
+}
+
+.column2:nth-child(6), .column:nth-child(6){
+    width: 20%;
 }
 
 .row:last-child {
@@ -141,7 +164,6 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    flex: 1; /* 기본 비율 */
 }
 
 .column .reviewButton {
@@ -154,9 +176,6 @@
     margin-bottom: 5px; /* 아래 여백 추가 */
 }
 
-.column2:nth-child(4) {
-    flex: 0 0 80px; /* 수량 열 크기 고정 */
-}
 
 /* Link 컴포넌트 스타일 */
 .orderLink {
@@ -181,7 +200,6 @@
     justify-content: center; 
     align-items: center;
     text-align: center;
-    flex: 1;
 }
 
 .column3 {
@@ -195,7 +213,6 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    flex: 1;
 }
 
 .column .product-info {
@@ -205,11 +222,6 @@
 
 .column .product-details {
     text-align: center; /* 상품 내용은 기존대로 가운데 정렬 */
-}
-
-
-.column:nth-child(2) {
-    flex: 0 0 80px; /* 이미지 열의 크기를 고정 */
 }
 
 
@@ -223,27 +235,20 @@
 }
 
 
-.column2:nth-child(2) {
-    flex: 0 0 80px; /* 이미지 열의 크기를 고정 */
-}
-
-
-
 .image {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100px;
-    height: 100px;
-    padding-right: 10px;
+    width: 100%;
+    height: 100%;
     background-color: #988c7325; /* 원하는 배경색 */
     position: relative; /* 가상 요소가 제대로 배치되도록 상대 위치 지정 */
 }
 
 .image img {
-    max-width: 90px;
-    max-height: 1100px;
-    object-fit: contain; /* 이미지 비율 유지 */
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* 이미지 비율 유지 */
 }
 
 .reviewColumn {
@@ -283,18 +288,6 @@
     background: #f6f2ee;
     padding: 20px;
     border: 1px solid #988c73;
-}
-.paymentDetails {
-    text-align: right;
-    line-height: 1.2; /* 줄 간격 조정 */
-}
-
-.paymentDetails p {
-    margin: 3px 0; /* 위아래 간격 좁히기 */
-}
-
-.paymentDetails span {
-    margin-left: 3px; /* 숫자와 텍스트 사이 간격 */
 }
 
 .totalPrice {
@@ -447,23 +440,37 @@
     }
 
     .image img {
-        max-width: 60px;
-        max-height: 60px;
-        margin-left: 8px;
+        max-width: 100%;
+        max-height: 100%;
     }
 
     .reviewButton{
-        font-size: 11px;
-        padding: 4px 4px;
+        font-size: 18px;
+        padding: 10px 10px;
     }
 
     .column3 {
-        font-size: 13px;
-        margin-left: 10px;
+        font-size: 19px;
+        width: 50%;
+    }
+
+    .row:first-child{
+        background-color: #F6F2EE; 
+        border-radius: 0px; 
+        box-shadow: 0 0 0; 
+        padding: 8px; 
+        margin-bottom: 35px;
     }
 
     .row{
-        padding: 3px;
+        display: flex;
+        flex-direction: column;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        padding: 12px;
+        gap: 14px;
+        margin-bottom: 18px;
     }
 
     .solidLine{
@@ -479,5 +486,58 @@
         background: #f6f2ee;
         padding: 20px;
         margin-top: 25px;
+    }
+
+    .totalPrice {
+        font-size: 19px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .backToOrders {
+        margin-top: 30px;
+        font-size: 17px;
+    }
+
+    .column2:nth-child(1), .image:nth-child(1){
+        width: 75%;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .column2:nth-child(2), .column:nth-child(2){
+        width: 40%;
+    }
+    
+    .column2:nth-child(3), .column:nth-child(3){
+        width: 40%;
+        color: #a57f42;
+    }
+
+    .column2:nth-child(4), .column:nth-child(4){
+        width: 40%;
+    }
+
+    .column2:nth-child(5), .column:nth-child(5){
+        width: 40%;
+    }
+
+    .column2:nth-child(6), .column:nth-child(6){
+        margin-top: 12px;
+        width: 40%;
+        color: #833131;
+    }
+
+    .column2{
+        margin-bottom: 10px;
+        font-size: 13pt;
+    }
+
+    .column{
+        font-size: 13pt;
+    }
+    
+    .image{
+        height: 100%;
     }
 }

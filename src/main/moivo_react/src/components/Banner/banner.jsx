@@ -33,6 +33,7 @@ const Banner = () => {
         { name: '상품복구', navigateTo: '/admin/admin_productTrash' },
         { name: 'Q&A', navigateTo: '/qna_faqboard' },
         { name: '게시판', navigateTo: '/qna_board' },
+        { name: 'MyReview', navigateTo: '/myreview' }  // 여기에 마이리뷰 추가
       ]
     },
     ...(isAdmin ? [{

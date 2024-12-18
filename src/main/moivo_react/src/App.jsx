@@ -30,6 +30,8 @@ import Admins_productUpdate from './containers/admin/admins_productupdate';
 import ProductTrash from './containers/admin/admin_productTrash';
 import KakaoCallback from './components/kakao/KakaoCallback';
 import Admins_FAQ from './containers/admin/admins_FAQ';
+import ReviewWrite from './containers/review/review_write';
+
 
 
 const routeConfig = [
@@ -39,6 +41,7 @@ const routeConfig = [
   { path: "/product-board", element: <ProductBoard /> },
   { path: "/product-list", element: <ProductList /> },
   { path: "/product-detail/:productId", element: <ProductDetail /> },
+  { path: "/review/write", element: <ReviewWrite /> },
   { path: "/upload", element: <Upload /> },
   { path: "/update", element: <Update /> },
   { path: "/mypage", element: <MypageMain /> },
@@ -63,17 +66,18 @@ const routeConfig = [
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
   { path: "/oauth2/callback/kakao", element: <KakaoCallback /> },
   { path: "/admins_FAQ", element: <Admins_FAQ /> }
+
 ];
 
 const App = () => {
   return (
     <Router>
         <AuthProvider>
-            <Routes>
-            {routeConfig.map(({ path, element }, index) => (
-              <Route key={index} path={path} element={element} />
-            ))}
-          </Routes>
+                <Routes>
+                {routeConfig.map(({ path, element }, index) => (
+                  <Route key={index} path={path} element={element} />
+                ))}
+              </Routes>
         </AuthProvider>
     </Router>
   );

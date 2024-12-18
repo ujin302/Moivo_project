@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.ToString;
 
 @Entity
@@ -18,15 +19,13 @@ public class QuestionCategoryEntity {
         SIZE("사이즈문의"),
         OTHER("기타문의");
 
+        @Getter
         private final String displayName;
 
         QuestionCategory(String displayName) {
             this.displayName = displayName;
         }
 
-        public String getDisplayName() {
-            return displayName;
-        }
     }
 
     @Id

@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserCouponRepository extends JpaRepository<UserCouponEntity, Long> {
   // 특정 사용자 ID로 쿠폰을 조회
-  @Query("SELECT uc FROM UserCouponEntity uc JOIN FETCH uc.couponEntity WHERE uc.userEntity.id = :userid")
-  public List<UserCouponEntity> findByUserEntity_Id(int userid);
+  @Query("SELECT uc FROM UserCouponEntity uc JOIN FETCH uc.couponEntity WHERE uc.userEntity.id = :userId")
+  public List<UserCouponEntity> findByUserEntity_Id(int userId);
   
   public void deleteByUserEntity_Id(int userId);  
 }

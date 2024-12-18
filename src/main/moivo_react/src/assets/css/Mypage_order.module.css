@@ -16,6 +16,21 @@
     margin-top: 70px;
 }
 
+.reviewButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.reviewButton:hover {
+    background-color: #45a049;
+}
+
 .logoutCartSearch {
     font-family: 'Italiana', serif;
     font-size: 16px;

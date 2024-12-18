@@ -570,67 +570,97 @@
 /* Review Section */
 .reviewSection {
   padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .reviewHeading {
   font-size: 1.5rem;
+  font-weight: 600;
   margin-bottom: 2rem;
-  color: var(--primary-color);
+  color: #333;
 }
 
 .reviewList {
-  display: grid;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .review {
   padding: 1.5rem;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-}
-
-.reviewContent {
-  margin-bottom: 1rem;
-  line-height: 1.6;
-}
-
-.reviewAuthor {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.noReview {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 3rem;
-  font-size: 1.1rem;
-}
-
-/* Example Reviews */
-.exampleReviews {
-  margin-top: 2rem;
-  padding: 2rem;
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-}
-
-.exampleReview {
-  padding: 1.5rem;
-  background-color: white;
-  border-radius: 10px;
-  margin-bottom: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
 }
 
 .reviewHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.reviewInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;  /* 별점, 유저네임, 날짜 사이 간격 */
 }
 
 .rating {
-  color: var(--accent-color);
+  color: #ffd700;
+  font-size: 1.1rem;
+  letter-spacing: 2px;  /* 별점 사이 간격 */
+}
+
+.reviewAuthor {
   font-weight: 500;
+  color: #444;
+  padding: 0 0.5rem;
+  position: relative;
+}
+
+.reviewAuthor::after {
+  content: '';
+  position: absolute;
+  right: -0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 12px;
+  background-color: #ddd;
+}
+
+.reviewDate {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.purchaseInfo {
+  font-size: 0.9rem;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+}
+
+.reviewContent {
+  margin-top: 1rem;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-line;  /* 줄바꿈 유지 */
+}
+
+.noReviewContainer {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.noReview {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
 }
 
 /* QnA Section */

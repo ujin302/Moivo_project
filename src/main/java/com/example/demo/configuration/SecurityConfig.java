@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -48,36 +47,33 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository)
             throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .oauth2Login(oauth2 -> oauth2
-                .clientRegistrationRepository(clientRegistrationRepository)
-                .authorizedClientRepository(authorizedClientRepository())
-                .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
-                .successHandler(successHandler()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(
-                    "/api/user/login", 
-                    "/api/user/join",
-                    "/api/auth/**" ,
-                    "/api/auth/token/refresh",
-                    "/api/user/social/kakao", // 카카오 인증 URI
-                    "/api/user/social/kakao/login", // 카카오 로그인
-                    "/api/store/**",
-                    "/api/oauth/**",
-                    "/api/user/mypage/orders/88",
-                    "/oauth/**",
-                    "/api/mail/success",
-                    "/api/user/question" // 12/17 questionlist 추가 장훈
-                ).permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .oauth2Login(oauth2 -> oauth2
+                        .clientRegistrationRepository(clientRegistrationRepository)
+                        .authorizedClientRepository(authorizedClientRepository())
+                        .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService))
+                        .successHandler(successHandler()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(
+                                "/api/user/login",
+                                "/api/user/join",
+                                "/api/auth/**",
+                                "/api/auth/token/refresh",
+                                "/api/user/social/kakao", // 카카오 인증 URI
+                                "/api/user/social/kakao/login", // 카카오 로그인
+                                "/api/store/**",
+                                "/api/oauth/**",
+                                "/oauth/**",
+                                "/api/mail/success",
+                                "/api/user/question")
+                        .permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
@@ -87,8 +83,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                // "https://kauth.kakao.com",
-                // "https://kapi.kakao.com",
+                "https://kauth.kakao.com",
+                "https://kapi.kakao.com",
                 "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용

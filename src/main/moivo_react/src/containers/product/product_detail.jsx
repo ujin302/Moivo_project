@@ -9,6 +9,7 @@ import styles from '../../assets/css/product_detail.module.css';
 import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
 import LoadingModal from './LoadingModal';
+import axiosInstance from '../../utils/axiosConfig';
 
 const ProductDetail = () => {
   const { productId } = useParams(); // 받아온 상품 ID
@@ -53,106 +54,30 @@ const ProductDetail = () => {
     setError(null);
   
     try {
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-  
-      try {
-        const response = await axios.get(
-          `${PATH.SERVER}/api/store/${productId}`,
-          { headers }
-        );
-  
-        const { product: productData, imgList, stockList, reviewList } = response.data;
- 
-        // 상품 정보 설정
-        setProduct(productData);
-        
-        // 메인 이미지 설정
-        const mainImg = imgList.find(img => img.layer === 1);
-        const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
-        setMainImage(mainImgUrl);
-        
-        // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
-        const thumbnails = imgList.filter(img => img.layer === 2);
-        setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
-        
-        // 상세 이미지 설정
-        const details = imgList.filter(img => img.layer === 3);
-        setDetailImages(details);
-        
-        // 재고 정보 설정
-        setStocks(stockList);
-        
-        // 리뷰 정보 설정
-        setReviews(reviewList);
-  
-      } catch (error) {
-        // access 토큰 만료로 인한 401 에러인 경우
-        if (error.response?.status === 401) {
-          try {
-            // refresh 토큰으로 새로운 access 토큰 요청
-            const refreshToken = localStorage.getItem('refreshToken');
-            const refreshResponse = await axios.post(
-              `${PATH.SERVER}/api/auth/token/refresh`,
-              {},
-              {
-                headers: {
-                  'Authorization': `Bearer ${refreshToken}`
-                }
-              }
-            );
-  
-            // 새로운 access 토큰과 isAdmin 정보 저장
-            const { newAccessToken, isAdmin } = refreshResponse.data;
-            localStorage.setItem('accessToken', newAccessToken);
-            localStorage.setItem('isAdmin', isAdmin);
-  
-            // 새로운 토큰으로 상품 정보 재요청
-            const retryResponse = await axios.get(
-              `${PATH.SERVER}/api/store/${productId}`,
-              { 
-                headers: { 
-                  'Authorization': `Bearer ${newAccessToken}` 
-                } 
-              }
-            );
-  
-            const { product: productData, imgList, stockList, reviewList } = retryResponse.data;
-            
-            // 상품 정보 설정
-            setProduct(productData);
-            
-            // 메인 이미지 설정
-            const mainImg = imgList.find(img => img.layer === 1);
-            const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
-            setMainImage(mainImgUrl);
-            
-            // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
-            const thumbnails = imgList.filter(img => img.layer === 2);
-            setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
-            
-            // 상세 이미지 설정
-            const details = imgList.filter(img => img.layer === 3);
-            setDetailImages(details);
-            
-            // 재고 정보 설정
-            setStocks(stockList);
-            
-            // 리뷰 정보 설정
-            setReviews(reviewList);
-  
-          } catch (refreshError) {
-            // refresh 토큰도 만료된 경우
-            console.error('Token refresh failed:', refreshError);
-            // AuthContext의 logout 함수 호출 필요
-            setError('세션이 만료되었습니다. 다시 로그인해주세요.');
-          }
-        } else {
-          throw error;
-        }
-      }
+      const response = await axiosInstance.get(`/api/store/${productId}`);
+      const { product: productData, imgList, stockList, reviewList } = response.data;
+      
+      // 상품 정보 설정
+      setProduct(productData);
+      
+      // 메인 이미지 설정
+      const mainImg = imgList.find(img => img.layer === 1);
+      const mainImgUrl = mainImg ? mainImg.fileName : productData.img;
+      setMainImage(mainImgUrl);
+      
+      // 썸네일 이미지 설정 (메인 이미지를 첫 번째로 포함)
+      const thumbnails = imgList.filter(img => img.layer === 2);
+      setThumbnailImages([{ id: 'main', fileName: mainImgUrl }, ...thumbnails]);
+      
+      // 상세 이미지 설정
+      const details = imgList.filter(img => img.layer === 3);
+      setDetailImages(details);
+      
+      // 재고 정보 설정
+      setStocks(stockList);
+      
+      // 리뷰 정보 설정
+      setReviews(reviewList);
   
     } catch (error) {
       console.error('Error fetching product detail:', error);
@@ -250,7 +175,7 @@ const ProductDetail = () => {
   const handleAddToWishlist = async () => {
     try {
       const userId = localStorage.getItem('id');
-      await axios.get(`${PATH.SERVER}/api/user/wish/${productId}/${userId}`);
+      await axiosInstance.get(`/api/user/wish/${productId}/${userId}`);
       alert('위시리스트에 추가되었습니다.');
       navigate('/mypage/wish');
     } catch (error) {
@@ -267,21 +192,9 @@ const ProductDetail = () => {
 
     try {
         const userId = localStorage.getItem('id');
-        const token = localStorage.getItem('accessToken');
+        const url = `/api/user/cart/add/${productId}?userid=${userId}&count=${quantity}&size=${selectedSize}`;
         
-        // URL에 직접 파라미터 추가
-        const url = `${PATH.SERVER}/api/user/cart/add/${productId}?userid=${userId}&count=${quantity}&size=${selectedSize}`;
-        console.log('요청 URL:', url);
-
-        const response = await axios({
-            method: 'post',
-            url: url,
-            headers: token ? {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            } : {}
-        });
-
+        const response = await axiosInstance.post(url);
         console.log('장바구니 응답:', response);
 
         if (response.status === 200) {
@@ -298,6 +211,22 @@ const ProductDetail = () => {
         }
     }
   };
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+        try {
+            // axios 대신 axiosInstance 사용
+            const response = await axiosInstance.get(`/api/store/${productId}/reviews`);
+            setReviews(response.data.content);
+        } catch (error) {
+            console.error("리뷰 데이터 가져오기 실패:", error);
+        }
+    };
+
+    if (productId && activeTab === 'reviews') {
+      fetchReviews();
+    }
+  }, [productId, activeTab]);
 
   if (loading) { // 로딩 중일 때 로딩 모달 표시
     return <LoadingModal isOpen={true} />;
@@ -637,8 +566,20 @@ const ProductDetail = () => {
                           viewport={{ once: true }}
                         >
                           <div className={styles.reviewHeader}>
-                            <span className={styles.rating}>★ {review.rating}</span>
-                            <span className={styles.reviewAuthor}>{review.userName}</span>
+                            <div className={styles.reviewInfo}>
+                              <span className={styles.rating}>
+                                {[...Array(review.rating)].map((_, i) => (
+                                  <span key={i}>★</span>
+                                ))}
+                              </span>
+                              <span className={styles.reviewAuthor}>{review.userName}</span>
+                              <span className={styles.reviewDate}>
+                                {new Date(review.reviewDate).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <span className={styles.purchaseInfo}>
+                              구매 사이즈: {review.size}
+                            </span>
                           </div>
                           <p className={styles.reviewContent}>{review.content}</p>
                         </motion.div>
@@ -647,28 +588,6 @@ const ProductDetail = () => {
                   ) : (
                     <div className={styles.noReviewContainer}>
                       <p className={styles.noReview}>리뷰가 존재하지 않습니다.</p>
-                      <div className={styles.exampleReviews}>
-                        <h3>리뷰 예시</h3>
-                        <div className={styles.exampleReview}>
-                          <div className={styles.reviewHeader}>
-                            <span className={styles.rating}>★ 4.5</span>
-                            <span className={styles.reviewAuthor}>홍길동</span>
-                          </div>
-                          <p className={styles.reviewContent}>
-                            상품이 너무 마음에 들어요! 사이즈도 딱 맞고 배송도 빨랐습니다.
-                            다음에도 구매하고 싶네요.
-                          </p>
-                        </div>
-                        <div className={styles.exampleReview}>
-                          <div className={styles.reviewHeader}>
-                            <span className={styles.rating}>★ 5.0</span>
-                            <span className={styles.reviewAuthor}>김철수</span>
-                          </div>
-                          <p className={styles.reviewContent}>
-                            퀄리티가 정말 좋아요. 가격대비 만족스럽습니다!
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   )}
                 </div>

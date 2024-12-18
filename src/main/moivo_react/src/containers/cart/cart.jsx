@@ -66,12 +66,18 @@ const Cart = () => {
   // 상품 제거
   const handleRemoveItem = async (id) => {
     if (!userid) return;
+    console.log(id);
     try {
       await axiosInstance.delete(`${PATH.SERVER}/api/user/cart/delete/${id}`, {
         params: { userid }
       });
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
       console.log(`${id} 상품 삭제 성공`);
+      // 상품 삭제 후 상태 업데이트 (필터링된 항목으로 상태 변경)
+      setCartItems((prevItems) => prevItems.filter((item) => item.usercartId !== id));
+      // 선택된 항목 리스트에서 제거
+      setSelectedItems((prevSelected) => prevSelected.filter((selectedId) => selectedId !== id));
+
     } catch (error) {
       console.error("Error removing item:", error);
       if (error.response?.status === 401) {
@@ -204,7 +210,7 @@ const Cart = () => {
                   )}
                   <button
                     className={styles.removeButton}
-                    onClick={() => handleRemoveItem(item.id)}
+                    onClick={() => handleRemoveItem(item.usercartId)}
                   >
                     REMOVE
                   </button>

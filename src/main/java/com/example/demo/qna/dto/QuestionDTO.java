@@ -22,6 +22,7 @@ public class QuestionDTO {
     private LocalDateTime responseDate; // 응답 일시 (NULL이면 미응답)
     private String secret; // 비밀글 (추가)
     private Boolean fixQuestion; // 수정 문의 (추가)
+//    private Boolean isQuestionView; //Access 토큰에서 자기 id값만 확인해서
 
     // entity => dto 변환
     public static QuestionDTO toGetQuestionDTO(QuestionEntity entity) {
