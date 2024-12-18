@@ -106,7 +106,7 @@ const MypageOrderDetails = () => {
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
                             <p className={styles.label}>주문일자:</p>
-                            <p className={styles.value}>{OrdersInfo[0]?.paymentDate}</p>
+                            <p className={styles.value}>{OrdersInfo[0]?.paymentDate?.replace('T', ' ')}</p>
                         </div>
                         <hr className={styles.dottedLine} />
                         <div className={styles.rowInfo}>
@@ -157,10 +157,25 @@ const MypageOrderDetails = () => {
                             <div className={styles.column}>x {item.count}</div> {/* 수량 표시 */}
                             <div className={styles.column}>KRW {item.price}</div>
                             <div className={styles.column}>
-                                {OrdersInfo[0]?.deliveryStatus}
-                                {OrdersInfo[0]?.deliveryStatus === "구매확정" && (
-                                    <button className={styles.reviewButton}>REVIEW</button>
-                                )}
+                            {OrdersInfo[0]?.deliveryStatus === "CONFIRMED" ? (
+                                <>
+                                    <div className={styles.confirmedText}>배송완료</div>
+                                    <button 
+                                        className={styles.reviewButton} 
+                                        onClick={() => navigate('/review/write', { state: { productId: OrdersInfo[0]?.productId } })}
+                                    >
+                                        Review
+                                    </button>
+                                </>
+                            ) : OrdersInfo[0]?.deliveryStatus === "PAYMENT_COMPLETED" ? (
+                                <div className={styles.statusText}>결제완료</div>
+                            ) : OrdersInfo[0]?.deliveryStatus === "READY" ? (
+                                <div className={styles.statusText}>준비중</div>
+                            ) : OrdersInfo[0]?.deliveryStatus === "DELIVERY" ? (
+                                <div className={styles.statusText}>배송중</div>
+                            ) : (
+                                OrdersInfo[0]?.deliveryStatus || "배송 상태 없음"
+                            )}
                             </div>
                         </div>
 

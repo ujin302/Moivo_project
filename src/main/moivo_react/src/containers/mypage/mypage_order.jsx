@@ -119,19 +119,17 @@ const Mypage_order = () => {
                                     KRW {totalPrice.toLocaleString()}
                                 </div>
                                 <div className={styles.column}>
-                                {order.deliveryStatus === "CONFIRMED" ? (
-                                    <>
+                                    {order.deliveryStatus === "CONFIRMED" ? (
                                         <div className={styles.confirmedText}>배송완료</div>
-                                        <button 
-                                            className={styles.reviewButton} 
-                                            onClick={() => navigate('/review/write', { state: { productId: order.productId } })}
-                                        >
-                                            Review
-                                        </button>
-                                    </>
-                                ) : (
-                                    order.deliveryStatus || "배송 상태 없음"
-                                )}
+                                    ) : order.deliveryStatus === "PAYMENT_COMPLETED" ? (
+                                        <div className={styles.statusText}>결제완료</div>
+                                    ) : order.deliveryStatus === "READY" ? (
+                                        <div className={styles.statusText}>준비중</div>
+                                    ) : order.deliveryStatus === "DELIVERY" ? (
+                                        <div className={styles.statusText}>배송중</div>
+                                    ) : (
+                                        order.deliveryStatus || "배송 상태 없음"
+                                    )}
                                 </div>
                             </div>
                         );
