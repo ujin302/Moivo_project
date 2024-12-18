@@ -23,7 +23,7 @@ public class ReviewController {
     private ReviewService reviewService;
 
     // 24.12.17 - uj (수정)
-    // 리뷰 작성 -> 주문상세 페이지에서 모달 또는 페이지를 따로 띄워서 리뷰 작성 진행.
+    // 리뷰 작성 -> 주문상세 페이지에서 페이지를 따로 띄워서 리뷰 작성 진행.
     @PostMapping("")
     public ResponseEntity<String> insertReview(@RequestBody ReviewDTO reviewDTO) {
         try {
@@ -42,7 +42,7 @@ public class ReviewController {
         }
     }
 
-    // 리뷰 조회는 인증 없이 접근 가능하도록 /api/store 경로로 이동
+    // 리뷰 조회는 인증 없이 접근 가능하도록 
     @GetMapping("/product/{productId}")
     public ResponseEntity<Page<ReviewDTO>> getReviewsByPage(
             @PathVariable int productId,
@@ -79,7 +79,7 @@ public class ReviewController {
         }
     }
 
-    // 리뷰 수정
+    // 리뷰 수정 -> 중복? 다시 점검예정
     @PutMapping("/{reviewId}")
     public ResponseEntity<String> updateReview(
             @PathVariable int reviewId,

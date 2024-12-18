@@ -34,36 +34,36 @@ public class ReviewServiceImpl implements ReviewService {
     private PaymentDetailRepository detailRepository;
 
 // 24.12.17 - uj (수정)
-    // 리뷰 작성
-    @Override
-    public void insertReview(ReviewDTO reviewDTO) {
-        UserEntity userEntity = userRepository.findById(reviewDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+// 리뷰 작성
+        @Override
+        public void insertReview(ReviewDTO reviewDTO) {
+            UserEntity userEntity = userRepository.findById(reviewDTO.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        PaymentDetailEntity paymentDetailEntity = detailRepository.findById(
-                reviewDTO.getPaymentDetailId()).orElseThrow();
+            PaymentDetailEntity paymentDetailEntity = detailRepository.findById(
+                    reviewDTO.getPaymentDetailId()).orElseThrow();
 
-        // 리뷰 중복 작성 방지
-        System.out.println("리뷰 작성 여부 : " + paymentDetailEntity.isWriteReview());
-        if (!paymentDetailEntity.isWriteReview()) {
-            ProductEntity productEntity = productRepository.findById(reviewDTO.getProductId()).orElseThrow();
+            // 리뷰 중복 작성 방지
+            System.out.println("리뷰 작성 여부 : " + paymentDetailEntity.isWriteReview());
+            if (!paymentDetailEntity.isWriteReview()) {
+                ProductEntity productEntity = productRepository.findById(reviewDTO.getProductId()).orElseThrow();
 
-            ReviewEntity entity = ReviewEntity.toSaveReviewEntity(
-                    reviewDTO, userEntity,
-                    productEntity, paymentDetailEntity);
+                ReviewEntity entity = ReviewEntity.toSaveReviewEntity(
+                        reviewDTO, userEntity,
+                        productEntity, paymentDetailEntity);
 
-            // 리뷰 저장
-            reviewRepository.save(entity);
+                // 리뷰 저장
+                reviewRepository.save(entity);
 
-            // 리뷰 작성 여부 저장
-            paymentDetailEntity.setWriteReview(true);
-            detailRepository.save(paymentDetailEntity);
-        } else {
-            throw new RuntimeException("결제 상품에 대한 리뷰를 이미 작성하였습니다.");
+                // 리뷰 작성 여부 저장
+                paymentDetailEntity.setWriteReview(true);
+                detailRepository.save(paymentDetailEntity);
+            } else {
+                throw new RuntimeException("결제 상품에 대한 리뷰를 이미 작성하였습니다.");
+            }
+
+            System.out.println("리뷰 작성 성공");
         }
-
-        System.out.println("리뷰 작성 성공");
-    }
 
     // 리뷰 조회 (페이징 처리)
     @Override

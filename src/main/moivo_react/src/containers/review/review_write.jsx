@@ -64,7 +64,7 @@ const ReviewWrite = () => {
             alert('리뷰가 성공적으로 작성되었습니다.');
             navigate('/mypage/order');
         } catch (err) {
-            console.error('에러 발생:', err);
+            console.error('에러 : 발생:', err);
             setError(err.response?.data || '리뷰 작성에 실패했습니다.');
         }
     };
