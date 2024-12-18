@@ -67,7 +67,7 @@ public class QuestionController {
         } else {
             //비밀번호가 틀리면
             Map<String, String> response = new HashMap<>();
-            response.put("false", "비밀번호 틀림");
+            response.put("false", "비밀번호가 맞지 않습니다.");
             return ResponseEntity.ok(response);
         }
     }

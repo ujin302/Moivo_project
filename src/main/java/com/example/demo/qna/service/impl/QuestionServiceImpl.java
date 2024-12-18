@@ -77,7 +77,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public String privateBoardCheck(String privatepwd, int id){
 
-        QuestionEntity questionEntity = questionRepository.findQuestionById(id); //받아온 게시글 id로 게시글 조회
+        QuestionEntity questionEntity = questionRepository.findQuestionById(id); //받아온 게시글 id로 id에 맞는 게시글 조회
 
         if(questionEntity.getPrivatePwd().equals(privatepwd)){
             //입력한 비밀번호와 게시글 비밀번호가 일치하면
@@ -86,8 +86,6 @@ public class QuestionServiceImpl implements QuestionService {
             //입력한 비밀번호와 게시글 비밀번호가 틀리면
             return "false";
         }
-        //게시글 id 조회후 //비밀번호가 db랑 맞으면 true
-        //비밀번호가 db랑 틀리면 false
     }
 
 
@@ -123,8 +121,8 @@ public class QuestionServiceImpl implements QuestionService {
 
         if ((title == null || title.isEmpty()) && categoryid == 0) { //전체검색
             System.out.println("title X = " + " categoryid X = 전체검색");
-            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
-//            pageQuestionList = questionRepository.findBySecret(pageable); //전체DB에서 secret가 false 인 것만
+            pageQuestionList = questionRepository.findAllByFixquestion(pageable);
+//            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
         }
         else if(((title == null || title.isEmpty())) && categoryid != 0) {
             System.out.println("title X = " + " categoryid = " + categoryid );
