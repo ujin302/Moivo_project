@@ -28,7 +28,7 @@ public class PaymentController {
             return ResponseEntity.ok(null);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("데이터 처리 중 오류가 발생했습니다.");
+            return ResponseEntity.badRequest().body(e.getMessage());  // 중복 오류 메시지 반환
         }
 
     }

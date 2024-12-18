@@ -5,7 +5,7 @@ const axiosInstance = axios.create({
   baseURL: PATH.SERVER,
   withCredentials: true,
 });
-
+axiosInstance()
 let isRefreshing = false;
 let failedQueue = [];
 

@@ -3,19 +3,27 @@ package com.example.demo.user.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.payment.dto.PaymentDTO;
 import com.example.demo.payment.dto.PaymentDetailDTO;
+import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.store.dto.ProductDTO;
 import com.example.demo.user.dto.UserDTO;
 import com.example.demo.user.dto.WishDTO;
 import com.example.demo.user.service.MypageService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Controller
 @RequestMapping("/api/user/mypage")
@@ -33,9 +41,9 @@ public class MypageController {
     // 회원 정보 (포스트맨 테스트 성공)
     @GetMapping("/info/{id}")
     public ResponseEntity<UserDTO> getUserInfo(@PathVariable(name = "id") int id) { 
-
+        System.out.println("회원정보 조회 컨트롤러");
         UserDTO userInfo = mypageService.getUserInfo(id);
-        System.out.println(userInfo);
+        System.out.println("userInfo = " + userInfo);
         return ResponseEntity.ok(userInfo);
     }
 
@@ -72,15 +80,20 @@ public class MypageController {
 
     // 주문 내역 조회 12/16 완료 - 강민
     @GetMapping("/orders/{id}")
-    public ResponseEntity<List<PaymentDTO>> getOrders(@PathVariable(name = "id") int id) {
+    public ResponseEntity<Page<PaymentDTO>> getOrders(
+        @PathVariable(name = "id") int id,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "4") int size) {
         try {
-            List<PaymentDTO> orders = mypageService.getOrders(id);
-            System.out.println("Orders fetched: " + orders);
-            return ResponseEntity.ok(orders);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")); // id 기준 내림차순 정렬 추가
+            Page<PaymentDTO> ordersPage = mypageService.getOrders(id, pageable);
+            System.out.println("Orders fetched: " + ordersPage);
+            return ResponseEntity.ok(ordersPage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     // 주문 기본 정보 조회 12/17 작업 - 강민
     @GetMapping("/orders/info/{tosscode}")
@@ -106,6 +119,17 @@ public class MypageController {
         }
     }
  
+    // 나의 문의 목록 조회 12/18 작업 - 강민
+    @GetMapping("/question/{id}")
+    public ResponseEntity<List<QuestionDTO>> getMyQuestion(@PathVariable(name = "id") int id) {
+        try {
+            List<QuestionDTO> myQuestion = mypageService.getMyQuestion(id);
+            System.out.println("my question : " + myQuestion);
+            return ResponseEntity.ok(myQuestion);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 
     // 주문내역 조회

@@ -53,11 +53,16 @@ public class CartController {
     // 장바구니에서 상품 삭제 11.26 - yjy (포스트맨 성공)
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProduct(
-            @PathVariable(name = "id") int productId,
+            @PathVariable(name = "id") int userCartId,
             @RequestParam(name = "userid") int userId) {
 
-        cartService.deleteProduct(productId, userId);
-        return ResponseEntity.ok(null);
+        try {
+            cartService.deleteProduct(userCartId, userId);
+            return ResponseEntity.ok(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     // 장바구니 수량&사이즈 수정 11.28 sumin

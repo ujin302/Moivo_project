@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.example.demo.qna.dto.QuestionDTO;
 import com.example.demo.qna.entity.QuestionEntity;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,11 +70,15 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 
     // 24.12.13 - yjy
     // 미답변 문의 수 조회
-    int countByResponseIsNull();
+    public int countByResponseIsNull();
 
     // 24.12.13 - yjy
     // 답변 완료 문의 수 조회
-    int countByResponseIsNotNull();
+    public int countByResponseIsNotNull();
+
+    // FAQ 목록 조회 (fixQuestion이 true인 것만 최신순으로)
+    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion = true ORDER BY q.questionDate DESC")
+    List<QuestionEntity> findByFixQuestionTrueOrderByQuestionDateDesc();
 
     // 문의리스트 제목, 카테고리 검색
     Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
@@ -86,4 +92,6 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
 //
 //    @Query("SELECT q FROM QuestionEntity q WHERE q.secret IS FALSE")
 //    Page<QuestionEntity> findBySecret(Pageable pageable);
+    // 마이페이지 나의 문의 리스트 조회 - 강민 12/18 11:06
+    public List<QuestionEntity> findByUserEntity_Id(Integer userId);
 }

@@ -13,6 +13,7 @@ const MypageOrderDetails = () => {
     const [paymentId, setPaymentId] = useState(undefined);
     const { tosscode } = location.state || {};
     const navigate = useNavigate();
+    const [userId, setUserId] = useState(null);
 
     //주문 목록으로 다시 이동하는 부분
     const handleButtonClick = () => {
@@ -32,8 +33,8 @@ const MypageOrderDetails = () => {
         // 토큰 디코딩 (jwt-decode 없이)
         const payload = token.split('.')[1];
         const decodedPayload = JSON.parse(atob(payload));
-        const id = decodedPayload.id;  //토큰에 있는 id 추출
-        console.log("User ID:", id);
+        setUserId(decodedPayload.id);
+        console.log("User ID:", decodedPayload.id);
 
         //구매한 payment info 정보 가지고 오기, 구매한 상세 목록 가지고 오기 - 12/17 강민
         const fetchOrdersInfo = async () => {
@@ -158,15 +159,29 @@ const MypageOrderDetails = () => {
                             <div className={styles.column}>KRW {item.price}</div>
                             <div className={styles.column}>
                             {OrdersInfo[0]?.deliveryStatus === "CONFIRMED" ? (
-                                <>
-                                    <div className={styles.confirmedText}>배송완료</div>
-                                    <button 
-                                        className={styles.reviewButton} 
-                                        onClick={() => navigate('/review/write', { state: { productId: OrdersInfo[0]?.productId } })}
-                                    >
-                                        Review
-                                    </button>
-                                </>
+                                item.writeReview === false ? (
+                                    <>
+                                        <div className={styles.confirmedText}>배송완료</div>
+                                        <button 
+                                            className={styles.reviewButton} 
+                                            onClick={() => navigate('/review/write', { 
+                                                state: { 
+                                                    productId: item.productId,
+                                                    productName: item.productName,
+                                                    paymentDetailId: item.id,
+                                                    size: item.size,
+                                                    userId: userId,
+                                                    userName: OrdersInfo[0]?.name,
+                                                    orderDate: OrdersInfo[0]?.paymentDate
+                                                } 
+                                            })}
+                                        >
+                                            Review
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className={styles.reviewCompleteText}>리뷰작성완료</div>
+                                )
                             ) : OrdersInfo[0]?.deliveryStatus === "PAYMENT_COMPLETED" ? (
                                 <div className={styles.statusText}>결제완료</div>
                             ) : OrdersInfo[0]?.deliveryStatus === "READY" ? (

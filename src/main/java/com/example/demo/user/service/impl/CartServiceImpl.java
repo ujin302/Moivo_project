@@ -144,12 +144,12 @@ public class CartServiceImpl implements CartService {
 
     // 장바구니에서 상품 삭제
     @Override
-    public void deleteProduct(int productId, int userId) {
+    public void deleteProduct(int userCartId, int userId) {
         CartEntity cartEntity = cartRepository.findByUserEntity_Id(userId)
                 .orElseThrow(() -> new RuntimeException("사용자의 장바구니가 없습니다."));
 
         UserCartEntity userCartEntity = cartEntity.getUserCartList().stream()
-                .filter(userCart -> userCart.getProductEntity().getId() == productId)
+                .filter(userCart -> userCart.getId() == userCartId)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("해당 상품이 장바구니에 없습니다."));
 

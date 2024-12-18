@@ -1,0 +1,177 @@
+.adminMainDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    gap: 20px;
+    height: calc(100vh - 100px);
+    width: 90%;
+}
+
+/* FAQ 목록 섹션 */
+.faqListSection {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: calc(100vh - 140px);
+    width: 50%;
+}
+
+.faqList {
+    margin-top: 20px;
+    overflow-y: auto;
+    height: calc(100% - 60px);
+}
+
+.faqListItem {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.faqListItem:hover {
+    background-color: #f5f5f5;
+}
+
+.faqListItem.selected {
+    background-color: #e3f2fd;
+    border-left: 4px solid #1976d2;
+}
+
+/* FAQ 폼 섹션 */
+.faqFormSection {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: calc(100vh - 140px);
+    width: 50%;
+    overflow-y: auto;
+}
+
+/* 모드 선택 탭 */
+.modeSelector {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.modeTab {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #666;
+}
+
+.modeTab:first-child {
+    cursor: default;
+}
+
+.modeTab:last-child {
+    cursor: pointer;
+}
+
+.modeTab:last-child:hover {
+    color: #1976d2;
+}
+
+.modeTab.activeTab {
+    color: #1976d2;
+    border-bottom: 2px solid #1976d2;
+    margin-bottom: -2px;
+}
+
+/* 폼 스타일 */
+.faqForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inputGroup label {
+    font-weight: bold;
+    color: #333;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+}
+
+.inputGroup textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+/* 버튼 스타일 */
+.buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.editButton,
+.addButton,
+.delButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.editButton {
+    background-color: #bbb951;
+    color: white;
+}
+
+.editButton:hover {
+    background-color: #918f40;
+}
+
+.addButton {
+    background-color: #8b8ad8;
+    color: white;
+}
+
+.addButton:hover {
+    background-color: #615fd1;
+}
+
+.delButton {
+    background-color: #d65360;
+    color: white;
+}
+
+.delButton:hover {
+    background-color: #c82333;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .adminMainDiv {
+        flex-direction: column;
+    }
+
+    .faqListSection,
+    .faqFormSection {
+        flex: none;
+        width: 100%;
+    }
+}

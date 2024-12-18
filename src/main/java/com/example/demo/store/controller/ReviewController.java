@@ -25,10 +25,10 @@ public class ReviewController {
     // 24.12.17 - uj (수정)
     // 리뷰 작성 -> 주문상세 페이지에서 모달 또는 페이지를 따로 띄워서 리뷰 작성 진행.
     @PostMapping("")
-    public ResponseEntity<String> insertReview(@ModelAttribute ReviewDTO reviewDTO) {
+    public ResponseEntity<String> insertReview(@RequestBody ReviewDTO reviewDTO) {
         try {
             reviewService.insertReview(reviewDTO);
-            return ResponseEntity.ok("리뷰 작성");
+            return ResponseEntity.ok("리뷰 작성 성공");
         } catch (RuntimeException e) {
             e.printStackTrace();
             if (e.getMessage().toLowerCase().contains("user")) {
@@ -42,13 +42,18 @@ public class ReviewController {
         }
     }
 
-    // 리뷰 조회 (페이징 처리)
-    @GetMapping("/{productId}")
+    // 리뷰 조회는 인증 없이 접근 가능하도록 /api/store 경로로 이동
+    @GetMapping("/api/store/review/{productId}")
     public ResponseEntity<Page<ReviewDTO>> getReviewsByPage(
             @PathVariable int productId,
             @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ReviewDTO> reviews = reviewService.getReviewsByProductIdAndPage(productId, pageable);
-        return ResponseEntity.ok(reviews);
+        try {
+            Page<ReviewDTO> reviews = reviewService.getReviewsByProductIdAndPage(productId, pageable);
+            return ResponseEntity.ok(reviews);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     // 리뷰 수정
@@ -66,38 +71,25 @@ public class ReviewController {
     }
 
     // 특정 사용자의 리뷰 조회
-    @GetMapping("/user/{userId}/{productId}")
-    public ResponseEntity<Page<ReviewDTO>> getUserReviewsByPage(
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<ReviewDTO>> getUserReviews(
             @PathVariable int userId,
-            @PathVariable int productId,
-            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ReviewDTO> reviews = reviewService.getUserReviewsByProductId(userId, productId, pageable);
-        return ResponseEntity.ok(reviews);
+            @RequestHeader("Authorization") String token,
+            @PageableDefault(size = 10, sort = "reviewDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        try {
+            System.out.println("사용자 리뷰 조회 요청 - userId: " + userId);
+            System.out.println("Authorization 토큰: " + token);
+            
+            if (!token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+            }
+            
+            Page<ReviewDTO> reviews = reviewService.getAllUserReviews(userId, pageable);
+            System.out.println("조회된 리뷰 수: " + reviews.getContent().size());
+            return ResponseEntity.ok(reviews);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body(null);
+        }
     }
 }
-
-
-/* 
-
-1. 리뷰 작성
-HTTP Method: POST
-URL: /api/user/review
-Request Body: ReviewDTO (리뷰 내용 포함)
-Parameters:
-userid: 작성자 ID
-productid: 상품 ID
-2. 리뷰 조회
-HTTP Method: GET
-URL: /api/user/review/{productId}
-Path Variable: productId (리뷰를 조회할 상품 ID)
-3. 리뷰 수정
-HTTP Method: PUT
-URL: /api/user/review/{reviewId}
-Path Variable: reviewId (수정할 리뷰 ID)
-Request Body: ReviewDTO (수정할 내용 포함)
-4. 리뷰 삭제
-HTTP Method: DELETE
-URL: /api/user/review/{reviewId}
-Path Variable: reviewId (삭제할 리뷰 ID)
-
-*/

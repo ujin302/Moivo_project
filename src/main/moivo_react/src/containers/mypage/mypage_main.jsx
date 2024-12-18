@@ -112,21 +112,27 @@ const MypageMain = () => {
             <img src="../image/level5.png" alt="Profile" />
           </div>
           <div>
-            <div className={styles.membershipInfo}>
-                {userInfo ? (
-                  <>
-                    {userInfo.name}님의 멤버십 등급은 [ {userInfo.grade} ]입니다.
-                    <br />
-                    LV.5 까지 남은 구매금액은 KRW 100,000원입니다.
-                    <br />
-                    <br />
-                    키: <strong>{userInfo.height}cm &nbsp;</strong>
-                    몸무게: <strong>{userInfo.weight}kg</strong>
-                  </>
+          <div className={styles.membershipInfo}>
+            {userInfo ? (
+              <>
+                <p>{userInfo.name}님의 멤버십 등급은 <strong>[ {userInfo.grade} ]</strong>입니다.</p>
+                {userInfo.nextLevelTarget === 0 ? (
+                  <strong><p></p></strong>
                 ) : (
-                  "사용자 정보를 불러오는 중입니다..."
+                  <p>
+                    다음 등급까지 남은 구매금액은 
+                    <strong> KRW {userInfo.nextLevelTarget.toLocaleString()}원</strong>입니다.
+                  </p>
                 )}
-              </div>
+                <p>
+                  키: <strong>{userInfo.height}cm</strong> &nbsp;
+                  몸무게: <strong>{userInfo.weight}kg</strong>
+                </p>
+              </>
+            ) : (
+              "사용자 정보를 불러오는 중입니다..."
+            )}
+          </div>
             <div className={styles.couponSection}>
                 <div className={styles.coupon}>
                     COUPON: &nbsp;

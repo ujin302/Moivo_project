@@ -34,7 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private PaymentDetailRepository detailRepository;
 
-    // 24.12.17 - uj (수정)
+// 24.12.17 - uj (수정)
     // 리뷰 작성
     @Override
     public void insertReview(ReviewDTO reviewDTO) {
@@ -121,5 +121,15 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<ReviewDTO> getUserReviewsByProductId(int userId, int productId, Pageable pageable) {
         return reviewRepository.findByUserEntityIdAndProductEntityId(userId, productId, pageable)
                 .map(ReviewDTO::toGetReviewDTO);
+    }
+
+    // 사용자의 모든 리뷰 조회
+    @Override
+    public Page<ReviewDTO> getAllUserReviews(int userId, Pageable pageable) {
+        System.out.println("서비스 레이어 - 사용자 리뷰 조회 시작 - userId: " + userId);
+        Page<ReviewDTO> reviews = reviewRepository.findByUserEntityId(userId, pageable)
+                .map(ReviewDTO::toGetReviewDTO);
+        System.out.println("조회된 리뷰 수: " + reviews.getContent().size());
+        return reviews;
     }
 }
