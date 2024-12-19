@@ -2,8 +2,10 @@ package com.example.demo.payment.entity;
 
 import com.example.demo.payment.dto.PaymentDetailDTO;
 import com.example.demo.store.entity.ProductEntity;
+import com.example.demo.store.entity.ReviewEntity;
 import com.example.demo.store.entity.ProductStockEntity.Size;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -33,6 +36,11 @@ public class PaymentDetailEntity {
     @ManyToOne
     @JoinColumn(name = "productid", nullable = false)
     private ProductEntity productEntity; // 상품과 연관된 상품 정보
+
+    // 결제 상품 1개 : 리뷰 1개
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "reviewid", nullable = true)
+    private ReviewEntity reviewEntity; // 리뷰 고유 키
 
     @Column(name = "price", nullable = false)
     private int price; // 상품 가격: 1개 상품 가격 * 상품 수량
