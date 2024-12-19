@@ -40,11 +40,14 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionEntity questionEntity = new QuestionEntity();
         //여기서 로그인한 아이디를 받아오는 방법? 재영이가 jwt 사용시 다른방법으로 가능. 현재는 프론트에서 id 를 받아옴
 //        questionEntity.setQuestionDate(questionDTO.getQuestionDate()); //시간은 자동으로 등록되므로 필요 X
-        System.out.println("프론트에서 받아온 questionDTO = " +questionDTO);
+        System.out.println("프론트에서 받아온 questionDTO = " + questionDTO);
         System.out.println("프론트에서 받아온 id = " + questionDTO.getUserId()); // QuestionDTO의 userid는 user 테이블 id 값임
         System.out.println("questionEntity Id 저장 전 = " + questionEntity);
         QuestionCategoryEntity questionCategoryEntity = questionCategoryRepository.findById(questionDTO.getCategoryId()).orElseThrow();
         UserEntity userEntity = userRepository.findById(questionDTO.getUserId()).orElseThrow();
+        System.out.println("questionDTO = " + questionDTO);
+        System.out.println("questionCategoryEntity = " + questionCategoryEntity);
+//        System.out.println("userEntity = " + userEntity);
         questionEntity = QuestionEntity.tosaveQuestionEntity(questionDTO, questionCategoryEntity, userEntity);
         questionRepository.save(questionEntity);
         System.out.println("questionEntity Id 저장 후 = " + questionEntity);
@@ -56,7 +59,7 @@ public class QuestionServiceImpl implements QuestionService {
 //        QuestionEntity questionEntity = questionRepository.findById(questionDTO.getUserId()).get(); //Question 레포지토리에서 Question 유저 Id로 등록한 글 찾기
         QuestionEntity questionEntity = questionRepository.findById(questionDTO.getId()).get(); //Question 레포지토리에서 Question Id(글 번호)로 등록한 글 찾기
 
-        System.out.println("프론트에서 받아온 questionDTO = " +questionDTO);
+        System.out.println("프론트에서 받아온 questionDTO = " + questionDTO);
         System.out.println("프론트에서 받아온 id = " + questionDTO.getUserId()); // QuestionDTO의 userid는 user 테이블 id 값임
         System.out.println("수정한 글 번호 questionEntity.getId() = " + questionEntity.getId());
         questionEntity.setTitle(questionDTO.getTitle()); //제목
@@ -71,15 +74,15 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionEntity questionEntity = questionRepository.findById(questionDTO.getId()).get(); //Question 레포지토리에서 Question Id(글 번호)로 등록한 글 찾기
         questionRepository.delete(questionEntity);
     }
-    
+
     //문의사항 비밀글 조회
     //프론트에서 받아온 게시글번호랑 비밀번호로 그 게시글번호에 맞는 글을 찾아서 비밀번호 맞으면 true 틀리면 false
     @Override
-    public String privateBoardCheck(String privatepwd, int id){
+    public String privateBoardCheck(String privatepwd, int id) {
 
         QuestionEntity questionEntity = questionRepository.findQuestionById(id); //받아온 게시글 id로 id에 맞는 게시글 조회
 
-        if(questionEntity.getPrivatePwd().equals(privatepwd)){
+        if (questionEntity.getPrivatePwd().equals(privatepwd)) {
             //입력한 비밀번호와 게시글 비밀번호가 일치하면
             return "true";
         } else {
@@ -87,7 +90,6 @@ public class QuestionServiceImpl implements QuestionService {
             return "false";
         }
     }
-
 
 
     //문의 리스트, 검색, 정렬
@@ -105,7 +107,7 @@ public class QuestionServiceImpl implements QuestionService {
             title = datemap.get("title").toString();
         }
 
-        if (datemap.get("categoryid") != null){
+        if (datemap.get("categoryid") != null) {
             categoryid = (int) datemap.get("categoryid");
         }
 
@@ -121,20 +123,22 @@ public class QuestionServiceImpl implements QuestionService {
 
         if ((title == null || title.isEmpty()) && categoryid == 0) { //전체검색
             System.out.println("title X = " + " categoryid X = 전체검색");
-            pageQuestionList = questionRepository.findAllByFixquestion(pageable);
 //            pageQuestionList = questionRepository.findAll(pageable); //전체 DB추출 확인완료 12/17 17:10
-        }
-        else if(((title == null || title.isEmpty())) && categoryid != 0) {
-            System.out.println("title X = " + " categoryid = " + categoryid );
-            pageQuestionList = questionRepository.findByCategoryEntityId(categoryid, pageable);  //categoryid로 DB추출 확인완료 12/17 17:10
-        }
-        else if (title != null && categoryid == 0) {
+            pageQuestionList = questionRepository.findAllByFixQuestionFalse(pageable);
+        } else if (((title == null || title.isEmpty())) && categoryid != 0) {
+            System.out.println("title X = " + " categoryid = " + categoryid);
+//            pageQuestionList = questionRepository.findByCategoryEntityId(categoryid, pageable);  //categoryid로 DB추출 확인완료 12/17 17:10
+            pageQuestionList = questionRepository.findByFixQuestionFalseAndCategoryEntityId(categoryid, pageable);
+
+        } else if (title != null && categoryid == 0) {
             System.out.println("title = " + title + " categoryid X = ");
-            pageQuestionList = questionRepository.findByTitleContainingIgnoreCase(title, pageable); //title DB추출 확인완료 12/17 17:37
-        }
-        else if (title != null && categoryid != 0) {
-            System.out.println("title = " + title + " categoryid = " + categoryid );
-            pageQuestionList = questionRepository.findByTitleContainingIgnoreCaseAndCategoryEntityId(title, categoryid, pageable); //title,categoryid로 DB추출 확인완료 12/17 17:37
+//            pageQuestionList = questionRepository.findByTitleContainingIgnoreCase(title, pageable); //title DB추출 확인완료 12/17 17:37
+            pageQuestionList = questionRepository.findByFixQuestionFalseAndTitleContainingIgnoreCase(title, pageable);
+
+        } else if (title != null && categoryid != 0) {
+            System.out.println("title = " + title + " categoryid = " + categoryid);
+//            pageQuestionList = questionRepository.findByTitleContainingIgnoreCaseAndCategoryEntityId(title, categoryid, pageable); //title,categoryid로 DB추출 확인완료 12/17 17:37
+            pageQuestionList = questionRepository.findByFixQuestionFalseAndTitleContainingIgnoreCaseAndCategoryEntityId(title, categoryid, pageable);
         }
 
 

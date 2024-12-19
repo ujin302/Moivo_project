@@ -78,20 +78,24 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
     List<QuestionEntity> findByFixQuestionTrueOrderByQuestionDateDesc();
 
     //문의리스트 전체검색 fixquestion이 false 것만
-    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false ")
-    Page<QuestionEntity> findAllByFixquestion(Pageable pageable);
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false ")
+    Page<QuestionEntity> findAllByFixQuestionFalse(Pageable pageable);
 
     // 문의리스트 제목만 검색
-    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false  AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%'))")
-    public Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false  AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%'))")
+//    public Page<QuestionEntity> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    public Page<QuestionEntity> findByFixQuestionFalseAndTitleContainingIgnoreCase(String title, Pageable pageable);
+
 
     // 문의리스트 문의 카테고리만 검색
-    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false AND q.categoryEntity.id=:categoryid")
-    Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion=false AND q.categoryEntity.id=:categoryid")
+//    Page<QuestionEntity> findByCategoryEntityId(int categoryid, Pageable pageable);
+    Page<QuestionEntity> findByFixQuestionFalseAndCategoryEntityId(int categoryid, Pageable pageable);
 
     // 문의리스트 제목, 카테고리 검색
-    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion = false AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%')) AND q.categoryEntity.id = :categoryid")
-    Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
+//    @Query("SELECT q FROM QuestionEntity q WHERE q.fixQuestion = false AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%')) AND q.categoryEntity.id = :categoryid")
+//    Page<QuestionEntity> findByTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
+    Page<QuestionEntity> findByFixQuestionFalseAndTitleContainingIgnoreCaseAndCategoryEntityId(String title, int categoryid, Pageable pageable);
 
 
     // 문의리스트 비밀글 조회
