@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 import { PATH } from '../../../scripts/path';
+import axiosInstance from '../../utils/axiosConfig';
 
 const Qna_board = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Qna_board = () => {
     type: "",
     title: "",
     question: "",
-    isSecret: false,
+    isSecret: false
   });
 
   const [errors, setErrors] = useState({});
@@ -93,20 +94,7 @@ const Qna_board = () => {
     console.log("Submitted Data:", postData);
   
     // 서버로 데이터 전송
-    fetch(`${PATH.SERVER}/api/user/question/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // 토큰 추가
-      },
-      body: JSON.stringify(postData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("문의 작성에 실패했습니다.");
-        }
-        return response.json();
-      })
+    axiosInstance.post(`/api/user/question/add`, postData )
       .then(() => {
         alert("문의가 성공적으로 작성되었습니다!");
         navigate("/qna_boardlist"); // 작성 후 문의 게시글 목록으로 이동
