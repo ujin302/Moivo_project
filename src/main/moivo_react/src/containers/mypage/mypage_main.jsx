@@ -133,18 +133,43 @@ const MypageMain = () => {
               "사용자 정보를 불러오는 중입니다..."
             )}
           </div>
-            <div className={styles.couponSection}>
-                <div className={styles.coupon}>
-                    COUPON: &nbsp;
-                    {userInfo && userInfo.coupons ? (
-                      userInfo.coupons.map((coupon, index) => (
-                        <strong key={index}>{coupon.name}</strong>
-                      ))
-                    ) : (
-                      "쿠폰 정보를 불러오는 중입니다..."
-                    )}
-                </div>
-              </div>
+          <div className={styles.couponSection}>
+            <div className={styles.coupon}>
+              COUPON: &nbsp;
+              {userInfo && userInfo.coupons ? (
+                userInfo.coupons.map((coupon, index) => {
+                  // 이미 사용했거나 유효기간이 지난 쿠폰인지 확인
+                  const isInvalidCoupon = coupon.couponName === "이미 사용한 쿠폰" || coupon.couponName === "유효기간이 지난 쿠폰";
+
+                  return (
+                    <div 
+                      key={index} 
+                      className={styles.couponItem}
+                      onMouseEnter={() => !isInvalidCoupon && handleCouponMouseEnter(coupon)}
+                      onMouseLeave={handleCouponMouseLeave}
+                    >
+                      <strong>{coupon.couponName}</strong>
+                      {!isInvalidCoupon && coupon.startDate && coupon.endDate && !coupon.used && (
+                        <p className={styles.couponDate}>
+                          유효기간: {new Date(coupon.startDate).toLocaleDateString()} ~ {new Date(coupon.endDate).toLocaleDateString()}
+                        </p>
+                      )}
+                      {!isInvalidCoupon && showCouponTooltip && (
+                        <div className={styles.couponTooltip}>
+                          <p>
+                            쿠폰 이름: {coupon.couponName} <br />
+                            유효기간: {new Date(coupon.startDate).toLocaleDateString()} ~ {new Date(coupon.endDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                "쿠폰 정보를 불러오는 중입니다..."
+              )}
+            </div>
+          </div>
             </div>
             {/* 아이콘 영역 (우측 상단에 배치) */}
             <div 

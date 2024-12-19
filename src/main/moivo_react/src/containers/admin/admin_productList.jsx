@@ -30,17 +30,13 @@ const ProductList = () => {
   }, [sortBy, statusFilter]);
 
   useEffect(() => {
-    fetchProducts(); 
-  }, [statusFilter]);
-
-  useEffect(() => {
     console.log("Pagination State:", pagination);
   }, [pagination]);
 
-  const fetchProducts = async (page) => {
+  const fetchProducts = async (page = 0) => {
     try {
       console.log("status 확인:", statusFilter);
-
+  
       const response = await axiosInstance.get(
         "http://localhost:8080/api/admin/store/list",
         {

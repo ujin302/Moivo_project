@@ -47,6 +47,8 @@ const Payment = () => {
   console.log(location.state);
   console.log(isCartItem);
 
+  console.log("쿠폰 : ", coupons);
+
   const fetchUserInfo = async () => {
     const token = localStorage.getItem("accessToken");
     const id = localStorage.getItem("id");
@@ -286,8 +288,17 @@ const Payment = () => {
                 >
                   <option value="">쿠폰을 선택하세요</option>
                   {coupons.map((coupon) => (
-                    <option key={coupon.id} value={coupon.name}>
+                    <option
+                      key={coupon.id}
+                      value={coupon.name}
+                      disabled={getDiscountedTotal() < coupon.minOrderPrice}  // 결제 금액이 최소 주문 금액보다 적으면 비활성화
+                    >
                       {coupon.name} ({coupon.discountValue}% 할인)
+                      {getDiscountedTotal() < coupon.minOrderPrice && (
+                        <span style={{ color: "red", marginLeft: "10px" }}>
+                          (최소 주문 금액: KRW {coupon.minOrderPrice.toLocaleString()})
+                        </span>
+                      )}
                     </option>
                   ))}
                 </select>
