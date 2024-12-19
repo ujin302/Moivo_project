@@ -120,18 +120,10 @@ const Qna_boardlist = () => {
             navigate('/user');
             return;
         }
-    
         if (item.categoryId === 4) { // 비밀글인 경우
-            if (currentUserId === item.userId) {
-                // 자신이 작성한 비밀글인 경우 비밀번호 모달 없이 바로 열기
-                setActiveIndex(activeIndex === index ? null : index);
-            } else {
-                // 다른 사용자가 작성한 비밀글인 경우 비밀번호 모달 표시
-                setSelectedPost(item);
-                setPasswordModalVisible(true);
-            }
+            setSelectedPost(item);
+            setPasswordModalVisible(true);
         } else {
-            // 비밀글이 아닌 경우 바로 열기
             setActiveIndex(activeIndex === index ? null : index);
         }
     };
@@ -220,15 +212,36 @@ const Qna_boardlist = () => {
         }
     };
 
-    //비밀글 페스워드 모달
-    const handlePasswordCheck = () => {
-        if (enteredPassword === selectedPost.password) { 
-            setActiveIndex(qnaData.indexOf(selectedPost)); // 해당 글 활성화
-            setPasswordModalVisible(false); // 모달 닫기
-        } else {
-            setPasswordError('비밀번호가 틀렸습니다.');
+    // 비밀번호 확인 함수 수정
+    const handlePasswordCheck = async () => {
+        try {
+            // 서버로 비밀번호 확인 요청
+            const response = await axiosInstance.get('/api/user/question/private', {
+                params: {
+                    id: selectedPost.id,
+                    privatepwd: enteredPassword
+                }
+            });
+
+            if (response.data.true === "200ok") {
+                // 비밀번호가 맞으면
+                setActiveIndex(qnaData.indexOf(selectedPost));
+                setPasswordModalVisible(false);
+                setEnteredPassword('');
+                setPasswordError('');
+            } else {
+                // 비밀번호가 틀리면
+                setPasswordError('비밀번호가 틀렸습니다.');
+            }
+        } catch (error) {
+            console.error('비밀번호 확인 중 오류:', error);
+            if (error.response && error.response.status === 401) {
+                setPasswordError('인증에 실패했습니다. 다시 로그인해주세요.');
+            } else {
+                setPasswordError('비밀번호 확인 중 오류가 발생했습니다.');
+            }
         }
-    };
+    }
 
     //비밀글 페스워드 모달
     const closePasswordModal = () => {
