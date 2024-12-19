@@ -53,6 +53,10 @@
   gap: 10px;
 }
 
+.QuestioncardList{
+  display: block;
+}
+
 /* 각 아이템 스타일 */
 .cardItem {
   font-size: 14px;
@@ -100,7 +104,24 @@
   color: inherit;
 }
 
-.clickable:hover {
+.Questionclickable{
+  text-decoration: none;
+  color: inherit;
+  width: 150%;
+  height: 33%;
+  margin-bottom: 10px;
+}
+
+.Questionclickable2{
+  text-decoration: none;
+  color: inherit;
+  width: 150%;
+  height: 33%;
+  margin-bottom: 5px;
+  margin-left: -10px;
+}
+
+.clickable:hover, .Questionclickable:hover, .Questionclickable2:hover {
   text-decoration: none;
   color: inherit;
 }
@@ -116,10 +137,23 @@
 
 .canvas {
   display: block;
-  max-width: 100%;
 }
 
 .canvas2 {
   display: block;
   max-width: 100%;
+}
+
+.canvas3{
+  display: flex;
+}
+
+.canvas4 {
+  display: block;
+  margin: 0 auto;
+}
+
+.canvas5{
+  display: flex;
+  margin-left: 60px;
 }
