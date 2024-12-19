@@ -19,7 +19,7 @@ const Banner = () => {
 
   const navLinks = [
     {
-      title: 'SHOP',
+      title: 'SHOP', navigateTo : '/product-list',
       submenu: [
         { name: 'ALL', navigateTo: '/product-list' },
         { name: 'Dashboard', navigateTo: '/product-board' }
