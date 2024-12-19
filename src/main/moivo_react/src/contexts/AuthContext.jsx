@@ -4,7 +4,6 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from "../../scripts/path";
 import PropTypes from 'prop-types';
-// yjy 만듬
 
 // AuthContext 생성 및 내보내기
 export const AuthContext = createContext(null);

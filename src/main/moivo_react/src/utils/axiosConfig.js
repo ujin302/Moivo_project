@@ -5,6 +5,9 @@ import { PATH } from '../../scripts/path';
 const axiosInstance = axios.create({
   baseURL: PATH.SERVER,
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 axiosInstance()
 let isRefreshing = false;

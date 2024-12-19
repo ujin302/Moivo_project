@@ -3,12 +3,7 @@ import QnA_w from '../../assets/css/qna_board.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
-<<<<<<< HEAD
-import { PATH } from '../../../scripts/path';
-import axiosInstance from '../../utils/axiosConfig';
-=======
 import axiosInstance from "../../utils/axiosConfig";
->>>>>>> 648bc211e4223d2a1dd3af9e90c8b3259d02d201
 
 const Qna_board = () => {
   const navigate = useNavigate();
@@ -17,12 +12,8 @@ const Qna_board = () => {
     type: "",
     title: "",
     question: "",
-<<<<<<< HEAD
-    isSecret: false
-=======
     isSecret: false,
     privatePwd : "",
->>>>>>> 648bc211e4223d2a1dd3af9e90c8b3259d02d201
   });
 
   const [errors, setErrors] = useState({});
