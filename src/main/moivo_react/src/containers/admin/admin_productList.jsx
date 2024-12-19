@@ -107,6 +107,10 @@ const ProductList = () => {
     }
   };
   
+  const handleUpdate = async (productId) => {
+    navigate(`/admins_productupdate/${productId}`);
+  }
+
   const handleRestore = async (productId) => {
     try {
       await axiosInstance.post(
@@ -179,7 +183,7 @@ const ProductList = () => {
               <div>{product.status}</div>
               <div className={styles.actionButtons}>
                 <button
-                  onClick={() => navigate(`/admin/products/edit/${product.id}`)}
+                  onClick={() => handleUpdate(product.id)}
                 >
                   수정
                 </button>

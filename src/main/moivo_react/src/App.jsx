@@ -63,7 +63,7 @@ const routeConfig = [
   { path: "/api/oauth/kakao/callback", element: <KakaoCallback /> },
   { path : "/admins_qnaboard", element: <Admins_qna/>},
   { path : "/admins_productadd", element: <Admins_productAdd/>},
-  { path : "/admins_productupdate", element: <Admins_productUpdate/>},
+  { path : "/admins_productupdate/:productId", element: <Admins_productUpdate/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
   { path : "/admin/admin_productList", element: <Admins_ProductList/>},
   { path: "/oauth2/callback/kakao", element: <KakaoCallback /> },
