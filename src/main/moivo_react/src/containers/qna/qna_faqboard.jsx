@@ -50,7 +50,7 @@ const Qna_faqboard = () => {
         <div className={QnA.faqmainDiv}>
             <div><Banner /></div>
             <div className={QnA.faqheader}></div>
-            <div className={QnA.faqcoment}> 고객센터 </div>
+            <div className={QnA.faqcoment}> 자주 묻는 질문 </div>
             <div className={QnA.faqDiv}>
                 
             {/* 고객센터 네비*/}

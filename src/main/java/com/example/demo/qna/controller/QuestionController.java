@@ -55,7 +55,7 @@ public class QuestionController {
 
     //문의 비밀글 조회 12/18 16:47 tang
     @GetMapping("/private")
-    public ResponseEntity<Map<String, String>> privateBoardCheck(@RequestParam String privatepwd, @RequestParam int id) {
+    public ResponseEntity<Map<String, String>> privateBoardCheck(@RequestParam(name="privatepwd") String privatepwd, @RequestParam(name="id") int id) {
         //게시글번호랑 비밀번호 받아옴
         String pwd = questionsService.privateBoardCheck(privatepwd, id);
 

@@ -102,7 +102,7 @@ const Qna_board = () => {
       <div><Banner /></div>
       <div className={QnA_w.qnaboardheader}></div>
 
-      <div className={QnA_w.qnaboardTitle}>고객센터</div>
+      <div className={QnA_w.qnaboardTitle}>문의 작성하기</div>
 
       {/* 네비게이션 */}
       <div className={QnA_w.qnaboardNavi}>

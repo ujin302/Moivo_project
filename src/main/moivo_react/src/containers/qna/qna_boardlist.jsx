@@ -148,6 +148,7 @@ const Qna_boardlist = () => {
     // 게시글 수정 제출 핸들러
     const handleEditSubmit = async () => {
         try {
+            console.log('수정 요청 데이터:', editedPost);
             await axiosInstance.put('/api/user/question/update', {
                 ...editedPost,
                 userId: currentUserId
@@ -301,7 +302,7 @@ const Qna_boardlist = () => {
             <div><Banner /></div>
             <div className={QnA_b.qnalistheader}></div>
 
-            <div className={QnA_b.qnalistTitle}>고객센터</div>
+            <div className={QnA_b.qnalistTitle}>문의 게시글</div>
 
             {/* 네비게이션 */}
             <div className={QnA_b.qnalistNavi}>
@@ -390,11 +391,13 @@ const Qna_boardlist = () => {
                                             ...editedPost, 
                                             categoryId: parseInt(e.target.value)
                                         })}
-                                className={QnA_b.modalSelect}>
+                                className={QnA_b.modalSelect}
+                                disabled={editedPost.categoryId === 4} 
+                                >
                                     <option value={1}>일반 문의</option>
                                     <option value={2}>기타 문의</option>
                                     <option value={3}>사이즈 문의</option>
-                                    <option value={4}>비밀 문의</option>
+                                    {editedPost.categoryId == 4 && ( <option value={4}>비밀 문의</option>)}
                                 </select>
                                 
                                 {/* 제목 입력 */}
@@ -407,14 +410,17 @@ const Qna_boardlist = () => {
                                     className={QnA_b.modalInput} />
                                     
                                 {/* 비밀글 여부 체크박스 */}
+                                {editedPost.categoryId == 4 && (
                                 <div className={QnA_b.secretCheckbox}>
                                     <label>비밀글</label>
                                     <input type="checkbox" checked={editedPost.categoryId === 4 || editedPost.secret === true} onChange={(e) => setEditedPost({
                                             ...editedPost, 
                                             categoryId: e.target.checked ? 4 : 1,
                                             secret: e.target.checked
-                                        })} />
+                                        })}
+                                        disabled={editedPost.categoryId === 4} />
                                 </div>
+                                )}
 
                                 {/* 내용 입력 */}
                                 <span className={QnA_b.modalQuestionTitle}>내용</span>
