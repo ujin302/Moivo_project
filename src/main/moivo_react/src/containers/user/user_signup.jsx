@@ -125,7 +125,7 @@ function UserSignup() {
           if (!value) {
             newError = "비밀번호를 입력해주세요.";
           } else {
-            // 비밀번호 정규식 패턴
+            // 비밀번호 정규식 패턴 추가
             const passwordPattern = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,15}$/;
             if (!passwordPattern.test(value)) {
               newError = "비밀번호는 영문, 숫자, 특수문자를 포함한 8~15자리여야 합니다.";
