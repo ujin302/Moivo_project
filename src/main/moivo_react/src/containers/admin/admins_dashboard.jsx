@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
   const { isAdmin, getAccessToken, refreshAccessToken } = useAuth();
   const navigate = useNavigate();
+  const [selectedProductStatus, setSelectedProductStatus] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState({});
   const [deliveryStatus, setDeliveryStatus] = useState({});
   const [productStatus, setProductStatus] = useState({});
@@ -23,6 +24,10 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
     }
   });
 
+  const handleCardClick = (statusType) => {
+    setSelectedProductStatus(statusType);
+  };
+  
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -123,27 +128,31 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy
             <div className={admin_dashboard.card}>
               <h3 className={admin_dashboard.cardTitle}>상품 현황</h3>
               <div className={admin_dashboard.cardList}>
-                <div className={admin_dashboard.cardItem}>
-                  <Link to="/admin/admin_productList" >
+                <div 
+                  className={admin_dashboard.cardItem} 
+                  onClick={() => handleCardClick('판매 상품')}
+                >
+                  <Link to="/admin/admin_productList">
                     판매 상품 :
                   </Link>
-                  <span className={admin_dashboard.cardNumber}>{productStatus['판매 상품'] }</span>
+                  <span className={admin_dashboard.cardNumber}>{productStatus['판매 상품']}</span>
                 </div>
-                <div className={admin_dashboard.cardItem}>
-                  <Link to="">
+                <div className={admin_dashboard.cardItem} onClick={() => handleCardClick('품절 상품')}>
+                  <Link to="/admin/admin_productList?status=SOLDOUT">
                     품절 상품 :
                   </Link>
                   <span className={admin_dashboard.cardNumber}>{productStatus['품절 상품']}</span>
                 </div>
-                <div className={admin_dashboard.cardItem}>
-                  <Link to="">
+
+                <div className={admin_dashboard.cardItem} onClick={() => handleCardClick('삭제된 상품')}>
+                  <Link to="/admin/admin_productList?status=DELETED">
                     삭제된 상품 :
                   </Link>
                   <span className={admin_dashboard.cardNumber}>{productStatus['삭제된 상품']}</span>
                 </div>
               </div>
             </div>
-          </div>
+            </div>
         </section>
 
         {/* 2번 섹션 */}

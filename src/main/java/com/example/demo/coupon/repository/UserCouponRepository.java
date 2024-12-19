@@ -20,4 +20,6 @@ public interface UserCouponRepository extends JpaRepository<UserCouponEntity, Lo
   public List<UserCouponEntity> findByUserEntity_Id(int userId);
   
   public void deleteByUserEntity_Id(int userId);  
+
+  
 }
