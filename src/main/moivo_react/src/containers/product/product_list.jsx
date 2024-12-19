@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../../contexts/AuthContext";
-import { PATH } from "../../../scripts/path";
+// import { PATH } from "../../../scripts/path";
 import styles from "../../assets/css/product_list.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
 import LoadingModal from "./LoadingModal";
+import axiosInstance from '../../utils/axiosConfig';
 
 const ProductList = () => {
   const { token } = useContext(AuthContext);
-  const id = localStorage.getItem("id"); // 사용자 pk
+  const accessToken = localStorage.getItem('accessToken');
+  // const id = localStorage.getItem("id"); // 사용자 pk
   const [products, setProducts] = useState([]); // 상품 List
   const [currentPage, setCurrentPage] = useState(0);
   const [pageInfo, setPageInfo] = useState({ // 페이징 정보
@@ -40,14 +41,7 @@ const ProductList = () => {
   const fetchProducts = async (page) => {
     setIsLoading(true);
     try {
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      // 1. 상품 Data 요청
-      const response = await axios.get(`${PATH.SERVER}/api/store`, {
-        headers,
+      const response = await axiosInstance.get('/api/store', {
         params: {
           page: page,
           size: itemsPerPage,
@@ -74,21 +68,13 @@ const ProductList = () => {
         // 3. 카테고리 Data 저장
         setCategories([{ id: 0, name: '전체' }, ...response.data.category]);
 
-        // 4. 사용자 Wish Data 요청
-        if(id != null) {
-          // 사용자 Wish & Cart Data
+        if (accessToken) {
           getWishCartCount('wish');
           getWishCartCount('cart');
         }
         
         // 5. 현재 페이지 설정
         setCurrentPage(page);
-        
-        console.log(response.data);
-        console.log(categories);
-        console.log(products);
-        console.log(pageInfo);
-        console.log(currentPage);
       }
     } catch (error) {
       if (error.response?.status === 401) {
@@ -104,24 +90,13 @@ const ProductList = () => {
   // 페이지 렌더링
   useEffect(() => {
     fetchProducts(0);
-  }, []);
+  }, [accessToken]);
 
   // 24.11.28 - uj
   // 사용자 Wish or Cart Data 요청
   const getWishCartCount = async (type) => {
     try {
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      // 1. wish Data 요청
-      const response = await axios.get(`${PATH.SERVER}/api/user/${type}/list`, {
-        headers,
-        params: {
-          userid : id
-        }
-      });
+      const response = await axiosInstance.get(`/api/user/${type}/list`);
   
       // 2. wish Data 저장
       switch (type) {
@@ -136,11 +111,11 @@ const ProductList = () => {
       }
       console.log(type, " 상품 개수: " + wishItem);
     } catch (error) {
-      console.error("Error:", error.message, error.response);
+      console.error("Error:", error.message);
       if (error.response?.status === 401) {
         console.error("인증 오류: ", error);
       } else {
-        console.error("사용자 ", type, " 정보를 가져오는 중 오류가 발생했습니다: ", error);
+        console.error(`사용자 ${type} 정보를 가져오는 중 오류가 발생했습니다:`, error);
       }
     } finally {
       setIsLoading(false);
@@ -151,7 +126,7 @@ const ProductList = () => {
   // 카테고리, 정렬, 검색에 따른 상품 목록 렌더링
   useEffect(() => {
     fetchProducts(0);
-  }, [sortBy, searchTerm, activeCategory]);
+  }, [sortBy, searchTerm, activeCategory, accessToken]);
 
   // 상품 상세 화면 이동
   const handleProductClick = (productId) => {
@@ -161,7 +136,7 @@ const ProductList = () => {
   // 11.28 - uj
   // wish 목록 이동
   const handleWishClick = () => {
-    if(id != null) {
+    if(accessToken) {
       navigate(`/mypage/wish`);
     } else {
       alert("로그인 후에 이용해주세요.");
@@ -171,7 +146,7 @@ const ProductList = () => {
   // 11.28 - uj
   // wish 목록 이동
   const handleCartClick = () => {
-    if(id != null) {
+    if(accessToken) {
       navigate(`/cart`);
     } else {
       alert("로그인 후에 이용해주세요.");
@@ -201,7 +176,7 @@ const ProductList = () => {
               </motion.button>
               <motion.input
                 type="text"
-                placeholder="상품 검색..."
+                placeholder="상품 검색.."
                 className={styles.searchInput}
                 animate={{ opacity: searchOpen ? 1 : 0 }}
                 transition={{ duration: 0.2 }}

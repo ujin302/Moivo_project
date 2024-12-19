@@ -86,14 +86,13 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    const id = localStorage.getItem("id");
     
-    if (!token || !id) {
-      alert("로그인이 필요한 서비스입니다.");
-      navigate("/user");
-      return;
+    if (!token) {
+        alert("로그인이 필요한 서비스입니다.");
+        navigate("/user");
+        return;
     }
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     fetchProductDetail();
@@ -171,8 +170,7 @@ const ProductDetail = () => {
 
   const handleAddToWishlist = async () => {
     try {
-      const userId = localStorage.getItem('id');
-      await axiosInstance.get(`/api/user/wish/${productId}/${userId}`);
+      await axiosInstance.get(`/api/user/wish/${productId}`);
       alert('위시리스트에 추가되었습니다.');
       navigate('/mypage/wish');
     } catch (error) {
@@ -188,8 +186,7 @@ const ProductDetail = () => {
     }
 
     try {
-        const userId = localStorage.getItem('id');
-        const url = `/api/user/cart/add/${productId}?userid=${userId}&count=${quantity}&size=${selectedSize}`;
+        const url = `/api/user/cart/add/${productId}?count=${quantity}&size=${selectedSize}`;
         
         const response = await axiosInstance.post(url);
         console.log('장바구니 응답:', response);

@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import singup from '../../assets/css/user_sigup.module.css';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Footer from './../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
-import {PATH} from "../../../scripts/path";
+import { PATH } from "../../../scripts/path";
 
 function UserSignup() {
     const navigate = useNavigate();
@@ -70,65 +70,14 @@ function UserSignup() {
 
     // 입력값 변경 처리 함수
     const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData((prev) => ({...prev, [name]: value}));
-        setErrors((prevErrors) => ({...prevErrors, [name]: ""}));
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     };
-
-    // ID 중복 체크 포커스 아웃시 검증
-    const IdCheckHandleBlur = async (e) => {
-        const {name} = e.target;
-
-        //ID 중복 체크
-        if (name === "userId") {
-            if (!formData.userId) {
-                setErrors((prevErrors) => ({
-                    ...prevErrors,
-                    userId: "아이디를 입력해주세요.",
-                }));
-                return;
-            }
-
-            try {
-                // 서버로 GET 요청 전송
-                const response = await axios.get(`${PATH.SERVER}/api/user/idCheck`, {
-                    params: {userId: formData.userId}, // GET 요청 파라미터
-                });
-                console.log(response.status);
-                if(response.status === 201){
-                    // 성공적으로 사용 가능한 아이디인 경우
-                    console.log("status = " + response.status); // 201 Created 상태 코드 확인
-                    setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        userId: "사용 가능한 아이디입니다.", // 성공 메시지
-                    }));
-                }
-
-            } catch (error) {
-                if (error.response.status === 409) {
-                    console.log(error.response.status)
-                    // 중복된 아이디인 경우 (409 Conflict)
-                    setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        userId: "이미 사용 중인 아이디입니다.",
-                    }));
-                } else {
-                    // 기타 에러
-                    console.error("아이디 중복 확인 실패:", error);
-                    setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        userId: "아이디 중복 확인에 실패했습니다.",
-                    }));
-                }
-
-            }
-        }
-    }
-    // ID 중복 체크 포커스 아웃시 검증
 
     // 포커스 아웃 시 검증
     const handleBlur = (e) => {
-        const {name} = e.target;
+        const { name } = e.target;
 
         // 휴대폰 번호 검증
         if (name === "phone1" || name === "phone2" || name === "phone3") {
@@ -163,6 +112,56 @@ function UserSignup() {
         }
     };
 
+    // ID 중복 체크 포커스 아웃시 검증
+    const IdCheckHandleBlur = async (e) => {
+        const {name} = e.target;
+
+        //ID 중복 체크
+        if (name === "userId") {
+            if (!formData.userId) {
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    userId: "아이디를 입력해주세요.",
+                }));
+                return;
+            }
+
+            try {
+                // 서버로 GET 요청 전송
+                const response = await axios.get(`${PATH.SERVER}/api/user/idCheck`, {
+                    params: {userId: formData.userId}, // GET 요청 파라미터
+                });
+                console.log(response.status);
+                if (response.status === 201) {
+                    // 성공적으로 사용 가능한 아이디인 경우
+                    console.log("status = " + response.status); // 201 Created 상태 코드 확인
+                    setErrors((prevErrors) => ({
+                        ...prevErrors,
+                        userId: "사용 가능한 아이디입니다.", // 성공 메시지
+                    }));
+                }
+
+            } catch (error) {
+                if (error.response.status === 409) {
+                    console.log(error.response.status)
+                    // 중복된 아이디인 경우 (409 Conflict)
+                    setErrors((prevErrors) => ({
+                        ...prevErrors,
+                        userId: "이미 사용 중인 아이디입니다.",
+                    }));
+                } else {
+                    // 기타 에러
+                    console.error("아이디 중복 확인 실패:", error);
+                    setErrors((prevErrors) => ({
+                        ...prevErrors,
+                        userId: "아이디 중복 확인에 실패했습니다.",
+                    }));
+                }
+            }
+        }
+    }
+    // ID 중복 체크 포커스 아웃시 검증
+
     // 필드별 검증 함수
     const validateField = (fieldName) => {
         let newError = '';
@@ -173,7 +172,15 @@ function UserSignup() {
                 newError = value ? "" : "아이디를 입력해주세요.";
                 break;
             case "pwd":
-                newError = value ? "" : "비밀번호를 입력해주세요.";
+                if (!value) {
+                    newError = "비밀번호를 입력해주세요.";
+                } else {
+                    // 비밀번호 정규식 패턴 추가
+                    const passwordPattern = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,15}$/;
+                    if (!passwordPattern.test(value)) {
+                        newError = "비밀번호는 영문, 숫자, 특수문자를 포함한 8~15자리여야 합니다.";
+                    }
+                }
                 break;
             case "confirmPwd":
                 newError = formData.pwd !== formData.confirmPwd ? "비밀번호가 일치하지 않습니다." : "";
@@ -264,7 +271,7 @@ function UserSignup() {
     return (
         <div className={singup.signupContainer}>
             <div className={singup.signbanner}>
-                <Banner/>
+                <Banner />
             </div>
             <div className={singup.signheader}></div>
             <div className={singup.pageName}>Sign Up</div>
@@ -273,101 +280,88 @@ function UserSignup() {
                     {/* ID */}
                     <div className={singup.formRow}>
                         <span>ID</span>
-                        <input type="text" name="userId" value={formData.userId} onChange={handleChange}
-                               onBlur={IdCheckHandleBlur}/>
+                        <input type="text" name="userId" value={formData.userId} onChange={handleChange} onBlur={IdCheckHandleBlur} />
                         <div className={singup.exception}>{errors.userId}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Password */}
                     <div className={singup.formRow}>
                         <span>PASSWORD</span>
-                        <input type="password" name="pwd" value={formData.pwd} onChange={handleChange}
-                               onBlur={handleBlur}/>
+                        <input type="password" name="pwd" placeholder="* 영문, 숫자, 특수문자(!@#$%^&*)를 포함한 8~15자리" value={formData.pwd} onChange={handleChange} onBlur={handleBlur} />
                         <div className={singup.exception}>{errors.pwd}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Confirm Password */}
                     <div className={singup.formRow}>
                         <span>CONFIRM PASSWORD</span>
-                        <input type="password" name="confirmPwd" value={formData.confirmPwd} onChange={handleChange}
-                               onBlur={handleBlur}/>
+                        <input type="password" name="confirmPwd" value={formData.confirmPwd} onChange={handleChange} onBlur={handleBlur} />
                         <div className={singup.exception}>{errors.confirmPwd}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Name */}
                     <div className={singup.formRow}>
                         <span>NAME</span>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange}
-                               onBlur={handleBlur}/>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} />
                         <div className={singup.exception}>{errors.name}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Gender */}
                     <div className={singup.formRow}>
                         <span>GENDER</span>
                         <div className={singup.radioContainer}>
-                            <input type="radio" name="gender" value="M" checked={formData.gender === "M"}
-                                   onChange={handleChange}/> Male
-                            <input type="radio" name="gender" value="F" checked={formData.gender === "F"}
-                                   onChange={handleChange}/> Female
+                            <input type="radio" name="gender" value="M" checked={formData.gender === "M"} onChange={handleChange}/> Male
+                            <input type="radio" name="gender" value="F" checked={formData.gender === "F"} onChange={handleChange}/> Female
                         </div>
                         <div className={singup.exception}>{errors.gender}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Address */}
                     <div className={singup.formRow}>
                         <span>ADDRESS</span>
                         <div className={singup.addressContainer}>
                             <div className={singup.postalRow}>
-                                <input type="text" name="postalCode" placeholder="우편번호" value={formData.postalCode}
-                                       onChange={handleChange} onBlur={handleBlur}/>
+                                <input type="text" name="postalCode" placeholder="우편번호" value={formData.postalCode} onChange={handleChange} onBlur={handleBlur} />
                                 <button type="button" onClick={handleFindPostalCode} className={singup.findButton}>
                                     우편번호 찾기
                                 </button>
                             </div>
                             <div className={singup.detailedAddress}>
-                                <input type="text" name="address" placeholder="기본 주소" value={formData.address}
-                                       onChange={handleChange} onBlur={handleBlur}/>
+                                <input type="text" name="address" placeholder="기본 주소" value={formData.address} onChange={handleChange} onBlur={handleBlur} />
                             </div>
                             <div className={singup.detailedAddress}>
-                                <input type="text" name="detailedAddress" placeholder="상세 주소"
-                                       value={formData.detailedAddress} onChange={handleChange} onBlur={handleBlur}/>
+                                <input type="text" name="detailedAddress" placeholder="상세 주소" value={formData.detailedAddress} onChange={handleChange} onBlur={handleBlur} />
                             </div>
                         </div>
                         <div className={singup.exception}>{errors.address}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Phone */}
                     <div className={singup.formRow}>
                         <span>PHONE</span>
                         <div className={singup.phoneRow}>
-                            <input type="text" name="phone1" placeholder="010" maxLength="3" value={formData.phone1}
-                                   onChange={handleChange} onBlur={handleBlur}/>
+                            <input type="text" name="phone1" placeholder="010" maxLength="3" value={formData.phone1} onChange={handleChange} onBlur={handleBlur} />
                             <p>-</p>
-                            <input type="text" name="phone2" placeholder="0000" maxLength="4" value={formData.phone2}
-                                   onChange={handleChange} onBlur={handleBlur}/>
+                            <input type="text" name="phone2" placeholder="0000" maxLength="4" value={formData.phone2} onChange={handleChange} onBlur={handleBlur} />
                             <p>-</p>
-                            <input type="text" name="phone3" placeholder="0000" maxLength="4" value={formData.phone3}
-                                   onChange={handleChange} onBlur={handleBlur}/>
+                            <input type="text" name="phone3" placeholder="0000" maxLength="4" value={formData.phone3} onChange={handleChange} onBlur={handleBlur} />
                         </div>
                         <div className={singup.exception}>{errors.phone}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Email */}
                     <div className={singup.formRow}>
                         <span>EMAIL</span>
-                        <input className={singup.emaildetail} type="email" name="email" value={formData.email}
-                               onChange={handleChange} onBlur={handleBlur}/>
+                        <input className={singup.emaildetail} type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} />
                         <div className={singup.exception}>{errors.email}</div>
                     </div>
-                    <hr className={singup.signupline}/>
+                    <hr className={singup.signupline} />
 
                     {/* Buttons */}
                     <div className={singup.signupbtn}>
@@ -378,7 +372,7 @@ function UserSignup() {
                     </div>
                 </form>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 }
