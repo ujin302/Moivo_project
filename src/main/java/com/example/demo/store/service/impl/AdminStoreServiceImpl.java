@@ -61,14 +61,14 @@ public class AdminStoreServiceImpl implements AdminStoreService {
 
         // 판매 중인 상품 수 (삭제되지 않은 상품)
         long activeProducts = productRepository.countByDeleteFalse();
-        
+
         // 품절 상품 수 (재고가 0인 상품, 사이즈별로 체크)
         long soldOutProducts = 0;
-        
+
         // 판매 중인 상품을 가져와서 사이즈별 재고를 체크
         for (ProductEntity product : productRepository.findAll()) {
             boolean isSoldOut = false;
-            
+
             // 해당 상품의 모든 사이즈별 재고를 가져와서 체크
             for (ProductStockEntity.Size size : ProductStockEntity.Size.values()) {
                 ProductStockEntity stock = stockRepository.findByProductEntityAndSize(product, size);
@@ -272,7 +272,7 @@ public class AdminStoreServiceImpl implements AdminStoreService {
     public Map<String, Object> getAllProductList(Map<String, Object> dataMap) {
         Map<String, Object> products = new HashMap<>();
         List<AdminProductDTO> productList = new ArrayList<>();
-        
+
         // 데이터 추출
         Pageable pageable = (Pageable) dataMap.get("pageable"); // 페이지 처리
         int block = Integer.parseInt(dataMap.get("block").toString()); // 한 페이지당 보여줄 숫자
@@ -366,10 +366,35 @@ public class AdminStoreServiceImpl implements AdminStoreService {
 
             // 이미 삭제 상태인 경우만 복구
             if (product.getDelete()) {
+                // 재고 상태에 따른 상품 상태 설정
+                boolean isAllOutOfStock = true; // 전체 품절 상태
+                boolean isPartialOutOfStock = false; // 일부 품절 상태
+
+                // 각 사이즈별 재고를 확인
+                for (ProductStockEntity stockEntity : product.getStockList()) {
+                    if (stockEntity.getCount() > 0) {
+                        isAllOutOfStock = false; // 재고가 있는 사이즈가 있으면 전체 품절이 아님
+                    } else {
+                        isPartialOutOfStock = true; // 품절인 사이즈가 있으면 일부 품절
+                    }
+                }
+
+                // 상태 업데이트
+                if (isAllOutOfStock && isPartialOutOfStock) {
+                    product.setStatus(ProductEntity.ProductStatus.SOLDOUT); // 전체품절
+                } else if (isPartialOutOfStock) {
+                    product.setStatus(ProductEntity.ProductStatus.SOMESOLDOUT); // 일부품절
+                } else {
+                    product.setStatus(ProductEntity.ProductStatus.EXIST); // 정상
+                }
+
+                // 삭제 상태를 false로 변경하여 복구
                 product.setDelete(false);
                 productRepository.save(product);
                 return true; // 복구 성공
             }
+        } else {
+            throw new NotFoundException("상품번호, " + productId + "가 존재하지 않습니다.");
         }
 
         return false; // 복구 실패
