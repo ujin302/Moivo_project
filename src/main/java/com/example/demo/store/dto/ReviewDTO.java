@@ -42,11 +42,12 @@ public class ReviewDTO { // 리뷰
 
     // DTO 검증 메서드 추가
     public void validate() {
-        if (userId == null) throw new IllegalArgumentException("사용자 ID는 필수입니다.");
-        if (productId <= 0) throw new IllegalArgumentException("상품 ID는 필수입니다.");
-        if (paymentDetailId <= 0) throw new IllegalArgumentException("결제상세 ID는 필수입니다.");
-        if (rating < 1 || rating > 5) throw new IllegalArgumentException("별점은 1-5 사이여야 합니다.");
-        if (content == null || content.trim().isEmpty()) throw new IllegalArgumentException("리뷰 내용은 필수입니다.");
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("별점은 1-5 사이여야 합니다.");
+        }
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("리뷰 내용은 필수입니다.");
+        }
     }
 
 }

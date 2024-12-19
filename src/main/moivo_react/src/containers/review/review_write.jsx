@@ -6,27 +6,22 @@ import Banner from '../../components/Banner/banner';
 import Footer from '../../components/Footer/Footer';
 import { PATH } from '../../../scripts/path';
 
-axiosInstance.interceptors.request.use((config) => {
-    const token = localStorage.getItem('accessToken');
-    // console.log('요청 헤더의 토큰:', token);
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
 const ReviewWrite = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    // location.state에서 모든 필요한 데이터 추출
+    // isEdit 상태 추가
+    const [isEdit, setIsEdit] = useState(false);
+    
     const {
         productId,
         productName,
         paymentDetailId,
         size,
         userName,
-        orderDate
+        orderDate,
+        userId,
+        isReviewComplete // 리뷰 작성 완료 여부
     } = location.state || {};
 
     const [rating, setRating] = useState(0);
@@ -34,40 +29,88 @@ const ReviewWrite = () => {
     const [error, setError] = useState(null);
     const maxLength = 1000; // 최대 글자수 제한
 
+    // 컴포넌트 시작 부분에 existingReview 상태 추가
+    const [existingReview, setExistingReview] = useState(null);
+
     useEffect(() => {
-        console.log("전달받은 데이터:", location.state);
-    }, [location]);
+        const loadExistingReview = async () => {
+            if (isReviewComplete && paymentDetailId) {
+                try {
+                    const response = await axiosInstance.get(`${PATH.SERVER}/api/user/review/payment/${paymentDetailId}`);
+                    
+                    if (response.data) {
+                        setRating(response.data.rating);
+                        setContent(response.data.content);
+                        setIsEdit(true);
+                        setExistingReview({
+                            ...response.data,
+                            id: response.data.id  // 실제 리뷰 ID 사용
+                        });
+                    }
+                } catch (err) {
+                    console.error('리뷰 로딩 에러:', err);
+                    setError('리뷰를 불러오는데 실패했습니다.');
+                }
+            }
+        };
+
+        if (location.state) {
+            loadExistingReview();
+        }
+    }, [isReviewComplete, paymentDetailId, location.state]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
-            const token = localStorage.getItem('accessToken');
-            const payload = token.split('.')[1];
-            const decodedPayload = JSON.parse(atob(payload));
-            
             const reviewData = {
-                userId: decodedPayload.id,
-                userName,
-                productId,
-                size: size.toUpperCase(),
-                paymentDetailId,
-                rating,
-                content,
-                reviewDate: new Date().toISOString()
+                userId: existingReview ? existingReview.userId : userId,
+                userName: userName,
+                productId: productId,
+                size: size ? size.toUpperCase() : "UNKNOWN",
+                paymentDetailId: paymentDetailId,
+                rating: parseInt(rating, 10),
+                content: content.trim(),
+                reviewDate: new Date().toISOString(),
             };
+
+            console.log('전송 데이터:', reviewData);
             
-            console.log('전송할 리뷰 데이터:', reviewData);
-            const response = await axiosInstance.post(`${PATH.SERVER}/api/user/review`, reviewData);
-            console.log('서버 응답:', response);
-            
-            alert('리뷰가 성공적으로 작성되었습니다.');
-            navigate('/mypage/order');
+            if (isEdit && existingReview?.id) {
+                const response = await axiosInstance.put(
+                    `/api/user/review/${existingReview.id}`,
+                    {
+                        id: existingReview.id,  // reviewId 추가
+                        userId: existingReview.userId,
+                        userName: userName,
+                        productId: productId,
+                        size: size ? size.toUpperCase() : "UNKNOWN",
+                        paymentDetailId: paymentDetailId,
+                        rating: parseInt(rating, 10),
+                        content: content.trim(),
+                        reviewDate: new Date().toISOString()
+                    }
+                );
+                if (response.status === 200) {
+                    alert('리뷰가 성공적으로 수정되었습니다.');
+                    navigate('/mypage/order');
+                }
+            } else {
+                // 새 리뷰 작성
+                const response = await axiosInstance.post(`${PATH.SERVER}/api/user/review`, reviewData);
+                console.log('서버 응답:', response);
+                if (response.status === 200) {
+                    alert('리뷰가 성공적으로 작성되었습니다.');
+                    navigate('/mypage/order');
+                }
+            }
         } catch (err) {
-            console.error('에러 : 발생:', err);
-            setError(err.response?.data || '리뷰 작성에 실패했습니다.');
+            console.error('에러 발생:', err);
+            console.error('에러 응답:', err.response);
+            setError(err.response?.data || '리뷰 수정에 실패했습니다.');
         }
     };
+      
+    
 
     const handleStarClick = (selectedRating) => {
         setRating(selectedRating);
@@ -81,6 +124,27 @@ const ReviewWrite = () => {
         return '';
     };
 
+    // 리뷰 삭제 핸들러 추가
+    const handleDelete = async () => {
+        if (!window.confirm('리뷰를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const response = await axiosInstance.delete(
+                `${PATH.SERVER}/api/user/review/${existingReview.id}`
+            );
+
+            if (response.status === 200) {
+                alert('리뷰가 성공적으로 삭제되었습니다.');
+                navigate('/mypage/order');
+            }
+        } catch (err) {
+            console.error('리뷰 삭제 중 에러:', err);
+            setError('리뷰 삭제에 실패했습니다.');
+        }
+    };
+
     return (
         <>
             <div>
@@ -89,15 +153,13 @@ const ReviewWrite = () => {
 
             <div className={styles.reviewWriteContainer}>
                 <br/><br/>
-                <h1>리뷰 작성</h1>
-
-                
+                <h1>{isEdit ? '리뷰 수정' : '리뷰 작성'}</h1>
                 <div className={styles.productInfo} data-tooltip="구매하신 상품 정보입니다">
                     <h2>{productName}</h2>
                     <p>구매일: {new Date(orderDate).toLocaleDateString()}</p>
                     <p>사이즈:  {size}</p>
                 </div>
-
+                
                 <form onSubmit={handleSubmit}>
                     <div className={styles.ratingContainer}>
                         <div className={styles.ratingStars}>
@@ -177,8 +239,17 @@ const ReviewWrite = () => {
 
                     <div className={styles.buttonContainer}>
                         <button type="submit" className={styles.submitButton}>
-                            리뷰 등록하기
+                            {isEdit ? '리뷰 수정하기' : '리뷰 등록하기'}
                         </button>
+                        {isEdit && ( // 수정 모드일 때만 삭제 버튼 표시
+                            <button 
+                                type="button" 
+                                className={styles.deleteButton}
+                                onClick={handleDelete}
+                            >
+                                리뷰 삭제하기 
+                            </button>
+                        )}
                         <button 
                             type="button" 
                             className={styles.cancelButton}
@@ -187,6 +258,10 @@ const ReviewWrite = () => {
                             취소
                         </button>
                     </div>
+
+                    {isReviewComplete && (
+                        <div className={styles.reviewCompleteText}>이미 작성된 리뷰 입니다.</div>
+                    )}
                 </form>
                 <br/>
 
@@ -199,3 +274,5 @@ const ReviewWrite = () => {
 };
 
 export default ReviewWrite;
+
+//  지금 리뷰 삭제 하기 버튼 눌렀을 때 삭제 되는 것 확인 필요
