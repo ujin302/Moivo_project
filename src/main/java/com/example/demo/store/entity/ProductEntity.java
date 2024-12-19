@@ -31,7 +31,8 @@ public class ProductEntity { // 상품
     public enum ProductStatus {
         EXIST(""), // 모든 재고가 존재
         SOMESOLDOUT("일부 품절"), // 일부 품절
-        SOLDOUT("전체 품절"); // 전체 품절
+        SOLDOUT("전체 품절"), // 전체 품절
+        DELETED("삭제된 상품"); // 삭제된 상품
 
         private final String description;
 

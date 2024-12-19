@@ -3,9 +3,6 @@ package com.example.demo.store.controller;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.store.dto.ReviewDTO;
 import com.example.demo.store.service.ReviewService;
@@ -79,16 +76,25 @@ public class ReviewController {
         }
     }
 
-    // 리뷰 수정 -> 중복? 다시 점검예정
+    // 리뷰 수정 (리뷰 ID 기준)
     @PutMapping("/{reviewId}")
     public ResponseEntity<String> updateReview(
-            @PathVariable int reviewId,
-            @RequestBody ReviewDTO reviewDTO) {
+            @PathVariable(name = "reviewId") int reviewId,
+            @RequestBody ReviewDTO reviewDTO,
+            @RequestHeader(value = "Authorization", required = true) String token) {
         try {
+            // Authorization 헤더 검증 로직
+            if (token == null || !token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+            
+            reviewDTO.validate();
             reviewService.updateReview(reviewId, reviewDTO);
-            return ResponseEntity.ok("리뷰�� 성공적으로 수정되었습니다.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            System.err.println("리뷰 수정 중 에러 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .body("리뷰 수정에 실패했습니다: " + e.getMessage());
         }
     }
 
@@ -114,45 +120,24 @@ public class ReviewController {
         }
     }
 
-    // 결제상세ID로 리뷰 수정
-    @PutMapping("/payment/{paymentDetailId}")
-    public ResponseEntity<String> updateReviewByPaymentDetailId(
-            @PathVariable int paymentDetailId,
-            @RequestBody ReviewDTO reviewDTO) {
-        try {
-            System.out.println("리뷰 수정 요청 데이터: " + reviewDTO);
-            
-            // 기존 리뷰 조회
-            ReviewDTO existingReview = reviewService.getReviewByPaymentDetailId(paymentDetailId);
-            if (existingReview == null) {
-                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body("리뷰를 찾을 수 없습니다.");
-            }
-            
-            // 리뷰 수정
-            reviewService.updateReview(existingReview.getId(), reviewDTO);
-            return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
     // 결제상세ID로 리뷰 조회
     @GetMapping("/payment/{paymentDetailId}")
     public ResponseEntity<ReviewDTO> getReviewByPaymentDetailId(
-        @PathVariable int paymentDetailId,
+        @PathVariable("paymentDetailId") int paymentDetailId,
         @RequestHeader(value = "Authorization", required = true) String token) {
         try {
             if (!token.startsWith("Bearer ")) {
                 return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
             }
             
-            System.out.println("리뷰 조회 요청 - paymentDetailId: " + paymentDetailId);
             ReviewDTO review = reviewService.getReviewByPaymentDetailId(paymentDetailId);
+            if (review == null) {
+                return ResponseEntity.notFound().build();
+            }
             return ResponseEntity.ok(review);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             System.err.println("리뷰 조회 실패: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

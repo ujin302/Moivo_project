@@ -43,6 +43,7 @@ public class QuestionServiceImpl implements QuestionService {
         System.out.println("프론트에서 받아온 questionDTO = " + questionDTO);
         System.out.println("프론트에서 받아온 id = " + questionDTO.getUserId()); // QuestionDTO의 userid는 user 테이블 id 값임
         System.out.println("questionEntity Id 저장 전 = " + questionEntity);
+        System.out.println("PrivatePwd: " + questionDTO.getPrivatePwd());
         QuestionCategoryEntity questionCategoryEntity = questionCategoryRepository.findById(questionDTO.getCategoryId()).orElseThrow();
         UserEntity userEntity = userRepository.findById(questionDTO.getUserId()).orElseThrow();
         System.out.println("questionDTO = " + questionDTO);
