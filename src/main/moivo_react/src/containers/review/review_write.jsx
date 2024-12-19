@@ -247,7 +247,7 @@ const ReviewWrite = () => {
                                 className={styles.deleteButton}
                                 onClick={handleDelete}
                             >
-                                리뷰 삭제하기
+                                리뷰 삭제하기 
                             </button>
                         )}
                         <button 
@@ -274,3 +274,5 @@ const ReviewWrite = () => {
 };
 
 export default ReviewWrite;
+
+//  지금 리뷰 삭제 하기 버튼 눌렀을 때 삭제 되는 것 확인 필요
