@@ -176,7 +176,7 @@ const ProductList = () => {
               </motion.button>
               <motion.input
                 type="text"
-                placeholder="상품 검색..."
+                placeholder="상품 검색.."
                 className={styles.searchInput}
                 animate={{ opacity: searchOpen ? 1 : 0 }}
                 transition={{ duration: 0.2 }}
