@@ -4,6 +4,7 @@ import com.example.demo.coupon.entity.UserCouponEntity;
 
 import feign.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jdbc.repository.query.Modifying;
@@ -20,4 +21,6 @@ public interface UserCouponRepository extends JpaRepository<UserCouponEntity, Lo
   public List<UserCouponEntity> findByUserEntity_Id(int userId);
   
   public void deleteByUserEntity_Id(int userId);  
+
+  List<UserCouponEntity> findByEndDateBeforeAndUsedFalse(LocalDateTime now);
 }
