@@ -2,7 +2,6 @@ package com.example.demo.payment.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private UserCouponService userCouponService;
 
+    // 24.12.19 - 상품 테이블에 재고 상태 변경 - uj (수정)
     // 24.12.12 - uj
     // 결제 정보 저장
     @Override
@@ -109,13 +109,26 @@ public class PaymentServiceImpl implements PaymentService {
             detailRepository.save(detailEntity);
 
             // 3-2. 재고 수정
+            int soldoutCount = 0;
             List<ProductStockEntity> stockEntiyList = productEntity.getStockList();
             for (ProductStockEntity stockEntity : stockEntiyList) {
                 if (stockEntity.getSize() == detailDTO.getSize()) {
-                    stockEntity.setCount(stockEntity.getCount() - detailDTO.getCount()); // 재고 수정
+                    int stockCount = stockEntity.getCount() - detailDTO.getCount();
+                    stockEntity.setCount(stockCount < 0 ? 0 : stockCount); // 재고 수정
+                    soldoutCount += stockEntity.getCount() == 0 ? 1 : 0; // 사이즈 별 재고 0인것 개수 구하기
                 }
             }
-            // 3-3. 재고 DB 반영
+
+            // 3-3. 재고 상태 설정
+            if (soldoutCount == 0) { // 모든 사이즈 재고: 0 이상
+                productEntity.setStatus(ProductEntity.ProductStatus.EXIST);
+            } else if (soldoutCount < stockEntiyList.size()) { // 일부 사이즈 재고 : 0
+                productEntity.setStatus(ProductEntity.ProductStatus.SOMESOLDOUT);
+            } else if (soldoutCount == stockEntiyList.size()) { // 모든 사이즈 재고 : 0
+                productEntity.setStatus(ProductEntity.ProductStatus.SOLDOUT);
+            }
+
+            // 3-4. 재고 DB 반영
             productRepository.save(productEntity);
         }
 
