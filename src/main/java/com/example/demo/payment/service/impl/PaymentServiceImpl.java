@@ -147,9 +147,22 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 5. 쿠폰 사용 여부 저장
         if (paymentDTO.getDiscount() > 0) {
+            // 사용자에 해당하는 쿠폰 목록을 가져옵니다.
             List<UserCouponEntity> couponEntityList = userCouponRepository.findByUserEntity_Id(paymentDTO.getUserId());
-            couponEntityList.get(0).setUsed(true);
-            userCouponRepository.save(couponEntityList.get(0));
+            
+            if (!couponEntityList.isEmpty()) {
+                // 첫 번째 쿠폰을 가져와서 사용된 것으로 표시
+                UserCouponEntity userCoupon = couponEntityList.get(0); // 쿠폰 하나만 사용되므로 첫 번째 쿠폰을 사용
+
+                // 쿠폰이 아직 사용되지 않았고 유효하다면
+                if (!userCoupon.getUsed()) {
+                    userCoupon.setUsed(true);  // 사용된 것으로 표시
+
+                    // 영속성 컨텍스트에 저장
+                    userCouponRepository.save(userCoupon); // 변경 사항 저장
+                    System.out.println("Coupon used status updated to: " + userCoupon.getUsed());
+                }
+            }
         }
 
         // 6. 결제 후 등급 업데이트 - sumin (2024.12.16)

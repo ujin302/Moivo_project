@@ -150,17 +150,9 @@ const MypageMain = () => {
                       onMouseLeave={handleCouponMouseLeave}
                     >
                       <strong>{coupon.couponName}</strong>
-                      {!isInvalidCoupon && coupon.startDate && coupon.endDate && !coupon.used && (
-                        <p className={styles.couponDate}>
-                          유효기간: {new Date(coupon.startDate).toLocaleDateString()} ~ {new Date(coupon.endDate).toLocaleDateString()}
-                        </p>
-                      )}
                       {!isInvalidCoupon && showCouponTooltip && (
                         <div className={styles.couponTooltip}>
-                          <p>
-                            쿠폰 이름: {coupon.couponName} <br />
                             유효기간: {new Date(coupon.startDate).toLocaleDateString()} ~ {new Date(coupon.endDate).toLocaleDateString()}
-                          </p>
                         </div>
                       )}
                     </div>
@@ -170,6 +162,7 @@ const MypageMain = () => {
                 "쿠폰 정보를 불러오는 중입니다..."
               )}
             </div>
+          </div>
           </div>
             {/* 아이콘 영역 (우측 상단에 배치) */}
             <div 
