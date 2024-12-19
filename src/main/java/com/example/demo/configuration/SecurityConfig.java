@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .successHandler(successHandler()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/user/review/**").authenticated()
                         .requestMatchers(
                                 "/api/user/login",
                                 "/api/user/join",

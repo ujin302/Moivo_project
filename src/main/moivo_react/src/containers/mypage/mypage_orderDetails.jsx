@@ -25,7 +25,7 @@ const MypageOrderDetails = () => {
         const token = localStorage.getItem("accessToken");
         
         if (!token) {
-            alert("로그인이 필요합니다.");
+            alert("로그인이 필요합니��.");
             navigate("/user");
             return;
         }
@@ -180,7 +180,32 @@ const MypageOrderDetails = () => {
                                         </button>
                                     </>
                                 ) : (
-                                    <div className={styles.reviewCompleteText}>리뷰작성완료</div>
+                                    <>
+                                        <div className={styles.reviewCompleteText}>리뷰작성완료</div>
+                                        <button 
+                                            className={styles.editReviewButton} 
+                                            onClick={() => {
+                                                if (!item.id || !item.productId || !item.productName) {
+                                                    console.error('필요한 데이터가 없습니다:', item);
+                                                    return;
+                                                }
+                                                navigate('/review/write', { 
+                                                    state: { 
+                                                        productId: item.productId,
+                                                        productName: item.productName,
+                                                        paymentDetailId: item.id,
+                                                        size: item.size,
+                                                        userId: userId,
+                                                        userName: OrdersInfo[0]?.name,
+                                                        orderDate: OrdersInfo[0]?.paymentDate,
+                                                        isReviewComplete: true
+                                                    } 
+                                                });
+                                            }}
+                                        >
+                                            리뷰 수정
+                                        </button>
+                                    </>
                                 )
                             ) : OrdersInfo[0]?.deliveryStatus === "PAYMENT_COMPLETED" ? (
                                 <div className={styles.statusText}>결제완료</div>
