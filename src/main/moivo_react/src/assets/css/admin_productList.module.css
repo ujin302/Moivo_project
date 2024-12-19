@@ -184,3 +184,24 @@
     color: red;
   }
   
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .pagination button.activePage {
+    background: #2f2e2c;
+    color: white;
+    font-weight: bold;
+  }
+  

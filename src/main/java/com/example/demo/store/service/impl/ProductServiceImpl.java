@@ -348,6 +348,7 @@ public class ProductServiceImpl implements ProductService {
         System.out.println("여기와 ?? " + productId);
         // delete 변수 true로 설정
         product.setDelete(true);
+        product.setStatus(ProductEntity.ProductStatus.DELETED);
 
         // 변경 사항 저장
         productRepository.save(product);
@@ -371,18 +372,42 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean restoreProduct(int productId) {
         Optional<ProductEntity> productEntity = productRepository.findById(productId);
-
+    
         if (productEntity.isPresent()) {
             ProductEntity product = productEntity.get();
-
+    
             // 이미 삭제 상태인 경우만 복구
             if (product.getDelete()) {
+                // 재고 상태에 따른 상품 상태 설정
+                boolean isAllOutOfStock = true; // 전체 품절 상태
+                boolean isPartialOutOfStock = false; // 일부 품절 상태
+    
+                // 각 사이즈별 재고를 확인
+                for (ProductStockEntity stockEntity : product.getStockList()) {
+                    if (stockEntity.getCount() > 0) {
+                        isAllOutOfStock = false; // 재고가 있는 사이즈가 있으면 전체 품절이 아님
+                    } else {
+                        isPartialOutOfStock = true; // 품절인 사이즈가 있으면 일부 품절
+                    }
+                }
+    
+                // 상태 업데이트
+                if (isAllOutOfStock) {
+                    product.setStatus(ProductEntity.ProductStatus.SOLDOUT); // 전체품절
+                } else if (isPartialOutOfStock) {
+                    product.setStatus(ProductEntity.ProductStatus.SOMESOLDOUT); // 일부품절
+                } else {
+                    product.setStatus(ProductEntity.ProductStatus.EXIST); // 정상
+                }
+    
+                // 삭제 상태를 false로 변경하여 복구
                 product.setDelete(false);
                 productRepository.save(product);
                 return true; // 복구 성공
             }
         }
-
+    
         return false; // 복구 실패
     }
+    
 }

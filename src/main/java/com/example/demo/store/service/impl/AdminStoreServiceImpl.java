@@ -84,7 +84,7 @@ public class AdminStoreServiceImpl implements AdminStoreService {
     public Map<String, Object> getAllProductList(Map<String, Object> dataMap) {
         Map<String, Object> products = new HashMap<>();
         List<AdminProductDTO> productList = new ArrayList<>();
-
+        
         // 데이터 추출
         Pageable pageable = (Pageable) dataMap.get("pageable"); // 페이지 처리
         int block = Integer.parseInt(dataMap.get("block").toString()); // 한 페이지당 보여줄 숫자
@@ -100,15 +100,24 @@ public class AdminStoreServiceImpl implements AdminStoreService {
         Page<ProductEntity> pageProductList = null;
         List<ProductEntity.ProductStatus> statusList = new ArrayList<>();
         if (sortby == 1) {
+            // 전체 상품
             pageProductList = productRepository.findAll(pageable);
             System.out.println("delete = false 상품 추출 >> " + pageProductList.getSize() + "개");
         } else if (sortby == 2) {
+            // 일부 품절 또는 전체 품절
             statusList.add(ProductEntity.ProductStatus.SOLDOUT);
             statusList.add(ProductEntity.ProductStatus.SOMESOLDOUT);
             pageProductList = productRepository.findByStatuses(statusList, pageable);
             System.out.println("일부 품절 & 전체 품절 상품 추출 >> " + pageProductList.getSize() + "개");
         } else if (sortby == 3) {
-            pageProductList = productRepository.findByDeleteTrue(pageable);
+            // 정상 상태(EXIST("")만 포함)
+            statusList.add(ProductEntity.ProductStatus.EXIST);
+            pageProductList = productRepository.findByStatuses(statusList, pageable);
+            System.out.println("정상 상품(EXIST) 추출 >> " + pageProductList.getSize() + "개");
+        } else if (sortby == 4) {
+            // 삭제된 상품
+            statusList.add(ProductEntity.ProductStatus.DELETED);
+            pageProductList = productRepository.findByStatuses(statusList, pageable);
             System.out.println("임시 삭제(복구 대상) 상품 추출 >> " + pageProductList.getSize() + "개");
         }
 
@@ -128,6 +137,12 @@ public class AdminStoreServiceImpl implements AdminStoreService {
         int currentBlock = pageProductList.getNumber() / block;
         int startPage = currentBlock * block;
         int engPage = Math.min(startPage + block, pageProductList.getTotalPages());
+
+        System.out.println("productList = " + productList);
+        System.out.println("currentBlock = " + currentBlock);
+        System.out.println("startPage = " + startPage);
+        System.out.println("engPage = " + engPage);
+        System.out.println("pageProductList.getTotalPages() = " + pageProductList.getTotalPages());
 
         // 페이징 정보 결과 담기
         products.put("startPage", startPage); // 블럭 첫번째 페이지

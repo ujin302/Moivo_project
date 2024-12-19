@@ -17,7 +17,7 @@ const admins_side = () => {
     
               {/* Products */}
               <li className={admin_sidebar.hasSubnav}>
-                <Link to="/admins_productadd">
+                <Link to="/admin/admin_productList">
                   <i className="fa fa-cube fa-2x"></i>
                   <span className={admin_sidebar.navText}>Products</span>
                 </Link>
