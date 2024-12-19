@@ -30,6 +30,7 @@ import Admins_productUpdate from './containers/admin/admins_productupdate';
 import ProductTrash from './containers/admin/admin_productTrash';
 import KakaoCallback from './components/kakao/KakaoCallback';
 import Admins_FAQ from './containers/admin/admins_FAQ';
+import Admins_ProductList from './containers/admin/admin_productList';
 import ReviewWrite from './containers/review/review_write';
 
 
@@ -62,8 +63,9 @@ const routeConfig = [
   { path: "/api/oauth/kakao/callback", element: <KakaoCallback /> },
   { path : "/admins_qnaboard", element: <Admins_qna/>},
   { path : "/admins_productadd", element: <Admins_productAdd/>},
-  { path : "/admins_productupdate", element: <Admins_productUpdate/>},
+  { path : "/admins_productupdate/:productId", element: <Admins_productUpdate/>},
   { path : "/admin/admin_productTrash", element: <ProductTrash/>},
+  { path : "/admin/admin_productList", element: <Admins_ProductList/>},
   { path: "/oauth2/callback/kakao", element: <KakaoCallback /> },
   { path: "/admins_FAQ", element: <Admins_FAQ /> }
 

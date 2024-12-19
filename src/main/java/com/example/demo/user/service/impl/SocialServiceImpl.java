@@ -61,8 +61,8 @@ public class SocialServiceImpl implements SocialService {
         if (checkUserOptional == null || checkUserOptional.isEmpty()) {
             // 신규 회원 >> 회원가입 진행
             userKakaoEntity = userService.insertInit(UserEntity.toSaveKakaoUserEntity(userKakaoInfoDTO));
-            System.out.println("신규 회원 >> pk: " + userKakaoEntity.getId() +
-                    " & userid: " + userKakaoEntity.getUserId());
+            // System.out.println("신규 회원 >> pk: " + userKakaoEntity.getId() +
+            //         " & userid: " + userKakaoEntity.getUserId());
         } else {
             // 기존 회원 >> 로그인 성공
             System.out.println("기존 회원 >> pk: " + checkUserOptional.get().getId() +

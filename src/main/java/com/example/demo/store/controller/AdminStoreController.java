@@ -129,6 +129,7 @@ public class AdminStoreController {
     // 상품 삭제 - 24.11.27 - uj
     @DeleteMapping("delete/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable(name = "productId") int productId) {
+        System.out.println(productId);
         try {
             adminStoreService.deleteProduct(productId);
             return ResponseEntity.ok("상품 삭제가 완료되었습니다.");

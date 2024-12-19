@@ -61,17 +61,38 @@ public class AdminStoreServiceImpl implements AdminStoreService {
 
         // 판매 중인 상품 수 (삭제되지 않은 상품)
         long activeProducts = productRepository.countByDeleteFalse();
-
-        // 품절 상품 수 (재고가 0인 상품)
-        long soldOutProducts = stockRepository.countByCountEquals(0);
+        
+        // 품절 상품 수 (재고가 0인 상품, 사이즈별로 체크)
+        long soldOutProducts = 0;
+        
+        // 판매 중인 상품을 가져와서 사이즈별 재고를 체크
+        for (ProductEntity product : productRepository.findAll()) {
+            boolean isSoldOut = false;
+            
+            // 해당 상품의 모든 사이즈별 재고를 가져와서 체크
+            for (ProductStockEntity.Size size : ProductStockEntity.Size.values()) {
+                ProductStockEntity stock = stockRepository.findByProductEntityAndSize(product, size);
+                if (stock != null && stock.getCount() == 0) {
+                    isSoldOut = true; // 하나라도 품절이면 품절로 처리
+                    break;
+                }
+            }
+            if (isSoldOut) {
+                soldOutProducts++;
+            }
+        }
 
         // 재고 10개 이하 상품 수
         long lowStockProducts = stockRepository.countByCountLessThanEqual(10);
+
+        // 삭제 상품 수 - sumin 12.18
+        long inactiveProducts = productRepository.countByDeleteTrue();
 
         result.put("전체 상품", totalProducts);
         result.put("판매 상품", activeProducts);
         result.put("품절 상품", soldOutProducts);
         result.put("재고 10 이하", lowStockProducts);
+        result.put("삭제된 상품", inactiveProducts);
 
         return result;
     }
@@ -251,7 +272,7 @@ public class AdminStoreServiceImpl implements AdminStoreService {
     public Map<String, Object> getAllProductList(Map<String, Object> dataMap) {
         Map<String, Object> products = new HashMap<>();
         List<AdminProductDTO> productList = new ArrayList<>();
-
+        
         // 데이터 추출
         Pageable pageable = (Pageable) dataMap.get("pageable"); // 페이지 처리
         int block = Integer.parseInt(dataMap.get("block").toString()); // 한 페이지당 보여줄 숫자
@@ -261,15 +282,24 @@ public class AdminStoreServiceImpl implements AdminStoreService {
         Page<ProductEntity> pageProductList = null;
         List<ProductEntity.ProductStatus> statusList = new ArrayList<>();
         if (sortby == 1) {
+            // 전체 상품
             pageProductList = productRepository.findAll(pageable);
             System.out.println("delete = false 상품 추출 >> " + pageProductList.getSize() + "개");
         } else if (sortby == 2) {
+            // 일부 품절 또는 전체 품절
             statusList.add(ProductEntity.ProductStatus.SOLDOUT);
             statusList.add(ProductEntity.ProductStatus.SOMESOLDOUT);
             pageProductList = productRepository.findByStatuses(statusList, pageable);
             System.out.println("일부 품절 & 전체 품절 상품 추출 >> " + pageProductList.getSize() + "개");
         } else if (sortby == 3) {
-            pageProductList = productRepository.findByDeleteTrue(pageable);
+            // 정상 상태(EXIST("")만 포함)
+            statusList.add(ProductEntity.ProductStatus.EXIST);
+            pageProductList = productRepository.findByStatuses(statusList, pageable);
+            System.out.println("정상 상품(EXIST) 추출 >> " + pageProductList.getSize() + "개");
+        } else if (sortby == 4) {
+            // 삭제된 상품
+            statusList.add(ProductEntity.ProductStatus.DELETED);
+            pageProductList = productRepository.findByStatuses(statusList, pageable);
             System.out.println("임시 삭제(복구 대상) 상품 추출 >> " + pageProductList.getSize() + "개");
         }
 
@@ -286,6 +316,12 @@ public class AdminStoreServiceImpl implements AdminStoreService {
         int currentBlock = pageProductList.getNumber() / block;
         int startPage = currentBlock * block;
         int engPage = Math.min(startPage + block, pageProductList.getTotalPages());
+
+        System.out.println("productList = " + productList);
+        System.out.println("currentBlock = " + currentBlock);
+        System.out.println("startPage = " + startPage);
+        System.out.println("engPage = " + engPage);
+        System.out.println("pageProductList.getTotalPages() = " + pageProductList.getTotalPages());
 
         // 페이징 정보 결과 담기
         products.put("startPage", startPage); // 블럭 첫번째 페이지

@@ -17,7 +17,17 @@ const Qna_boardlist = () => {
     const [enteredPassword, setEnteredPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [selectedPost, setSelectedPost] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
+    const resetState = () => {
+        setQnaData([]);  // 데이터를 초기화
+        setCurrentPage(0);  // 페이지 번호 초기화
+        setSelectedType('');  // 카테고리 필터 초기화
+        setSearchTerm('');  // 검색어 초기화
+
+        fetchQnaData(0, 0, '');
+    };
+    
     // 새로운 상태 추가: 편집 모달 관련
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [editedPost, setEditedPost] = useState({
@@ -38,13 +48,14 @@ const Qna_boardlist = () => {
     // 현재 로그인한 사용자 ID 상태 추가
     const [currentUserId, setCurrentUserId] = useState(null);
 
-    // 서버에서 문의 데이터를 가져오는 함수, 카테고리 필터링 포함
-    const fetchQnaData = async (page = 0, categoryId = 0) => {
+    // 서버에서 문의 데이터를 가져오는 함수, 카테고리 필터링 포함, 검색 포함
+    const fetchQnaData = async (page = 0, categoryId = 0, search = '') => {
         try {
             const response = await axiosInstance.get('/api/user/question', {
                 params: {
                     page: page,
-                    categoryid: categoryId
+                    categoryid: categoryId,
+                    title: search || undefined  // Only send if search is not empty
                 }
             });
             setQnaData(response.data.QuestionList || []);
@@ -56,6 +67,20 @@ const Qna_boardlist = () => {
         }
     };
 
+    // 엔터키 검색 함수 실행
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();  // 엔터 키가 눌렸을 때 검색 함수 실행
+        }
+    };
+    
+    //검색 핸들러
+    const handleSearch = () => {
+        const categoryId = categoryMapping[selectedType] || 0;
+        fetchQnaData(0, categoryId, searchTerm);
+    };
+
+
     // 현재 사용자 ID 확인
     const checkUserId = () => {
         const storedUserId = localStorage.getItem('id');
@@ -65,7 +90,7 @@ const Qna_boardlist = () => {
     };
 
     useEffect(() => {
-        fetchQnaData();
+        fetchQnaData(0, 0, '');
         checkUserId();
     }, []);
 
@@ -83,7 +108,7 @@ const Qna_boardlist = () => {
         setIsDropdownVisible(false);
 
         // 서버에 카테고리 필터링 요청
-        fetchQnaData(0, categoryId);
+        fetchQnaData(0, categoryId, searchTerm);
 
         setActiveIndex(null);
     };
@@ -179,7 +204,7 @@ const Qna_boardlist = () => {
     const handlePageChange = (page) => {
         const categoryId = categoryMapping[selectedType] || 0;
         setActiveIndex(null);
-        fetchQnaData(page, categoryId);
+        fetchQnaData(page, categoryId, searchTerm);
     };
 
     // 아이콘 체크
@@ -235,31 +260,21 @@ const Qna_boardlist = () => {
             <div className={QnA_b.pagination}>
                 {/* 이전 버튼 (첫 페이지 그룹이 아닐 때만 표시) */}
                 {pageGroup > 0 && (
-                    <button 
-                        className={QnA_b.paginationBtn} 
-                        onClick={() => handlePageChange(startPage - 1)}
-                    >
+                    <button  className={QnA_b.paginationBtn}  onClick={() => handlePageChange(startPage - 1)} >
                         이전
                     </button>
                 )}
     
                 {/* 페이지 번호들 */}
                 {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map(page => (
-                    <button
-                        key={page}
-                        className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`}
-                        onClick={() => handlePageChange(page)}
-                    >
+                    <button key={page} className={`${QnA_b.paginationBtn} ${currentPage === page ? QnA_b.active : ''}`} onClick={() => handlePageChange(page)} >
                         {page + 1}
                     </button>
                 ))}
     
                 {/* 다음 버튼 (마지막 페이지 그룹이 아닐 때만 표시) */}
                 {endPage < totalPages - 1 && (
-                    <button 
-                        className={QnA_b.paginationBtn} 
-                        onClick={() => handlePageChange(endPage + 1)}
-                    >
+                    <button className={QnA_b.paginationBtn} onClick={() => handlePageChange(endPage + 1)} >
                         다음
                     </button>
                 )}
@@ -284,7 +299,7 @@ const Qna_boardlist = () => {
                     <button className={QnA_b.qnalistNaviBtn}>문의 작성하기</button>
                 </Link>
                 <Link to="/qna_boardlist">
-                    <button className={QnA_b.qnalistNaviBtn}>문의 게시글</button>
+                    <button onClick={resetState} className={QnA_b.qnalistNaviBtn}>문의 게시글</button>
                 </Link>
             </div>
 
@@ -292,7 +307,7 @@ const Qna_boardlist = () => {
             <div className={QnA_b.qnalist}>
                 <div className={QnA_b.qnalistContainer}>
 
-                    {/* 문의 유형 드롭다운 */}
+                    {/* 문의 유형 드롭다운 , 검색*/}
                     <div className={QnA_b.dropdownContainer}>
                         <button className={QnA_b.dropdownBtn} onClick={toggleDropdown}>
                             {selectedType || '전체 문의'} {isDropdownVisible ? '▲' : '▼'}
@@ -305,8 +320,14 @@ const Qna_boardlist = () => {
                                 <li onClick={() => handleFilterChange('사이즈 문의')}>사이즈 문의</li>
                                 <li onClick={() => handleFilterChange('비밀 문의')}>비밀 문의</li>
                             </ul>
-                        )}
+                        )}  
+                    
+                        {/* 검색 */}
+                        <div className={QnA_b.search_container}>
+                            <input type="text" placeholder="제목으로 검색" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={QnA_b.search_input} onKeyDown={handleKeyDown}/>
+                        </div>
                     </div>
+                    
 
                     {qnaData.length === 0 ? (
                         <div>등록된 문의가 없습니다.</div>
@@ -399,11 +420,7 @@ const Qna_boardlist = () => {
                         </div>
                     )}
                 </div>
-                
-                {/* 검색 */}
-                 <div className={QnA_b.suchMain}>
-                </div>   
-                
+                                
                 {/* 페이징 버튼 */}
                 <div className={QnA_b.pagination}>
                     {renderPagination()}
