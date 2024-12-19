@@ -60,6 +60,7 @@ const Qna_board = () => {
     }
   };
 
+  //axios 수정
   const handleSubmit = async (e) => {
     e.preventDefault();
   
