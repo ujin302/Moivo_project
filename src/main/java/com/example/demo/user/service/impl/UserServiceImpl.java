@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
         // 사용자 저장
         UserEntity savedUser = userRepository.save(userEntity);
-        System.out.println("신규 회원 데이터 저장 성공 >> " + savedUser);
+        // System.out.println("신규 회원 데이터 저장 성공 >> " + savedUser);
 
         // 회원가입 후, LV1 쿠폰 발급 2024.11.25 sumin
         System.out.println("쿠폰 발급 시도");

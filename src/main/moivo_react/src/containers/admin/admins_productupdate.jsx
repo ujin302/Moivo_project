@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import admin_productupdate from "../../assets/css/admins_productupdate.module.css";
 import Admins_side from '../../components/admin_sidebar/admins_side';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosConfig';
 
 const Admins_productupdate = () => {
-  const productId = 40; // 수정 상품 Id
+  const{ productId } = useParams();// 수정 상품 Id
+
   const [product, setProduct] = useState({
     id: 0,
     name: "",
