@@ -48,14 +48,16 @@ public class QuestionServiceImpl implements QuestionService {
     //문의사항 수정
     @Override
     public void updateQuestion(QuestionDTO questionDTO) {
-//        QuestionEntity questionEntity = questionRepository.findById(questionDTO.getUserId()).get(); //Question 레포지토리에서 Question 유저 Id로 등록한 글 찾기
         QuestionEntity questionEntity = questionRepository.findById(questionDTO.getId()).get(); //Question 레포지토리에서 Question Id(글 번호)로 등록한 글 찾기
 
         System.out.println("프론트에서 받아온 questionDTO = " + questionDTO);
         System.out.println("프론트에서 받아온 id = " + questionDTO.getUserId()); // QuestionDTO의 userid는 user 테이블 id 값임
         System.out.println("수정한 글 번호 questionEntity.getId() = " + questionEntity.getId());
+        QuestionCategoryEntity questionCategoryEntity = questionCategoryRepository.findById(questionDTO.getCategoryId()).orElseThrow();
         questionEntity.setTitle(questionDTO.getTitle()); //제목
         questionEntity.setContent(questionDTO.getContent()); //내용
+        questionEntity.setCategoryEntity(questionCategoryEntity);
+
         System.out.println("수정한 questionEntity = " + questionEntity);
         questionRepository.save(questionEntity);
     }
