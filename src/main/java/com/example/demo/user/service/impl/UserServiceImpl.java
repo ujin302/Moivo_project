@@ -103,9 +103,9 @@ public class UserServiceImpl implements UserService {
         wishEntity.setUserEntity(userEntity);
         userEntity.setWishEntity(wishEntity); // 양방향 관계 설정
 
-        // 사용자 저장
+        // 사용자 저장 getUserId추가
         UserEntity savedUser = userRepository.save(userEntity);
-        System.out.println("신규 회원 데이터 저장 성공 >> " + savedUser);
+        System.out.println("신규 회원 데이터 저장 성공 >> " + savedUser.getUserId());
 
         // 회원가입 후, LV1 쿠폰 발급 2024.11.25 sumin
         System.out.println("쿠폰 발급 시도");

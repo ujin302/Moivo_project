@@ -88,4 +88,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
   public Page<ProductEntity> findByStatuses(@Param("statuses") List<ProductEntity.ProductStatus> statuses,
       Pageable pageable);
 
+
+    // 삭제된 상품 수 조회 - 24.12.18 - sumin
+    public long countByDeleteTrue();
+
 }

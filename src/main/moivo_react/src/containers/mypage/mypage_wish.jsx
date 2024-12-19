@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosConfig";
 import styles from "../../assets/css/Mypage_wish.module.css";
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -21,7 +21,7 @@ const MypageWish = () => {
     const fetchWishlist = async () => {
       if (!storedUserid) return;
       try {
-        const response = await axios.get(`${PATH.SERVER}/api/user/wish/list`, {
+        const response = await axiosInstance.get(`${PATH.SERVER}/api/user/wish/list`, {
           headers: {
             Authorization: `Bearer ${token}`, // Bearer 토큰 포함
           },
@@ -48,7 +48,7 @@ const MypageWish = () => {
     console.log("userId = " + userid);
 
     try {
-      await axios.delete(`${PATH.SERVER}/api/user/wish/delete/${productId}`, {
+      await axiosInstance.delete(`${PATH.SERVER}/api/user/wish/delete/${productId}`, {
         params: { userid }, //userid는 쿼리 파라미터로 전달
       });
       // 삭제 성공 시 상태 업데이트하기

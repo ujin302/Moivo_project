@@ -1,0 +1,207 @@
+/* 공통 스타일 */
+.productTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .tableHeader,
+  .tableRow {
+    display: grid;
+    grid-template-columns: 1fr 3fr 2fr 2fr 2fr 2fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .tableHeader {
+    background: #2F2E2C;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .tableRow:hover {
+    background: #f9f9f9;
+  }
+  
+  .actionButtons button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+/* 기본 수정, 삭제 버튼 */
+.actionButtons button:first-child {
+  background: #2F2E2C;
+  color: white;
+}
+
+.actionButtons button:last-child {
+  background: #dc3545;
+  color: white;
+}
+
+/* 복구 버튼 스타일 */
+.actionButtons button.restore {
+  background: #28a745; /* 초록색 */
+  color: white;
+}
+
+
+.container {
+    display: flex;
+    height: 100vh;
+    font-family: "Titillium Web", sans-serif;
+  }
+  
+  .sidebar {
+    width: 60px;
+    background: #212121;
+    height: 100%;
+    position: fixed;
+    overflow: hidden;
+    transition: width 0.3s ease;
+  }
+  
+  .sidebar:hover {
+    width: 250px;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar li {
+    padding: 15px;
+    color: #999;
+    cursor: pointer;
+  }
+  
+  .sidebar li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .navText {
+    margin-left: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .sidebar:hover .navText {
+    opacity: 1;
+  }
+  
+  .mainContent {
+    flex-grow: 1;
+    margin-left: 60px;
+    padding: 20px;
+    background: #f4f4f4;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .addButton {
+    padding: 10px 15px;
+    border: none;
+    background: #2F2E2C;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .addButton:hover {
+    background: #2F2E2C;
+  }
+  
+  .sortButtons button {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .sortButtons .active {
+    background: #2F2E2C;
+    color: white;
+  }
+  
+  .cardContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .productCard {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1 1 calc(25% - 20px);
+  }
+  
+  .productCard:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .cardActions button {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .cardActions button:first-child {
+    background: #007bff;
+    color: white;
+  }
+  
+  .cardActions button:last-child {
+    background: #dc3545;
+    color: white;
+  }
+  
+  .partialStock {
+    color: orange;
+  }
+  
+  .outOfStock {
+    color: red;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .pagination button.activePage {
+    background: #2f2e2c;
+    color: white;
+    font-weight: bold;
+  }
+  

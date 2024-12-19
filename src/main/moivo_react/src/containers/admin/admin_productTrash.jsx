@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosConfig";
 import styles from "../../assets/css/Mypage_wish.module.css"; 
 import Banner from "../../components/Banner/banner";
 import Footer from "../../components/Footer/Footer";
@@ -11,25 +11,23 @@ const AdminProductTrash = () => {
   const [userid, setUserid] = useState(null); // 관리자의 사용자 ID
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
     const storedUserid = localStorage.getItem("id");
     setUserid(storedUserid);
 
     const fetchDeletedProducts = async () => {
       if (!storedUserid) return;
       try {
-        const response = await axios.get(`${PATH.SERVER}/api/admin/store/trash`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Bearer 토큰 포함
-          },
+        const response = await axiosInstance.get(`${PATH.SERVER}/api/admin/store/trash`, {
           params: { userid },
         });
-        const products = response.data;
-        setDeletedProducts(products);
-        console.log(products);
-
+        console.log(response.data);  // 응답 데이터 확인
+        if (Array.isArray(response.data)) {
+          setDeletedProducts(response.data);
+        } else {
+          console.error("응답 데이터가 배열이 아닙니다.");
+        }
       } catch (error) {
-        console.error("Failed to fetch deleted products:", error);
+        console.error("삭제된 상품을 가져오는 데 실패했습니다:", error);
       }
     };
 
@@ -40,7 +38,7 @@ const AdminProductTrash = () => {
   const handleRestore = async (productId) => {
     if (!userid) return;
     try {
-      await axios.post(`${PATH.SERVER}/api/admin/store/restore/${productId}`, {
+      await axiosInstance.post(`${PATH.SERVER}/api/admin/store/restore/${productId}`, {
         params: { userid },
       });
       setDeletedProducts((prevItems) =>
