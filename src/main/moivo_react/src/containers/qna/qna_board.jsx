@@ -16,18 +16,6 @@ const Qna_board = () => {
     privatePwd : "",
   });
 
-  const [errors, setErrors] = useState({});
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.type) newErrors.type = "문의 유형을 선택하세요.";
-    if (!formData.title) newErrors.title = "제목을 입력하세요.";
-    if (!formData.question) newErrors.question = "문의 내용을 입력하세요.";
-    if (formData.isSecret && !formData.privatePwd) newErrors.privatePwd = "비밀번호를 입력하세요.";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   //2024/12/17 핸들러 예외처리 수정 장훈
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -130,13 +118,11 @@ const Qna_board = () => {
                 <option value="사이즈 문의">사이즈 문의</option>
                 <option value="비밀 문의">비밀 문의</option>
               </select>
-              {errors.type && <p className={QnA_w.errorMsg}>{errors.type}</p>}
             </div>
 
             <div className={QnA_w.qnaboardHeader}>
               <span className={QnA_w.qnaboardQuestionType}>제목</span>
               <input type="text" className={QnA_w.qnaboardInput} name="title" placeholder="제목을 입력하세요" value={formData.title} onChange={handleChange} required />
-              {errors.title && <p className={QnA_w.errorMsg}>{errors.title}</p>}
             </div>
 
             {/* 비밀글 체크박스 */}
@@ -150,14 +136,12 @@ const Qna_board = () => {
               <div className={QnA_w.qnaboardHeader}>
                 <span className={QnA_w.qnaboardQuestionType}>비밀번호</span>
                 <input type="password" className={QnA_w.qnaboardInput} name="privatePwd" placeholder="비밀번호를 입력하세요" value={formData.privatePwd} onChange={handleChange} required={formData.isSecret} />
-                {errors.privatePwd && <p className={QnA_w.errorMsg}>{errors.privatePwd}</p>}
               </div>
             )}
 
             <div className={QnA_w.qnaboardHeader}>
               <span className={QnA_w.qnaboardQuestionType}>내용</span>
               <textarea className={QnA_w.qnaboardTextarea} name="question" placeholder="문의 내용을 입력하세요" value={formData.question} onChange={handleChange} required />
-              {errors.question && <p className={QnA_w.errorMsg}>{errors.question}</p>}
             </div>
 
             <div className={QnA_w.qnaboardSubmit}>
