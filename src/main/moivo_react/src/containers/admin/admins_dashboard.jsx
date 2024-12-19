@@ -222,16 +222,22 @@ const Admins_dashboard = () => {  // 24.12.13 백, 프론트 연결 - yjy , 12/1
               <h3 className={admin_dashboard.cardTitle}>상품 현황</h3>
               <div className={admin_dashboard.cardList}>
                 <div className={admin_dashboard.cardItem}>
-                  판매 상품 :
-                  <span className={admin_dashboard.cardNumber}>{productStatus['판매 상품']}</span>
+                  <Link to="/admin/admin_productList" >
+                    판매 상품 :
+                  </Link>
+                  <span className={admin_dashboard.cardNumber}>{productStatus['판매 상품'] }</span>
                 </div>
                 <div className={admin_dashboard.cardItem}>
-                  품절 상품 :
+                  <Link to="">
+                    품절 상품 :
+                  </Link>
                   <span className={admin_dashboard.cardNumber}>{productStatus['품절 상품']}</span>
                 </div>
                 <div className={admin_dashboard.cardItem}>
-                  재고 10 이하 :
-                  <span className={admin_dashboard.cardNumber}>{productStatus['재고 10 이하']}</span>
+                  <Link to="">
+                    삭제된 상품 :
+                  </Link>
+                  <span className={admin_dashboard.cardNumber}>{productStatus['삭제된 상품']}</span>
                 </div>
               </div>
             </div>

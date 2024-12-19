@@ -6,6 +6,7 @@ import com.example.demo.store.dto.ReviewDTO;
 import com.example.demo.user.entity.UserEntity;
 import com.example.demo.payment.entity.PaymentDetailEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,10 +36,10 @@ public class ReviewEntity { // 리뷰
     @JoinColumn(name = "productid", nullable = false)
     private ProductEntity productEntity; // 상품 고유 키
 
-    // 결제 상품 1개 : 리뷰 1개
-    @OneToOne
-    @JoinColumn(name = "paymentdetailid", nullable = false)
-    private PaymentDetailEntity paymentDetailEntity; // 결제제 상세 고유 키
+    // 리뷰 1개 : 결제 상품 1개
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "paymentdetailid", nullable = true)
+    private PaymentDetailEntity paymentDetailEntity; // 결제 상세 고유 키
 
     @Column(name = "rating", nullable = false)
     private int rating; // 평점 (1~5)
@@ -73,7 +74,7 @@ public class ReviewEntity { // 리뷰
         if (reviewDTO.getContent() == null || reviewDTO.getContent().trim().isEmpty()) {
             throw new IllegalArgumentException("리뷰 내용은 필수입니다.");
         }
-        
+
         this.rating = reviewDTO.getRating();
         this.content = reviewDTO.getContent().trim();
         this.reviewDate = LocalDateTime.now(); // 수정 시간 업데이트

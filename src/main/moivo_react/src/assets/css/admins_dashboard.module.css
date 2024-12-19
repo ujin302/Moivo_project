@@ -83,6 +83,17 @@
   font-size: 18px;
 }
 
+/* Link 스타일링 */
+.cardItem a {
+  color: black;
+  text-decoration: none; /* 밑줄 제거 */
+  transition: color 0.3s ease; /* 색상 변화에 부드러운 전환 추가 */
+}
+
+/* 링크 호버 상태 */
+.cardItem a:hover {
+  color: #0056b3; /* 호버 시 색상 */
+}
 /* 링크 스타일 없애기 */
 .clickable {
   text-decoration: none;
