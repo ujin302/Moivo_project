@@ -232,6 +232,9 @@ const Qna_boardlist = () => {
 
     // 비밀번호 확인 함수 수정
     const handlePasswordCheck = async () => {
+        console.log(selectedPost.id);
+        console.log(enteredPassword);
+        
         try {
             // 서버로 비밀번호 확인 요청
             const response = await axiosInstance.get('/api/user/question/private', {

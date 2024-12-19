@@ -2,7 +2,6 @@ package com.example.demo.payment.service.impl;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private UserCouponService userCouponService;
 
+    // 24.12.19 - 상품 테이블에 재고 상태 변경 - uj (수정)
     // 24.12.12 - uj
     // 결제 정보 저장
     @Override
@@ -109,13 +109,26 @@ public class PaymentServiceImpl implements PaymentService {
             detailRepository.save(detailEntity);
 
             // 3-2. 재고 수정
+            int soldoutCount = 0;
             List<ProductStockEntity> stockEntiyList = productEntity.getStockList();
             for (ProductStockEntity stockEntity : stockEntiyList) {
                 if (stockEntity.getSize() == detailDTO.getSize()) {
-                    stockEntity.setCount(stockEntity.getCount() - detailDTO.getCount()); // 재고 수정
+                    int stockCount = stockEntity.getCount() - detailDTO.getCount();
+                    stockEntity.setCount(stockCount < 0 ? 0 : stockCount); // 재고 수정
+                    soldoutCount += stockEntity.getCount() == 0 ? 1 : 0; // 사이즈 별 재고 0인것 개수 구하기
                 }
             }
-            // 3-3. 재고 DB 반영
+
+            // 3-3. 재고 상태 설정
+            if (soldoutCount == 0) { // 모든 사이즈 재고: 0 이상
+                productEntity.setStatus(ProductEntity.ProductStatus.EXIST);
+            } else if (soldoutCount < stockEntiyList.size()) { // 일부 사이즈 재고 : 0
+                productEntity.setStatus(ProductEntity.ProductStatus.SOMESOLDOUT);
+            } else if (soldoutCount == stockEntiyList.size()) { // 모든 사이즈 재고 : 0
+                productEntity.setStatus(ProductEntity.ProductStatus.SOLDOUT);
+            }
+
+            // 3-4. 재고 DB 반영
             productRepository.save(productEntity);
         }
 
@@ -134,9 +147,22 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 5. 쿠폰 사용 여부 저장
         if (paymentDTO.getDiscount() > 0) {
+            // 사용자에 해당하는 쿠폰 목록을 가져옵니다.
             List<UserCouponEntity> couponEntityList = userCouponRepository.findByUserEntity_Id(paymentDTO.getUserId());
-            couponEntityList.get(0).setUsed(true);
-            userCouponRepository.save(couponEntityList.get(0));
+            
+            if (!couponEntityList.isEmpty()) {
+                // 첫 번째 쿠폰을 가져와서 사용된 것으로 표시
+                UserCouponEntity userCoupon = couponEntityList.get(0); // 쿠폰 하나만 사용되므로 첫 번째 쿠폰을 사용
+
+                // 쿠폰이 아직 사용되지 않았고 유효하다면
+                if (!userCoupon.getUsed()) {
+                    userCoupon.setUsed(true);  // 사용된 것으로 표시
+
+                    // 영속성 컨텍스트에 저장
+                    userCouponRepository.save(userCoupon); // 변경 사항 저장
+                    System.out.println("Coupon used status updated to: " + userCoupon.getUsed());
+                }
+            }
         }
 
         // 6. 결제 후 등급 업데이트 - sumin (2024.12.16)
