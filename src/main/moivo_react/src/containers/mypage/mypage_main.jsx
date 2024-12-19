@@ -12,6 +12,7 @@ const MypageMain = () => {
   const [productList, setProductList] = useState([]); // 상품 목록 저장
   const navigate = useNavigate();
   console.log(productList);
+  console.log(userInfo);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -138,7 +139,7 @@ const MypageMain = () => {
                     COUPON: &nbsp;
                     {userInfo && userInfo.coupons ? (
                       userInfo.coupons.map((coupon, index) => (
-                        <strong key={index}>{coupon.name}</strong>
+                        <strong key={index}>{coupon.couponName}</strong>
                       ))
                     ) : (
                       "쿠폰 정보를 불러오는 중입니다..."
