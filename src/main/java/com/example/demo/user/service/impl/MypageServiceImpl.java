@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.coupon.dto.CouponDTO;
+import com.example.demo.coupon.dto.UserCouponDTO;
 import com.example.demo.coupon.entity.CouponEntity;
 import com.example.demo.coupon.repository.UserCouponRepository;
 import com.example.demo.ncp.dto.NCPObjectStorageDTO;
@@ -118,18 +119,19 @@ public class MypageServiceImpl implements MypageService {
         System.out.println(userDTO.getNextLevelTarget());
 
         // 쿠폰 정보 가져오기
-        List<CouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(userId)
+        List<UserCouponDTO> userCoupons = userCouponRepository.findByUserEntity_Id(userId)
                 .stream()
-                .map(userCoupon -> {
-                    CouponEntity coupon = userCoupon.getCouponEntity();
-                    return new CouponDTO(
-                            coupon.getId(),
-                            coupon.getName(),
-                            coupon.getGrade(),
-                            coupon.getDiscountType(),
-                            coupon.getDiscountValue(),
-                            coupon.getMinOrderPrice(),
-                            coupon.getActive());
+                .map(item -> {
+                    UserCouponDTO userCouponDTO = new UserCouponDTO();
+
+                    if (item.getUsed()) {
+                        userCouponDTO.setCouponName("이미 사용한 쿠폰입니다.");
+                    } else if (item.getEndDate().isBefore(LocalDateTime.now()))
+                        userCouponDTO.setCouponName("유효기간이 지난 쿠폰입니다.");
+                    else {
+                        userCouponDTO = UserCouponDTO.toGUserCouponDTO(item);
+                    }
+                    return userCouponDTO;
                 })
                 .collect(Collectors.toList());
 
