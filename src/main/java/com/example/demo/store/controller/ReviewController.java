@@ -86,7 +86,7 @@ public class ReviewController {
             @RequestBody ReviewDTO reviewDTO) {
         try {
             reviewService.updateReview(reviewId, reviewDTO);
-            return ResponseEntity.ok("리뷰가 성공적으로 수정되었습니다.");
+            return ResponseEntity.ok("리뷰�� 성공적으로 수정되었습니다.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(e.getMessage());
         }
@@ -115,7 +115,7 @@ public class ReviewController {
     }
 
     // 결제상세ID로 리뷰 수정
-    @PutMapping("/detail/{paymentDetailId}")
+    @PutMapping("/payment/{paymentDetailId}")
     public ResponseEntity<String> updateReviewByPaymentDetailId(
             @PathVariable int paymentDetailId,
             @RequestBody ReviewDTO reviewDTO) {
@@ -134,6 +134,25 @@ public class ReviewController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // 결제상세ID로 리뷰 조회
+    @GetMapping("/payment/{paymentDetailId}")
+    public ResponseEntity<ReviewDTO> getReviewByPaymentDetailId(
+        @PathVariable int paymentDetailId,
+        @RequestHeader(value = "Authorization", required = true) String token) {
+        try {
+            if (!token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+            }
+            
+            System.out.println("리뷰 조회 요청 - paymentDetailId: " + paymentDetailId);
+            ReviewDTO review = reviewService.getReviewByPaymentDetailId(paymentDetailId);
+            return ResponseEntity.ok(review);
+        } catch (RuntimeException e) {
+            System.err.println("리뷰 조회 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND).body(null);
         }
     }
 

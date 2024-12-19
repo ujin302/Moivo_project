@@ -130,9 +130,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewDTO getReviewByPaymentDetailId(int paymentDetailId) {
+        System.out.println("결제상세ID로 리뷰 조회: " + paymentDetailId);
         ReviewEntity review = reviewRepository.findByPaymentDetailEntityId(paymentDetailId)
-            .orElseThrow(() -> new RuntimeException("Review not found"));
-        return ReviewDTO.toGetReviewDTO(review);
+            .orElseThrow(() -> {
+                System.err.println("리뷰를 찾을 수 없음 - paymentDetailId: " + paymentDetailId);
+                return new RuntimeException("Review not found");
+            });
+        ReviewDTO reviewDTO = ReviewDTO.toGetReviewDTO(review);
+        System.out.println("조회된 리뷰: " + reviewDTO);
+        return reviewDTO;
     }
 
 }

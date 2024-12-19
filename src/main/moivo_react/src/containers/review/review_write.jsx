@@ -19,14 +19,17 @@ const ReviewWrite = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    // location.state에서 모든 필요한 데이터 추출
+    // isEdit 상태 추가
+    const [isEdit, setIsEdit] = useState(false);
+    
     const {
         productId,
         productName,
         paymentDetailId,
         size,
         userName,
-        orderDate
+        orderDate,
+        isReviewComplete // 리뷰 작성 완료 여부
     } = location.state || {};
 
     const [rating, setRating] = useState(0);
@@ -35,8 +38,39 @@ const ReviewWrite = () => {
     const maxLength = 1000; // 최대 글자수 제한
 
     useEffect(() => {
-        console.log("전달받은 데이터:", location.state);
-    }, [location]);
+        const loadExistingReview = async () => {
+            if (isReviewComplete && paymentDetailId) {
+                try {
+                    const token = localStorage.getItem('accessToken');
+                    console.log('리뷰 데이터 요청 시작');
+                    console.log('paymentDetailId:', paymentDetailId);
+                    console.log('현재 토큰:', token);
+                    
+                    const response = await axiosInstance.get(`/api/user/review/payment/${paymentDetailId}`);
+                    
+                    console.log('서버 응답:', response);
+                    
+                    if (response.data) {
+                        setRating(response.data.rating);
+                        setContent(response.data.content);
+                        setIsEdit(true);
+                    }
+                } catch (err) {
+                    console.error('리뷰 로딩 에러:', err.response?.data || err);
+                    if (err.response?.status === 401) {
+                        // 토큰이 만료되었거나 유효하지 않은 경우
+                        const token = localStorage.getItem('accessToken');
+                        console.error('인증 에러. 현재 토큰:', token);
+                    }
+                    setError('리뷰를 불러오는데 실패했습니다.');
+                }
+            }
+        };
+
+        if (location.state) {
+            loadExistingReview();
+        }
+    }, [isReviewComplete, paymentDetailId, location.state]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -57,14 +91,19 @@ const ReviewWrite = () => {
                 reviewDate: new Date().toISOString()
             };
             
-            console.log('전송할 리뷰 데이터:', reviewData);
-            const response = await axiosInstance.post(`${PATH.SERVER}/api/user/review`, reviewData);
-            console.log('서버 응답:', response);
+            if (isEdit) {
+                // 리뷰 수정 API 호출
+                await axiosInstance.put(`${PATH.SERVER}/api/user/review/payment/${paymentDetailId}`, reviewData);
+                alert('리뷰가 성공적으로 수정되었습니다.');
+            } else {
+                // 새 리뷰 작성 API 호출
+                await axiosInstance.post(`${PATH.SERVER}/api/user/review`, reviewData);
+                alert('리뷰가 성공적으로 작성되었습니다.');
+            }
             
-            alert('리뷰가 성공적으로 작성되었습니다.');
             navigate('/mypage/order');
         } catch (err) {
-            console.error('에러 : 발생:', err);
+            console.error('에러 발생:', err);
             setError(err.response?.data || '리뷰 작성에 실패했습니다.');
         }
     };
@@ -89,9 +128,12 @@ const ReviewWrite = () => {
 
             <div className={styles.reviewWriteContainer}>
                 <br/><br/>
-                <h1>리뷰 작성</h1>
-
+                <h1>{isEdit ? '리뷰 수정' : '리뷰 작성'}</h1>
                 
+                {isReviewComplete && (
+                    <div className={styles.reviewCompleteText}>리뷰작성완료</div>
+                )}
+
                 <div className={styles.productInfo} data-tooltip="구매하신 상품 정보입니다">
                     <h2>{productName}</h2>
                     <p>구매일: {new Date(orderDate).toLocaleDateString()}</p>
@@ -177,7 +219,7 @@ const ReviewWrite = () => {
 
                     <div className={styles.buttonContainer}>
                         <button type="submit" className={styles.submitButton}>
-                            리뷰 등록하기
+                            {isEdit ? '리뷰 수정하기' : '리뷰 등록하기'}
                         </button>
                         <button 
                             type="button" 
