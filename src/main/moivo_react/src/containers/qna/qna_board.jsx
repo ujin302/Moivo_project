@@ -90,7 +90,7 @@ const Qna_board = () => {
       formData.type === "사이즈 문의" ? 3 :
       formData.type === "비밀 문의" ? 4 : 0
     );
-    
+     
     console.log("Submitted Data:", postData);
   
     // 서버로 데이터 전송
