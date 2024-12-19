@@ -12,6 +12,7 @@ const MypageMain = () => {
   const [productList, setProductList] = useState([]); // 상품 목록 저장
   const navigate = useNavigate();
   console.log(productList);
+  console.log(userInfo);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -170,7 +171,6 @@ const MypageMain = () => {
               )}
             </div>
           </div>
-            </div>
             {/* 아이콘 영역 (우측 상단에 배치) */}
             <div 
               className={styles.tooltipIcon} 

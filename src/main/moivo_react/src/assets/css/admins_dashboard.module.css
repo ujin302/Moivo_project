@@ -30,9 +30,9 @@
 
 /* 카드 타이틀 영역 */
 .cardTitle{
-  margin-left: 15px;
   width: 100%;
   font-weight: bold;
+  text-align: center;
 }
 
 /* 개별 카드 영역 */
@@ -43,6 +43,7 @@
   border-radius: 10px;
   flex: 1 1 calc(25% - 20px);
   height: 400px;
+  margin-top: 20px;
 }
 
 /* 리스트 스타일링 대신 div 스타일 적용 */
@@ -50,8 +51,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-left: 10px;
-  margin-top: 40px;
+}
+
+.QuestioncardList{
+  display: block;
 }
 
 /* 각 아이템 스타일 */
@@ -81,7 +84,7 @@
   font-weight: bold;
   color: #555;
   margin-bottom: 5px;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* Link 스타일링 */
@@ -97,8 +100,56 @@
   color: inherit;
 }
 
-.clickable:hover {
+.Questionclickable{
+  text-decoration: none;
+  color: inherit;
+  width: 150%;
+  height: 33%;
+  margin-bottom: 10px;
+}
+
+.Questionclickable2{
+  text-decoration: none;
+  color: inherit;
+  width: 150%;
+  height: 33%;
+  margin-bottom: 5px;
+  margin-left: -10px;
+}
+
+.clickable:hover, .Questionclickable:hover, .Questionclickable2:hover {
   text-decoration: none;
   color: inherit;
 }
 
+/* ChartComponent.css */
+.chart_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px auto;
+  border-radius: 10px;
+}
+
+.canvas {
+  display: block;
+}
+
+.canvas2 {
+  display: block;
+  max-width: 100%;
+}
+
+.canvas3{
+  display: flex;
+}
+
+.canvas4 {
+  display: block;
+  margin: 0 auto;
+}
+
+.canvas5{
+  display: flex;
+  margin-left: 60px;
+}

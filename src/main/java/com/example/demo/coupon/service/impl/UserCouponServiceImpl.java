@@ -32,6 +32,7 @@ public class UserCouponServiceImpl implements UserCouponService {
     @Override
     public void updateCouponByUserAndGrade(int userId, String grade) {
         System.out.println("쿠폰 업데이트 시작 - userId: " + userId + ", grade: " + grade);
+        // userId: 사용자 PK, grade: 변경한 등급
 
         // 1. 쿠폰 등급에 해당하는 쿠폰 조회
         CouponEntity coupon = couponRepository.findByGrade(grade)
@@ -50,8 +51,8 @@ public class UserCouponServiceImpl implements UserCouponService {
                 .findFirst()
                 .orElse(null);
 
+        // 4-1. 동일 등급의 쿠폰이 이미 있는 경우
         if (existingCoupon != null) {
-            // 동일 등급의 쿠폰이 이미 있는 경우
             if (!existingCoupon.getUsed()) {
                 // 사용 가능한 쿠폰이 이미 존재한다면 처리 종료
                 System.out.println("사용 가능한 쿠폰이 이미 존재합니다. 추가 작업이 필요 없습니다.");
@@ -66,23 +67,25 @@ public class UserCouponServiceImpl implements UserCouponService {
         }
 
         // 5. 기존 쿠폰이 다른 등급이라면 삭제
-        userCoupons.forEach(userCoupon -> {
+        // userCoupons.forEach(userCoupon -> {
+        // if (!userCoupon.getCouponEntity().getGrade().equals(grade)) {
+        // // userCouponRepository.delete(userCoupon);
+
+        // System.out.println("기존 쿠폰(" + userCoupon.getCouponEntity().getGrade() + ")을
+        // 삭제했습니다.");
+        // }
+        // });
+
+        // 5. 기존 쿠폰이 다른 등급이라면 쿠폰 변경
+        for (UserCouponEntity userCoupon : userCoupons) {
             if (!userCoupon.getCouponEntity().getGrade().equals(grade)) {
-                userCouponRepository.delete(userCoupon);
-                System.out.println("기존 쿠폰(" + userCoupon.getCouponEntity().getGrade() + ")을 삭제했습니다.");
+                userCoupon.setEndDate(LocalDateTime.now().withDayOfMonth(1).plusMonths(1).minusDays(1)); // 현재 달의 끝
+                userCoupon.setStartDate(LocalDateTime.now().withDayOfMonth(1)); // 현재 달의 시작
+                userCoupon.setUsed(false); // 기본값: 미사용
+                userCoupon.setCouponEntity(coupon); // 등급에 따른 쿠폰 변경경
+                userCouponRepository.save(userCoupon);
+                System.out.println("새 쿠폰(" + coupon.getGrade() + ")이 발급되었습니다.");
             }
-        });
-
-        // 6. 새로운 쿠폰 발급
-        UserCouponEntity newUserCoupon = new UserCouponEntity();
-        newUserCoupon.setUserEntity(userEntity);
-        newUserCoupon.setCouponEntity(coupon);
-        newUserCoupon.setStartDate(LocalDateTime.now().withDayOfMonth(1)); // 현재 달의 시작
-        newUserCoupon.setEndDate(LocalDateTime.now().withDayOfMonth(1).plusMonths(1).minusDays(1)); // 현재 달의 끝
-        newUserCoupon.setUsed(false); // 기본값: 미사용
-
-        // 새 쿠폰 발급
-        userCouponRepository.save(newUserCoupon);
-        System.out.println("새 쿠폰(" + coupon.getGrade() + ")이 발급되었습니다.");
+        }
     }
 }
