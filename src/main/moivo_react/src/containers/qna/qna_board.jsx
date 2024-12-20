@@ -52,8 +52,6 @@ const Qna_board = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    if (!validateForm()) return;
-  
     const token = localStorage.getItem("accessToken");
     const userId = parseInt(localStorage.getItem("id"));
   
