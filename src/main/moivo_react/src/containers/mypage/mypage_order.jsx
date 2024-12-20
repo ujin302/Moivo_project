@@ -172,15 +172,7 @@ const Mypage_order = () => {
                                             </button>
                                         </>
                                     ) : order.deliveryStatus === "DELIVERY" ? (
-                                        <>
-                                            <div className={styles.statusText}>배송중</div>
-                                            <button
-                                                className={styles.editReviewButton}
-                                                onClick={() => handleOrderCancel(order)}
-                                            >
-                                                주문 취소
-                                            </button>
-                                        </>
+                                        <div className={styles.statusText}>배송중</div>
                                     ) : (
                                         order.deliveryStatus || "배송 상태 없음"
                                     )}
