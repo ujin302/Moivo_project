@@ -109,15 +109,47 @@ const Qna_faqboard = () => {
               ))}
               {/* 페이지네이션 버튼 */}
               <div className={QnA.pagination}>
-                {Array.from({ length: Math.ceil(faqList.length / itemsPerPage) }).map((_, index) => (
-                  <button
-                    key={index + 1}
-                    onClick={() => handlePageChange(index + 1)}
-                    className={currentPage === index + 1 ? QnA.activePage : ''}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+                <button 
+                  className={QnA.pageArrow}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  &#8249;
+                </button>
+                
+                {Array.from({ length: Math.ceil(faqList.length / itemsPerPage) }).map((_, index) => {
+                  const pageNum = index + 1;
+                  // 현재 페이지 주변의 5개 페이지만 표시
+                  if (
+                    pageNum === 1 ||
+                    pageNum === Math.ceil(faqList.length / itemsPerPage) ||
+                    (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)
+                  ) {
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`${QnA.pageButton} ${currentPage === pageNum ? QnA.activePage : ''}`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  } else if (
+                    pageNum === currentPage - 3 ||
+                    pageNum === currentPage + 3
+                  ) {
+                    return <span key={pageNum} style={{ color: '#666' }}>...</span>;
+                  }
+                  return null;
+                })}
+
+                <button 
+                  className={QnA.pageArrow}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === Math.ceil(faqList.length / itemsPerPage)}
+                >
+                  &#8250;
+                </button>
               </div>
             </>
           )}
