@@ -4,7 +4,6 @@ import Footer from '../../components/Footer/Footer';
 import Banner from '../../components/Banner/banner';
 import { Link } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosConfig';
-import axios from 'axios';
 
 const Qna_faqboard = () => {
   // FAQ 열림 상태 관리
@@ -12,6 +11,8 @@ const Qna_faqboard = () => {
   const [faqList, setFaqList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 기본 1
+  const itemsPerPage = 6; // 한 페이지에 표시할 FAQ 항목 수
 
   // FAQ 목록을 가져오는 함수
   useEffect(() => {
@@ -46,62 +47,86 @@ const Qna_faqboard = () => {
       setOpenFAQ(openFAQ === id ? null : id);
   };
 
-    return (
-        <div className={QnA.faqmainDiv}>
-            <div><Banner /></div>
-            <div className={QnA.faqheader}></div>
-            <div className={QnA.faqcoment}> 자주 묻는 질문 </div>
-            <div className={QnA.faqDiv}>
-                
-            {/* 고객센터 네비*/}
-            <div className={QnA.faqNavi}>
-                <Link to="/qna_faqboard">
-                    <button className={QnA.faqNaviBtn}>자주 묻는 질문</button>
-                 </Link>
-    
-                <Link to="/qna_board">
-                    <button className={QnA.faqNaviBtn}>문의 작성하기</button>
-                </Link>
+  // 현재 페이지에 표시할 FAQ 항목들을 계산
+  const indexOfLastItem = currentPage * itemsPerPage; // 현재 페이지의 마지막 항목 인덱스
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage; // 현재 페이지의 첫 항목 인덱스
+  const currentItems = faqList.slice(indexOfFirstItem, indexOfLastItem); // 현재 페이지에 표시할 FAQ 항목들
 
-                <Link to="/qna_boardlist">
-                    <button className={QnA.faqNaviBtn}>문의 게시글</button>
-                </Link>
-            </div>
-                <div className={QnA.faqss}>
-                <div className={QnA.faq}>
-                    {isLoading ? (
-                      <p>FAQ 목록을 불러오는 중...</p>
-                    ) : error ? (
-                      <p className={QnA.errorMessage}>{error}</p>
-                    ) : faqList.length === 0 ? (
-                      <p>등록된 FAQ가 없습니다.</p>
-                    ) : (
-                      faqList.map((faq) => (
-                        <div key={faq.id} className={QnA.faqItem}>
-                          <input 
-                            id={`faq-${faq.id}`}
-                            type="checkbox"
-                            checked={openFAQ === faq.id}
-                            onChange={() => handleToggle(faq.id)}
-                          />
-                          <label htmlFor={`faq-${faq.id}`}>
-                            <p className={QnA.faqHeading}>{faq.title}</p>
-                            <div className={QnA.faqArrow}></div>
-                          </label>
-                          {openFAQ === faq.id && (
-                            <p className={QnA.faqText}>
-                              {faq.content}
-                            </p>
-                          )}
-                        </div>
-                      ))
-                    )}
+  // 페이지 변경 핸들러
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  return (
+    <div className={QnA.faqmainDiv}>
+      <div><Banner /></div>
+      <div className={QnA.faqheader}></div>
+      <div className={QnA.faqcoment}> 자주 묻는 질문 </div>
+      <div className={QnA.faqDiv}>
+        
+      {/* 고객센터 네비*/}
+      <div className={QnA.faqNavi}>
+        <Link to="/qna_faqboard">
+          <button className={QnA.faqNaviBtn}>자주 묻는 질문</button>
+        </Link>
+
+        <Link to="/qna_board">
+          <button className={QnA.faqNaviBtn}>문의 작성하기</button>
+        </Link>
+
+        <Link to="/qna_boardlist">
+          <button className={QnA.faqNaviBtn}>문의 게시글</button>
+        </Link>
+      </div>
+      <div className={QnA.faqss}>
+        <div className={QnA.faq}>
+          {isLoading ? (
+            <p>FAQ 목록을 불러오는 중...</p>
+          ) : error ? (
+            <p className={QnA.errorMessage}>{error}</p>
+          ) : currentItems.length === 0 ? (
+            <p>등록된 FAQ가 없습니다.</p>
+          ) : (
+            <>
+              {currentItems.map((faq) => (
+                <div key={faq.id} className={QnA.faqItem}>
+                  <input 
+                    id={`faq-${faq.id}`}
+                    type="checkbox"
+                    checked={openFAQ === faq.id}
+                    onChange={() => handleToggle(faq.id)}
+                  />
+                  <label htmlFor={`faq-${faq.id}`}>
+                    <p className={QnA.faqHeading}>{faq.title}</p>
+                    <div className={QnA.faqArrow}></div>
+                  </label>
+                  {openFAQ === faq.id && (
+                    <p className={QnA.faqText}>
+                      {faq.content}
+                    </p>
+                  )}
                 </div>
-                </div>
-            </div>
-            <Footer/>
+              ))}
+              {/* 페이지네이션 버튼 */}
+              <div className={QnA.pagination}>
+                {Array.from({ length: Math.ceil(faqList.length / itemsPerPage) }).map((_, index) => (
+                  <button
+                    key={index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={currentPage === index + 1 ? QnA.activePage : ''}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
-        );
+      </div>
+      </div>
+      <Footer/>
+    </div>
+  );
 };
 
 export default Qna_faqboard;
