@@ -1,6 +1,6 @@
 .faqmainDiv {
   height: 100%;
-  background-color: #fff;
+  background: linear-gradient(to bottom, #fff 0%, #fafafa 100%);
 }
 
 .faqheader {
@@ -16,6 +16,8 @@
   font-size: 30px;
   font-weight: bold;
   position: relative;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
 }
 
 /* QnA 설명 텍스트 아래 밑줄 */
@@ -53,6 +55,26 @@
   transition: all 0.3s ease;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.faqNaviBtn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: -100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+.faqNaviBtn:hover::after {
+  left: 100%;
 }
 
 .faqNaviBtn:hover {
@@ -84,6 +106,11 @@
   border-bottom: 1px solid #eee;
   transition: all 0.3s ease;
   margin: 0 auto;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
 }
 
 /* FAQ 항목 영역 스타일 */
@@ -142,6 +169,11 @@
   border-radius: 0 0 8px 8px;
   line-height: 1.6;
   color: #666;
+  background: linear-gradient(145deg, #fafafa, #f5f5f5);
+  border-radius: 0 0 12px 12px;
+  padding: 20px 30px;
+  font-size: 15px;
+  line-height: 1.8;
 }
 
 .faqItem input[type="checkbox"]:checked + label + .faqText {
@@ -227,7 +259,7 @@
   min-width: 36px;
   height: 36px;
   border: none;
-  background: transparent;
+  background: white;
   color: #666;
   font-size: 14px;
   cursor: pointer;
@@ -236,11 +268,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
 }
 
 .pageButton:hover {
-  background: #0d0d0d;
-  color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 .activePage {
@@ -409,7 +444,7 @@
 }
 
 .faqss::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .faqss::-webkit-scrollbar-track {
@@ -417,8 +452,9 @@
 }
 
 .faqss::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 3px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  border: 2px solid #f5f5f5;
 }
 
 .faqss::-webkit-scrollbar-thumb:hover {
@@ -564,4 +600,14 @@
   .faqHeading {
     font-size: 14px;
   }
+}
+
+/* 로딩 및 에러 메시지 스타일 */
+.errorMessage {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  font-size: 15px;
 }
