@@ -188,6 +188,8 @@
   gap: 8px;
   margin-top: 40px;
   font-family: 'Arial', sans-serif;
+  flex-wrap: wrap;
+  padding: 0 15px;
 }
 
 .pageButton {
@@ -206,7 +208,7 @@
 }
 
 .pageButton:hover {
-  background: #f0f0f0;
+  background: #0d0d0d;
   color: #333;
 }
 
@@ -229,6 +231,11 @@
   cursor: pointer;
   padding: 0 10px;
   transition: all 0.3s ease;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pageArrow:hover {
@@ -237,7 +244,84 @@
 }
 
 .pageArrow:disabled {
-  color: #ddd;
+  color: #0f0e0e;
   cursor: not-allowed;
   transform: none;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .pagination {
+    gap: 4px;
+    margin-top: 30px;
+  }
+
+  .pageButton {
+    min-width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .pageArrow {
+    font-size: 16px;
+    min-width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination {
+    gap: 2px;
+    margin-top: 20px;
+  }
+
+  .pageButton {
+    min-width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .pageArrow {
+    font-size: 14px;
+    min-width: 28px;
+    height: 28px;
+  }
+  
+  /* 모바일에서는 현재 페이지 주변의 페이지만 표시하도록 로직 수정 */
+  .pagination span {
+    font-size: 12px;
+    padding: 0 4px;
+  }
+}
+
+/* 터치 디바이스를 위한 최적화 수정 */
+@media (hover: none) {
+  .pageButton:hover {
+    background: transparent;
+    color: #666;
+  }
+
+  .pageButton:active {
+    background: #000000;
+    color: white;
+    transform: scale(0.95);
+  }
+
+  /* 활성 페이지 버튼은 항상 검은 배경 유지 */
+  .activePage,
+  .activePage:hover,
+  .activePage:active {
+    background: #000 !important;
+    color: white !important;
+  }
+}
+
+/* 모바일 환경에서도 활성 페이지 스타일 강제 적용 */
+@media (max-width: 480px) {
+  .activePage,
+  .activePage:hover,
+  .activePage:active {
+    background: #000 !important;
+    color: white !important;
+  }
 }
