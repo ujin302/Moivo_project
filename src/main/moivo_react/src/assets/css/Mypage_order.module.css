@@ -367,7 +367,18 @@
     color: #fff;
 }
 
+.orderDetailsContainer {
+    background: #f6f2ee;
+    padding: 20px;
+    color: #2f2e2c;
+    line-height: 1.6;
+    position: relative;
+}
 
+.editReviewButton{
+    margin-top: 10px;
+    color: #f6f2ee;
+}
 
 
   @media (max-width: 768px) {
