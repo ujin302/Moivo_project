@@ -60,6 +60,7 @@
   letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .faqNaviBtn::after {
@@ -268,14 +269,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #eee;
   box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-  transition: all 0.25s ease;
 }
 
-.pageButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+.pageButton::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.pageButton:hover::after {
+  transform: scaleX(1);
 }
 
 .activePage {
@@ -610,4 +619,18 @@
   background: #f8f8f8;
   border-radius: 8px;
   font-size: 15px;
+}
+
+/* 로딩 상태 애니메이션 */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.loadingState {
+  text-align: center;
+  padding: 40px 0;
+  color: #666;
+  animation: pulse 1.5s infinite;
 }
