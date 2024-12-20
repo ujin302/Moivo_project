@@ -28,7 +28,7 @@ const ProductDetail = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [stockInfo, setStockInfo] = useState([]); // 재고 정보 상태 추가
 
-  // 재고 정보와 사이즈 정보를 가져오는 useEffect
+  // 재고 정보와 사이즈 정보를 가져오는 useEffect!!
   useEffect(() => {
     if (stocks && stocks.length > 0) {
       setStockInfo(stocks);
