@@ -5,6 +5,7 @@ export default defineConfig({
   base: './', // 상대 경로로 설정
   build: {
       outDir: './build',
+      chunkSizeWarningLimit: 1600,
   },
   plugins: [react()],
   server: {
