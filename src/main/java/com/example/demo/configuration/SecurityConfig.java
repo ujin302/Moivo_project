@@ -88,10 +88,6 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "http://101.79.9.149",
                 "http://101.79.9.149:9090",
-                "http://localhost:9090",
-                "http://127.0.0.1:9090",
-                "http://localhost:9090",
-                "http://localhost:80",
                 "https://kauth.kakao.com",
                 "https://kapi.kakao.com",
                 "http://localhost:8080"));
