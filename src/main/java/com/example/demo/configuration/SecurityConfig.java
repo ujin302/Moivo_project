@@ -87,6 +87,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:9090",
+                "http://localhost:80",
                 "https://kauth.kakao.com",
                 "https://kapi.kakao.com",
                 "http://localhost:8080"));
