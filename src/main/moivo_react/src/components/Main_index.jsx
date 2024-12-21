@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styles from '../assets/css/Main_index.module.css';
-import video from '../assets/image/main_banner1.mp4';
+// import video from '../assets/image/main_banner1.mp4';
 import Banner from "../components/Banner/banner";
 import { Link } from 'react-router-dom';
 import AOS from 'aos';
