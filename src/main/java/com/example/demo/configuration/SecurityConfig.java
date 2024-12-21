@@ -86,6 +86,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
+                "http://localhost:9090",
                 "https://kauth.kakao.com",
                 "https://kapi.kakao.com",
                 "http://localhost:8080"));
