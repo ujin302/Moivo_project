@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: './', // 상대 경로로 설정
   build: {
-      outDir: '../resources/build',
+      outDir: './build',
   },
   plugins: [react()],
   server: {
