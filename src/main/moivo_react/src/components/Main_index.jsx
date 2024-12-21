@@ -89,11 +89,11 @@ const Main_index = () => {
         <div className={styles.maindiv}>
             <Banner/>
             {/* banner */}
-            <div className={styles.videoContainer}>
+{/*             <div className={styles.videoContainer}>
                 <video className={styles.video} autoPlay muted loop>
                     <source src={video} type="video/mp4" />
                 </video>
-            </div>
+            </div> */}
 
             {/* main_part1 */}
             <div className={styles.stickyContainer}>
