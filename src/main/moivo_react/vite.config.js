@@ -4,12 +4,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: './', // 상대 경로로 설정
   build: {
-      outDir: './build',
+      outDir: '../../../front',
       chunkSizeWarningLimit: 1600,
   },
   plugins: [react()],
   server: {
-    build: { outDir: '../../../front', chunkSizeWarningLimit: 1600, },
     proxy: {
       // 프론트엔드의 /api 요청을 백엔드 서버로 프록시
       '/api': {
