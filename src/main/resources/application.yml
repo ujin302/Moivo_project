@@ -1,4 +1,5 @@
 spring:
+  port: 9090
   config:
     import: "classpath:external-config.properties"
   security:
